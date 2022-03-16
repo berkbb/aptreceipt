@@ -1,51 +1,21 @@
 
-/* Class = "NSMenuItem"; title = "Customize Toolbar…"; ObjectID = "1UK-8n-QPP"; */
-"1UK-8n-QPP.title" = "Customize Toolbar…";
-
 /* Class = "NSMenuItem"; title = "aptreceipt"; ObjectID = "1Xt-HY-uBw"; */
-"1Xt-HY-uBw.title" = "Apartment Receipt";
-
-/* Class = "NSMenu"; title = "Find"; ObjectID = "1b7-l0-nxx"; */
-"1b7-l0-nxx.title" = "Find";
-
-/* Class = "NSMenuItem"; title = "Transformations"; ObjectID = "2oI-Rn-ZJC"; */
-"2oI-Rn-ZJC.title" = "Transformations";
-
-/* Class = "NSMenu"; title = "Spelling"; ObjectID = "3IN-sU-3Bg"; */
-"3IN-sU-3Bg.title" = "Spelling";
-
-/* Class = "NSMenu"; title = "Speech"; ObjectID = "3rS-ZA-NoH"; */
-"3rS-ZA-NoH.title" = "Speech";
-
-/* Class = "NSMenuItem"; title = "Find"; ObjectID = "4EN-yA-p0u"; */
-"4EN-yA-p0u.title" = "Find";
-
-/* Class = "NSMenuItem"; title = "Enter Full Screen"; ObjectID = "4J7-dP-txa"; */
-"4J7-dP-txa.title" = "Enter Full Screen";
+"1Xt-HY-uBw.title" = "Apartment Receipt Creator";
 
 /* Class = "NSMenuItem"; title = "Quit aptreceipt"; ObjectID = "4sb-4s-VLi"; */
-"4sb-4s-VLi.title" = "Quit aptreceipt";
+"4sb-4s-VLi.title" = "Quit Apartment Receipt Creator";
 
-/* Class = "NSMenuItem"; title = "Düzenle"; ObjectID = "5QF-Oa-p0T"; */
+/* Class = "NSMenuItem"; title = "Edit"; ObjectID = "5QF-Oa-p0T"; */
 "5QF-Oa-p0T.title" = "Edit";
 
 /* Class = "NSMenuItem"; title = "About aptreceipt"; ObjectID = "5kV-Vb-QxS"; */
-"5kV-Vb-QxS.title" = "About aptreceipt";
+"5kV-Vb-QxS.title" = "About Apartment Receipt Creator";
 
 /* Class = "NSMenuItem"; title = "Redo"; ObjectID = "6dh-zS-Vam"; */
 "6dh-zS-Vam.title" = "Redo";
 
-/* Class = "NSTextFieldCell"; title = "Ait Olduğu Ay & Yıl"; ObjectID = "6oS-eN-6Cl"; */
-"6oS-eN-6Cl.title" = "Ait Olduğu Ay & Yıl";
-
-/* Class = "NSMenuItem"; title = "Correct Spelling Automatically"; ObjectID = "78Y-hA-62v"; */
-"78Y-hA-62v.title" = "Correct Spelling Automatically";
-
-/* Class = "NSMenuItem"; title = "Substitutions"; ObjectID = "9ic-FL-obx"; */
-"9ic-FL-obx.title" = "Substitutions";
-
-/* Class = "NSMenuItem"; title = "Smart Copy/Paste"; ObjectID = "9yt-4B-nSM"; */
-"9yt-4B-nSM.title" = "Smart Copy/Paste";
+/* Class = "NSTextFieldCell"; title = "Month and Year"; ObjectID = "6oS-eN-6Cl"; */
+"6oS-eN-6Cl.title" = "Month and Year";
 
 /* Class = "NSMenu"; title = "Main Menu"; ObjectID = "AYu-sK-qS6"; */
 "AYu-sK-qS6.title" = "Main Menu";
@@ -53,53 +23,23 @@
 /* Class = "NSMenuItem"; title = "Preferences…"; ObjectID = "BOF-NM-1cW"; */
 "BOF-NM-1cW.title" = "Preferences…";
 
-/* Class = "NSMenuItem"; title = "Save As…"; ObjectID = "Bw7-FT-i3A"; */
-"Bw7-FT-i3A.title" = "Save As…";
-
-/* Class = "NSMenuItem"; title = "Close"; ObjectID = "DVo-aG-piG"; */
-"DVo-aG-piG.title" = "Close";
-
 /* Class = "NSMenuItem"; title = "6"; ObjectID = "Dhn-Mh-uiL"; */
 "Dhn-Mh-uiL.title" = "6";
 
-/* Class = "NSMenuItem"; title = "Spelling and Grammar"; ObjectID = "Dv1-io-Yv7"; */
-"Dv1-io-Yv7.title" = "Spelling and Grammar";
-
-/* Class = "NSMenu"; title = "Yardım"; ObjectID = "F2S-fz-NVQ"; */
-"F2S-fz-NVQ.title" = "Yardım";
+/* Class = "NSMenu"; title = "Help"; ObjectID = "F2S-fz-NVQ"; */
+"F2S-fz-NVQ.title" = "Help";
 
 /* Class = "NSMenuItem"; title = "aptreceipt Help"; ObjectID = "FKE-Sm-Kum"; */
-"FKE-Sm-Kum.title" = "aptreceipt Help";
+"FKE-Sm-Kum.title" = "Apartment Receipt Creator Help";
 
-/* Class = "NSMenu"; title = "Substitutions"; ObjectID = "FeM-D8-WVr"; */
-"FeM-D8-WVr.title" = "Substitutions";
+/* Class = "NSButtonCell"; title = "Clear"; ObjectID = "H4j-Dg-rWq"; */
+"H4j-Dg-rWq.title" = "Clear";
 
-/* Class = "NSButtonCell"; title = "Temizle"; ObjectID = "H4j-Dg-rWq"; */
-"H4j-Dg-rWq.title" = "Temizle";
-
-/* Class = "NSMenuItem"; title = "Görünüm"; ObjectID = "H8h-7b-M4v"; */
-"H8h-7b-M4v.title" = "Görünüm";
-
-/* Class = "NSMenuItem"; title = "Text Replacement"; ObjectID = "HFQ-gK-NFA"; */
-"HFQ-gK-NFA.title" = "Text Replacement";
-
-/* Class = "NSMenuItem"; title = "Show Spelling and Grammar"; ObjectID = "HFo-cy-zxI"; */
-"HFo-cy-zxI.title" = "Show Spelling and Grammar";
-
-/* Class = "NSMenu"; title = "Görünüm"; ObjectID = "HyV-fh-RgO"; */
-"HyV-fh-RgO.title" = "Görünüm";
-
-/* Class = "NSMenuItem"; title = "Open…"; ObjectID = "IAo-SY-fd9"; */
-"IAo-SY-fd9.title" = "Open…";
-
-/* Class = "NSWindow"; title = "108. Blok Makbuz Oluşturucu"; ObjectID = "IQv-IB-iLA"; */
-"IQv-IB-iLA.title" = "108. Blok Makbuz Oluşturucu";
+/* Class = "NSWindow"; title = "Receipt Creator"; ObjectID = "IQv-IB-iLA"; */
+"IQv-IB-iLA.title" = "Apartment Receipt Creator";
 
 /* Class = "NSMenuItem"; title = "2"; ObjectID = "Ihk-7E-fpB"; */
 "Ihk-7E-fpB.title" = "2";
-
-/* Class = "NSMenuItem"; title = "Revert to Saved"; ObjectID = "KaW-ft-85H"; */
-"KaW-ft-85H.title" = "Revert to Saved";
 
 /* Class = "NSMenuItem"; title = "Show All"; ObjectID = "Kd2-mp-pUS"; */
 "Kd2-mp-pUS.title" = "Show All";
@@ -107,8 +47,8 @@
 /* Class = "NSMenuItem"; title = "Bring All to Front"; ObjectID = "LE2-aR-0XJ"; */
 "LE2-aR-0XJ.title" = "Bring All to Front";
 
-/* Class = "NSTextFieldCell"; title = "Sıra No"; ObjectID = "LNc-qU-B39"; */
-"LNc-qU-B39.title" = "Sıra No";
+/* Class = "NSTextFieldCell"; title = "Sequence Number"; ObjectID = "LNc-qU-B39"; */
+"LNc-qU-B39.title" = "Sequence Number";
 
 /* Class = "NSMenuItem"; title = "Services"; ObjectID = "NMo-om-nkz"; */
 "NMo-om-nkz.title" = "Services";
@@ -117,16 +57,10 @@
 "OY7-WF-poV.title" = "Minimize";
 
 /* Class = "NSMenuItem"; title = "Hide aptreceipt"; ObjectID = "Olw-nP-bQN"; */
-"Olw-nP-bQN.title" = "Hide aptreceipt";
+"Olw-nP-bQN.title" = "Hide Apartment Receipt Creator";
 
-/* Class = "NSMenuItem"; title = "Find Previous"; ObjectID = "OwM-mh-QMV"; */
-"OwM-mh-QMV.title" = "Find Previous";
-
-/* Class = "NSMenuItem"; title = "Stop Speaking"; ObjectID = "Oyz-dy-DGm"; */
-"Oyz-dy-DGm.title" = "Stop Speaking";
-
-/* Class = "NSTextFieldCell"; title = "Daire No"; ObjectID = "QV4-Cn-Glw"; */
-"QV4-Cn-Glw.title" = "Daire No";
+/* Class = "NSTextFieldCell"; title = "Apartment Number"; ObjectID = "QV4-Cn-Glw"; */
+"QV4-Cn-Glw.title" = "Apartment Number";
 
 /* Class = "NSMenuItem"; title = "3"; ObjectID = "R3f-qM-R5F"; */
 "R3f-qM-R5F.title" = "3";
@@ -134,17 +68,14 @@
 /* Class = "NSMenuItem"; title = "Zoom"; ObjectID = "R4o-n2-Eq4"; */
 "R4o-n2-Eq4.title" = "Zoom";
 
+/* Class = "NSMenuItem"; title = "Clear"; ObjectID = "RoQ-8Y-tb7"; */
+"RoQ-8Y-tb7.title" = "Clear";
+
 /* Class = "NSMenuItem"; title = "Select All"; ObjectID = "Ruw-6m-B2m"; */
 "Ruw-6m-B2m.title" = "Select All";
 
-/* Class = "NSMenuItem"; title = "Jump to Selection"; ObjectID = "S0p-oC-mLd"; */
-"S0p-oC-mLd.title" = "Jump to Selection";
-
-/* Class = "NSMenu"; title = "Pencere"; ObjectID = "Td7-aD-5lo"; */
-"Td7-aD-5lo.title" = "Pencere";
-
-/* Class = "NSMenuItem"; title = "Capitalize"; ObjectID = "UEZ-Bs-lqG"; */
-"UEZ-Bs-lqG.title" = "Capitalize";
+/* Class = "NSMenu"; title = "Window"; ObjectID = "Td7-aD-5lo"; */
+"Td7-aD-5lo.title" = "Window";
 
 /* Class = "NSMenuItem"; title = "Hide Others"; ObjectID = "Vdr-fp-XzO"; */
 "Vdr-fp-XzO.title" = "Hide Others";
@@ -152,56 +83,32 @@
 /* Class = "NSMenuItem"; title = "4"; ObjectID = "Ve6-Sm-AYx"; */
 "Ve6-Sm-AYx.title" = "4";
 
-/* Class = "NSMenu"; title = "Düzenle"; ObjectID = "W48-6f-4Dl"; */
-"W48-6f-4Dl.title" = "Düzenle";
+/* Class = "NSMenu"; title = "Edit"; ObjectID = "W48-6f-4Dl"; */
+"W48-6f-4Dl.title" = "Edit";
 
 /* Class = "NSMenuItem"; title = "5"; ObjectID = "WAz-3D-K8C"; */
 "WAz-3D-K8C.title" = "5";
 
-/* Class = "NSMenuItem"; title = "New"; ObjectID = "Was-JA-tGl"; */
-"Was-JA-tGl.title" = "New";
+/* Class = "NSMenuItem"; title = "Create"; ObjectID = "Was-JA-tGl"; */
+"Was-JA-tGl.title" = "Create";
 
 /* Class = "NSMenuItem"; title = "Paste and Match Style"; ObjectID = "WeT-3V-zwk"; */
 "WeT-3V-zwk.title" = "Paste and Match Style";
 
-/* Class = "NSMenuItem"; title = "Find…"; ObjectID = "Xz5-n4-O0W"; */
-"Xz5-n4-O0W.title" = "Find…";
-
-/* Class = "NSMenuItem"; title = "Find and Replace…"; ObjectID = "YEy-JH-Tfz"; */
-"YEy-JH-Tfz.title" = "Find and Replace…";
-
-/* Class = "NSMenuItem"; title = "Start Speaking"; ObjectID = "Ynk-f8-cLZ"; */
-"Ynk-f8-cLZ.title" = "Start Speaking";
-
 /* Class = "NSMenuItem"; title = "7"; ObjectID = "ZZb-5u-WfY"; */
 "ZZb-5u-WfY.title" = "7";
 
-/* Class = "NSMenuItem"; title = "Print…"; ObjectID = "aTl-1u-JFS"; */
-"aTl-1u-JFS.title" = "Print…";
+/* Class = "NSMenuItem"; title = "Window"; ObjectID = "aUF-d1-5bR"; */
+"aUF-d1-5bR.title" = "Window";
 
-/* Class = "NSMenuItem"; title = "Pencere"; ObjectID = "aUF-d1-5bR"; */
-"aUF-d1-5bR.title" = "Pencere";
+/* Class = "NSMenu"; title = "File"; ObjectID = "bib-Uj-vzu"; */
+"bib-Uj-vzu.title" = "File";
 
-/* Class = "NSMenu"; title = "Dosya"; ObjectID = "bib-Uj-vzu"; */
-"bib-Uj-vzu.title" = "Dosya";
+/* Class = "NSTextFieldCell"; title = "Who will receive the receipt?"; ObjectID = "blF-Hb-3vE"; */
+"blF-Hb-3vE.title" = "Who will receive the receipt?";
 
-/* Class = "NSTextFieldCell"; title = "Makbuz Kime Verilecek ?"; ObjectID = "blF-Hb-3vE"; */
-"blF-Hb-3vE.title" = "Makbuz Kime Verilecek ?";
-
-/* Class = "NSMenuItem"; title = "Use Selection for Find"; ObjectID = "buJ-ug-pKt"; */
-"buJ-ug-pKt.title" = "Use Selection for Find";
-
-/* Class = "NSMenu"; title = "Transformations"; ObjectID = "c8a-y6-VQd"; */
-"c8a-y6-VQd.title" = "Transformations";
-
-/* Class = "NSMenuItem"; title = "Smart Links"; ObjectID = "cwL-P1-jid"; */
-"cwL-P1-jid.title" = "Smart Links";
-
-/* Class = "NSMenuItem"; title = "Make Lower Case"; ObjectID = "d9M-CD-aMd"; */
-"d9M-CD-aMd.title" = "Make Lower Case";
-
-/* Class = "NSMenuItem"; title = "Dosya"; ObjectID = "dMs-cI-mzQ"; */
-"dMs-cI-mzQ.title" = "Dosya";
+/* Class = "NSMenuItem"; title = "File"; ObjectID = "dMs-cI-mzQ"; */
+"dMs-cI-mzQ.title" = "File";
 
 /* Class = "NSMenuItem"; title = "Undo"; ObjectID = "dRJ-4n-Yzg"; */
 "dRJ-4n-Yzg.title" = "Undo";
@@ -212,89 +119,38 @@
 /* Class = "NSMenuItem"; title = "Paste"; ObjectID = "gVA-U4-sdL"; */
 "gVA-U4-sdL.title" = "Paste";
 
-/* Class = "NSMenuItem"; title = "Smart Quotes"; ObjectID = "hQb-2v-fYv"; */
-"hQb-2v-fYv.title" = "Smart Quotes";
-
-/* Class = "NSMenuItem"; title = "Check Document Now"; ObjectID = "hz2-CU-CR7"; */
-"hz2-CU-CR7.title" = "Check Document Now";
-
 /* Class = "NSMenu"; title = "Services"; ObjectID = "hz9-B4-Xy5"; */
 "hz9-B4-Xy5.title" = "Services";
 
 /* Class = "NSBox"; title = "Box"; ObjectID = "kGq-ve-2B4"; */
 "kGq-ve-2B4.title" = "Box";
 
-/* Class = "NSMenuItem"; title = "Show Sidebar"; ObjectID = "kIP-vf-haE"; */
-"kIP-vf-haE.title" = "Show Sidebar";
+/* Class = "NSTextFieldCell"; title = "Total"; ObjectID = "l6U-yF-woz"; */
+"l6U-yF-woz.title" = "Total";
 
-/* Class = "NSTextFieldCell"; title = "Tutar"; ObjectID = "l6U-yF-woz"; */
-"l6U-yF-woz.title" = "Tutar";
+/* Class = "NSTextFieldCell"; title = "Who will issue the receipt?"; ObjectID = "lcm-bR-oBw"; */
+"lcm-bR-oBw.title" = "Who will issue the receipt?";
 
-/* Class = "NSTextFieldCell"; title = "Makbuzu Kim Verecek ?"; ObjectID = "lcm-bR-oBw"; */
-"lcm-bR-oBw.title" = "Makbuzu Kim Verecek ?";
-
-/* Class = "NSButtonCell"; title = "Yarat"; ObjectID = "lw1-b7-5Rz"; */
-"lw1-b7-5Rz.title" = "Yarat";
-
-/* Class = "NSMenuItem"; title = "Check Grammar With Spelling"; ObjectID = "mK6-2p-4JG"; */
-"mK6-2p-4JG.title" = "Check Grammar With Spelling";
-
-/* Class = "NSMenu"; title = "Open Recent"; ObjectID = "oas-Oc-fiZ"; */
-"oas-Oc-fiZ.title" = "Open Recent";
+/* Class = "NSButtonCell"; title = "Create"; ObjectID = "lw1-b7-5Rz"; */
+"lw1-b7-5Rz.title" = "Create";
 
 /* Class = "NSMenuItem"; title = "Delete"; ObjectID = "pa3-QI-u2k"; */
 "pa3-QI-u2k.title" = "Delete";
 
-/* Class = "NSMenuItem"; title = "Save…"; ObjectID = "pxx-59-PXV"; */
-"pxx-59-PXV.title" = "Save…";
-
-/* Class = "NSMenuItem"; title = "Find Next"; ObjectID = "q09-fT-Sye"; */
-"q09-fT-Sye.title" = "Find Next";
-
-/* Class = "NSMenuItem"; title = "Page Setup…"; ObjectID = "qIS-W8-SiK"; */
-"qIS-W8-SiK.title" = "Page Setup…";
-
-/* Class = "NSMenuItem"; title = "Check Spelling While Typing"; ObjectID = "rbD-Rh-wIN"; */
-"rbD-Rh-wIN.title" = "Check Spelling While Typing";
-
-/* Class = "NSMenuItem"; title = "Smart Dashes"; ObjectID = "rgM-f4-ycn"; */
-"rgM-f4-ycn.title" = "Smart Dashes";
-
-/* Class = "NSMenuItem"; title = "Show Toolbar"; ObjectID = "snW-S8-Cw5"; */
-"snW-S8-Cw5.title" = "Show Toolbar";
-
-/* Class = "NSMenuItem"; title = "Data Detectors"; ObjectID = "tRr-pd-1PS"; */
-"tRr-pd-1PS.title" = "Data Detectors";
-
-/* Class = "NSMenuItem"; title = "Open Recent"; ObjectID = "tXI-mr-wws"; */
-"tXI-mr-wws.title" = "Open Recent";
-
 /* Class = "NSMenu"; title = "aptreceipt"; ObjectID = "uQy-DD-JDr"; */
-"uQy-DD-JDr.title" = "aptreceipt";
+"uQy-DD-JDr.title" = "Apartment Receipt Creator";
 
 /* Class = "NSMenuItem"; title = "Cut"; ObjectID = "uRl-iY-unG"; */
 "uRl-iY-unG.title" = "Cut";
 
-/* Class = "NSMenuItem"; title = "Clear Menu"; ObjectID = "vNY-rz-j42"; */
-"vNY-rz-j42.title" = "Clear Menu";
-
-/* Class = "NSMenuItem"; title = "Make Upper Case"; ObjectID = "vmV-6d-7jI"; */
-"vmV-6d-7jI.title" = "Make Upper Case";
-
 /* Class = "NSTextFieldCell"; title = "Mustafa Cem Babadoğan"; ObjectID = "vqn-9J-cOF"; */
 "vqn-9J-cOF.title" = "Mustafa Cem Babadoğan";
 
-/* Class = "NSMenuItem"; title = "Yardım"; ObjectID = "wpr-3q-Mcd"; */
-"wpr-3q-Mcd.title" = "Yardım";
+/* Class = "NSMenuItem"; title = "Help"; ObjectID = "wpr-3q-Mcd"; */
+"wpr-3q-Mcd.title" = "Help";
 
 /* Class = "NSMenuItem"; title = "Copy"; ObjectID = "x3v-GG-iWU"; */
 "x3v-GG-iWU.title" = "Copy";
 
 /* Class = "NSMenuItem"; title = "1"; ObjectID = "xrC-HP-pGM"; */
 "xrC-HP-pGM.title" = "1";
-
-/* Class = "NSMenuItem"; title = "Speech"; ObjectID = "xrE-MZ-jX0"; */
-"xrE-MZ-jX0.title" = "Speech";
-
-/* Class = "NSMenuItem"; title = "Show Substitutions"; ObjectID = "z6F-FW-3nz"; */
-"z6F-FW-3nz.title" = "Show Substitutions";

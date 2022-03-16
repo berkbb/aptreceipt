@@ -51,6 +51,7 @@
 		9A9CF8B027E22E060042D276 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9A9CF8B527E22E670042D276 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		9A9CF8B727E22E6B0042D276 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		9AE91FEC27E232EB0090007B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Main.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -305,6 +306,7 @@
 			children = (
 				9A9CF87F27E204920042D276 /* Base */,
 				9A9CF8A627E227BD0042D276 /* tr */,
+				9AE91FEC27E232EB0090007B /* en */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";

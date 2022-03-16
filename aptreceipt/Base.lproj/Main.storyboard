@@ -63,13 +63,16 @@
                                     <items>
                                         <menuItem title="Create" keyEquivalent="n" id="Was-JA-tGl">
                                             <connections>
-                                                <action selector="newDocument:" target="Ady-hI-5gd" id="4Si-XN-c54"/>
+                                                <action selector="Create_Click:" target="Ady-hI-5gd" id="twu-ea-AR5"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem title="Clear" id="RoQ-8Y-tb7">
                                             <string key="keyEquivalent" base64-UTF8="YES">
 CA
 </string>
+                                            <connections>
+                                                <action selector="Clear_Click:" target="Ady-hI-5gd" id="gQ6-fg-Qha"/>
+                                            </connections>
                                         </menuItem>
                                     </items>
                                 </menu>
@@ -235,6 +238,9 @@ CA
                                     <font key="font" metaFont="system" size="14"/>
                                 </buttonCell>
                                 <color key="bezelColor" name="systemGreenColor" catalog="System" colorSpace="catalog"/>
+                                <connections>
+                                    <action selector="Create_Click:" target="XfG-lQ-9wD" id="7nA-4D-V2K"/>
+                                </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="43h-AI-Wtk" userLabel="Clear_Button">
                                 <rect key="frame" x="619" y="13" width="68" height="32"/>
@@ -243,6 +249,9 @@ CA
                                     <font key="font" metaFont="system" size="14"/>
                                 </buttonCell>
                                 <color key="bezelColor" name="systemRedColor" catalog="System" colorSpace="catalog"/>
+                                <connections>
+                                    <action selector="Clear_Click:" target="XfG-lQ-9wD" id="WAP-XP-vgX"/>
+                                </connections>
                             </button>
                             <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Z0k-hO-fsa" userLabel="HomeNumber_Selector">
                                 <rect key="frame" x="17" y="415" width="48" height="25"/>
@@ -358,8 +367,8 @@ CA
                                 <rect key="frame" x="20" y="340" width="77" height="28"/>
                                 <datePickerCell key="cell" borderStyle="bezel" alignment="left" useCurrentDate="YES" id="jm3-92-aJZ" userLabel="DatePicker_Cell">
                                     <font key="font" metaFont="system"/>
-                                    <date key="date" timeIntervalSinceReferenceDate="669128382.96146405">
-                                        <!--2022-03-16 12:59:42 +0000-->
+                                    <date key="date" timeIntervalSinceReferenceDate="669135570.20703495">
+                                        <!--2022-03-16 14:59:30 +0000-->
                                     </date>
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -400,6 +409,14 @@ CA
                             <constraint firstItem="qxo-4G-bKj" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="20" symbolic="YES" id="zKH-YI-6UK"/>
                         </constraints>
                     </view>
+                    <connections>
+                        <outlet property="DatePicker_Receipt" destination="ZQL-LR-NfT" id="hAI-kL-mTg"/>
+                        <outlet property="HomeHumber_Selector" destination="Z0k-hO-fsa" id="QmQ-hW-SFq"/>
+                        <outlet property="OwnerName_textControl" destination="e0U-7L-wbW" id="F9I-TZ-mbM"/>
+                        <outlet property="SeqNumber_textControl" destination="RiD-Ak-7dC" id="CGE-yO-Zsq"/>
+                        <outlet property="SupplierName_textControl" destination="iz7-it-YbR" id="WOb-6g-rcw"/>
+                        <outlet property="Total_TextControl" destination="JG6-pY-14C" id="0QK-bT-O6i"/>
+                    </connections>
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
