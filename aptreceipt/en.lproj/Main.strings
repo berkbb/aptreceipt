@@ -32,11 +32,14 @@
 /* Class = "NSMenuItem"; title = "aptreceipt Help"; ObjectID = "FKE-Sm-Kum"; */
 "FKE-Sm-Kum.title" = "Apartment Receipt Creator Help";
 
+/* Class = "NSTextFieldCell"; title = "Info (Optional)"; ObjectID = "GuW-Si-e02"; */
+"GuW-Si-e02.title" = "Info (Optional)";
+
 /* Class = "NSButtonCell"; title = "Clear"; ObjectID = "H4j-Dg-rWq"; */
 "H4j-Dg-rWq.title" = "Clear";
 
 /* Class = "NSWindow"; title = "Receipt Creator"; ObjectID = "IQv-IB-iLA"; */
-"IQv-IB-iLA.title" = "Apartment Receipt Creator";
+"IQv-IB-iLA.title" = "Receipt Creator";
 
 /* Class = "NSMenuItem"; title = "2"; ObjectID = "Ihk-7E-fpB"; */
 "Ihk-7E-fpB.title" = "2";

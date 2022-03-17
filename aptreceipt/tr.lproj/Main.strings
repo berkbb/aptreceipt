@@ -30,7 +30,10 @@
 "F2S-fz-NVQ.title" = "Yardım";
 
 /* Class = "NSMenuItem"; title = "aptreceipt Help"; ObjectID = "FKE-Sm-Kum"; */
-"FKE-Sm-Kum.title" = "Yardım";
+"FKE-Sm-Kum.title" = "Apartman Makbuzu Oluşturucu Yardımı";
+
+/* Class = "NSTextFieldCell"; title = "Info (Optional)"; ObjectID = "GuW-Si-e02"; */
+"GuW-Si-e02.title" = "Bilgi (Opsiyonel)";
 
 /* Class = "NSButtonCell"; title = "Clear"; ObjectID = "H4j-Dg-rWq"; */
 "H4j-Dg-rWq.title" = "Temizle";
@@ -42,10 +45,10 @@
 "Ihk-7E-fpB.title" = "2";
 
 /* Class = "NSMenuItem"; title = "Show All"; ObjectID = "Kd2-mp-pUS"; */
-"Kd2-mp-pUS.title" = "Hepsini Göster";
+"Kd2-mp-pUS.title" = "Tümünü Göster";
 
 /* Class = "NSMenuItem"; title = "Bring All to Front"; ObjectID = "LE2-aR-0XJ"; */
-"LE2-aR-0XJ.title" = "Hepsini Öne Taşı";
+"LE2-aR-0XJ.title" = "Tümünü Öne Taşı";
 
 /* Class = "NSTextFieldCell"; title = "Sequence Number"; ObjectID = "LNc-qU-B39"; */
 "LNc-qU-B39.title" = "Sıra Numarası";
@@ -99,19 +102,19 @@
 "ZZb-5u-WfY.title" = "7";
 
 /* Class = "NSMenuItem"; title = "Window"; ObjectID = "aUF-d1-5bR"; */
-"aUF-d1-5bR.title" = "eEncere";
+"aUF-d1-5bR.title" = "Pencere";
 
 /* Class = "NSMenu"; title = "File"; ObjectID = "bib-Uj-vzu"; */
 "bib-Uj-vzu.title" = "Dosya";
 
 /* Class = "NSTextFieldCell"; title = "Who will receive the receipt?"; ObjectID = "blF-Hb-3vE"; */
-"blF-Hb-3vE.title" = "Makbuzu kim alacak ?";
+"blF-Hb-3vE.title" = "Makbuzu kim verecek?";
 
 /* Class = "NSMenuItem"; title = "File"; ObjectID = "dMs-cI-mzQ"; */
 "dMs-cI-mzQ.title" = "Dosya";
 
 /* Class = "NSMenuItem"; title = "Undo"; ObjectID = "dRJ-4n-Yzg"; */
-"dRJ-4n-Yzg.title" = "Geri Al";
+"dRJ-4n-Yzg.title" = "Geri";
 
 /* Class = "NSMenuItem"; title = "8"; ObjectID = "eH1-5e-gqj"; */
 "eH1-5e-gqj.title" = "8";
@@ -120,22 +123,22 @@
 "gVA-U4-sdL.title" = "Yapıştır";
 
 /* Class = "NSMenu"; title = "Services"; ObjectID = "hz9-B4-Xy5"; */
-"hz9-B4-Xy5.title" = "Services";
+"hz9-B4-Xy5.title" = "Servisler";
 
 /* Class = "NSBox"; title = "Box"; ObjectID = "kGq-ve-2B4"; */
-"kGq-ve-2B4.title" = "Box";
+"kGq-ve-2B4.title" = "Kutu";
 
 /* Class = "NSTextFieldCell"; title = "Total"; ObjectID = "l6U-yF-woz"; */
 "l6U-yF-woz.title" = "Tutar";
 
 /* Class = "NSTextFieldCell"; title = "Who will issue the receipt?"; ObjectID = "lcm-bR-oBw"; */
-"lcm-bR-oBw.title" = "Makbuzu kim verecek?";
+"lcm-bR-oBw.title" = "Makbuzu kim alacak ?";
 
 /* Class = "NSButtonCell"; title = "Create"; ObjectID = "lw1-b7-5Rz"; */
 "lw1-b7-5Rz.title" = "Yarat";
 
 /* Class = "NSMenuItem"; title = "Delete"; ObjectID = "pa3-QI-u2k"; */
-"pa3-QI-u2k.title" = "Delete";
+"pa3-QI-u2k.title" = "Sil";
 
 /* Class = "NSMenu"; title = "aptreceipt"; ObjectID = "uQy-DD-JDr"; */
 "uQy-DD-JDr.title" = "Apartman Makbuzu Oluşturucu";
@@ -154,4 +157,3 @@
 
 /* Class = "NSMenuItem"; title = "1"; ObjectID = "xrC-HP-pGM"; */
 "xrC-HP-pGM.title" = "1";
-
