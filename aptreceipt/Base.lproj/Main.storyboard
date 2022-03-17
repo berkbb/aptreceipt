@@ -391,8 +391,8 @@ CA
                                 <rect key="frame" x="20" y="340" width="77" height="28"/>
                                 <datePickerCell key="cell" borderStyle="bezel" alignment="left" useCurrentDate="YES" id="jm3-92-aJZ" userLabel="DatePicker_Cell">
                                     <font key="font" metaFont="system"/>
-                                    <date key="date" timeIntervalSinceReferenceDate="669212583.95860898">
-                                        <!--2022-03-17 12:23:03 +0000-->
+                                    <date key="date" timeIntervalSinceReferenceDate="669223249.074754">
+                                        <!--2022-03-17 15:20:49 +0000-->
                                     </date>
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -446,6 +446,228 @@ CA
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="549" y="1093"/>
+        </scene>
+        <!--View Controller-->
+        <scene sceneID="LYb-kN-ZYJ">
+            <objects>
+                <viewController id="3Op-hd-zmR" sceneMemberID="viewController">
+                    <view key="view" id="a7n-lO-R4i">
+                        <rect key="frame" x="0.0" y="0.0" width="817" height="483"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <box boxType="custom" borderWidth="3" cornerRadius="4" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="whj-m8-QHF">
+                                <rect key="frame" x="0.0" y="0.0" width="817" height="483"/>
+                                <view key="contentView" id="bXA-un-IwL">
+                                    <rect key="frame" x="3" y="3" width="811" height="477"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="sBp-4k-Ifw">
+                                            <rect key="frame" x="28" y="353" width="155" height="21"/>
+                                            <textFieldCell key="cell" lineBreakMode="clipping" title="Apartment Number:" id="GwO-Ca-QIE">
+                                                <font key="font" textStyle="title2" name=".SFNS-Regular"/>
+                                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Unp-x5-TRp">
+                                            <rect key="frame" x="187" y="353" width="20" height="21"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" lineBreakMode="clipping" title="1" id="OEq-pU-rMr">
+                                                <font key="font" metaFont="systemMedium" size="18"/>
+                                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="k0m-fH-LNh">
+                                            <rect key="frame" x="592" y="353" width="127" height="21"/>
+                                            <textFieldCell key="cell" lineBreakMode="clipping" title="17 March 2022" id="4J4-3l-d6d">
+                                                <font key="font" metaFont="systemMedium" size="18"/>
+                                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7Ew-g1-VJz">
+                                            <rect key="frame" x="140" y="290" width="104" height="23"/>
+                                            <textFieldCell key="cell" lineBreakMode="clipping" title="March 2022" id="Buc-am-vqX">
+                                                <font key="font" metaFont="systemMedium" size="18"/>
+                                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="pwn-fH-hX1">
+                                            <rect key="frame" x="499" y="353" width="89" height="21"/>
+                                            <textFieldCell key="cell" lineBreakMode="clipping" title="Issue Date:" id="3KZ-tY-wFg">
+                                                <font key="font" textStyle="title2" name=".SFNS-Regular"/>
+                                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TYY-IO-8dp">
+                                            <rect key="frame" x="499" y="292" width="151" height="21"/>
+                                            <textFieldCell key="cell" lineBreakMode="clipping" title="Sequence Number:" id="eGY-W7-GTJ">
+                                                <font key="font" textStyle="title2" name=".SFNS-Regular"/>
+                                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="IYX-GI-TKb">
+                                            <rect key="frame" x="18" y="68" width="115" height="19"/>
+                                            <textFieldCell key="cell" lineBreakMode="clipping" title="Receipt Issuer:" id="nXt-6V-YcU">
+                                                <font key="font" textStyle="title3" name=".SFNS-Regular"/>
+                                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="hRL-tX-HU2">
+                                            <rect key="frame" x="137" y="68" width="70" height="19"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" lineBreakMode="clipping" title="Person Y" id="EFq-p9-JVm">
+                                                <font key="font" metaFont="systemBold" size="15"/>
+                                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="AhW-Qg-4vy">
+                                            <rect key="frame" x="28" y="292" width="108" height="21"/>
+                                            <textFieldCell key="cell" lineBreakMode="clipping" title="Month - Year:" id="L06-1k-law">
+                                                <font key="font" textStyle="title2" name=".SFNS-Regular"/>
+                                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1vx-2b-m3a">
+                                            <rect key="frame" x="193" y="424" width="426" height="33"/>
+                                            <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Apartment Income - Expense Receipt" id="p78-b8-iO5">
+                                                <font key="font" textStyle="largeTitle" name=".SFNS-Regular"/>
+                                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <box boxType="custom" borderWidth="2" cornerRadius="20" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="ytL-nF-yvB">
+                                            <rect key="frame" x="20" y="107" width="771" height="155"/>
+                                            <view key="contentView" id="Sms-c3-e4E">
+                                                <rect key="frame" x="2" y="2" width="767" height="151"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="x3m-Ci-Nu2">
+                                                        <rect key="frame" x="18" y="19" width="177" height="21"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Total amount received:" id="Em8-wX-gH0">
+                                                            <font key="font" textStyle="title2" name=".SFNS-Regular"/>
+                                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="JNt-gM-e3k">
+                                                        <rect key="frame" x="199" y="19" width="57" height="21"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" lineBreakMode="clipping" title="500 ₺" id="kLa-vU-Iys">
+                                                            <font key="font" metaFont="systemHeavy" size="18"/>
+                                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="AaQ-b7-KG9">
+                                                        <rect key="frame" x="18" y="48" width="731" height="83"/>
+                                                        <textFieldCell key="cell" selectable="YES" alignment="center" title="The following amount has been received from Person X." id="9Ns-jH-I95">
+                                                            <font key="font" textStyle="title1" name=".SFNS-Regular"/>
+                                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                </subviews>
+                                                <constraints>
+                                                    <constraint firstItem="AaQ-b7-KG9" firstAttribute="top" secondItem="Sms-c3-e4E" secondAttribute="top" constant="20" symbolic="YES" id="FCg-SC-D7y"/>
+                                                    <constraint firstItem="x3m-Ci-Nu2" firstAttribute="top" secondItem="AaQ-b7-KG9" secondAttribute="bottom" constant="8" symbolic="YES" id="MIn-fe-sSo"/>
+                                                    <constraint firstItem="AaQ-b7-KG9" firstAttribute="leading" secondItem="x3m-Ci-Nu2" secondAttribute="leading" id="bun-cZ-p93"/>
+                                                    <constraint firstAttribute="trailing" secondItem="AaQ-b7-KG9" secondAttribute="trailing" constant="20" symbolic="YES" id="qyd-Ri-K2p"/>
+                                                </constraints>
+                                            </view>
+                                            <color key="borderColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </box>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="mJ0-Kv-hnv">
+                                            <rect key="frame" x="18" y="44" width="47" height="16"/>
+                                            <textFieldCell key="cell" lineBreakMode="clipping" title="Notes:" id="pS3-aq-brw">
+                                                <font key="font" textStyle="headline" name=".SFNS-Bold"/>
+                                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="iJs-sj-Mku">
+                                            <rect key="frame" x="18" y="20" width="775" height="14"/>
+                                            <textFieldCell key="cell" selectable="YES" title="Notes comes here." id="hMT-AG-EF5">
+                                                <font key="font" textStyle="subheadline" name=".SFNS-Regular"/>
+                                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="yyh-c7-Uib">
+                                            <rect key="frame" x="654" y="292" width="13" height="21"/>
+                                            <textFieldCell key="cell" lineBreakMode="clipping" title="1" id="GX3-Rd-ifl">
+                                                <font key="font" metaFont="systemMedium" size="18"/>
+                                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstItem="sBp-4k-Ifw" firstAttribute="top" secondItem="1vx-2b-m3a" secondAttribute="bottom" constant="50" id="0WR-9D-xgO"/>
+                                        <constraint firstItem="AhW-Qg-4vy" firstAttribute="top" secondItem="sBp-4k-Ifw" secondAttribute="bottom" constant="40" id="2lk-08-QVM"/>
+                                        <constraint firstItem="IYX-GI-TKb" firstAttribute="leading" secondItem="bXA-un-IwL" secondAttribute="leading" constant="20" symbolic="YES" id="2pH-DF-stJ"/>
+                                        <constraint firstItem="pwn-fH-hX1" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Unp-x5-TRp" secondAttribute="trailing" constant="8" symbolic="YES" id="5Yk-LM-kKy"/>
+                                        <constraint firstItem="iJs-sj-Mku" firstAttribute="leading" secondItem="bXA-un-IwL" secondAttribute="leading" constant="20" symbolic="YES" id="6Nt-Zp-yBV"/>
+                                        <constraint firstItem="1vx-2b-m3a" firstAttribute="centerX" secondItem="bXA-un-IwL" secondAttribute="centerX" id="6bh-92-o78"/>
+                                        <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="mJ0-Kv-hnv" secondAttribute="trailing" constant="20" symbolic="YES" id="7vz-6c-0f7"/>
+                                        <constraint firstAttribute="trailing" secondItem="iJs-sj-Mku" secondAttribute="trailing" constant="20" symbolic="YES" id="9aR-ml-XFC"/>
+                                        <constraint firstItem="hRL-tX-HU2" firstAttribute="leading" secondItem="IYX-GI-TKb" secondAttribute="trailing" constant="8" symbolic="YES" id="CQQ-1P-120"/>
+                                        <constraint firstItem="sBp-4k-Ifw" firstAttribute="leading" secondItem="bXA-un-IwL" secondAttribute="leading" constant="30" id="DXR-Ie-eq3"/>
+                                        <constraint firstAttribute="trailing" secondItem="TYY-IO-8dp" secondAttribute="trailing" constant="163" id="FFP-hY-smo"/>
+                                        <constraint firstItem="Sms-c3-e4E" firstAttribute="top" secondItem="7Ew-g1-VJz" secondAttribute="bottom" constant="30" id="Gla-ad-5y3"/>
+                                        <constraint firstItem="ytL-nF-yvB" firstAttribute="top" secondItem="AhW-Qg-4vy" secondAttribute="bottom" constant="30" id="IbB-RE-GeN"/>
+                                        <constraint firstItem="k0m-fH-LNh" firstAttribute="top" secondItem="1vx-2b-m3a" secondAttribute="bottom" constant="50" id="KCh-6q-C5e"/>
+                                        <constraint firstItem="1vx-2b-m3a" firstAttribute="top" secondItem="bXA-un-IwL" secondAttribute="top" constant="20" id="KTR-xl-qlO"/>
+                                        <constraint firstItem="pwn-fH-hX1" firstAttribute="leading" secondItem="TYY-IO-8dp" secondAttribute="leading" id="Kh1-Qh-MVW"/>
+                                        <constraint firstItem="ytL-nF-yvB" firstAttribute="leading" secondItem="bXA-un-IwL" secondAttribute="leading" constant="20" symbolic="YES" id="Lj3-pq-Bmk"/>
+                                        <constraint firstItem="Unp-x5-TRp" firstAttribute="leading" secondItem="sBp-4k-Ifw" secondAttribute="trailing" constant="8" symbolic="YES" id="Mnv-P5-GYa"/>
+                                        <constraint firstAttribute="trailing" secondItem="ytL-nF-yvB" secondAttribute="trailing" constant="20" symbolic="YES" id="NQd-1y-2Y9"/>
+                                        <constraint firstItem="hRL-tX-HU2" firstAttribute="top" secondItem="ytL-nF-yvB" secondAttribute="bottom" constant="20" id="NsF-4v-LmF"/>
+                                        <constraint firstItem="7Ew-g1-VJz" firstAttribute="leading" secondItem="AhW-Qg-4vy" secondAttribute="trailing" constant="8" symbolic="YES" id="WAL-5U-xUy"/>
+                                        <constraint firstItem="Unp-x5-TRp" firstAttribute="top" secondItem="1vx-2b-m3a" secondAttribute="bottom" constant="50" id="ZW1-zZ-cuD"/>
+                                        <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="k0m-fH-LNh" secondAttribute="trailing" constant="20" symbolic="YES" id="cwB-gd-Q2n"/>
+                                        <constraint firstAttribute="bottom" secondItem="iJs-sj-Mku" secondAttribute="bottom" constant="20" symbolic="YES" id="e4r-H8-JKc"/>
+                                        <constraint firstItem="7Ew-g1-VJz" firstAttribute="top" secondItem="Unp-x5-TRp" secondAttribute="bottom" constant="40" id="eXT-g1-Waa"/>
+                                        <constraint firstItem="pwn-fH-hX1" firstAttribute="top" secondItem="1vx-2b-m3a" secondAttribute="bottom" constant="50" id="fQA-wY-5Hp"/>
+                                        <constraint firstItem="k0m-fH-LNh" firstAttribute="leading" secondItem="pwn-fH-hX1" secondAttribute="trailing" constant="8" symbolic="YES" id="gwP-Fa-RT5"/>
+                                        <constraint firstItem="ytL-nF-yvB" firstAttribute="top" secondItem="yyh-c7-Uib" secondAttribute="bottom" constant="30" id="jEU-Wq-L9g"/>
+                                        <constraint firstItem="mJ0-Kv-hnv" firstAttribute="top" secondItem="IYX-GI-TKb" secondAttribute="bottom" constant="8" symbolic="YES" id="mWw-fB-5Xk"/>
+                                        <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="yyh-c7-Uib" secondAttribute="trailing" constant="20" symbolic="YES" id="mdH-4h-ZE1"/>
+                                        <constraint firstItem="ytL-nF-yvB" firstAttribute="top" secondItem="TYY-IO-8dp" secondAttribute="bottom" constant="30" id="nfb-Xe-PVh"/>
+                                        <constraint firstItem="AhW-Qg-4vy" firstAttribute="leading" secondItem="bXA-un-IwL" secondAttribute="leading" constant="30" id="o1S-Cf-ZY8"/>
+                                        <constraint firstItem="TYY-IO-8dp" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="7Ew-g1-VJz" secondAttribute="trailing" constant="8" symbolic="YES" id="pH3-lp-NN7"/>
+                                        <constraint firstItem="yyh-c7-Uib" firstAttribute="leading" secondItem="TYY-IO-8dp" secondAttribute="trailing" constant="8" symbolic="YES" id="phe-RN-5gJ"/>
+                                        <constraint firstItem="IYX-GI-TKb" firstAttribute="top" secondItem="ytL-nF-yvB" secondAttribute="bottom" constant="20" id="rSm-HS-wak"/>
+                                        <constraint firstItem="iJs-sj-Mku" firstAttribute="top" secondItem="mJ0-Kv-hnv" secondAttribute="bottom" constant="10" id="tvG-oS-yYE"/>
+                                        <constraint firstItem="TYY-IO-8dp" firstAttribute="top" secondItem="pwn-fH-hX1" secondAttribute="bottom" constant="40" id="ugA-3e-uhG"/>
+                                        <constraint firstItem="mJ0-Kv-hnv" firstAttribute="leading" secondItem="bXA-un-IwL" secondAttribute="leading" constant="20" symbolic="YES" id="um7-5I-q8w"/>
+                                        <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="hRL-tX-HU2" secondAttribute="trailing" constant="20" symbolic="YES" id="vL3-lE-dPo"/>
+                                    </constraints>
+                                </view>
+                                <color key="borderColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <color key="fillColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <font key="titleFont" textStyle="largeTitle" name=".SFNS-Regular"/>
+                            </box>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="whj-m8-QHF" firstAttribute="leading" secondItem="a7n-lO-R4i" secondAttribute="leading" id="0Vd-Ox-kcM"/>
+                            <constraint firstAttribute="trailing" secondItem="whj-m8-QHF" secondAttribute="trailing" id="Obz-6l-1vV"/>
+                            <constraint firstAttribute="bottom" secondItem="whj-m8-QHF" secondAttribute="bottom" id="SsZ-E7-hfF"/>
+                            <constraint firstItem="whj-m8-QHF" firstAttribute="top" secondItem="a7n-lO-R4i" secondAttribute="top" id="nJT-oR-kRx"/>
+                        </constraints>
+                    </view>
+                </viewController>
+                <customObject id="JCh-Jt-Zel" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1451" y="1085"/>
         </scene>
     </scenes>
     <resources>
