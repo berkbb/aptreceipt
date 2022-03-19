@@ -10,3 +10,4 @@
 "errorTitle" = "Error";
 "errorMessage" = "Please check all areas.";
 "totalMessage"="The following amount has been received from:";
+"saveImageTitle"="Where should I save the receipt?";

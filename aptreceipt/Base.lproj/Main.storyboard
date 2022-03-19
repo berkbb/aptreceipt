@@ -392,8 +392,8 @@ CA
                                 <rect key="frame" x="20" y="340" width="77" height="28"/>
                                 <datePickerCell key="cell" borderStyle="bezel" alignment="left" useCurrentDate="YES" id="jm3-92-aJZ" userLabel="DatePicker_Cell">
                                     <font key="font" metaFont="system"/>
-                                    <date key="date" timeIntervalSinceReferenceDate="669374986.25293803">
-                                        <!--2022-03-19 09:29:46 +0000-->
+                                    <date key="date" timeIntervalSinceReferenceDate="669393169.85252702">
+                                        <!--2022-03-19 14:32:49 +0000-->
                                     </date>
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -457,9 +457,9 @@ CA
                         <rect key="frame" x="0.0" y="0.0" width="818" height="523"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <box boxType="custom" borderWidth="3" cornerRadius="4" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="whj-m8-QHF">
+                            <box boxType="custom" borderWidth="3" cornerRadius="4" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="whj-m8-QHF" userLabel="Receipt">
                                 <rect key="frame" x="0.0" y="40" width="818" height="483"/>
-                                <view key="contentView" id="bXA-un-IwL">
+                                <view key="contentView" id="bXA-un-IwL" userLabel="Receipt_View">
                                     <rect key="frame" x="3" y="3" width="812" height="477"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
@@ -708,6 +708,8 @@ Gw
                         <outlet property="MonthYear_Label" destination="7Ew-g1-VJz" id="KX5-ua-uEQ"/>
                         <outlet property="Notes_Print" destination="iJs-sj-Mku" id="RSO-nx-868"/>
                         <outlet property="Price_Label" destination="JNt-gM-e3k" id="iQS-in-cvL"/>
+                        <outlet property="Receipt" destination="whj-m8-QHF" id="YXA-8x-ZLF"/>
+                        <outlet property="ReceiptView" destination="bXA-un-IwL" id="IXT-25-l5d"/>
                         <outlet property="Receipt_IssuerLabel" destination="hRL-tX-HU2" id="Kbp-3i-etT"/>
                         <outlet property="Seq_Label" destination="yyh-c7-Uib" id="Ebg-oZ-vwi"/>
                         <outlet property="Total_MesaageLabel" destination="AaQ-b7-KG9" id="kMl-GY-892"/>
