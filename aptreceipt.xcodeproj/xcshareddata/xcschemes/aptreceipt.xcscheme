@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "9A9CF87427E204920042D276"
-               BuildableName = "Apartman Makbuzu Olus&#x327;turucu.app"
+               BuildableName = "aptreceipt.app"
                BlueprintName = "aptreceipt"
                ReferencedContainer = "container:aptreceipt.xcodeproj">
             </BuildableReference>
@@ -65,7 +65,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "9A9CF87427E204920042D276"
-            BuildableName = "Apartman Makbuzu Olus&#x327;turucu.app"
+            BuildableName = "aptreceipt.app"
             BlueprintName = "aptreceipt"
             ReferencedContainer = "container:aptreceipt.xcodeproj">
          </BuildableReference>
@@ -82,7 +82,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "9A9CF87427E204920042D276"
-            BuildableName = "Apartman Makbuzu Olus&#x327;turucu.app"
+            BuildableName = "aptreceipt.app"
             BlueprintName = "aptreceipt"
             ReferencedContainer = "container:aptreceipt.xcodeproj">
          </BuildableReference>
