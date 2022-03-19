@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9A1F6CAA27E485B5006C171B /* ReceiptViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A1F6CA927E485B5006C171B /* ReceiptViewController.swift */; };
 		9A306E2E27E323AA00F6F5EB /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9A306E2D27E323AA00F6F5EB /* Info.plist */; };
-		9A7E3DF827E37C04004405EE /* Receipt.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9A7E3DF727E37C04004405EE /* Receipt.xib */; };
 		9A9CF87927E204920042D276 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A9CF87827E204920042D276 /* AppDelegate.swift */; };
 		9A9CF87B27E204920042D276 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A9CF87A27E204920042D276 /* ViewController.swift */; };
 		9A9CF87D27E204920042D276 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9A9CF87C27E204920042D276 /* Assets.xcassets */; };
@@ -17,6 +17,7 @@
 		9A9CF89527E204930042D276 /* aptreceiptUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A9CF89427E204930042D276 /* aptreceiptUITests.swift */; };
 		9A9CF89727E204930042D276 /* aptreceiptUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A9CF89627E204930042D276 /* aptreceiptUITestsLaunchTests.swift */; };
 		9A9CF8B427E22E670042D276 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9A9CF8B627E22E670042D276 /* InfoPlist.strings */; };
+		9ADECA1427E5DC3500EB0A7F /* File.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9ADECA1627E5DC3500EB0A7F /* File.strings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -37,8 +38,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		9A1F6CA927E485B5006C171B /* ReceiptViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptViewController.swift; sourceTree = "<group>"; };
 		9A306E2D27E323AA00F6F5EB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		9A7E3DF727E37C04004405EE /* Receipt.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Receipt.xib; sourceTree = "<group>"; };
 		9A9CF87527E204920042D276 /* aptreceipt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = aptreceipt.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A9CF87827E204920042D276 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		9A9CF87A27E204920042D276 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -54,6 +55,8 @@
 		9A9CF8B727E22E6B0042D276 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		9AA07CFE27E3455A00389D27 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Main.strings; sourceTree = "<group>"; };
 		9AA07D0027E3456600389D27 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Main.strings; sourceTree = "<group>"; };
+		9ADECA1527E5DC3500EB0A7F /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/File.strings; sourceTree = "<group>"; };
+		9ADECA1827E5DD2D00EB0A7F /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/File.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -111,7 +114,8 @@
 				9A9CF87E27E204920042D276 /* Main.storyboard */,
 				9A9CF88127E204920042D276 /* aptreceipt.entitlements */,
 				9A9CF8B627E22E670042D276 /* InfoPlist.strings */,
-				9A7E3DF727E37C04004405EE /* Receipt.xib */,
+				9A1F6CA927E485B5006C171B /* ReceiptViewController.swift */,
+				9ADECA1627E5DC3500EB0A7F /* File.strings */,
 			);
 			path = aptreceipt;
 			sourceTree = "<group>";
@@ -238,11 +242,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9A7E3DF827E37C04004405EE /* Receipt.xib in Resources */,
 				9A306E2E27E323AA00F6F5EB /* Info.plist in Resources */,
 				9A9CF87D27E204920042D276 /* Assets.xcassets in Resources */,
 				9A9CF8B427E22E670042D276 /* InfoPlist.strings in Resources */,
 				9A9CF88027E204920042D276 /* Main.storyboard in Resources */,
+				9ADECA1427E5DC3500EB0A7F /* File.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -267,6 +271,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9A1F6CAA27E485B5006C171B /* ReceiptViewController.swift in Sources */,
 				9A9CF87B27E204920042D276 /* ViewController.swift in Sources */,
 				9A9CF87927E204920042D276 /* AppDelegate.swift in Sources */,
 			);
@@ -322,6 +327,15 @@
 				9A9CF8B727E22E6B0042D276 /* tr */,
 			);
 			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		9ADECA1627E5DC3500EB0A7F /* File.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				9ADECA1527E5DC3500EB0A7F /* en */,
+				9ADECA1827E5DD2D00EB0A7F /* tr */,
+			);
+			name = File.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

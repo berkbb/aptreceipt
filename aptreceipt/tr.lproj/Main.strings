@@ -108,7 +108,7 @@
 "bib-Uj-vzu.title" = "Dosya";
 
 /* Class = "NSTextFieldCell"; title = "Who will receive the receipt?"; ObjectID = "blF-Hb-3vE"; */
-"blF-Hb-3vE.title" = "Makbuzu kim verecek?";
+"blF-Hb-3vE.title" = "Makbuzu kim alacak?";
 
 /* Class = "NSMenuItem"; title = "File"; ObjectID = "dMs-cI-mzQ"; */
 "dMs-cI-mzQ.title" = "Dosya";
@@ -132,7 +132,7 @@
 "l6U-yF-woz.title" = "Tutar";
 
 /* Class = "NSTextFieldCell"; title = "Who will issue the receipt?"; ObjectID = "lcm-bR-oBw"; */
-"lcm-bR-oBw.title" = "Makbuzu kim alacak ?";
+"lcm-bR-oBw.title" = "Makbuzu kim verecek ?";
 
 /* Class = "NSButtonCell"; title = "Create"; ObjectID = "lw1-b7-5Rz"; */
 "lw1-b7-5Rz.title" = "Yarat";
@@ -157,3 +157,21 @@
 
 /* Class = "NSMenuItem"; title = "1"; ObjectID = "xrC-HP-pGM"; */
 "xrC-HP-pGM.title" = "1";
+
+"p78-b8-iO5.title" = "Apartman Gelir - Gider Makbuzu";
+"GwO-Ca-QIE.title"="Bina Numarası:";
+"L06-1k-law.title"="Ay - Yıl:";
+
+"3KZ-tY-wFg.title"="Veriliş Tarihi:";
+
+"eGY-W7-GTJ.title"="Sıra Numarası:";
+
+"Em8-wX-gH0.title"="Alınan Toplam Tutar:";
+
+"nXt-6V-YcU.title"="Makbuzu Düzenleyen:";
+
+"pS3-aq-brw.title"="Notlar:";
+
+"42J-eD-UcN.title"="İptal Et";
+"K7i-VG-DKe.title"="Kaydet";
+

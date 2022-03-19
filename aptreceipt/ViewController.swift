@@ -21,7 +21,9 @@ class ViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        
+       
+
+       
 
         // Do any additional setup after loading the view.
     }
@@ -56,6 +58,7 @@ class ViewController: NSViewController {
         if !issueDate.isEmpty {
             print("Issue Date: \(issueDate)")
         }
+  
         let seqNumber=SeqNumber_textControl.stringValue
         if !seqNumber.isEmpty {
             print("Sequence Number \(seqNumber)")
@@ -86,10 +89,37 @@ class ViewController: NSViewController {
             info=" "
         }
         
-        if( !selectedApartment!.isEmpty  && !seqNumber.isEmpty && !total.isEmpty && !supplierName.isEmpty && !ownerName.isEmpty && !issueDate.isEmpty )
+        let doubleTotal = Double(total)
+        
+        let intSequence = Int(seqNumber)
+        
+        if( !selectedApartment!.isEmpty  && !seqNumber.isEmpty && !total.isEmpty && !supplierName.isEmpty && !ownerName.isEmpty && !issueDate.isEmpty && !info.isEmpty && doubleTotal != nil && intSequence != nil )
         {
             print("OK")
+       
+        
+           let vc = self.storyboard?.instantiateController(withIdentifier: "ReceiptView") as? ReceiptViewController
+           
+            vc?.issuer=supplierName
+            vc?.recevier=ownerName
+            vc?.notes=info
+            vc?.monthYear=issueDate
+            vc?.aptNumber=Int(selectedApartment!)!
+            vc?.price=Double(total)!
+            vc?.seqNumber=Int(seqNumber)!
+            vc?.currentDate=getDatewithDayMonthYear(sentDate: Date())
             
+          if let controller = vc {self.view.window?.contentViewController=controller}
+            
+            
+        }
+        else
+        {
+            print("Error - Check areas!")
+            
+            let answer = showDialog(title: localizedString(forKey: "errorTitle"), text: localizedString(forKey: "errorMessage"), buttonName: localizedString(forKey: "okText"), alertType: .warning)
+            
+            print(answer)
         }
        
     }
@@ -105,12 +135,82 @@ class ViewController: NSViewController {
         dateFormatter1.dateFormat = "yyyy"
         let yearString = dateFormatter1.string(from: sentDate)
         let dateFormatter2 = DateFormatter()
-        dateFormatter2.dateFormat = "LLLL"
+        dateFormatter2.dateFormat = "MMMM"
         let monthString = dateFormatter2.string(from: sentDate)
         let returnValue = "\(monthString) \(yearString)"
         
       
         return returnValue
     }
+    
+    // Get day, month and year from Date from given 'sentDate'
+    ///
+    /// - Warning: The returned string is  localized.
+    /// - Parameter subject: The subject  is Date object.
+    /// - Returns: A date string to the `sentDate` like XXXX YYYY.
+    func getDatewithDayMonthYear(sentDate:Date) -> String
+    {
+        let dateFormatter1 = DateFormatter()
+        dateFormatter1.dateFormat = "yyyy"
+        let yearString = dateFormatter1.string(from: sentDate)
+        let dateFormatter2 = DateFormatter()
+        dateFormatter2.dateFormat = "MMMM"
+        let monthString = dateFormatter2.string(from: sentDate)
+        
+        let dateFormatter3 = DateFormatter()
+        dateFormatter3.dateFormat = "dd"
+        let dayString = dateFormatter3.string(from: sentDate)
+      
+        var returnValue=""
+        let locale =  Locale.current.languageCode
+        if locale!.contains("tr") {
+             returnValue = "\(dayString) \(monthString) \(yearString)"
+        }
+        else
+        {
+             returnValue = "\(monthString) \(dayString), \(yearString)"
+        }
+      
+        return returnValue
+    }
+    
+    
+    /// Prints OK Cancel Dialog
+    ///
+    /// - Warning: The returned alert is  localized.
+    /// - Parameter title: The title  is String object.
+    /// - Parameter text: The text  is String object.
+    /// - Parameter alertType: The text  is NSAlert.Style object.
+    /// - Parameter buttonName: The text  is String object.
+    /// - Returns: boolean.
+    
+    func showDialog(title: String, text: String, buttonName:String, alertType: NSAlert.Style ) -> Bool {
+        let alert = NSAlert()
+        alert.messageText = title
+        alert.informativeText = text
+        alert.alertStyle = alertType
+        alert.addButton(withTitle: buttonName)
+     
+        return alert.runModal() == .alertFirstButtonReturn
+    }
+    
+    
+    /// Retuns value of translated key.
+    ///
+    /// - Warning: The returned String is  localized.
+    /// - Parameter forKey: The forKey  is String object.
+    /// - Returns: bStringoolean.
+    
+    
+    func localizedString(forKey key: String) -> String {
+        var result = Bundle.main.localizedString(forKey: key, value: nil, table: nil)
+
+        if result == key {
+            result = Bundle.main.localizedString(forKey: key, value: nil, table: "File")
+        }
+
+        return result
+    }
 }
+
 

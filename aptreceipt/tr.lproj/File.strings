@@ -1,0 +1,12 @@
+/* 
+  File.strings
+  aptreceipt
+
+  Created by Berk Babadoğan on 19.03.2022.
+  
+*/
+
+"okText" = "Tamam";
+"errorTitle" = "Hata";
+"errorMessage" = "Lütfen tüm alanları kontrol edin.";
+"totalMessage"="Aşağıdaki tutar şu kişiden alınmıştır:";

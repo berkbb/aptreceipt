@@ -1,0 +1,12 @@
+/* 
+  File.strings
+  aptreceipt
+
+  Created by Berk Babadoğan on 19.03.2022.
+  
+*/
+
+"okText" = "OK";
+"errorTitle" = "Error";
+"errorMessage" = "Please check all areas.";
+"totalMessage"="The following amount has been received from:";
