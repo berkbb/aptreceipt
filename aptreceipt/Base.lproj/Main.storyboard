@@ -25,7 +25,11 @@
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="VOq-y0-SEH"/>
-                                        <menuItem title="Preferences…" keyEquivalent="," id="BOF-NM-1cW"/>
+                                        <menuItem title="Preferences…" keyEquivalent="," id="BOF-NM-1cW">
+                                            <connections>
+                                                <segue destination="GKA-CE-VcU" kind="show" identifier="ShowPreferences" id="VH1-sN-VnH"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem isSeparatorItem="YES" id="wFC-TO-SCJ"/>
                                         <menuItem title="Services" id="NMo-om-nkz">
                                             <modifierMask key="keyEquivalentModifierMask"/>
@@ -178,6 +182,46 @@ CA
             <point key="canvasLocation" x="-226" y="-83"/>
         </scene>
         <!--Window Controller-->
+        <scene sceneID="o88-oE-Sbc">
+            <objects>
+                <windowController id="GKA-CE-VcU" sceneMemberID="viewController">
+                    <window key="window" title="Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" frameAutosaveName="" animationBehavior="default" titlebarAppearsTransparent="YES" id="wwm-jb-00B">
+                        <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
+                        <windowCollectionBehavior key="collectionBehavior" fullScreenNone="YES"/>
+                        <rect key="contentRect" x="359" y="388" width="600" height="480"/>
+                        <rect key="screenRect" x="0.0" y="0.0" width="2240" height="1235"/>
+                        <value key="minSize" type="size" width="600" height="480"/>
+                        <value key="maxSize" type="size" width="600" height="480"/>
+                        <view key="contentView" id="pcY-wx-uyV">
+                            <rect key="frame" x="0.0" y="0.0" width="600" height="480"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </view>
+                        <connections>
+                            <outlet property="delegate" destination="GKA-CE-VcU" id="ESV-BP-Mca"/>
+                        </connections>
+                    </window>
+                    <connections>
+                        <segue destination="QJK-aL-kSl" kind="relationship" relationship="window.shadowedContentViewController" destinationCreationSelector="PereferencesView" id="khq-ly-Wq6"/>
+                    </connections>
+                </windowController>
+                <customObject id="g6N-y5-N0G" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-226" y="368"/>
+        </scene>
+        <!--PreferencesViewController-->
+        <scene sceneID="aHH-W9-1ze">
+            <objects>
+                <viewController id="QJK-aL-kSl" userLabel="PreferencesViewController" customClass="PreferencesViewController" customModule="aptreceipt" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="tpV-NS-LBF">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="480"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </view>
+                </viewController>
+                <customObject id="P6E-eA-Tf2" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-226" y="1133"/>
+        </scene>
+        <!--Window Controller-->
         <scene sceneID="R2V-B0-nI4">
             <objects>
                 <windowController id="B8D-0N-5wS" sceneMemberID="viewController">
@@ -193,7 +237,7 @@ CA
                         </connections>
                     </window>
                     <connections>
-                        <segue destination="XfG-lQ-9wD" kind="relationship" relationship="window.shadowedContentViewController" id="cq2-FE-JQM"/>
+                        <segue destination="XfG-lQ-9wD" kind="relationship" relationship="window.shadowedContentViewController" destinationCreationSelector="CreatorView" id="cq2-FE-JQM"/>
                     </connections>
                 </windowController>
                 <customObject id="Oky-zY-oP4" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
@@ -203,7 +247,7 @@ CA
         <!--CreatorViewController-->
         <scene sceneID="hIz-AP-VOD">
             <objects>
-                <viewController storyboardIdentifier="HomeView" id="XfG-lQ-9wD" userLabel="CreatorViewController" customClass="ViewController" customModule="aptreceipt" customModuleProvider="target" propertyAccessControl="all" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="HomeView" id="XfG-lQ-9wD" userLabel="CreatorViewController" customClass="ViewController" customModule="aptreceipt" customModuleProvider="target" propertyAccessControl="none" sceneMemberID="viewController">
                     <view key="view" id="m2S-Jp-Qdl">
                         <rect key="frame" x="0.0" y="0.0" width="700" height="500"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -255,22 +299,11 @@ CA
                                 </connections>
                             </button>
                             <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Z0k-hO-fsa" userLabel="HomeNumber_Selector">
-                                <rect key="frame" x="17" y="415" width="48" height="25"/>
-                                <popUpButtonCell key="cell" type="push" title="1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="xrC-HP-pGM" id="b0c-Ea-zcM" userLabel="HomeNumber">
+                                <rect key="frame" x="17" y="415" width="39" height="25"/>
+                                <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="b0c-Ea-zcM" userLabel="HomeNumber">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="menu"/>
-                                    <menu key="menu" id="PoS-17-eBa" userLabel="HomeNumber_Menu">
-                                        <items>
-                                            <menuItem title="1" state="on" id="xrC-HP-pGM"/>
-                                            <menuItem title="2" id="Ihk-7E-fpB"/>
-                                            <menuItem title="3" id="R3f-qM-R5F"/>
-                                            <menuItem title="4" id="Ve6-Sm-AYx"/>
-                                            <menuItem title="5" id="WAz-3D-K8C"/>
-                                            <menuItem title="6" id="Dhn-Mh-uiL"/>
-                                            <menuItem title="7" id="ZZb-5u-WfY"/>
-                                            <menuItem title="8" id="eH1-5e-gqj"/>
-                                        </items>
-                                    </menu>
+                                    <menu key="menu" id="PoS-17-eBa" userLabel="HomeNumber_Menu"/>
                                 </popUpButtonCell>
                             </popUpButton>
                             <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="RiD-Ak-7dC" userLabel="QueueNumber_Text">
@@ -327,7 +360,7 @@ CA
                                         </textField>
                                         <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="iz7-it-YbR" userLabel="SenderUser_Text">
                                             <rect key="frame" x="65" y="221" width="300" height="22"/>
-                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" title="Mustafa Cem Babadoğan" drawsBackground="YES" usesSingleLineMode="YES" id="vqn-9J-cOF">
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" usesSingleLineMode="YES" id="vqn-9J-cOF">
                                                 <font key="font" metaFont="system" size="14"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -392,8 +425,8 @@ CA
                                 <rect key="frame" x="20" y="340" width="77" height="28"/>
                                 <datePickerCell key="cell" borderStyle="bezel" alignment="left" useCurrentDate="YES" id="jm3-92-aJZ" userLabel="DatePicker_Cell">
                                     <font key="font" metaFont="system"/>
-                                    <date key="date" timeIntervalSinceReferenceDate="669393169.85252702">
-                                        <!--2022-03-19 14:32:49 +0000-->
+                                    <date key="date" timeIntervalSinceReferenceDate="669461111.61043406">
+                                        <!--2022-03-20 09:25:11 +0000-->
                                     </date>
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -411,6 +444,7 @@ CA
                             <constraint firstItem="kGq-ve-2B4" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="f4a-VJ-9bz" secondAttribute="trailing" constant="8" symbolic="YES" id="7vl-Wv-LZb"/>
                             <constraint firstItem="ErK-jj-KVR" firstAttribute="top" secondItem="ZQL-LR-NfT" secondAttribute="bottom" constant="20" id="8Gc-AH-u6U"/>
                             <constraint firstItem="ZQL-LR-NfT" firstAttribute="top" secondItem="qxo-4G-bKj" secondAttribute="bottom" constant="14" id="BH5-TT-Lq4"/>
+                            <constraint firstItem="kGq-ve-2B4" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Z0k-hO-fsa" secondAttribute="trailing" constant="20" symbolic="YES" id="D5a-LU-vQf"/>
                             <constraint firstItem="kGq-ve-2B4" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" constant="20" symbolic="YES" id="Dlp-Yp-vAe"/>
                             <constraint firstItem="f4a-VJ-9bz" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" constant="20" symbolic="YES" id="G2U-6H-27U"/>
                             <constraint firstItem="kGq-ve-2B4" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="qxo-4G-bKj" secondAttribute="trailing" constant="8" symbolic="YES" id="HD5-Ss-Ik0"/>
@@ -442,7 +476,7 @@ CA
                         <outlet property="SeqNumber_textControl" destination="RiD-Ak-7dC" id="CGE-yO-Zsq"/>
                         <outlet property="SupplierName_textControl" destination="iz7-it-YbR" id="WOb-6g-rcw"/>
                         <outlet property="Total_TextControl" destination="JG6-pY-14C" id="53H-Oo-puS"/>
-                        <segue destination="3Op-hd-zmR" kind="show" id="g99-Pr-B6p"/>
+                        <segue destination="3Op-hd-zmR" kind="show" identifier="ShowReceipt" id="g99-Pr-B6p"/>
                     </connections>
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
@@ -452,7 +486,7 @@ CA
         <!--ReceiptViewController-->
         <scene sceneID="LYb-kN-ZYJ">
             <objects>
-                <viewController title="Apartment Income - Expense Receipt" storyboardIdentifier="ReceiptView" id="3Op-hd-zmR" userLabel="ReceiptViewController" customClass="ReceiptViewController" customModule="aptreceipt" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="Apartment Income - Expense Receipt" storyboardIdentifier="ReceiptView" id="3Op-hd-zmR" userLabel="ReceiptViewController" customClass="ReceiptViewController" customModule="aptreceipt" customModuleProvider="target" propertyAccessControl="all" sceneMemberID="viewController">
                     <view key="view" id="a7n-lO-R4i">
                         <rect key="frame" x="0.0" y="0.0" width="818" height="523"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>

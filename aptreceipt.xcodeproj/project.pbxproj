@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		9A1F6CAA27E485B5006C171B /* ReceiptViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A1F6CA927E485B5006C171B /* ReceiptViewController.swift */; };
-		9A306E2E27E323AA00F6F5EB /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9A306E2D27E323AA00F6F5EB /* Info.plist */; };
+		9A90651127E728020085AA4B /* PreferencesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A90651027E728020085AA4B /* PreferencesViewController.swift */; };
 		9A9CF87927E204920042D276 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A9CF87827E204920042D276 /* AppDelegate.swift */; };
 		9A9CF87B27E204920042D276 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A9CF87A27E204920042D276 /* ViewController.swift */; };
 		9A9CF87D27E204920042D276 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9A9CF87C27E204920042D276 /* Assets.xcassets */; };
@@ -39,7 +39,7 @@
 
 /* Begin PBXFileReference section */
 		9A1F6CA927E485B5006C171B /* ReceiptViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptViewController.swift; sourceTree = "<group>"; };
-		9A306E2D27E323AA00F6F5EB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9A90651027E728020085AA4B /* PreferencesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesViewController.swift; sourceTree = "<group>"; };
 		9A9CF87527E204920042D276 /* aptreceipt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = aptreceipt.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A9CF87827E204920042D276 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		9A9CF87A27E204920042D276 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -107,7 +107,6 @@
 		9A9CF87727E204920042D276 /* aptreceipt */ = {
 			isa = PBXGroup;
 			children = (
-				9A306E2D27E323AA00F6F5EB /* Info.plist */,
 				9A9CF87827E204920042D276 /* AppDelegate.swift */,
 				9A9CF87A27E204920042D276 /* ViewController.swift */,
 				9A9CF87C27E204920042D276 /* Assets.xcassets */,
@@ -115,6 +114,7 @@
 				9A9CF88127E204920042D276 /* aptreceipt.entitlements */,
 				9A9CF8B627E22E670042D276 /* InfoPlist.strings */,
 				9A1F6CA927E485B5006C171B /* ReceiptViewController.swift */,
+				9A90651027E728020085AA4B /* PreferencesViewController.swift */,
 				9ADECA1627E5DC3500EB0A7F /* File.strings */,
 			);
 			path = aptreceipt;
@@ -242,7 +242,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9A306E2E27E323AA00F6F5EB /* Info.plist in Resources */,
 				9A9CF87D27E204920042D276 /* Assets.xcassets in Resources */,
 				9A9CF8B427E22E670042D276 /* InfoPlist.strings in Resources */,
 				9A9CF88027E204920042D276 /* Main.storyboard in Resources */,
@@ -274,6 +273,7 @@
 				9A1F6CAA27E485B5006C171B /* ReceiptViewController.swift in Sources */,
 				9A9CF87B27E204920042D276 /* ViewController.swift in Sources */,
 				9A9CF87927E204920042D276 /* AppDelegate.swift in Sources */,
+				9A90651127E728020085AA4B /* PreferencesViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -472,6 +472,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = aptreceipt/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(PRODUCT_NAME)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSMainStoryboardFile = Main;
@@ -503,6 +504,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = aptreceipt/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(PRODUCT_NAME)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSMainStoryboardFile = Main;

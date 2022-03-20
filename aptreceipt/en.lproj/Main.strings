@@ -23,8 +23,8 @@
 /* Class = "NSMenuItem"; title = "Preferences…"; ObjectID = "BOF-NM-1cW"; */
 "BOF-NM-1cW.title" = "Preferences…";
 
-/* Class = "NSMenuItem"; title = "6"; ObjectID = "Dhn-Mh-uiL"; */
-"Dhn-Mh-uiL.title" = "6";
+///* Class = "NSMenuItem"; title = "6"; ObjectID = "Dhn-Mh-uiL"; */
+//"Dhn-Mh-uiL.title" = "6";
 
 /* Class = "NSMenu"; title = "Help"; ObjectID = "F2S-fz-NVQ"; */
 "F2S-fz-NVQ.title" = "Help";
@@ -41,8 +41,8 @@
 /* Class = "NSWindow"; title = "Receipt Creator"; ObjectID = "IQv-IB-iLA"; */
 "IQv-IB-iLA.title" = "Receipt Creator";
 
-/* Class = "NSMenuItem"; title = "2"; ObjectID = "Ihk-7E-fpB"; */
-"Ihk-7E-fpB.title" = "2";
+///* Class = "NSMenuItem"; title = "2"; ObjectID = "Ihk-7E-fpB"; */
+//"Ihk-7E-fpB.title" = "2";
 
 /* Class = "NSMenuItem"; title = "Show All"; ObjectID = "Kd2-mp-pUS"; */
 "Kd2-mp-pUS.title" = "Show All";
@@ -65,8 +65,8 @@
 /* Class = "NSTextFieldCell"; title = "Apartment Number"; ObjectID = "QV4-Cn-Glw"; */
 "QV4-Cn-Glw.title" = "Apartment Number";
 
-/* Class = "NSMenuItem"; title = "3"; ObjectID = "R3f-qM-R5F"; */
-"R3f-qM-R5F.title" = "3";
+///* Class = "NSMenuItem"; title = "3"; ObjectID = "R3f-qM-R5F"; */
+//"R3f-qM-R5F.title" = "3";
 
 /* Class = "NSMenuItem"; title = "Zoom"; ObjectID = "R4o-n2-Eq4"; */
 "R4o-n2-Eq4.title" = "Zoom";
@@ -83,14 +83,14 @@
 /* Class = "NSMenuItem"; title = "Hide Others"; ObjectID = "Vdr-fp-XzO"; */
 "Vdr-fp-XzO.title" = "Hide Others";
 
-/* Class = "NSMenuItem"; title = "4"; ObjectID = "Ve6-Sm-AYx"; */
-"Ve6-Sm-AYx.title" = "4";
+///* Class = "NSMenuItem"; title = "4"; ObjectID = "Ve6-Sm-AYx"; */
+//"Ve6-Sm-AYx.title" = "4";
 
 /* Class = "NSMenu"; title = "Edit"; ObjectID = "W48-6f-4Dl"; */
 "W48-6f-4Dl.title" = "Edit";
 
-/* Class = "NSMenuItem"; title = "5"; ObjectID = "WAz-3D-K8C"; */
-"WAz-3D-K8C.title" = "5";
+///* Class = "NSMenuItem"; title = "5"; ObjectID = "WAz-3D-K8C"; */
+//"WAz-3D-K8C.title" = "5";
 
 /* Class = "NSMenuItem"; title = "Create"; ObjectID = "Was-JA-tGl"; */
 "Was-JA-tGl.title" = "Create";
@@ -98,8 +98,8 @@
 /* Class = "NSMenuItem"; title = "Paste and Match Style"; ObjectID = "WeT-3V-zwk"; */
 "WeT-3V-zwk.title" = "Paste and Match Style";
 
-/* Class = "NSMenuItem"; title = "7"; ObjectID = "ZZb-5u-WfY"; */
-"ZZb-5u-WfY.title" = "7";
+///* Class = "NSMenuItem"; title = "7"; ObjectID = "ZZb-5u-WfY"; */
+//"ZZb-5u-WfY.title" = "7";
 
 /* Class = "NSMenuItem"; title = "Window"; ObjectID = "aUF-d1-5bR"; */
 "aUF-d1-5bR.title" = "Window";
@@ -116,8 +116,8 @@
 /* Class = "NSMenuItem"; title = "Undo"; ObjectID = "dRJ-4n-Yzg"; */
 "dRJ-4n-Yzg.title" = "Undo";
 
-/* Class = "NSMenuItem"; title = "8"; ObjectID = "eH1-5e-gqj"; */
-"eH1-5e-gqj.title" = "8";
+///* Class = "NSMenuItem"; title = "8"; ObjectID = "eH1-5e-gqj"; */
+//"eH1-5e-gqj.title" = "8";
 
 /* Class = "NSMenuItem"; title = "Paste"; ObjectID = "gVA-U4-sdL"; */
 "gVA-U4-sdL.title" = "Paste";
@@ -155,8 +155,8 @@
 /* Class = "NSMenuItem"; title = "Copy"; ObjectID = "x3v-GG-iWU"; */
 "x3v-GG-iWU.title" = "Copy";
 
-/* Class = "NSMenuItem"; title = "1"; ObjectID = "xrC-HP-pGM"; */
-"xrC-HP-pGM.title" = "1";
+///* Class = "NSMenuItem"; title = "1"; ObjectID = "xrC-HP-pGM"; */
+//"xrC-HP-pGM.title" = "1";
 
 "p78-b8-iO5.title" = "Apartment Income - Expense Receipt";
 
@@ -176,4 +176,4 @@
 "42J-eD-UcN.title"="Cancel";
 "K7i-VG-DKe.title"="Save";
 
-
+"wwm-jb-00B.title"="Preferences";

@@ -9,6 +9,7 @@ import Cocoa
 
 class ViewController: NSViewController {
 
+    //Outlets
  
     @IBOutlet weak var HomeHumber_Selector: NSPopUpButton!
     @IBOutlet weak var DatePicker_Receipt: NSDatePicker!
@@ -18,9 +19,19 @@ class ViewController: NSViewController {
     @IBOutlet weak var Total_TextControl: NSTextField!
     @IBOutlet weak var Info_TextControl: NSTextField!
     
+    //
+    
+    
+    ///Load function
     override func viewDidLoad() {
         super.viewDidLoad()
+        for i in 1..<9 // For 8 apartment home.
+        {
+            HomeHumber_Selector.addItem(withTitle: String(i))
+            
+        }
         
+        HomeHumber_Selector.selectItem(at: 0) // Select 1 for default.
        
 
        
@@ -54,7 +65,7 @@ class ViewController: NSViewController {
         
         let selectedApartment=HomeHumber_Selector.selectedItem?.title
         print("Apartment number: \(selectedApartment!)")
-        let issueDate=getDatewithMonthDate(sentDate: DatePicker_Receipt.dateValue)
+        let issueDate=DatePicker_Receipt.dateValue.getDatewithMonthandYear()
         if !issueDate.isEmpty {
             print("Issue Date: \(issueDate)")
         }
@@ -107,7 +118,7 @@ class ViewController: NSViewController {
             vc?.aptNumber=Int(selectedApartment!)!
             vc?.price=Double(total)!
             vc?.seqNumber=Int(seqNumber)!
-            vc?.currentDate=getDatewithDayMonthYear(sentDate: Date())
+            vc?.currentDate=Date().getDatewithDayMonthandYear()
             
           if let controller = vc {self.view.window?.contentViewController=controller}
             
@@ -124,57 +135,8 @@ class ViewController: NSViewController {
        
     }
     
-    /// Get month and year from Date from given 'sentDate'
-    ///
-    /// - Warning: The returned string is  localized.
-    /// - Parameter subject: The subject  is Date object.
-    /// - Returns: A date string to the `sentDate` like XXXX YYYY.
-    func getDatewithMonthDate(sentDate:Date) -> String
-    {
-        let dateFormatter1 = DateFormatter()
-        dateFormatter1.dateFormat = "yyyy"
-        let yearString = dateFormatter1.string(from: sentDate)
-        let dateFormatter2 = DateFormatter()
-        dateFormatter2.dateFormat = "MMMM"
-        let monthString = dateFormatter2.string(from: sentDate)
-        let returnValue = "\(monthString) \(yearString)"
-        
-      
-        return returnValue
-    }
-    
-    // Get day, month and year from Date from given 'sentDate'
-    ///
-    /// - Warning: The returned string is  localized.
-    /// - Parameter subject: The subject  is Date object.
-    /// - Returns: A date string to the `sentDate` like XXXX YYYY.
-    func getDatewithDayMonthYear(sentDate:Date) -> String
-    {
-        let dateFormatter1 = DateFormatter()
-        dateFormatter1.dateFormat = "yyyy"
-        let yearString = dateFormatter1.string(from: sentDate)
-        let dateFormatter2 = DateFormatter()
-        dateFormatter2.dateFormat = "MMMM"
-        let monthString = dateFormatter2.string(from: sentDate)
-        
-        let dateFormatter3 = DateFormatter()
-        dateFormatter3.dateFormat = "dd"
-        let dayString = dateFormatter3.string(from: sentDate)
-      
-        var returnValue=""
-        let locale =  Locale.current.languageCode
-        if locale!.contains("tr") {
-             returnValue = "\(dayString) \(monthString) \(yearString)"
-        }
-        else
-        {
-             returnValue = "\(monthString) \(dayString), \(yearString)"
-        }
-      
-        return returnValue
-    }
-    
-    
+   
+
     /// Prints OK Cancel Dialog
     ///
     /// - Warning: The returned alert is  localized.
@@ -212,5 +174,58 @@ class ViewController: NSViewController {
         return result
     }
 }
-
+extension Date
+{
+    // Get month and year from Date from given 'sentDate'
+    ///
+    /// - Warning: The returned string is  localized.
+    
+    /// - Returns: A date string to the `sentDate` like XXXX YYYY.
+    func getDatewithMonthandYear() -> String
+    {
+        let dateFormatter1 = DateFormatter()
+        dateFormatter1.dateFormat = "yyyy"
+        let yearString = dateFormatter1.string(from: self)
+        let dateFormatter2 = DateFormatter()
+        dateFormatter2.dateFormat = "MMMM"
+        let monthString = dateFormatter2.string(from: self)
+        let returnValue = "\(monthString) \(yearString)"
+        
+      
+        return returnValue
+    }
+    
+    // Get day, month and year from Date from given 'sentDate'
+    ///
+    /// - Warning: The returned string is  localized.
+   
+    /// - Returns: A date string to the `sentDate` like XXXX YYYY.
+    func getDatewithDayMonthandYear() -> String
+    {
+        let dateFormatter1 = DateFormatter()
+        dateFormatter1.dateFormat = "yyyy"
+        let yearString = dateFormatter1.string(from: self)
+        let dateFormatter2 = DateFormatter()
+        dateFormatter2.dateFormat = "MMMM"
+        let monthString = dateFormatter2.string(from: self)
+        
+        let dateFormatter3 = DateFormatter()
+        dateFormatter3.dateFormat = "dd"
+        let dayString = dateFormatter3.string(from: self)
+      
+        var returnValue=""
+        let locale =  Locale.current.languageCode
+        if locale!.contains("tr") {
+             returnValue = "\(dayString) \(monthString) \(yearString)"
+        }
+        else
+        {
+             returnValue = "\(monthString) \(dayString), \(yearString)"
+        }
+      
+        return returnValue
+    }
+    
+    
+}
 

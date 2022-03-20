@@ -9,6 +9,7 @@ import Cocoa
 
 class ReceiptViewController: NSViewController {
 
+    //Variables comes from main view controller
     var recevier:String = ""
     var issuer:String = ""
     var notes:String = ""
@@ -18,6 +19,9 @@ class ReceiptViewController: NSViewController {
     var seqNumber:Int=0
     var currentDate:String=""
     
+    //
+    
+    //Outlets
     @IBOutlet weak var ReceiptView: NSView!
     
     @IBOutlet weak var Receipt_IssuerLabel: NSTextField!
@@ -30,6 +34,10 @@ class ReceiptViewController: NSViewController {
     @IBOutlet weak var Seq_Label: NSTextField!
     @IBOutlet weak var CurrentDate_Label: NSTextField!
     @IBOutlet weak var Receipt: NSBox!
+    
+    //
+    
+    ///Load function
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do view setup here.
@@ -55,14 +63,16 @@ class ReceiptViewController: NSViewController {
     /// Cancel click function
     @IBAction func Cancel_Click(_ sender: Any) {
         
+        // Back to main view.
         if let controller=self.storyboard?.instantiateController(withIdentifier: "HomeView") as? ViewController{self.view.window?.contentViewController=controller}
     }
     
     /// Save click function
     @IBAction func Save_Click(_ sender: Any) {
         
-        let image=Receipt.asImage();
+        let image=Receipt.asImage(); // Convert NS Box to NSImage
    
+        //Save NSImage.
         let savePanel = NSSavePanel()
             savePanel.canCreateDirectories = true
             savePanel.showsTagField = false
@@ -74,7 +84,7 @@ class ReceiptViewController: NSViewController {
 
                    if (result != nil) {
 
-                       image.writeJPEG(toURL: result!)
+                       image.writeJPEG(toURL: result!) // Wtire JPEG extension.
                        print("saved at \(result!)")
                    }
                } else {
@@ -89,7 +99,7 @@ class ReceiptViewController: NSViewController {
     ///
     /// - Warning: The returned String is  localized.
     /// - Parameter forKey: The forKey  is String object.
-    /// - Returns: bStringoolean.
+    /// - Returns: String.
     
     
     func localizedString(forKey key: String) -> String {
@@ -106,8 +116,10 @@ class ReceiptViewController: NSViewController {
 }
 extension NSBox {
 
-    // Using a function since `var image` might conflict with an existing variable
-    // (like on `UIImageView`)
+    /// Converts NSBox to NSImage
+    ///
+   
+    /// - Returns: NsImage.
     func asImage() -> NSImage {
         let viewToCapture = self
         let rep = viewToCapture.bitmapImageRepForCachingDisplay(in: viewToCapture.bounds)!
@@ -121,7 +133,13 @@ extension NSBox {
     }
 
 extension NSImage {
-   public func writeJPEG(toURL url: URL) {
+    
+    /// Save NSImage as JPEG.
+    ///
+  
+    /// - Parameter toURL: Save location.
+    
+    func writeJPEG(toURL url: URL) {
 
        guard let data = tiffRepresentation,
            let rep = NSBitmapImageRep(data: data),
