@@ -40,6 +40,13 @@ class ViewController: NSViewController {
         {
             HomeHumber_Selector.addItem(withTitle: "1")
         }
+        
+        let defpay = UserDefaults.standard.string(forKey: "defaultpay")
+        if(defpay != nil)
+        {
+            Total_TextControl.stringValue=defpay!
+        }
+        
        
         
         HomeHumber_Selector.selectItem(at: 0) // Select 1 for default.

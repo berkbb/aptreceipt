@@ -12,13 +12,20 @@ class PreferencesViewController: NSViewController {
    
     @IBOutlet weak var AptName_TextControl: NSTextField!
 
-  
+    @IBOutlet weak var DefaultPay_TextControl: NSTextField!
+    
     @IBOutlet weak var FlatCount_TextControl: NSTextField!
     
     @IBOutlet weak var Issuer_TextControl: NSTextField!
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do view setup here.
+        
+        let defpay = UserDefaults.standard.string(forKey: "defaultpay")
+        if(defpay != nil)
+        {
+            DefaultPay_TextControl.stringValue=defpay!
+        }
         
         let aptName = UserDefaults.standard.string(forKey: "aptname")
         if(aptName != nil)
@@ -44,15 +51,19 @@ class PreferencesViewController: NSViewController {
         let flat=FlatCount_TextControl.stringValue
         let name=AptName_TextControl.stringValue
         let issuer = Issuer_TextControl.stringValue.localizedCapitalized
+        let pay=DefaultPay_TextControl.stringValue
         
        
-        print(issuer)
-        
-        print(name)
+    
+     
         let flats = Int(flat)
+        let pays=Double(pay)
         print(flat)
+        print(pay)
+        print(issuer)
+        print(name)
         
-        if(!AptName_TextControl.stringValue.isEmpty && !FlatCount_TextControl.stringValue.isEmpty && !Issuer_TextControl.stringValue.isEmpty && flats != nil)
+        if(!AptName_TextControl.stringValue.isEmpty && !FlatCount_TextControl.stringValue.isEmpty && !Issuer_TextControl.stringValue.isEmpty && flats != nil && pays != nil)
         {
             print("OK")
             UserDefaults.standard.set(name, forKey: "aptname")
@@ -60,6 +71,9 @@ class PreferencesViewController: NSViewController {
             UserDefaults.standard.set(issuer, forKey: "issuer")
             
             UserDefaults.standard.set(flat, forKey: "flatcount")
+            
+            UserDefaults.standard.set(pay, forKey: "defaultpay")
+            
             let answer = showDialog(title: localizedString(forKey: "infoTitle"), text: localizedString(forKey: "restartMessage"), buttonName: localizedString(forKey: "okText"), alertType: .informational)
             
             print(answer)
