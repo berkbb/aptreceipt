@@ -19,8 +19,10 @@ class ViewController: NSViewController {
     @IBOutlet weak var Total_TextControl: NSTextField!
     @IBOutlet weak var Info_TextControl: NSTextField!
     
+    
     //
     
+    private(set) var popUpInitiallySelectedItem: NSMenuItem?
     
     ///Load function
     override func viewDidLoad() {
@@ -33,6 +35,9 @@ class ViewController: NSViewController {
             {
                 HomeHumber_Selector.addItem(withTitle: String(i))
                 
+             
+                
+                
             }
         }
         
@@ -41,6 +46,19 @@ class ViewController: NSViewController {
             HomeHumber_Selector.addItem(withTitle: "1")
         }
         
+        HomeHumber_Selector.selectItem(at: 0)
+        let homeOwner = UserDefaults.standard.string(forKey: "homeowner_1")
+        
+       
+            if(homeOwner != nil)
+            {
+                
+                OwnerName_textControl.stringValue=homeOwner!.localizedCapitalized
+            }
+      
+       
+        
+     
         let defpay = UserDefaults.standard.string(forKey: "defaultpay")
         if(defpay != nil)
         {
@@ -56,16 +74,34 @@ class ViewController: NSViewController {
         {
             SupplierName_textControl.stringValue=issuerName!
         }
-       
-
+     
         // Do any additional setup after loading the view.
+        
+        
     }
 
     override var representedObject: Any? {
         didSet {
         // Update the view, if already loaded.
         }
+        
+        
     }
+    @IBAction func NumberSelectorChanged(_ sender: Any) {
+        
+        let selected=Int(HomeHumber_Selector.selectedItem!.title)
+        print("Selected apartment number: \(selected!)")
+        let homeOwner = UserDefaults.standard.string(forKey: "homeowner_\(selected!)")
+        
+            if(homeOwner != nil)
+            {
+                
+                OwnerName_textControl.stringValue=homeOwner!.localizedCapitalized
+            }
+      
+       
+    }
+    
     /// Clear button click  event.
     @IBAction func Clear_Click(_ sender: NSButton) {
         HomeHumber_Selector.selectItem(at: 0)

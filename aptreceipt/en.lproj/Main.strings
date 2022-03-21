@@ -15,7 +15,7 @@
 "6dh-zS-Vam.title" = "Redo";
 
 /* Class = "NSTextFieldCell"; title = "Month and Year"; ObjectID = "6oS-eN-6Cl"; */
-"6oS-eN-6Cl.title" = "Month and Year";
+"6oS-eN-6Cl.title" = "Month and year";
 
 /* Class = "NSMenu"; title = "Main Menu"; ObjectID = "AYu-sK-qS6"; */
 "AYu-sK-qS6.title" = "Main Menu";
@@ -33,7 +33,7 @@
 "FKE-Sm-Kum.title" = "Apartment Receipt Creator Help";
 
 /* Class = "NSTextFieldCell"; title = "Info (Optional)"; ObjectID = "GuW-Si-e02"; */
-"GuW-Si-e02.title" = "Info (Optional)";
+"GuW-Si-e02.title" = "Info (optional)";
 
 /* Class = "NSButtonCell"; title = "Clear"; ObjectID = "H4j-Dg-rWq"; */
 "H4j-Dg-rWq.title" = "Clear";
@@ -51,7 +51,7 @@
 "LE2-aR-0XJ.title" = "Bring All to Front";
 
 /* Class = "NSTextFieldCell"; title = "Sequence Number"; ObjectID = "LNc-qU-B39"; */
-"LNc-qU-B39.title" = "Sequence Number";
+"LNc-qU-B39.title" = "Sequence number";
 
 /* Class = "NSMenuItem"; title = "Services"; ObjectID = "NMo-om-nkz"; */
 "NMo-om-nkz.title" = "Services";
@@ -108,7 +108,7 @@
 "bib-Uj-vzu.title" = "File";
 
 /* Class = "NSTextFieldCell"; title = "Who will receive the receipt?"; ObjectID = "blF-Hb-3vE"; */
-"blF-Hb-3vE.title" = "Who will receive the receipt?";
+"blF-Hb-3vE.title" = "Who will receive the receipt ?";
 
 /* Class = "NSMenuItem"; title = "File"; ObjectID = "dMs-cI-mzQ"; */
 "dMs-cI-mzQ.title" = "File";
@@ -132,7 +132,7 @@
 "l6U-yF-woz.title" = "Total";
 
 /* Class = "NSTextFieldCell"; title = "Who will issue the receipt?"; ObjectID = "lcm-bR-oBw"; */
-"lcm-bR-oBw.title" = "Who will issue the receipt?";
+"lcm-bR-oBw.title" = "Who will issue the receipt ?";
 
 /* Class = "NSButtonCell"; title = "Create"; ObjectID = "Ey7-vW-mwb"; */
 "Ey7-vW-mwb.title" = "Create";
@@ -177,3 +177,12 @@
 "K7i-VG-DKe.title"="Save";
 
 "wwm-jb-00B.title"="Preferences";
+
+"ui8-yM-YDs.title"="Apartment name ?";
+"Ino-7I-4x1.title"="How many house are in the apartment ?";
+"god-J5-b8y.title"="Issuer name  ?";
+"u2a-8R-TMO.title"="Default Pay Amount ?";
+"lLV-YL-TwZ.title"="Neighbor names";
+"wMi-vY-UeN.title"="House number ?";
+"6Z4-Vo-4ca.title"="House owner name ?";
+"Nzm-M8-e6n.title"="Save All";

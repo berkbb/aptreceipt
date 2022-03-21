@@ -14,7 +14,9 @@ class PreferencesViewController: NSViewController {
 
     @IBOutlet weak var DefaultPay_TextControl: NSTextField!
     
+    @IBOutlet weak var House_Selector: NSPopUpButton!
     @IBOutlet weak var FlatCount_TextControl: NSTextField!
+    @IBOutlet weak var HouseOwner_TextControl: NSTextField!
     
     @IBOutlet weak var Issuer_TextControl: NSTextField!
     override func viewDidLoad() {
@@ -43,9 +45,64 @@ class PreferencesViewController: NSViewController {
         if(flatCount != nil)
         {
             FlatCount_TextControl.stringValue=flatCount!
+            for i in 1..<Int(flatCount!)!+1 // For 8 apartment home.
+            {
+                House_Selector.addItem(withTitle: String(i))
+                
+            }
         }
+        else
+        {
+            FlatCount_TextControl.stringValue="1"
+            House_Selector.addItem(withTitle: "1")
+            
+        }
+        House_Selector.selectItem(at: 0)
+        let homeOwner = UserDefaults.standard.string(forKey: "homeowner_1")
+        
+       
+            if(homeOwner != nil)
+            {
+                
+                HouseOwner_TextControl.stringValue=homeOwner!.localizedCapitalized
+            }
+      
+       
+        
     }
     
+    /// Save person button clciked event.
+    @IBAction func SavePersonButton_Clicked(_ sender: Any) {
+        
+        let selected=Int(House_Selector.selectedItem!.title)
+        
+        let person=HouseOwner_TextControl.stringValue
+        if(!person.isEmpty)
+        {
+            UserDefaults.standard.set(person, forKey: "homeowner_\(selected!)")
+        }
+      
+       
+    }
+    
+    /// House number changed devent.
+    @IBAction func HouseNumberChanged(_ sender: Any) {
+        HouseOwner_TextControl.stringValue="";
+        let selected=Int(House_Selector.selectedItem!.title)
+        print("Selected apartment number: \(selected!)")
+        let homeOwner = UserDefaults.standard.string(forKey: "homeowner_\(selected!)")
+        
+       
+            if(homeOwner != nil)
+            {
+                
+                HouseOwner_TextControl.stringValue=homeOwner!.localizedCapitalized
+            }
+      
+      
+       
+        
+    }
     @IBAction func SaveButton_Click(_ sender: Any) {
         
         let flat=FlatCount_TextControl.stringValue

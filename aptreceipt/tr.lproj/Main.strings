@@ -15,7 +15,7 @@
 "6dh-zS-Vam.title" = "Yinele";
 
 /* Class = "NSTextFieldCell"; title = "Month and Year"; ObjectID = "6oS-eN-6Cl"; */
-"6oS-eN-6Cl.title" = "Ay ve Yıl";
+"6oS-eN-6Cl.title" = "Ay ve yıl";
 
 /* Class = "NSMenu"; title = "Main Menu"; ObjectID = "AYu-sK-qS6"; */
 "AYu-sK-qS6.title" = "Ana Menü";
@@ -33,7 +33,7 @@
 "FKE-Sm-Kum.title" = "Apartman Makbuzu Oluşturucu Yardımı";
 
 /* Class = "NSTextFieldCell"; title = "Info (Optional)"; ObjectID = "GuW-Si-e02"; */
-"GuW-Si-e02.title" = "Bilgi (Opsiyonel)";
+"GuW-Si-e02.title" = "Bilgi (opsiyonel)";
 
 /* Class = "NSButtonCell"; title = "Clear"; ObjectID = "H4j-Dg-rWq"; */
 "H4j-Dg-rWq.title" = "Temizle";
@@ -51,7 +51,7 @@
 "LE2-aR-0XJ.title" = "Tümünü Öne Taşı";
 
 /* Class = "NSTextFieldCell"; title = "Sequence Number"; ObjectID = "LNc-qU-B39"; */
-"LNc-qU-B39.title" = "Sıra Numarası";
+"LNc-qU-B39.title" = "Sıra numarası";
 
 /* Class = "NSMenuItem"; title = "Services"; ObjectID = "NMo-om-nkz"; */
 "NMo-om-nkz.title" = "Servisler";
@@ -63,7 +63,7 @@
 "Olw-nP-bQN.title" = "Apartman Makbuzu Oluşturucu'yu Gizle";
 
 /* Class = "NSTextFieldCell"; title = "Apartment Number"; ObjectID = "QV4-Cn-Glw"; */
-"QV4-Cn-Glw.title" = "Daire Numarası";
+"QV4-Cn-Glw.title" = "Daire numarası";
 
 ///* Class = "NSMenuItem"; title = "3"; ObjectID = "R3f-qM-R5F"; */
 //"R3f-qM-R5F.title" = "3";
@@ -108,7 +108,7 @@
 "bib-Uj-vzu.title" = "Dosya";
 
 /* Class = "NSTextFieldCell"; title = "Who will receive the receipt?"; ObjectID = "blF-Hb-3vE"; */
-"blF-Hb-3vE.title" = "Makbuzu kim alacak?";
+"blF-Hb-3vE.title" = "Makbuzu kim alacak ?";
 
 /* Class = "NSMenuItem"; title = "File"; ObjectID = "dMs-cI-mzQ"; */
 "dMs-cI-mzQ.title" = "Dosya";
@@ -176,3 +176,12 @@
 "K7i-VG-DKe.title"="Kaydet";
 
 "wwm-jb-00B.title"="Tercihler";
+
+"ui8-yM-YDs.title"="Apartman adı ?";
+"Ino-7I-4x1.title"="Apartmanda kaç daire var ?";
+"god-J5-b8y.title"="Makbuzu kim veriyor ?";
+"u2a-8R-TMO.title"="Varsayılan ödeme miktarı ?";
+"lLV-YL-TwZ.title"="Komşu adları";
+"wMi-vY-UeN.title"="Ev numarası ?";
+"6Z4-Vo-4ca.title"="Ev sahibi adı ?";
+"Nzm-M8-e6n.title"="Tümünü Kaydet";
