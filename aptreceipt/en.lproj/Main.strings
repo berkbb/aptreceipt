@@ -134,8 +134,8 @@
 /* Class = "NSTextFieldCell"; title = "Who will issue the receipt?"; ObjectID = "lcm-bR-oBw"; */
 "lcm-bR-oBw.title" = "Who will issue the receipt?";
 
-/* Class = "NSButtonCell"; title = "Create"; ObjectID = "lw1-b7-5Rz"; */
-"lw1-b7-5Rz.title" = "Create";
+/* Class = "NSButtonCell"; title = "Create"; ObjectID = "Ey7-vW-mwb"; */
+"Ey7-vW-mwb.title" = "Create";
 
 /* Class = "NSMenuItem"; title = "Delete"; ObjectID = "pa3-QI-u2k"; */
 "pa3-QI-u2k.title" = "Delete";

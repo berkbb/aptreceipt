@@ -24,6 +24,7 @@ class ReceiptViewController: NSViewController {
     //Outlets
     @IBOutlet weak var ReceiptView: NSView!
     
+    @IBOutlet weak var MainTitle: NSTextField!
     @IBOutlet weak var Receipt_IssuerLabel: NSTextField!
     @IBOutlet weak var Total_MesaageLabel: NSTextField!
     @IBOutlet weak var Notes_Print: NSTextField!
@@ -34,6 +35,7 @@ class ReceiptViewController: NSViewController {
     @IBOutlet weak var Seq_Label: NSTextField!
     @IBOutlet weak var CurrentDate_Label: NSTextField!
     @IBOutlet weak var Receipt: NSBox!
+  
     
     //
     
@@ -50,10 +52,30 @@ class ReceiptViewController: NSViewController {
         let currencySymbol = locale.currencySymbol!
         if locale.languageCode!.contains("tr") {
             Price_Label.stringValue="\(String(price)) \(currencySymbol)"
+            let aptName = UserDefaults.standard.string(forKey: "aptname")
+            if(aptName != nil)
+            {
+                MainTitle.stringValue="\(aptName!) Gelir - Gider Makbuzu"
+            }
+            else
+            {
+                MainTitle.stringValue="Apartman Gelir - Gider Makbuzu"
+            }
+           
         }
-        else
+        else // en
         {
             Price_Label.stringValue=" \(currencySymbol) \(String(price))"
+            
+            let aptName = UserDefaults.standard.string(forKey: "aptname")
+            if(aptName != nil)
+            {
+                MainTitle.stringValue="Apartment Income - Expense Receipt for \(aptName!)"
+            }
+            else
+            {
+                MainTitle.stringValue="Apartment Income - Expense Receipt"
+            }
         }
         
         Price_Label.stringValue="\(String(price)) \(currencySymbol)"

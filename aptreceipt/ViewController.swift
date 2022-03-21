@@ -25,15 +25,30 @@ class ViewController: NSViewController {
     ///Load function
     override func viewDidLoad() {
         super.viewDidLoad()
-        for i in 1..<9 // For 8 apartment home.
+        
+        let flatCount = UserDefaults.standard.string(forKey: "flatcount")
+        if(flatCount != nil)
         {
-            HomeHumber_Selector.addItem(withTitle: String(i))
-            
+            for i in 1..<Int(flatCount!)!+1 // For 8 apartment home.
+            {
+                HomeHumber_Selector.addItem(withTitle: String(i))
+                
+            }
         }
+        
+        else
+        {
+            HomeHumber_Selector.addItem(withTitle: "1")
+        }
+       
         
         HomeHumber_Selector.selectItem(at: 0) // Select 1 for default.
        
-
+        let issuerName = UserDefaults.standard.string(forKey: "issuer")
+        if(issuerName != nil)
+        {
+            SupplierName_textControl.stringValue=issuerName!
+        }
        
 
         // Do any additional setup after loading the view.
@@ -50,7 +65,12 @@ class ViewController: NSViewController {
         DatePicker_Receipt.dateValue=Date()
         Total_TextControl.stringValue=""
         SeqNumber_textControl.stringValue=""
-        SupplierName_textControl.stringValue="Mustafa Cem Babadoğan"
+        let issuerName = UserDefaults.standard.string(forKey: "issuer")
+        if(issuerName != nil)
+        {
+            SupplierName_textControl.stringValue=issuerName!
+        }
+     
         OwnerName_textControl.stringValue=""
         Info_TextControl.stringValue="";
         
@@ -72,13 +92,13 @@ class ViewController: NSViewController {
   
         let seqNumber=SeqNumber_textControl.stringValue
         if !seqNumber.isEmpty {
-            print("Sequence Number \(seqNumber)")
+            print("Sequence Number: \(seqNumber)")
         }
     
       
-        let supplierName=SupplierName_textControl.stringValue.localizedCapitalized
-        if !supplierName.isEmpty {
-            print("Supplier Name: \(supplierName)")
+        let issuerName=SupplierName_textControl.stringValue.localizedCapitalized
+        if !issuerName.isEmpty {
+            print("Issuer Name: \(issuerName)")
         }
        
         let ownerName=OwnerName_textControl.stringValue.localizedCapitalized
@@ -104,14 +124,14 @@ class ViewController: NSViewController {
         
         let intSequence = Int(seqNumber)
         
-        if( !selectedApartment!.isEmpty  && !seqNumber.isEmpty && !total.isEmpty && !supplierName.isEmpty && !ownerName.isEmpty && !issueDate.isEmpty && !info.isEmpty && doubleTotal != nil && intSequence != nil )
+        if( !selectedApartment!.isEmpty  && !seqNumber.isEmpty && !total.isEmpty && !issuerName.isEmpty && !ownerName.isEmpty && !issueDate.isEmpty && !info.isEmpty && doubleTotal != nil && intSequence != nil )
         {
             print("OK")
        
         
            let vc = self.storyboard?.instantiateController(withIdentifier: "ReceiptView") as? ReceiptViewController
            
-            vc?.issuer=supplierName
+            vc?.issuer=issuerName
             vc?.recevier=ownerName
             vc?.notes=info
             vc?.monthYear=issueDate

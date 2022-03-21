@@ -11,3 +11,5 @@
 "errorMessage" = "Lütfen tüm alanları kontrol edin.";
 "totalMessage"="Aşağıdaki tutar şu kişiden alınmıştır:";
 "saveImageTitle"="Makbuzu nereye kaydedeyim ?";
+"infoTitle"="Bilgi";
+"restartMessage"="Değişiklerin geçerli olması için lütfen uygulamayı yeniden başlatın.";

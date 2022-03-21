@@ -11,3 +11,6 @@
 "errorMessage" = "Please check all areas.";
 "totalMessage"="The following amount has been received from:";
 "saveImageTitle"="Where should I save the receipt?";
+"infoTitle"="Info";
+"restartMessage"="Please restart the application for the changes to take effect.";
+
