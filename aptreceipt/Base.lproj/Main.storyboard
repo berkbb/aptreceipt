@@ -463,6 +463,14 @@ CA
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Nho-fD-HIz">
+                                <rect key="frame" x="18" y="217" width="42" height="21"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Type" id="0Ys-6W-uS3">
+                                    <font key="font" textStyle="title2" name=".SFNS-Regular"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="43h-AI-Wtk" userLabel="Clear_Button">
                                 <rect key="frame" x="619" y="13" width="68" height="32"/>
                                 <buttonCell key="cell" type="push" title="Clear" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="H4j-Dg-rWq">
@@ -604,18 +612,14 @@ CA
                                 <rect key="frame" x="20" y="340" width="77" height="28"/>
                                 <datePickerCell key="cell" borderStyle="bezel" alignment="left" useCurrentDate="YES" id="jm3-92-aJZ" userLabel="DatePicker_Cell">
                                     <font key="font" metaFont="system"/>
-                                    <date key="date" timeIntervalSinceReferenceDate="669557981.37795603">
-                                        <!--2022-03-21 12:19:41 +0000-->
+                                    <date key="date" timeIntervalSinceReferenceDate="670493627.74212801">
+                                        <!--2022-04-01 08:13:47 +0000-->
                                     </date>
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                     <datePickerElements key="datePickerElements" year="YES" month="YES"/>
                                 </datePickerCell>
                             </datePicker>
-                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="m2f-uU-V0y">
-                                <rect key="frame" x="20" y="20" width="128" height="128"/>
-                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="Logo" id="m3v-t2-gzV"/>
-                            </imageView>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="h2A-uK-XBN" userLabel="Create_Button">
                                 <rect key="frame" x="546" y="13" width="75" height="32"/>
                                 <buttonCell key="cell" type="push" title="Create" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Ey7-vW-mwb">
@@ -627,24 +631,69 @@ CA
                                     <action selector="Create_Click:" target="rPt-NT-nkU" id="eyb-fs-zlj"/>
                                 </connections>
                             </button>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="B8G-na-iZi">
+                                <rect key="frame" x="18" y="180" width="71" height="18"/>
+                                <buttonCell key="cell" type="check" title="Income" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Ivx-12-OhM">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="IncomeSelected:" target="XfG-lQ-9wD" id="l98-X4-VuW"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Xc8-1c-Lo4">
+                                <rect key="frame" x="18" y="154" width="82" height="18"/>
+                                <buttonCell key="cell" type="check" title="Outcome" bezelStyle="regularSquare" imagePosition="left" inset="2" id="chy-UL-fIn">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="OutComeSelected:" target="XfG-lQ-9wD" id="evp-Mf-C2S"/>
+                                </connections>
+                            </button>
+                            <switch horizontalHuggingPriority="750" verticalHuggingPriority="750" baseWritingDirection="leftToRight" alignment="left" state="on" translatesAutoresizingMaskIntoConstraints="NO" id="2DU-vg-5Or">
+                                <rect key="frame" x="18" y="111" width="42" height="25"/>
+                                <connections>
+                                    <action selector="AptONFOFFSwitchChanged:" target="XfG-lQ-9wD" id="rrW-kU-K7x"/>
+                                </connections>
+                            </switch>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9nk-R6-MMX">
+                                <rect key="frame" x="72" y="116" width="147" height="15"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Apartment Number is ON" id="2c2-fr-xSb">
+                                    <font key="font" usesAppearanceFont="YES"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
                         </subviews>
                         <constraints>
+                            <constraint firstItem="kGq-ve-2B4" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="B8G-na-iZi" secondAttribute="trailing" constant="20" symbolic="YES" id="0nA-k2-Vco"/>
+                            <constraint firstItem="Xc8-1c-Lo4" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="20" symbolic="YES" id="1NX-ul-eyk"/>
                             <constraint firstItem="kGq-ve-2B4" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="ErK-jj-KVR" secondAttribute="trailing" constant="8" symbolic="YES" id="3gd-oP-RI9"/>
+                            <constraint firstItem="h2A-uK-XBN" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="20" symbolic="YES" id="5Ln-JL-zvI"/>
+                            <constraint firstItem="B8G-na-iZi" firstAttribute="top" secondItem="Nho-fD-HIz" secondAttribute="bottom" constant="20" id="5qU-ZJ-A2a"/>
                             <constraint firstItem="ZQL-LR-NfT" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="20" id="66f-pz-iXX"/>
+                            <constraint firstItem="kGq-ve-2B4" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Xc8-1c-Lo4" secondAttribute="trailing" constant="20" symbolic="YES" id="6NS-WB-Ya8"/>
                             <constraint firstItem="kGq-ve-2B4" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="f4a-VJ-9bz" secondAttribute="trailing" constant="8" symbolic="YES" id="7vl-Wv-LZb"/>
                             <constraint firstItem="ErK-jj-KVR" firstAttribute="top" secondItem="ZQL-LR-NfT" secondAttribute="bottom" constant="20" id="8Gc-AH-u6U"/>
+                            <constraint firstItem="Nho-fD-HIz" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="20" symbolic="YES" id="92l-Na-ejb"/>
                             <constraint firstItem="ZQL-LR-NfT" firstAttribute="top" secondItem="qxo-4G-bKj" secondAttribute="bottom" constant="14" id="BH5-TT-Lq4"/>
                             <constraint firstItem="kGq-ve-2B4" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Z0k-hO-fsa" secondAttribute="trailing" constant="20" symbolic="YES" id="D5a-LU-vQf"/>
                             <constraint firstItem="kGq-ve-2B4" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" constant="20" symbolic="YES" id="Dlp-Yp-vAe"/>
                             <constraint firstItem="f4a-VJ-9bz" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" constant="20" symbolic="YES" id="G2U-6H-27U"/>
+                            <constraint firstItem="2DU-vg-5Or" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="20" symbolic="YES" id="H9K-Hv-Qud"/>
                             <constraint firstItem="kGq-ve-2B4" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="qxo-4G-bKj" secondAttribute="trailing" constant="8" symbolic="YES" id="HD5-Ss-Ik0"/>
                             <constraint firstAttribute="trailing" secondItem="kGq-ve-2B4" secondAttribute="trailing" constant="20" symbolic="YES" id="IKe-A8-wcF"/>
-                            <constraint firstAttribute="bottom" secondItem="m2f-uU-V0y" secondAttribute="bottom" constant="20" symbolic="YES" id="JBs-17-Ank"/>
+                            <constraint firstItem="9nk-R6-MMX" firstAttribute="leading" secondItem="2DU-vg-5Or" secondAttribute="trailing" constant="16" id="Jjg-GO-L7G"/>
                             <constraint firstAttribute="bottom" secondItem="43h-AI-Wtk" secondAttribute="bottom" constant="20" symbolic="YES" id="Lpw-NT-ztU"/>
+                            <constraint firstItem="B8G-na-iZi" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="20" symbolic="YES" id="QNi-mZ-aUP"/>
+                            <constraint firstItem="kGq-ve-2B4" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="9nk-R6-MMX" secondAttribute="trailing" constant="8" symbolic="YES" id="REZ-VI-23B"/>
                             <constraint firstItem="43h-AI-Wtk" firstAttribute="leading" secondItem="h2A-uK-XBN" secondAttribute="trailing" constant="12" symbolic="YES" id="SGB-5t-W09"/>
-                            <constraint firstItem="h2A-uK-XBN" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="m2f-uU-V0y" secondAttribute="trailing" constant="8" symbolic="YES" id="Sf3-lb-f1d"/>
-                            <constraint firstItem="m2f-uU-V0y" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="20" symbolic="YES" id="Thm-fC-Bd8"/>
+                            <constraint firstItem="Xc8-1c-Lo4" firstAttribute="top" secondItem="B8G-na-iZi" secondAttribute="bottom" constant="10" id="Si4-eZ-iev"/>
+                            <constraint firstItem="9nk-R6-MMX" firstAttribute="top" secondItem="Xc8-1c-Lo4" secondAttribute="bottom" constant="24" id="XQO-s6-PTR"/>
+                            <constraint firstItem="Nho-fD-HIz" firstAttribute="top" secondItem="RiD-Ak-7dC" secondAttribute="bottom" constant="20" id="Xjy-ck-2KX"/>
                             <constraint firstItem="f4a-VJ-9bz" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="20" symbolic="YES" id="Z67-b7-PTI"/>
+                            <constraint firstItem="2DU-vg-5Or" firstAttribute="top" secondItem="Xc8-1c-Lo4" secondAttribute="bottom" constant="20" id="e0S-qb-LQF"/>
                             <constraint firstItem="RiD-Ak-7dC" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="20" symbolic="YES" id="eTX-Bl-rAl"/>
                             <constraint firstItem="h2A-uK-XBN" firstAttribute="top" secondItem="kGq-ve-2B4" secondAttribute="bottom" constant="43" id="fNa-nU-VIO"/>
                             <constraint firstItem="ErK-jj-KVR" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="20" symbolic="YES" id="gu9-hg-XBL"/>
@@ -653,15 +702,20 @@ CA
                             <constraint firstItem="Z0k-hO-fsa" firstAttribute="top" secondItem="f4a-VJ-9bz" secondAttribute="bottom" constant="20" id="npD-6f-z3O"/>
                             <constraint firstItem="Z0k-hO-fsa" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="20" symbolic="YES" id="oIW-sv-5Fr"/>
                             <constraint firstItem="qxo-4G-bKj" firstAttribute="top" secondItem="Z0k-hO-fsa" secondAttribute="bottom" constant="20" id="p0b-Xs-GL7"/>
+                            <constraint firstItem="kGq-ve-2B4" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Nho-fD-HIz" secondAttribute="trailing" constant="8" symbolic="YES" id="t3u-ZK-nI0"/>
                             <constraint firstAttribute="bottom" secondItem="h2A-uK-XBN" secondAttribute="bottom" constant="20" symbolic="YES" id="uSb-Ci-Wwz"/>
                             <constraint firstItem="RiD-Ak-7dC" firstAttribute="top" secondItem="ErK-jj-KVR" secondAttribute="bottom" constant="20" id="yfT-mC-smk"/>
                             <constraint firstItem="qxo-4G-bKj" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="20" symbolic="YES" id="zKH-YI-6UK"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="AptONOFFLabel" destination="9nk-R6-MMX" id="U1q-K4-S65"/>
+                        <outlet property="AptONOFFSwitch" destination="2DU-vg-5Or" id="m3l-We-F7B"/>
                         <outlet property="DatePicker_Receipt" destination="ZQL-LR-NfT" id="hAI-kL-mTg"/>
                         <outlet property="HomeHumber_Selector" destination="Z0k-hO-fsa" id="QmQ-hW-SFq"/>
+                        <outlet property="Income_Check" destination="B8G-na-iZi" id="9U7-YT-z14"/>
                         <outlet property="Info_TextControl" destination="owD-0b-5fG" id="PKC-gK-sof"/>
+                        <outlet property="Outcome_Check" destination="Xc8-1c-Lo4" id="PHg-JJ-g8o"/>
                         <outlet property="OwnerName_textControl" destination="e0U-7L-wbW" id="F9I-TZ-mbM"/>
                         <outlet property="SeqNumber_textControl" destination="RiD-Ak-7dC" id="CGE-yO-Zsq"/>
                         <outlet property="SupplierName_textControl" destination="iz7-it-YbR" id="WOb-6g-rcw"/>
@@ -766,15 +820,15 @@ CA
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="x3m-Ci-Nu2" userLabel="Total_Title">
-                                                        <rect key="frame" x="18" y="20" width="184" height="21"/>
-                                                        <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Total Amount Received:" id="Em8-wX-gH0" userLabel="Total_TitleCell">
+                                                        <rect key="frame" x="18" y="20" width="73" height="21"/>
+                                                        <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Amount: " id="Em8-wX-gH0" userLabel="Total_TitleCell">
                                                             <font key="font" textStyle="title2" name=".SFNS-Regular"/>
                                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="JNt-gM-e3k" userLabel="Total_Print">
-                                                        <rect key="frame" x="206" y="20" width="57" height="21"/>
+                                                        <rect key="frame" x="95" y="20" width="57" height="21"/>
                                                         <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="500 ₺" id="kLa-vU-Iys" userLabel="Total_PrintCell">
                                                             <font key="font" metaFont="systemHeavy" size="18"/>
                                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -927,6 +981,7 @@ Gw
                     </view>
                     <connections>
                         <outlet property="AptNumber_Label" destination="Unp-x5-TRp" id="Zdh-pj-j36"/>
+                        <outlet property="AptNumber_Title" destination="sBp-4k-Ifw" id="Ss2-7q-ZyE"/>
                         <outlet property="CurrentDate_Label" destination="k0m-fH-LNh" id="8fd-py-stU"/>
                         <outlet property="Date_Label" destination="k0m-fH-LNh" id="eV0-AU-2pf"/>
                         <outlet property="MainTitle" destination="1vx-2b-m3a" id="SeD-yc-19z"/>
@@ -946,7 +1001,6 @@ Gw
         </scene>
     </scenes>
     <resources>
-        <image name="Logo" width="128" height="128"/>
         <image name="NSTouchBarUserAddTemplate" width="17" height="16"/>
         <namedColor name="AccentColor">
             <color red="0.0" green="0.46000000000000002" blue="0.89000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

@@ -9,7 +9,14 @@
 "okText" = "Tamam";
 "errorTitle" = "Hata";
 "errorMessage" = "Lütfen tüm alanları kontrol edin.";
-"totalMessage"="Aşağıdaki tutar şu kişiden alınmıştır:";
 "saveImageTitle"="Makbuzu nereye kaydedeyim ?";
 "infoTitle"="Bilgi";
 "restartMessage"="Değişiklerin geçerli olması için lütfen uygulamayı yeniden başlatın.";
+"switchON"="Daire Numarası AÇIK";
+"switchOFF"="Daire Numarası KAPALI";
+"incomeTitle"="Gelir Makbuzu";
+"outcomeTitle"="Gider Makbuzu";
+"totalMessage_Outcome"="Aşağıdaki tutar şu kişiye ödenmiştir:";
+"totalMessage_Income"="Aşağıdaki tutar şu kişiden alınmıştır:";
+
+

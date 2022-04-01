@@ -9,8 +9,14 @@
 "okText" = "OK";
 "errorTitle" = "Error";
 "errorMessage" = "Please check all areas.";
-"totalMessage"="The following amount has been received from:";
 "saveImageTitle"="Where should I save the receipt?";
 "infoTitle"="Info";
 "restartMessage"="Please restart the application for the changes to take effect.";
+"switchON"="Apartment Number is ON";
+"switchOFF"="Apartment Number is OFF";
+"incomeTitle"="Income Receipt";
+"outcomeTitle"="Outcome Receipt";
+"totalMessage_Outcome"="The following amount has been paid to:";
+"totalMessage_Income"="The following amount has been received from:";
+
 

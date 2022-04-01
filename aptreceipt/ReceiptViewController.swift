@@ -18,12 +18,15 @@ class ReceiptViewController: NSViewController {
     var price:Double=0.0
     var seqNumber:Int=0
     var currentDate:String=""
+    var printAptNumber=true
+    var recType=receiptType.income
     
+   
     //
     
     //Outlets
     @IBOutlet weak var ReceiptView: NSView!
-    
+    @IBOutlet weak var AptNumber_Title: NSTextField!
     @IBOutlet weak var MainTitle: NSTextField!
     @IBOutlet weak var Receipt_IssuerLabel: NSTextField!
     @IBOutlet weak var Total_MesaageLabel: NSTextField!
@@ -43,7 +46,22 @@ class ReceiptViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do view setup here.
-        Total_MesaageLabel.stringValue = "\(localizedString(forKey: "totalMessage")) \(recevier)"
+        if(recType == receiptType.income)
+        {
+            Total_MesaageLabel.stringValue = "\(localizedString(forKey: "totalMessage_Income")) \(recevier)"
+        }
+        
+        else
+        {
+            Total_MesaageLabel.stringValue = "\(localizedString(forKey: "totalMessage_Outcome")) \(recevier)"
+        }
+        
+        if(printAptNumber == false)
+        {
+            AptNumber_Label.isHidden=true
+            AptNumber_Title.isHidden=true
+        }
+
         Receipt_IssuerLabel.stringValue=issuer
         Notes_Print.stringValue=notes
         MonthYear_Label.stringValue=monthYear
@@ -55,11 +73,30 @@ class ReceiptViewController: NSViewController {
             let aptName = UserDefaults.standard.string(forKey: "aptname")
             if(aptName != nil)
             {
-                MainTitle.stringValue="\(aptName!) Gelir - Gider Makbuzu"
+             
+                
+                if(recType == receiptType.income)
+                {
+                    MainTitle.stringValue="\(aptName!) \(localizedString(forKey: "incomeTitle"))"
+                }
+                
+                else
+                {
+                    MainTitle.stringValue="\(aptName!) \(localizedString(forKey: "outcomeTitle"))"
+                }
             }
             else
             {
-                MainTitle.stringValue="Apartman Gelir - Gider Makbuzu"
+                
+                if(recType == receiptType.income)
+                {
+                    MainTitle.stringValue="\(localizedString(forKey: "incomeTitle"))"
+                }
+                
+                else
+                {
+                    MainTitle.stringValue="\(localizedString(forKey: "outcomeTitle"))"
+                }
             }
            
         }
@@ -178,4 +215,8 @@ extension NSImage {
        }
    }
 }
-
+enum receiptType {
+    case income
+    case outcome
+  
+}

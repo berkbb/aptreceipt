@@ -19,7 +19,11 @@ class ViewController: NSViewController {
     @IBOutlet weak var Total_TextControl: NSTextField!
     @IBOutlet weak var Info_TextControl: NSTextField!
     
+    @IBOutlet weak var AptONOFFSwitch: NSSwitch!
+    @IBOutlet weak var AptONOFFLabel: NSTextField!
+    @IBOutlet weak var Income_Check: NSButton!
     
+    @IBOutlet weak var Outcome_Check: NSButton!
     //
     
     private(set) var popUpInitiallySelectedItem: NSMenuItem?
@@ -67,7 +71,7 @@ class ViewController: NSViewController {
         
        
         
-        HomeHumber_Selector.selectItem(at: 0) // Select 1 for default.
+      
        
         let issuerName = UserDefaults.standard.string(forKey: "issuer")
         if(issuerName != nil)
@@ -87,6 +91,29 @@ class ViewController: NSViewController {
         
         
     }
+    @IBAction func AptONFOFFSwitchChanged(_ sender: Any) {
+        
+        if(AptONOFFSwitch.state==NSControl.StateValue.on)
+        {
+            print("on")
+            let value = localizedString(forKey: "switchON")
+       
+                AptONOFFLabel.stringValue=value
+            
+         
+            
+        }
+        
+        else
+        {
+            print("off")
+            let value = localizedString(forKey: "switchOFF")
+          
+                AptONOFFLabel.stringValue=value
+            
+            
+        }
+    }
     @IBAction func NumberSelectorChanged(_ sender: Any) {
         
         let selected=Int(HomeHumber_Selector.selectedItem!.title)
@@ -102,21 +129,52 @@ class ViewController: NSViewController {
        
     }
     
+    @IBAction func IncomeSelected(_ sender: Any) {
+        if(Outcome_Check.state == NSControl.StateValue.on)
+        {
+            Outcome_Check.state=NSControl.StateValue.off
+        }
+    }
+    @IBAction func OutComeSelected(_ sender: Any) {
+        
+        if(Income_Check.state == NSControl.StateValue.on)
+        {
+            Income_Check.state=NSControl.StateValue.off
+        }
+    }
     /// Clear button click  event.
     @IBAction func Clear_Click(_ sender: NSButton) {
         HomeHumber_Selector.selectItem(at: 0)
+        let homeOwner = UserDefaults.standard.string(forKey: "homeowner_1")
+        
+       
+            if(homeOwner != nil)
+            {
+                
+                OwnerName_textControl.stringValue=homeOwner!.localizedCapitalized
+            }
+      
         DatePicker_Receipt.dateValue=Date()
-        Total_TextControl.stringValue=""
         SeqNumber_textControl.stringValue=""
         let issuerName = UserDefaults.standard.string(forKey: "issuer")
         if(issuerName != nil)
         {
             SupplierName_textControl.stringValue=issuerName!
         }
-     
-        OwnerName_textControl.stringValue=""
-        Info_TextControl.stringValue="";
         
+        Info_TextControl.stringValue=""
+        AptONOFFSwitch.state=NSControl.StateValue.on
+        let value = localizedString(forKey: "switchON")
+   
+            AptONOFFLabel.stringValue=value
+        Outcome_Check.state=NSControl.StateValue.off
+        Income_Check.state=NSControl.StateValue.on
+        
+           let defpay = UserDefaults.standard.string(forKey: "defaultpay")
+           if(defpay != nil)
+           {
+               Total_TextControl.stringValue=defpay!
+           }
      
         
     }
@@ -154,7 +212,7 @@ class ViewController: NSViewController {
          }
        
      
-        var info=Info_TextControl.stringValue;
+        var info=Info_TextControl.stringValue
         if !info.isEmpty {
             print("Info: \(info)")
         }
@@ -182,6 +240,8 @@ class ViewController: NSViewController {
             vc?.price=Double(total)!
             vc?.seqNumber=Int(seqNumber)!
             vc?.currentDate=Date().getDatewithDayMonthandYear()
+            vc?.printAptNumber = AptONOFFSwitch.state == NSControl.StateValue.on ? true : false
+            vc?.recType = Income_Check.state == NSControl.StateValue.on ? receiptType.income : receiptType.outcome
             
           if let controller = vc {self.view.window?.contentViewController=controller}
             
@@ -291,4 +351,3 @@ extension Date
     
     
 }
-
