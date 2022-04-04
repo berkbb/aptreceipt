@@ -2,7 +2,7 @@
 //  AppDelegate.swift
 //  aptreceipt
 //
-//  Created by Berk Babadoğan on 16.03.2022.
+//  Created by berkbb on 16.03.2022.
 //
 
 import Cocoa

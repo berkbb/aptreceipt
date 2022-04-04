@@ -2,10 +2,11 @@
 //  PreferencesViewController.swift
 //  aptreceipt
 //
-//  Created by Berk Babadoğan on 20.03.2022.
+//  Created by berkbb on 20.03.2022.
 //
 
 import Cocoa
+
 
 class PreferencesViewController: NSViewController {
 
@@ -17,11 +18,22 @@ class PreferencesViewController: NSViewController {
     @IBOutlet weak var House_Selector: NSPopUpButton!
     @IBOutlet weak var FlatCount_TextControl: NSTextField!
     @IBOutlet weak var HouseOwner_TextControl: NSTextField!
-    
+    @IBOutlet weak var SignImage: NSImageView!
     @IBOutlet weak var Issuer_TextControl: NSTextField!
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do view setup here.
+        
+        if let imageData = UserDefaults.standard.value(forKey: "usersign") as? Data{
+                if let imageFromData = NSImage(data: imageData){
+                    SignImage.image=imageFromData
+                }
+            }
+  
+        else
+        {
+            print("No sign imported.")
+        }
         
         let defpay = UserDefaults.standard.string(forKey: "defaultpay")
         if(defpay != nil)
@@ -103,6 +115,47 @@ class PreferencesViewController: NSViewController {
        
         
     }
+    
+ 
+    @IBAction func ImportSignButton_Click(_ sender: Any) {
+        //Load NSImage.
+        let openPanel = NSOpenPanel()
+        openPanel.canCreateDirectories = false
+        openPanel.allowsMultipleSelection=false
+        openPanel.canChooseFiles=true
+        openPanel.canChooseDirectories=false
+        openPanel.showsTagField = false
+        openPanel.allowedFileTypes = ["png"]
+        openPanel.title=localizedString(forKey: "openImageTitle")
+        if (openPanel.runModal() == NSApplication.ModalResponse.OK) {
+            let result = openPanel.url
+
+                   if (result != nil) {
+                       do
+                       {
+                           SignImage.image=NSImage(data: try Data(contentsOf: result!))
+                       }
+                       catch
+                       {
+                           SignImage.image =  NSImage(named: NSImage.Name("sgn"))
+                           UserDefaults.standard.removeObject(forKey: "usersign")
+                       }
+                      
+                   
+                       print("sign imported: \(result!)")
+                   }
+               } else {
+                   print("Cancel")
+                   return // User clicked cancel
+               }
+    }
+    
+    @IBAction func ClearSignButton_Click(_ sender: Any) {
+        SignImage.image =  NSImage(named: NSImage.Name("sgn"))
+        UserDefaults.standard.removeObject(forKey: "usersign")
+    }
+    
+    /// Save info button cliick event.
     @IBAction func SaveButton_Click(_ sender: Any) {
         
         let flat=FlatCount_TextControl.stringValue
@@ -130,6 +183,15 @@ class PreferencesViewController: NSViewController {
             UserDefaults.standard.set(flat, forKey: "flatcount")
             
             UserDefaults.standard.set(pay, forKey: "defaultpay")
+            
+            if(SignImage.image !=  NSImage(named: NSImage.Name("sgn")))
+            {
+           
+                let imageData = NSImagePNGRepresentation(image: SignImage.image!)
+                UserDefaults.standard.set(imageData,forKey: "usersign")
+                
+  
+            }
             
             let answer = showDialog(title: localizedString(forKey: "infoTitle"), text: localizedString(forKey: "restartMessage"), buttonName: localizedString(forKey: "okText"), alertType: .informational)
             
@@ -182,4 +244,36 @@ class PreferencesViewController: NSViewController {
      
         return alert.runModal() == .alertFirstButtonReturn
     }
+    /// Retuns value of translated key.
+    ///
+    /// - Warning: The returned String is  localized.
+    /// - Parameter forKey: The forKey  is String object.
+    /// - Returns: String.
+    
+    
+    func localizedString(forKey key: String) -> String {
+        var result = Bundle.main.localizedString(forKey: key, value: nil, table: nil)
+
+        if result == key {
+            result = Bundle.main.localizedString(forKey: key, value: nil, table: "File")
+        }
+
+        return result
+    }
+    
+
 }
+
+
+#if os(macOS)
+
+func NSImagePNGRepresentation(image:NSImage) -> Data? {
+    guard let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil)
+        else { return nil }
+    let imageRep = NSBitmapImageRep(cgImage: cgImage)
+    imageRep.size = image.size // display size in points
+    return imageRep.representation(using: .png, properties: [:])
+}
+
+#endif
+

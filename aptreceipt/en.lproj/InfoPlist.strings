@@ -1,2 +1,10 @@
+/*
+ 
+ English
+ InfoPlist.strings for app name localization.
+ 
+ Created by berkbb on 16.03.2022.
+ 
+ */
 "CFBundleDisplayName" = "Apartment Receipt Creator";
 "CFBundleName" = "Apartment Receipt Creator";

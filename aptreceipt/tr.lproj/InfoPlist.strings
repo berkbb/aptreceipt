@@ -1,2 +1,10 @@
+/*
+ 
+ Turkish
+ InfoPlist.strings for app name localization.
+ 
+ Created by berkbb on 16.03.2022.
+ 
+ */
 "CFBundleDisplayName" = "Apartman Makbuzu Oluşturucu";
 "CFBundleName" = "Apartman Makbuzu Oluşturucu";

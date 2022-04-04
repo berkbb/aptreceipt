@@ -2,7 +2,7 @@
 //  ReceiptViewController.swift
 //  aptreceipt
 //
-//  Created by Berk Babadoğan on 18.03.2022.
+//  Created by berkbb on 18.03.2022.
 //
 
 import Cocoa
@@ -21,10 +21,12 @@ class ReceiptViewController: NSViewController {
     var printAptNumber=true
     var recType=receiptType.income
     
-   
+
+    
     //
     
     //Outlets
+    @IBOutlet weak var SignView: NSImageView!
     @IBOutlet weak var ReceiptView: NSView!
     @IBOutlet weak var AptNumber_Title: NSTextField!
     @IBOutlet weak var MainTitle: NSTextField!
@@ -46,6 +48,17 @@ class ReceiptViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do view setup here.
+        if let imageData = UserDefaults.standard.value(forKey: "usersign") as? Data{
+                if let imageFromData = NSImage(data: imageData){
+                    SignView.image=imageFromData
+                }
+            }
+  
+        else
+        {
+            SignView.isHidden=true
+        }
+        
         if(recType == receiptType.income)
         {
             Total_MesaageLabel.stringValue = "\(localizedString(forKey: "totalMessage_Income")) \(recevier)"
@@ -144,7 +157,7 @@ class ReceiptViewController: NSViewController {
                    if (result != nil) {
 
                        image.writeJPEG(toURL: result!) // Wtire JPEG extension.
-                       print("saved at \(result!)")
+                       print("saved at : \(result!)")
                    }
                } else {
                    print("Cancel")
@@ -215,8 +228,13 @@ extension NSImage {
        }
    }
 }
+
+/// Receipt type.
 enum receiptType {
+    /// Income
     case income
+    
+    ///Outcome
     case outcome
   
 }

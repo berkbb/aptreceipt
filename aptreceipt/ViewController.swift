@@ -2,7 +2,7 @@
 //  ViewController.swift
 //  aptreceipt
 //
-//  Created by Berk Babadoğan on 16.03.2022.
+//  Created by berkbb on 16.03.2022.
 //
 
 import Cocoa
@@ -28,9 +28,11 @@ class ViewController: NSViewController {
     
     private(set) var popUpInitiallySelectedItem: NSMenuItem?
     
-    ///Load function
+    // /Load function
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        //Load settings from User Defaults
         
         let flatCount = UserDefaults.standard.string(forKey: "flatcount")
         if(flatCount != nil)
@@ -91,6 +93,7 @@ class ViewController: NSViewController {
         
         
     }
+    /// Apartment ON / OFF Switch changed event.
     @IBAction func AptONFOFFSwitchChanged(_ sender: Any) {
         
         if(AptONOFFSwitch.state==NSControl.StateValue.on)
@@ -114,6 +117,7 @@ class ViewController: NSViewController {
             
         }
     }
+    /// Apartment number popup button selection changed event.
     @IBAction func NumberSelectorChanged(_ sender: Any) {
         
         let selected=Int(HomeHumber_Selector.selectedItem!.title)
@@ -129,12 +133,14 @@ class ViewController: NSViewController {
        
     }
     
+    /// Income button checked event.
     @IBAction func IncomeSelected(_ sender: Any) {
         if(Outcome_Check.state == NSControl.StateValue.on)
         {
             Outcome_Check.state=NSControl.StateValue.off
         }
     }
+    /// Outcome button checked event.
     @IBAction func OutComeSelected(_ sender: Any) {
         
         if(Income_Check.state == NSControl.StateValue.on)
@@ -229,7 +235,7 @@ class ViewController: NSViewController {
         {
             print("OK")
        
-        
+        // Create receipt.
            let vc = self.storyboard?.instantiateController(withIdentifier: "ReceiptView") as? ReceiptViewController
            
             vc?.issuer=issuerName

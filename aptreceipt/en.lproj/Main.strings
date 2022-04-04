@@ -1,4 +1,14 @@
 
+
+/*
+ 
+ English
+ Main.strings for storyboard localization.
+ 
+ Created by berkbb on 21.03.2022.
+ 
+ */
+
 /* Class = "NSMenuItem"; title = "aptreceipt"; ObjectID = "1Xt-HY-uBw"; */
 "1Xt-HY-uBw.title" = "Apartment Receipt Creator";
 
@@ -158,6 +168,30 @@
 ///* Class = "NSMenuItem"; title = "1"; ObjectID = "xrC-HP-pGM"; */
 //"xrC-HP-pGM.title" = "1";
 
+//Main UI
+
+"ui8-yM-YDs.title"="Apartment name ?";
+"Ino-7I-4x1.title"="How many house are in the apartment ?";
+"god-J5-b8y.title"="Issuer name  ?";
+"u2a-8R-TMO.title"="Default Pay Amount ?";
+"lLV-YL-TwZ.title"="Neighbor names";
+"wMi-vY-UeN.title"="House number ?";
+"6Z4-Vo-4ca.title"="House owner name ?";
+"Nzm-M8-e6n.title"="Save All";
+"0Ys-6W-uS3.title"="Type";
+"Ivx-12-OhM.title"="Income";
+"chy-UL-fIn.title"="Outcome";
+"2c2-fr-xSb.title"="Apartment Number is ON";
+"wwm-jb-00B.title"="Preferences";
+"PsQ-Gr-ol5.title"="Add";
+"hr6-xo-dd5.title"="Sign (optional)";
+"TLT-gK-rDX.title"="Clear";
+"DdK-Nl-cHZ.title"="Import";
+
+//
+
+//Receipt Area
+
 "p78-b8-iO5.title" = "Apartment Income - Expense Receipt";
 
 "GwO-Ca-QIE.title"="Apartment Number:";
@@ -176,18 +210,5 @@
 "42J-eD-UcN.title"="Cancel";
 "K7i-VG-DKe.title"="Save";
 
-"wwm-jb-00B.title"="Preferences";
 
-"ui8-yM-YDs.title"="Apartment name ?";
-"Ino-7I-4x1.title"="How many house are in the apartment ?";
-"god-J5-b8y.title"="Issuer name  ?";
-"u2a-8R-TMO.title"="Default Pay Amount ?";
-"lLV-YL-TwZ.title"="Neighbor names";
-"wMi-vY-UeN.title"="House number ?";
-"6Z4-Vo-4ca.title"="House owner name ?";
-"Nzm-M8-e6n.title"="Save All";
-"0Ys-6W-uS3.title"="Type";
-"Ivx-12-OhM.title"="Income";
-"chy-UL-fIn.title"="Outcome";
-"2c2-fr-xSb.title"="Apartment Number is ON";
-
+//

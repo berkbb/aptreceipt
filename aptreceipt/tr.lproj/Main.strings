@@ -1,4 +1,13 @@
 
+/*
+ 
+ Turkish
+ Main.strings for storyboard localization.
+ 
+ Created by berkbb on 21.03.2022.
+ 
+ */
+
 /* Class = "NSMenuItem"; title = "aptreceipt"; ObjectID = "1Xt-HY-uBw"; */
 "1Xt-HY-uBw.title" = "Apartman Makbuzu Oluşturucu";
 
@@ -158,24 +167,7 @@
 ///* Class = "NSMenuItem"; title = "1"; ObjectID = "xrC-HP-pGM"; */
 //"xrC-HP-pGM.title" = "1";
 
-"p78-b8-iO5.title" = "Apartman Gelir - Gider Makbuzu";
-"GwO-Ca-QIE.title"="Daire Numarası:";
-"L06-1k-law.title"="Ay - Yıl:";
-
-"3KZ-tY-wFg.title"="Veriliş Tarihi:";
-
-"eGY-W7-GTJ.title"="Sıra Numarası:";
-
-"Em8-wX-gH0.title"="Tutar: ";
-
-"nXt-6V-YcU.title"="Makbuzu Düzenleyen:";
-
-"pS3-aq-brw.title"="Notlar:";
-
-"42J-eD-UcN.title"="İptal Et";
-"K7i-VG-DKe.title"="Kaydet";
-
-"wwm-jb-00B.title"="Tercihler";
+//Main UI
 
 "ui8-yM-YDs.title"="Apartman adı ?";
 "Ino-7I-4x1.title"="Apartmanda kaç daire var ?";
@@ -189,4 +181,27 @@
 "Ivx-12-OhM.title"="Gelir";
 "chy-UL-fIn.title"="Gider";
 "2c2-fr-xSb.title"="Daire Numarası AÇIK";
+"wwm-jb-00B.title"="Tercihler";
+"PsQ-Gr-ol5.title"="Ekle";
+"hr6-xo-dd5.title"="İmzanız (isteğe bağlı)";
+"TLT-gK-rDX.title"="Temizle";
+"DdK-Nl-cHZ.title"="İçeri Aktar";
+
+//
+
+//Receipt
+"p78-b8-iO5.title" = "Apartman Gelir - Gider Makbuzu";
+"GwO-Ca-QIE.title"="Daire Numarası:";
+"L06-1k-law.title"="Ay - Yıl:";
+"3KZ-tY-wFg.title"="Veriliş Tarihi:";
+"eGY-W7-GTJ.title"="Sıra Numarası:";
+"Em8-wX-gH0.title"="Tutar: ";
+"nXt-6V-YcU.title"="Makbuzu Düzenleyen:";
+"pS3-aq-brw.title"="Notlar:";
+"42J-eD-UcN.title"="İptal Et";
+"K7i-VG-DKe.title"="Kaydet";
+//
+
+
+
 

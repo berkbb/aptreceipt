@@ -1,8 +1,9 @@
 /* 
   File.strings
-  aptreceipt
+  English
+  Strings for alerts and receipt transformations.
 
-  Created by Berk Babadoğan on 19.03.2022.
+  Created by berkbb on 19.03.2022.
   
 */
 
@@ -10,6 +11,7 @@
 "errorTitle" = "Error";
 "errorMessage" = "Please check all areas.";
 "saveImageTitle"="Where should I save the receipt?";
+"openImageTitle"="Select your sign";
 "infoTitle"="Info";
 "restartMessage"="Please restart the application for the changes to take effect.";
 "switchON"="Apartment Number is ON";

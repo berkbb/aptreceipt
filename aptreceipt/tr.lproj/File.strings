@@ -1,8 +1,9 @@
 /* 
   File.strings
-  aptreceipt
+  Turkish
+  Strings for alerts and receipt transformations.
 
-  Created by Berk Babadoğan on 19.03.2022.
+  Created by berkbb on 19.03.2022.
   
 */
 
@@ -10,6 +11,7 @@
 "errorTitle" = "Hata";
 "errorMessage" = "Lütfen tüm alanları kontrol edin.";
 "saveImageTitle"="Makbuzu nereye kaydedeyim ?";
+"openImageTitle"="Lütfen imzanızı seçin";
 "infoTitle"="Bilgi";
 "restartMessage"="Değişiklerin geçerli olması için lütfen uygulamayı yeniden başlatın.";
 "switchON"="Daire Numarası AÇIK";
