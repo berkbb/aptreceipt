@@ -1,4 +1,4 @@
-<img src="/aptreceipt/Assets.xcassets/Logo.imageset/aparment_macos-2@256.png" width="256" style="display: block;margin-left: auto;margin-right: auto;"/>
+<img src="/aptreceipt/Assets.xcassets/Logo.imageset/aparment_macos-2@256.png" width="256" />
 
 # Apartment Receipt Generator for macOS
 
@@ -12,3 +12,21 @@
 
 
 ### UI screenshots:
+<table>
+<tr>
+<td>
+<img src="/aptreceipt/Assets.xcassets/Logo.imageset/aparment_macos-2@256.png" width="256" />
+</td>
+<td>
+<img src="/aptreceipt/Assets.xcassets/Logo.imageset/aparment_macos-2@256.png" width="256" />
+</td>
+</tr>
+<tr>
+<td>
+<img src="/aptreceipt/Assets.xcassets/Logo.imageset/aparment_macos-2@256.png" width="256" />
+</td>
+<td>
+<img src="/aptreceipt/Assets.xcassets/Logo.imageset/aparment_macos-2@256.png" width="256" />
+</td>
+</tr>
+</table>
