@@ -13,8 +13,9 @@ class PreferencesViewController: NSViewController {
    
     @IBOutlet weak var AptName_TextControl: NSTextField!
 
+    @IBOutlet weak var Counter_TextControl: NSTextField!
     @IBOutlet weak var DefaultPay_TextControl: NSTextField!
-    
+
     @IBOutlet weak var House_Selector: NSPopUpButton!
     @IBOutlet weak var FlatCount_TextControl: NSTextField!
     @IBOutlet weak var HouseOwner_TextControl: NSTextField!
@@ -33,6 +34,15 @@ class PreferencesViewController: NSViewController {
         else
         {
             print("No sign imported.")
+        }
+        let seqNumber = UserDefaults.standard.string(forKey: "seqNumber")
+         if(seqNumber != nil)
+        {
+             Counter_TextControl.stringValue=seqNumber!
+         }
+        else
+        {
+            Counter_TextControl.stringValue="1"
         }
         
         let defpay = UserDefaults.standard.string(forKey: "defaultpay")
@@ -82,6 +92,12 @@ class PreferencesViewController: NSViewController {
        
         
     }
+    
+    /// Queue  reset
+    @IBAction func ResetCounterButton_Click(_ sender: Any) {
+        Counter_TextControl.stringValue="1"
+    }
+    
     
     /// Save person button clciked event.
     @IBAction func SavePersonButton_Clicked(_ sender: Any) {
@@ -162,6 +178,7 @@ class PreferencesViewController: NSViewController {
         let name=AptName_TextControl.stringValue
         let issuer = Issuer_TextControl.stringValue.localizedCapitalized
         let pay=DefaultPay_TextControl.stringValue
+        let count=Counter_TextControl.stringValue
         
        
     
@@ -173,10 +190,12 @@ class PreferencesViewController: NSViewController {
         print(issuer)
         print(name)
         
-        if(!AptName_TextControl.stringValue.isEmpty && !FlatCount_TextControl.stringValue.isEmpty && !Issuer_TextControl.stringValue.isEmpty && flats != nil && pays != nil)
+        if(!AptName_TextControl.stringValue.isEmpty && !FlatCount_TextControl.stringValue.isEmpty && !Counter_TextControl.stringValue.isEmpty && !Issuer_TextControl.stringValue.isEmpty && flats != nil && pays != nil )
         {
             print("OK")
             UserDefaults.standard.set(name, forKey: "aptname")
+            
+            UserDefaults.standard.set(count, forKey: "seqNumber")
             
             UserDefaults.standard.set(issuer, forKey: "issuer")
             

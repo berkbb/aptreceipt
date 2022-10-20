@@ -34,6 +34,16 @@ class ViewController: NSViewController {
         
         //Load settings from User Defaults
         
+        let seqNumber = UserDefaults.standard.string(forKey: "seqNumber")
+         if(seqNumber != nil)
+        {
+             SeqNumber_textControl.stringValue=seqNumber!
+         }
+        else
+        {
+            SeqNumber_textControl.stringValue="1"
+        }
+        
         let flatCount = UserDefaults.standard.string(forKey: "flatcount")
         if(flatCount != nil)
         {
@@ -150,6 +160,16 @@ class ViewController: NSViewController {
     }
     /// Clear button click  event.
     @IBAction func Clear_Click(_ sender: NSButton) {
+        let seqNumber = UserDefaults.standard.string(forKey: "seqNumber")
+         if(seqNumber != nil)
+        {
+             SeqNumber_textControl.stringValue=seqNumber!
+         }
+        else
+        {
+            SeqNumber_textControl.stringValue="1"
+        }
+        
         HomeHumber_Selector.selectItem(at: 0)
         let homeOwner = UserDefaults.standard.string(forKey: "homeowner_1")
         
@@ -161,7 +181,6 @@ class ViewController: NSViewController {
             }
       
         DatePicker_Receipt.dateValue=Date()
-        SeqNumber_textControl.stringValue=""
         let issuerName = UserDefaults.standard.string(forKey: "issuer")
         if(issuerName != nil)
         {
@@ -196,12 +215,27 @@ class ViewController: NSViewController {
         if !issueDate.isEmpty {
             print("Issue Date: \(issueDate)")
         }
+        
+        
   
         let seqNumber=SeqNumber_textControl.stringValue
         if !seqNumber.isEmpty {
             print("Sequence Number: \(seqNumber)")
+            let seqNumber2 = UserDefaults.standard.string(forKey: "seqNumber")
+             if(seqNumber2 != nil)
+            {
+                 let y = Int(seqNumber2!)!+1
+                 let t = String(y)
+                UserDefaults.standard.set(t, forKey: "seqNumber")
+             }
+            else
+            {
+               
+                UserDefaults.standard.set(2, forKey: "seqNumber")
+            }
         }
     
+        
       
         let issuerName=SupplierName_textControl.stringValue.localizedCapitalized
         if !issuerName.isEmpty {

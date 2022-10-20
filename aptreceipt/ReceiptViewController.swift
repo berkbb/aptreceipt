@@ -77,6 +77,7 @@ class ReceiptViewController: NSViewController {
 
         Receipt_IssuerLabel.stringValue=issuer
         Notes_Print.stringValue=notes
+        
         MonthYear_Label.stringValue=monthYear
         AptNumber_Label.stringValue=String(aptNumber)
         let locale = Locale.current
