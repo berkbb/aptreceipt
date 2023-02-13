@@ -49,7 +49,7 @@
 "H4j-Dg-rWq.title" = "Clear";
 
 /* Class = "NSWindow"; title = "Receipt Creator"; ObjectID = "IQv-IB-iLA"; */
-"IQv-IB-iLA.title" = "Receipt Creator";
+"IQv-IB-iLA.title" = "Apartment Receipt Creator";
 
 ///* Class = "NSMenuItem"; title = "2"; ObjectID = "Ihk-7E-fpB"; */
 //"Ihk-7E-fpB.title" = "2";
@@ -212,6 +212,9 @@
 "K7i-VG-DKe.title"="Save";
 "52B-ls-IgM.title"="Queue Counter";
 
+"Zqb-4B-rdJ.label"="Apartment";
+"omw-Mg-ghP.label"="Neighbor";
+"wVe-6h-UrH.label"="Other";
 
 
 //

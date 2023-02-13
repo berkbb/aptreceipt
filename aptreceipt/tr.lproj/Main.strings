@@ -48,7 +48,7 @@
 "H4j-Dg-rWq.title" = "Temizle";
 
 /* Class = "NSWindow"; title = "Receipt Creator"; ObjectID = "IQv-IB-iLA"; */
-"IQv-IB-iLA.title" = "Makbuz Yaratıcı";
+"IQv-IB-iLA.title" = "Apartman Makbuzu Oluşturucu";
 
 ///* Class = "NSMenuItem"; title = "2"; ObjectID = "Ihk-7E-fpB"; */
 //"Ihk-7E-fpB.title" = "2";
@@ -203,6 +203,9 @@
 "K7i-VG-DKe.title"="Kaydet";
 "52B-ls-IgM.title"="Sıra Numarası";
 "TZ0-b9-ept.title"="Sıfırla";
+"Zqb-4B-rdJ.label"="Apartman";
+"omw-Mg-ghP.label"="Komşu";
+"wVe-6h-UrH.label"="Diğer";
 
 
 //
