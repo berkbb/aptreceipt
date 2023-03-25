@@ -486,7 +486,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				MARKETING_VERSION = 3;
-				PRODUCT_BUNDLE_IDENTIFIER = com.babadogan.aptreceipt;
+				PRODUCT_BUNDLE_IDENTIFIER = com.berkbb.aptreceipt;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -519,7 +519,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				MARKETING_VERSION = 3;
-				PRODUCT_BUNDLE_IDENTIFIER = com.babadogan.aptreceipt;
+				PRODUCT_BUNDLE_IDENTIFIER = com.berkbb.aptreceipt;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
