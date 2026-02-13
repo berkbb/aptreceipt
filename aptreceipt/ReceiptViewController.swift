@@ -1,241 +1,164 @@
-//
-//  ReceiptViewController.swift
-//  aptreceipt
-//
-//  Created by berkbb on 18.03.2022.
-//
+import AppKit
+import SwiftUI
 
-import Cocoa
+struct ReceiptPreviewSheet: View {
+    let draft: ReceiptDraft
+    @ObservedObject var settings: ReceiptSettingsStore
+    @Environment(\.presentationMode) private var presentationMode
 
-class ReceiptViewController: NSViewController {
+    var body: some View {
+        VStack(spacing: 16) {
+            ReceiptDocumentView(draft: draft, apartmentName: settings.apartmentName, signatureImage: settings.signatureImage)
+                .frame(width: 760, height: 520)
+                .padding(16)
+                .background(Color.gray.opacity(0.08))
 
-    //Variables comes from main view controller
-    var recevier:String = ""
-    var issuer:String = ""
-    var notes:String = ""
-    var monthYear:String = ""
-    var aptNumber:Int=0
-    var price:Double=0.0
-    var seqNumber:Int=0
-    var currentDate:String=""
-    var printAptNumber=true
-    var recType=receiptType.income
-    
-
-    
-    //
-    
-    //Outlets
-    @IBOutlet weak var SignView: NSImageView!
-    @IBOutlet weak var ReceiptView: NSView!
-    @IBOutlet weak var AptNumber_Title: NSTextField!
-    @IBOutlet weak var MainTitle: NSTextField!
-    @IBOutlet weak var Receipt_IssuerLabel: NSTextField!
-    @IBOutlet weak var Total_MesaageLabel: NSTextField!
-    @IBOutlet weak var Notes_Print: NSTextField!
-    @IBOutlet weak var MonthYear_Label: NSTextField!
-    @IBOutlet weak var AptNumber_Label: NSTextField!
-    @IBOutlet weak var Date_Label: NSTextField!
-    @IBOutlet weak var Price_Label: NSTextField!
-    @IBOutlet weak var Seq_Label: NSTextField!
-    @IBOutlet weak var CurrentDate_Label: NSTextField!
-    @IBOutlet weak var Receipt: NSBox!
-  
-    
-    //
-    
-    ///Load function
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do view setup here.
-        if let imageData = UserDefaults.standard.value(forKey: "usersign") as? Data{
-                if let imageFromData = NSImage(data: imageData){
-                    SignView.image=imageFromData
+            HStack {
+                Spacer()
+                Button("Kapat") {
+                    presentationMode.wrappedValue.dismiss()
                 }
-            }
-  
-        else
-        {
-            SignView.isHidden=true
-        }
-        
-        if(recType == receiptType.income)
-        {
-            Total_MesaageLabel.stringValue = "\(localizedString(forKey: "totalMessage_Income")) \(recevier)"
-        }
-        
-        else
-        {
-            Total_MesaageLabel.stringValue = "\(localizedString(forKey: "totalMessage_Outcome")) \(recevier)"
-        }
-        
-        if(printAptNumber == false)
-        {
-            AptNumber_Label.isHidden=true
-            AptNumber_Title.isHidden=true
-        }
-
-        Receipt_IssuerLabel.stringValue=issuer
-        Notes_Print.stringValue=notes
-        
-        MonthYear_Label.stringValue=monthYear
-        AptNumber_Label.stringValue=String(aptNumber)
-        let locale = Locale.current
-        let currencySymbol = locale.currencySymbol!
-        if locale.languageCode!.contains("tr") {
-            Price_Label.stringValue="\(String(price)) \(currencySymbol)"
-            let aptName = UserDefaults.standard.string(forKey: "aptname")
-            if(aptName != nil)
-            {
-             
-                
-                if(recType == receiptType.income)
-                {
-                    MainTitle.stringValue="\(aptName!) \(localizedString(forKey: "incomeTitle"))"
+                Button("JPEG Olarak Kaydet") {
+                    saveReceiptImage()
                 }
-                
-                else
-                {
-                    MainTitle.stringValue="\(aptName!) \(localizedString(forKey: "outcomeTitle"))"
-                }
+                .keyboardShortcut(.defaultAction)
             }
-            else
-            {
-                
-                if(recType == receiptType.income)
-                {
-                    MainTitle.stringValue="\(localizedString(forKey: "incomeTitle"))"
-                }
-                
-                else
-                {
-                    MainTitle.stringValue="\(localizedString(forKey: "outcomeTitle"))"
-                }
-            }
-           
+            .padding(.horizontal, 16)
+            .padding(.bottom, 16)
         }
-        else // en
-        {
-            Price_Label.stringValue=" \(currencySymbol) \(String(price))"
-            
-            let aptName = UserDefaults.standard.string(forKey: "aptname")
-            if(aptName != nil)
-            {
-                MainTitle.stringValue="Apartment Income - Expense Receipt for \(aptName!)"
-            }
-            else
-            {
-                MainTitle.stringValue="Apartment Income - Expense Receipt"
-            }
-        }
-        
-        Price_Label.stringValue="\(String(price)) \(currencySymbol)"
-        Seq_Label.stringValue=String(seqNumber)
-        CurrentDate_Label.stringValue=currentDate
     }
-    /// Cancel click function
-    @IBAction func Cancel_Click(_ sender: Any) {
-        
-        // Back to main view.
-        if let controller=self.storyboard?.instantiateController(withIdentifier: "HomeView") as? ViewController{self.view.window?.contentViewController=controller}
-    }
-    
-    /// Save click function
-    @IBAction func Save_Click(_ sender: Any) {
-        
-        let image=Receipt.asImage(); // Convert NS Box to NSImage
-   
-        //Save NSImage.
-        let savePanel = NSSavePanel()
-            savePanel.canCreateDirectories = true
-            savePanel.showsTagField = false
-        savePanel.nameFieldStringValue = "\(recevier.lowercased())_\(monthYear.lowercased()).jpg"
-        savePanel.allowedFileTypes = ["jpg"]
-        savePanel.title=localizedString(forKey: "saveImagetitle")
-        if (savePanel.runModal() == NSApplication.ModalResponse.OK) {
-                    let result = savePanel.url
 
-                   if (result != nil) {
+    private func saveReceiptImage() {
+        let panel = NSSavePanel()
+        panel.canCreateDirectories = true
+        panel.showsTagField = false
+        panel.allowedFileTypes = ["jpg"]
+        panel.nameFieldStringValue = "\(draft.receiver.lowercased())_\(draft.monthYear.lowercased()).jpg"
 
-                       image.writeJPEG(toURL: result!) // Wtire JPEG extension.
-                       print("saved at : \(result!)")
-                   }
-               } else {
-                   print("Cancel")
-                   return // User clicked cancel
-               }
-    
-    }
-    
-    
-    /// Retuns value of translated key.
-    ///
-    /// - Warning: The returned String is  localized.
-    /// - Parameter forKey: The forKey  is String object.
-    /// - Returns: String.
-    
-    
-    func localizedString(forKey key: String) -> String {
-        var result = Bundle.main.localizedString(forKey: key, value: nil, table: nil)
-
-        if result == key {
-            result = Bundle.main.localizedString(forKey: key, value: nil, table: "File")
+        guard panel.runModal() == .OK, let url = panel.url else {
+            return
         }
 
-        return result
-    }
-    
+        let document = ReceiptDocumentView(
+            draft: draft,
+            apartmentName: settings.apartmentName,
+            signatureImage: settings.signatureImage
+        )
+        .frame(width: 760, height: 520)
 
+        let hosting = NSHostingView(rootView: document)
+        hosting.frame = NSRect(x: 0, y: 0, width: 760, height: 520)
+        hosting.layoutSubtreeIfNeeded()
+
+        guard let rep = hosting.bitmapImageRepForCachingDisplay(in: hosting.bounds) else {
+            return
+        }
+
+        hosting.cacheDisplay(in: hosting.bounds, to: rep)
+        let image = NSImage(size: hosting.bounds.size)
+        image.addRepresentation(rep)
+        image.writeJPEG(toURL: url)
+    }
 }
-extension NSBox {
 
-    /// Converts NSBox to NSImage
-    ///
-   
-    /// - Returns: NsImage.
-    func asImage() -> NSImage {
-        let viewToCapture = self
-        let rep = viewToCapture.bitmapImageRepForCachingDisplay(in: viewToCapture.bounds)!
-        viewToCapture.cacheDisplay(in: viewToCapture.bounds, to: rep)
+struct ReceiptDocumentView: View {
+    let draft: ReceiptDraft
+    let apartmentName: String
+    let signatureImage: NSImage?
 
-        let img = NSImage(size: viewToCapture.bounds.size)
-        img.addRepresentation(rep)
-        return img
-        }
-    
+    private var formattedAmount: String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.locale = .current
+        return formatter.string(from: NSNumber(value: draft.amount)) ?? "\(draft.amount)"
     }
+
+    private var title: String {
+        let base = apartmentName.isEmpty ? "Apartman" : apartmentName
+        switch draft.kind {
+        case .income:
+            return "\(base) Gelir Makbuzu"
+        case .outcome:
+            return "\(base) Gider Makbuzu"
+        }
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text(title)
+                .font(.system(size: 26, weight: .bold))
+
+            Divider()
+
+            receiptRow(label: "Tahsil Eden", value: draft.issuer)
+            receiptRow(label: "Ödeyen", value: draft.receiver)
+            receiptRow(label: "Dönem", value: draft.monthYear)
+
+            if draft.showApartmentNumber {
+                receiptRow(label: "Daire", value: "\(draft.apartmentNumber)")
+            }
+
+            receiptRow(label: "Tutar", value: formattedAmount)
+            receiptRow(label: "Sıra No", value: "\(draft.sequenceNumber)")
+            receiptRow(label: "Tarih", value: draft.createdDate)
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Açıklama")
+                    .font(.headline)
+                Text(draft.notes)
+                    .font(.body)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+
+            Spacer(minLength: 8)
+
+            if let signatureImage {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("İmza")
+                        .font(.headline)
+                    Image(nsImage: signatureImage)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(maxHeight: 80)
+                }
+            }
+        }
+        .padding(24)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .foregroundColor(.black)
+        .background(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(Color.white)
+                .shadow(color: .black.opacity(0.08), radius: 10, y: 4)
+        )
+    }
+
+    @ViewBuilder
+    private func receiptRow(label: String, value: String) -> some View {
+        HStack(alignment: .firstTextBaseline) {
+            Text(label)
+                .font(.headline)
+                .frame(width: 120, alignment: .leading)
+            Text(value)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+}
 
 extension NSImage {
-    
-    /// Save NSImage as JPEG.
-    ///
-  
-    /// - Parameter toURL: Save location.
-    
     func writeJPEG(toURL url: URL) {
+        guard
+            let data = tiffRepresentation,
+            let rep = NSBitmapImageRep(data: data),
+            let imageData = rep.representation(using: .jpeg, properties: [.compressionFactor: NSNumber(value: 1.0)])
+        else {
+            return
+        }
 
-       guard let data = tiffRepresentation,
-           let rep = NSBitmapImageRep(data: data),
-             let imgData = rep.representation(using: .jpeg, properties: [.compressionFactor : NSNumber(floatLiteral: 1.0)]) else {
-
-               print("\(self.self) Error Function '\(#function)' Line: \(#line) No tiff rep found for image writing to \(url)")
-               return
-       }
-
-       do {
-           try imgData.write(to: url)
-       }catch let error {
-           print("\(self.self) Error Function '\(#function)' Line: \(#line) \(error.localizedDescription)")
-       }
-   }
-}
-
-/// Receipt type.
-enum receiptType {
-    /// Income
-    case income
-    
-    ///Outcome
-    case outcome
-  
+        do {
+            try imageData.write(to: url)
+        } catch {
+            return
+        }
+    }
 }

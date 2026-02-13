@@ -1,39 +1,35 @@
-//
-//  AppDelegate.swift
-//  aptreceipt
-//
-//  Created by berkbb on 16.03.2022.
-//
-
 import Cocoa
+import SwiftUI
 
 @main
-class AppDelegate: NSObject, NSApplicationDelegate {
+struct AptReceiptApp: App {
+    @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 
-    
+    var body: some Scene {
+        WindowGroup("Apartman Makbuzu") {
+            MainScreen()
+                .frame(minWidth: 980, minHeight: 700)
+        }
+    }
+}
 
-
-    func applicationDidFinishLaunching(_ aNotification: Notification) {
-        // Insert code here to initialize your application
-        lazy var windows = NSWindow()
+final class AppDelegate: NSObject, NSApplicationDelegate {
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        NSApp.setActivationPolicy(.regular)
+        NSApp.activate(ignoringOtherApps: true)
     }
 
-    func applicationWillTerminate(_ aNotification: Notification) {
-        // Insert code here to tear down your application
-        
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        if !flag {
+            for window in sender.windows {
+                window.makeKeyAndOrderFront(self)
+            }
+            NSApp.activate(ignoringOtherApps: true)
+        }
+        return true
     }
 
     func applicationSupportsSecureRestorableState(_ app: NSApplication) -> Bool {
-        return true
+        true
     }
-    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
-            if !flag {
-                sender.windows.forEach { $0.makeKeyAndOrderFront(self) }
-            }
-
-            return true
-        }
-    
-    
 }
-

@@ -1,393 +1,313 @@
-//
-//  ViewController.swift
-//  aptreceipt
-//
-//  Created by berkbb on 16.03.2022.
-//
+import AppKit
+import SwiftUI
 
-import Cocoa
+struct MainScreen: View {
+    @StateObject private var settings = ReceiptSettingsStore()
 
-class ViewController: NSViewController {
+    @State private var selectedApartment = 1
+    @State private var receiptDate = Date()
+    @State private var issuerName = ""
+    @State private var ownerName = ""
+    @State private var sequenceNumber = "1"
+    @State private var totalAmount = ""
+    @State private var notes = ""
+    @State private var printApartmentNumber = true
+    @State private var receiptKind: ReceiptKind = .income
 
-    //Outlets
- 
-    @IBOutlet weak var HomeHumber_Selector: NSPopUpButton!
-    @IBOutlet weak var DatePicker_Receipt: NSDatePicker!
-    @IBOutlet weak var SupplierName_textControl: NSTextField!
-    @IBOutlet weak var OwnerName_textControl: NSTextField!
-    @IBOutlet weak var SeqNumber_textControl: NSTextField!
-    @IBOutlet weak var Total_TextControl: NSTextField!
-    @IBOutlet weak var Info_TextControl: NSTextField!
-    
-    @IBOutlet weak var AptONOFFSwitch: NSSwitch!
-    @IBOutlet weak var AptONOFFLabel: NSTextField!
-    @IBOutlet weak var Income_Check: NSButton!
-    
-    @IBOutlet weak var Outcome_Check: NSButton!
-    //
-    
-    private(set) var popUpInitiallySelectedItem: NSMenuItem?
-    
-    // /Load function
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        //Load settings from User Defaults
-        
-        let seqNumber = UserDefaults.standard.string(forKey: "seqNumber")
-         if(seqNumber != nil)
-        {
-             SeqNumber_textControl.stringValue=seqNumber!
-         }
-        else
-        {
-            SeqNumber_textControl.stringValue="1"
-        }
-        
-        let flatCount = UserDefaults.standard.string(forKey: "flatcount")
-        if(flatCount != nil)
-        {
-            for i in 1..<Int(flatCount!)!+1 // For 8 apartment home.
-            {
-                HomeHumber_Selector.addItem(withTitle: String(i))
-                
-             
-                
-                
+    @State private var previewDraft: ReceiptDraft?
+    @State private var isPresentingSettings = false
+    @State private var validationError: ValidationError?
+
+    var body: some View {
+        VStack(spacing: 16) {
+            HStack {
+                Text("Apartman Makbuzu")
+                    .font(.system(size: 24, weight: .semibold))
+                Spacer()
+                Button("Tercihler") {
+                    isPresentingSettings = true
+                }
+            }
+
+            VStack(spacing: 12) {
+                GroupBox(
+                    label: Text("Makbuz Türü")
+                ) {
+                    Picker("Makbuz Türü", selection: $receiptKind) {
+                        ForEach(ReceiptKind.allCases) { kind in
+                            Text(kind.title).tag(kind)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                }
+
+                GroupBox(
+                    label: Text("Makbuz Bilgileri")
+                ) {
+                    VStack(alignment: .leading, spacing: 10) {
+                        HStack {
+                            Picker("Daire No", selection: $selectedApartment) {
+                                ForEach(settings.apartmentNumbers, id: \.self) { number in
+                                    Text("\(number)").tag(number)
+                                }
+                            }
+                            Toggle("Daire numarasını yazdır", isOn: $printApartmentNumber)
+                        }
+
+                        DatePicker("Dönem", selection: $receiptDate, displayedComponents: .date)
+
+                        TextField("Tahsil Eden", text: $issuerName)
+                        TextField("Ödeyen", text: $ownerName)
+                        TextField("Sıra No", text: $sequenceNumber)
+                        TextField("Tutar", text: $totalAmount)
+                        TextField("Açıklama", text: $notes)
+                    }
+                }
+            }
+
+            HStack {
+                Button("Temizle") {
+                    resetForm()
+                }
+
+                Spacer()
+
+                Button("Makbuz Oluştur") {
+                    createReceipt()
+                }
+                .keyboardShortcut(.defaultAction)
             }
         }
-        
-        else
-        {
-            HomeHumber_Selector.addItem(withTitle: "1")
+        .padding(20)
+        .onAppear {
+            resetForm()
         }
-        
-        HomeHumber_Selector.selectItem(at: 0)
-        let homeOwner = UserDefaults.standard.string(forKey: "homeowner_1")
-        
-       
-            if(homeOwner != nil)
-            {
-                
-                OwnerName_textControl.stringValue=homeOwner!.localizedCapitalized
-            }
-      
-       
-        
-     
-        let defpay = UserDefaults.standard.string(forKey: "defaultpay")
-        if(defpay != nil)
-        {
-            Total_TextControl.stringValue=defpay!
+        .onChange(of: selectedApartment) { newValue in
+            ownerName = settings.owner(for: newValue)
         }
-        
-       
-        
-      
-       
-        let issuerName = UserDefaults.standard.string(forKey: "issuer")
-        if(issuerName != nil)
-        {
-            SupplierName_textControl.stringValue=issuerName!
+        .sheet(item: $previewDraft) { draft in
+            ReceiptPreviewSheet(draft: draft, settings: settings)
         }
-     
-        // Do any additional setup after loading the view.
-        
-        
+        .sheet(isPresented: $isPresentingSettings) {
+            SettingsView(settings: settings)
+                .frame(width: 640, height: 560)
+        }
+        .alert(item: $validationError) { issue in
+            Alert(
+                title: Text("Doğrulama Hatası"),
+                message: Text(issue.message),
+                dismissButton: .default(Text("Tamam"))
+            )
+        }
     }
 
-    override var representedObject: Any? {
-        didSet {
-        // Update the view, if already loaded.
-        }
-        
-        
+    private func resetForm() {
+        selectedApartment = settings.apartmentNumbers.first ?? 1
+        receiptDate = Date()
+        issuerName = settings.issuer
+        ownerName = settings.owner(for: selectedApartment)
+        sequenceNumber = String(settings.seqNumber)
+        totalAmount = settings.defaultPayment
+        notes = ""
+        printApartmentNumber = true
+        receiptKind = .income
     }
-    /// Apartment ON / OFF Switch changed event.
-    @IBAction func AptONFOFFSwitchChanged(_ sender: Any) {
-        
-        if(AptONOFFSwitch.state==NSControl.StateValue.on)
-        {
-            print("on")
-            let value = localizedString(forKey: "switchON")
-       
-                AptONOFFLabel.stringValue=value
-            
-         
-            
-        }
-        
-        else
-        {
-            print("off")
-            let value = localizedString(forKey: "switchOFF")
-          
-                AptONOFFLabel.stringValue=value
-            
-            
-        }
-    }
-    /// Apartment number popup button selection changed event.
-    @IBAction func NumberSelectorChanged(_ sender: Any) {
-        
-        let selected=Int(HomeHumber_Selector.selectedItem!.title)
-        print("Selected apartment number: \(selected!)")
-        let homeOwner = UserDefaults.standard.string(forKey: "homeowner_\(selected!)")
-        
-            if(homeOwner != nil)
-            {
-                
-                OwnerName_textControl.stringValue=homeOwner!.localizedCapitalized
-            }
-      
-       
-    }
-    
-    /// Income button checked event.
-    @IBAction func IncomeSelected(_ sender: Any) {
-        if(Outcome_Check.state == NSControl.StateValue.on)
-        {
-            Outcome_Check.state=NSControl.StateValue.off
-        }
-    }
-    /// Outcome button checked event.
-    @IBAction func OutComeSelected(_ sender: Any) {
-        
-        if(Income_Check.state == NSControl.StateValue.on)
-        {
-            Income_Check.state=NSControl.StateValue.off
-        }
-    }
-    /// Clear button click  event.
-    @IBAction func Clear_Click(_ sender: NSButton) {
-        let seqNumber = UserDefaults.standard.string(forKey: "seqNumber")
-         if(seqNumber != nil)
-        {
-             SeqNumber_textControl.stringValue=seqNumber!
-         }
-        else
-        {
-            SeqNumber_textControl.stringValue="1"
-        }
-        
-        HomeHumber_Selector.selectItem(at: 0)
-        let homeOwner = UserDefaults.standard.string(forKey: "homeowner_1")
-        
-       
-            if(homeOwner != nil)
-            {
-                
-                OwnerName_textControl.stringValue=homeOwner!.localizedCapitalized
-            }
-      
-        DatePicker_Receipt.dateValue=Date()
-        let issuerName = UserDefaults.standard.string(forKey: "issuer")
-        if(issuerName != nil)
-        {
-            SupplierName_textControl.stringValue=issuerName!
-        }
-        
-        Info_TextControl.stringValue=""
-        AptONOFFSwitch.state=NSControl.StateValue.on
-        let value = localizedString(forKey: "switchON")
-   
-            AptONOFFLabel.stringValue=value
-        Outcome_Check.state=NSControl.StateValue.off
-        Income_Check.state=NSControl.StateValue.on
-        
-           let defpay = UserDefaults.standard.string(forKey: "defaultpay")
-           if(defpay != nil)
-           {
-               Total_TextControl.stringValue=defpay!
-           }
-     
-        
-    }
-   
-    /// Create button click  event.
-    @IBAction func Create_Click(_ sender: NSButton) {
-        
-        
-        
-        let selectedApartment=HomeHumber_Selector.selectedItem?.title
-        print("Apartment number: \(selectedApartment!)")
-        let issueDate=DatePicker_Receipt.dateValue.getDatewithMonthandYear()
-        if !issueDate.isEmpty {
-            print("Issue Date: \(issueDate)")
-        }
-        
-        
-  
-        let seqNumber=SeqNumber_textControl.stringValue
-        if !seqNumber.isEmpty {
-            print("Sequence Number: \(seqNumber)")
-            let seqNumber2 = UserDefaults.standard.string(forKey: "seqNumber")
-             if(seqNumber2 != nil)
-            {
-                 let y = Int(seqNumber2!)!+1
-                 let t = String(y)
-                UserDefaults.standard.set(t, forKey: "seqNumber")
-             }
-            else
-            {
-               
-                UserDefaults.standard.set(2, forKey: "seqNumber")
-            }
-        }
-    
-        
-      
-        let issuerName=SupplierName_textControl.stringValue.localizedCapitalized
-        if !issuerName.isEmpty {
-            print("Issuer Name: \(issuerName)")
-        }
-       
-        let ownerName=OwnerName_textControl.stringValue.localizedCapitalized
-        if !ownerName.isEmpty {
-            print("Owner Name: \(ownerName)")
-        }
-        let total=Total_TextControl.stringValue
-         if !total.isEmpty {
-             print("Total: \(total)")
-         }
-       
-     
-        var info=Info_TextControl.stringValue
-        if !info.isEmpty {
-            print("Info: \(info)")
-        }
-        else
-        {
-            info=" "
-        }
-        
-        let doubleTotal = Double(total)
-        
-        let intSequence = Int(seqNumber)
-        
-        if( !selectedApartment!.isEmpty  && !seqNumber.isEmpty && !total.isEmpty && !issuerName.isEmpty && !ownerName.isEmpty && !issueDate.isEmpty && !info.isEmpty && doubleTotal != nil && intSequence != nil )
-        {
-            print("OK")
-       
-        // Create receipt.
-           let vc = self.storyboard?.instantiateController(withIdentifier: "ReceiptView") as? ReceiptViewController
-           
-            vc?.issuer=issuerName
-            vc?.recevier=ownerName
-            vc?.notes=info
-            vc?.monthYear=issueDate
-            vc?.aptNumber=Int(selectedApartment!)!
-            vc?.price=Double(total)!
-            vc?.seqNumber=Int(seqNumber)!
-            vc?.currentDate=Date().getDatewithDayMonthandYear()
-            vc?.printAptNumber = AptONOFFSwitch.state == NSControl.StateValue.on ? true : false
-            vc?.recType = Income_Check.state == NSControl.StateValue.on ? receiptType.income : receiptType.outcome
-            
-          if let controller = vc {self.view.window?.contentViewController=controller}
-            
-            
-        }
-        else
-        {
-            print("Error - Check areas!")
-            
-            let answer = showDialog(title: localizedString(forKey: "errorTitle"), text: localizedString(forKey: "errorMessage"), buttonName: localizedString(forKey: "okText"), alertType: .warning)
-            
-            print(answer)
-        }
-       
-    }
-    
-   
 
-    /// Prints OK Cancel Dialog
-    ///
-    /// - Warning: The returned alert is  localized.
-    /// - Parameter title: The title  is String object.
-    /// - Parameter text: The text  is String object.
-    /// - Parameter alertType: The text  is NSAlert.Style object.
-    /// - Parameter buttonName: The text  is String object.
-    /// - Returns: boolean.
-    
-    func showDialog(title: String, text: String, buttonName:String, alertType: NSAlert.Style ) -> Bool {
-        let alert = NSAlert()
-        alert.messageText = title
-        alert.informativeText = text
-        alert.alertStyle = alertType
-        alert.addButton(withTitle: buttonName)
-     
-        return alert.runModal() == .alertFirstButtonReturn
-    }
-    
-    
-    /// Retuns value of translated key.
-    ///
-    /// - Warning: The returned String is  localized.
-    /// - Parameter forKey: The forKey  is String object.
-    /// - Returns: bStringoolean.
-    
-    
-    func localizedString(forKey key: String) -> String {
-        var result = Bundle.main.localizedString(forKey: key, value: nil, table: nil)
+    private func createReceipt() {
+        let trimmedIssuer = issuerName.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedOwner = ownerName.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedSequence = sequenceNumber.trimmingCharacters(in: .whitespacesAndNewlines)
 
-        if result == key {
-            result = Bundle.main.localizedString(forKey: key, value: nil, table: "File")
+        guard !trimmedIssuer.isEmpty else {
+            validationError = ValidationError(message: "Tahsil eden bilgisi zorunludur.")
+            return
+        }
+        guard !trimmedOwner.isEmpty else {
+            validationError = ValidationError(message: "Ödeyen bilgisi zorunludur.")
+            return
+        }
+        guard let sequence = Int(trimmedSequence), sequence > 0 else {
+            validationError = ValidationError(message: "Sıra numarası pozitif tam sayı olmalıdır.")
+            return
+        }
+        guard let amount = parseAmount(totalAmount), amount >= 0 else {
+            validationError = ValidationError(message: "Tutar sayısal olmalıdır.")
+            return
         }
 
-        return result
+        previewDraft = ReceiptDraft(
+            receiver: trimmedOwner.localizedCapitalized,
+            issuer: trimmedIssuer.localizedCapitalized,
+            notes: notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "-" : notes,
+            monthYear: receiptDate.monthYearString,
+            apartmentNumber: selectedApartment,
+            amount: amount,
+            sequenceNumber: sequence,
+            createdDate: Date().dayMonthYearString,
+            showApartmentNumber: printApartmentNumber,
+            kind: receiptKind
+        )
+
+        settings.seqNumber = sequence + 1
+        sequenceNumber = String(settings.seqNumber)
+    }
+
+    private func parseAmount(_ input: String) -> Double? {
+        let normalized = input
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .replacingOccurrences(of: ",", with: ".")
+        return Double(normalized)
     }
 }
-extension Date
-{
-    // Get month and year from Date from given 'sentDate'
-    ///
-    /// - Warning: The returned string is  localized.
-    
-    /// - Returns: A date string to the `sentDate` like XXXX YYYY.
-    func getDatewithMonthandYear() -> String
-    {
-        let dateFormatter1 = DateFormatter()
-        dateFormatter1.dateFormat = "yyyy"
-        let yearString = dateFormatter1.string(from: self)
-        let dateFormatter2 = DateFormatter()
-        dateFormatter2.dateFormat = "MMMM"
-        let monthString = dateFormatter2.string(from: self)
-        let returnValue = "\(monthString) \(yearString)"
-        
-      
-        return returnValue
-    }
-    
-    // Get day, month and year from Date from given 'sentDate'
-    ///
-    /// - Warning: The returned string is  localized.
-   
-    /// - Returns: A date string to the `sentDate` like XXXX YYYY.
-    func getDatewithDayMonthandYear() -> String
-    {
-        let dateFormatter1 = DateFormatter()
-        dateFormatter1.dateFormat = "yyyy"
-        let yearString = dateFormatter1.string(from: self)
-        let dateFormatter2 = DateFormatter()
-        dateFormatter2.dateFormat = "MMMM"
-        let monthString = dateFormatter2.string(from: self)
-        
-        let dateFormatter3 = DateFormatter()
-        dateFormatter3.dateFormat = "dd"
-        let dayString = dateFormatter3.string(from: self)
-      
-        var returnValue=""
-        let locale =  Locale.current.languageCode
-        if locale!.contains("tr") {
-             returnValue = "\(dayString) \(monthString) \(yearString)"
+
+struct ValidationError: Identifiable {
+    let id = UUID()
+    let message: String
+}
+
+enum ReceiptKind: String, CaseIterable, Identifiable {
+    case income
+    case outcome
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .income:
+            return "Gelir"
+        case .outcome:
+            return "Gider"
         }
-        else
-        {
-             returnValue = "\(monthString) \(dayString), \(yearString)"
-        }
-      
-        return returnValue
     }
-    
-    
+}
+
+struct ReceiptDraft: Identifiable {
+    let id = UUID()
+    let receiver: String
+    let issuer: String
+    let notes: String
+    let monthYear: String
+    let apartmentNumber: Int
+    let amount: Double
+    let sequenceNumber: Int
+    let createdDate: String
+    let showApartmentNumber: Bool
+    let kind: ReceiptKind
+}
+
+@MainActor
+final class ReceiptSettingsStore: ObservableObject {
+    @Published var apartmentName: String {
+        didSet { defaults.set(apartmentName, forKey: Keys.apartmentName) }
+    }
+    @Published var issuer: String {
+        didSet { defaults.set(issuer, forKey: Keys.issuer) }
+    }
+    @Published var defaultPayment: String {
+        didSet { defaults.set(defaultPayment, forKey: Keys.defaultPayment) }
+    }
+    @Published var flatCount: Int {
+        didSet { defaults.set(String(flatCount), forKey: Keys.flatCount) }
+    }
+    @Published var seqNumber: Int {
+        didSet { defaults.set(String(seqNumber), forKey: Keys.seqNumber) }
+    }
+    @Published var signatureData: Data? {
+        didSet {
+            if let signatureData {
+                defaults.set(signatureData, forKey: Keys.signature)
+            } else {
+                defaults.removeObject(forKey: Keys.signature)
+            }
+        }
+    }
+
+    private let defaults = UserDefaults.standard
+
+    init() {
+        apartmentName = defaults.string(forKey: Keys.apartmentName) ?? ""
+        issuer = defaults.string(forKey: Keys.issuer) ?? ""
+        defaultPayment = defaults.string(forKey: Keys.defaultPayment) ?? ""
+        flatCount = max(1, ReceiptSettingsStore.readInt(defaults, key: Keys.flatCount, fallback: 1))
+        seqNumber = max(1, ReceiptSettingsStore.readInt(defaults, key: Keys.seqNumber, fallback: 1))
+        signatureData = defaults.data(forKey: Keys.signature)
+    }
+
+    var apartmentNumbers: [Int] {
+        Array(1...max(flatCount, 1))
+    }
+
+    var signatureImage: NSImage? {
+        guard let signatureData else { return nil }
+        return NSImage(data: signatureData)
+    }
+
+    func owner(for apartmentNumber: Int) -> String {
+        defaults.string(forKey: Keys.owner(apartmentNumber))?.localizedCapitalized ?? ""
+    }
+
+    func saveOwner(_ owner: String, apartmentNumber: Int) {
+        defaults.set(owner, forKey: Keys.owner(apartmentNumber))
+        objectWillChange.send()
+    }
+
+    func clearSignature() {
+        signatureData = nil
+    }
+
+    func importSignature() {
+        let panel = NSOpenPanel()
+        panel.canCreateDirectories = false
+        panel.allowsMultipleSelection = false
+        panel.canChooseFiles = true
+        panel.canChooseDirectories = false
+        panel.allowedFileTypes = ["png", "jpg", "jpeg"]
+
+        if panel.runModal() == .OK, let url = panel.url {
+            do {
+                signatureData = try Data(contentsOf: url)
+            } catch {
+                signatureData = nil
+            }
+        }
+    }
+
+    private static func readInt(_ defaults: UserDefaults, key: String, fallback: Int) -> Int {
+        if let value = defaults.object(forKey: key) as? Int {
+            return value
+        }
+        if let value = defaults.string(forKey: key), let intValue = Int(value) {
+            return intValue
+        }
+        return fallback
+    }
+
+    enum Keys {
+        static let apartmentName = "aptname"
+        static let issuer = "issuer"
+        static let defaultPayment = "defaultpay"
+        static let flatCount = "flatcount"
+        static let seqNumber = "seqNumber"
+        static let signature = "usersign"
+
+        static func owner(_ number: Int) -> String {
+            "homeowner_\(number)"
+        }
+    }
+}
+
+extension Date {
+    var monthYearString: String {
+        let formatter = DateFormatter()
+        formatter.locale = .current
+        formatter.dateFormat = "MMMM yyyy"
+        return formatter.string(from: self)
+    }
+
+    var dayMonthYearString: String {
+        let formatter = DateFormatter()
+        formatter.locale = .current
+        formatter.setLocalizedDateFormatFromTemplate("MMMM d, yyyy")
+        return formatter.string(from: self)
+    }
 }

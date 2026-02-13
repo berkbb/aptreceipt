@@ -1,298 +1,154 @@
-//
-//  PreferencesViewController.swift
-//  aptreceipt
-//
-//  Created by berkbb on 20.03.2022.
-//
+import SwiftUI
 
-import Cocoa
+struct SettingsView: View {
+    @ObservedObject var settings: ReceiptSettingsStore
+    @Environment(\.presentationMode) private var presentationMode
 
+    @State private var apartmentName = ""
+    @State private var issuer = ""
+    @State private var defaultPayment = ""
+    @State private var flatCount = "1"
+    @State private var sequenceNumber = "1"
 
-class PreferencesViewController: NSViewController {
+    @State private var selectedApartment = 1
+    @State private var selectedOwner = ""
 
-   
-    @IBOutlet weak var AptName_TextControl: NSTextField!
+    @State private var validationError: ValidationError?
 
-    @IBOutlet weak var Counter_TextControl: NSTextField!
-    @IBOutlet weak var DefaultPay_TextControl: NSTextField!
+    var body: some View {
+        VStack(spacing: 14) {
+            Text("Tercihler")
+                .font(.system(size: 22, weight: .semibold))
+                .frame(maxWidth: .infinity, alignment: .leading)
 
-    @IBOutlet weak var House_Selector: NSPopUpButton!
-    @IBOutlet weak var FlatCount_TextControl: NSTextField!
-    @IBOutlet weak var HouseOwner_TextControl: NSTextField!
-    @IBOutlet weak var SignImage: NSImageView!
-    @IBOutlet weak var Issuer_TextControl: NSTextField!
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do view setup here.
-        
-        if let imageData = UserDefaults.standard.value(forKey: "usersign") as? Data{
-                if let imageFromData = NSImage(data: imageData){
-                    SignImage.image=imageFromData
+            TabView {
+                Form {
+                    TextField("Apartman Adı", text: $apartmentName)
+                    TextField("Varsayılan Tahsil Eden", text: $issuer)
+                    TextField("Varsayılan Tutar", text: $defaultPayment)
+                    TextField("Daire Sayısı", text: $flatCount)
+                    TextField("Sıra No", text: $sequenceNumber)
+
+                    HStack {
+                        Picker("Daire", selection: $selectedApartment) {
+                            ForEach(availableApartments, id: \.self) { number in
+                                Text("\(number)").tag(number)
+                            }
+                        }
+                        TextField("Daire Sakini", text: $selectedOwner)
+                        Button("Kaydet") {
+                            settings.saveOwner(selectedOwner.localizedCapitalized, apartmentNumber: selectedApartment)
+                        }
+                    }
+                }
+                .tabItem {
+                    Text("Apartman")
+                }
+
+                VStack(alignment: .leading, spacing: 14) {
+                    if let image = settings.signatureImage {
+                        Image(nsImage: image)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(maxHeight: 150)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+
+                    HStack {
+                        Button("İmza Yükle") {
+                            settings.importSignature()
+                        }
+
+                        Button("İmzayı Temizle") {
+                            settings.clearSignature()
+                        }
+                    }
+
+                    if settings.signatureImage != nil {
+                        Text("İmza yüklendi")
+                            .foregroundColor(.secondary)
+                    }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                .padding(12)
+                .tabItem {
+                    Text("İmza")
                 }
             }
-  
-        else
-        {
-            print("No sign imported.")
-        }
-        let seqNumber = UserDefaults.standard.string(forKey: "seqNumber")
-         if(seqNumber != nil)
-        {
-             Counter_TextControl.stringValue=seqNumber!
-         }
-        else
-        {
-            Counter_TextControl.stringValue="1"
-        }
-        
-        let defpay = UserDefaults.standard.string(forKey: "defaultpay")
-        if(defpay != nil)
-        {
-            DefaultPay_TextControl.stringValue=defpay!
-        }
-        
-        let aptName = UserDefaults.standard.string(forKey: "aptname")
-        if(aptName != nil)
-        {
-            AptName_TextControl.stringValue=aptName!
-        }
-        let issuerName = UserDefaults.standard.string(forKey: "issuer")
-        if(issuerName != nil)
-        {
-            Issuer_TextControl.stringValue=issuerName!.localizedCapitalized
-        }
-        
-        
-        let flatCount = UserDefaults.standard.string(forKey: "flatcount")
-        if(flatCount != nil)
-        {
-            FlatCount_TextControl.stringValue=flatCount!
-            for i in 1..<Int(flatCount!)!+1 // For 8 apartment home.
-            {
-                House_Selector.addItem(withTitle: String(i))
-                
+
+            HStack {
+                Button("İptal") {
+                    presentationMode.wrappedValue.dismiss()
+                }
+                Spacer()
+                Button("Kaydet") {
+                    saveSettings()
+                }
+                .keyboardShortcut(.defaultAction)
             }
         }
-        else
-        {
-            FlatCount_TextControl.stringValue="1"
-            House_Selector.addItem(withTitle: "1")
-            
+        .padding(20)
+        .onAppear {
+            loadFromStore()
         }
-        House_Selector.selectItem(at: 0)
-        let homeOwner = UserDefaults.standard.string(forKey: "homeowner_1")
-        
-       
-            if(homeOwner != nil)
-            {
-                
-                HouseOwner_TextControl.stringValue=homeOwner!.localizedCapitalized
-            }
-      
-       
-        
-    }
-    
-    /// Queue  reset
-    @IBAction func ResetCounterButton_Click(_ sender: Any) {
-        Counter_TextControl.stringValue="1"
-    }
-    
-    
-    /// Save person button clciked event.
-    @IBAction func SavePersonButton_Clicked(_ sender: Any) {
-        
-        let selected=Int(House_Selector.selectedItem!.title)
-        
-        let person=HouseOwner_TextControl.stringValue
-        if(!person.isEmpty)
-        {
-            UserDefaults.standard.set(person, forKey: "homeowner_\(selected!)")
+        .onChange(of: selectedApartment) { apartment in
+            selectedOwner = settings.owner(for: apartment)
         }
-      
-       
-    }
-    
-    /// House number changed devent.
-    @IBAction func HouseNumberChanged(_ sender: Any) {
-        HouseOwner_TextControl.stringValue="";
-        let selected=Int(House_Selector.selectedItem!.title)
-        print("Selected apartment number: \(selected!)")
-        let homeOwner = UserDefaults.standard.string(forKey: "homeowner_\(selected!)")
-        
-       
-            if(homeOwner != nil)
-            {
-                
-                HouseOwner_TextControl.stringValue=homeOwner!.localizedCapitalized
-            }
-      
-      
-       
-        
-    }
-    
- 
-    @IBAction func ImportSignButton_Click(_ sender: Any) {
-        //Load NSImage.
-        let openPanel = NSOpenPanel()
-        openPanel.canCreateDirectories = false
-        openPanel.allowsMultipleSelection=false
-        openPanel.canChooseFiles=true
-        openPanel.canChooseDirectories=false
-        openPanel.showsTagField = false
-        openPanel.allowedFileTypes = ["png"]
-        openPanel.title=localizedString(forKey: "openImageTitle")
-        if (openPanel.runModal() == NSApplication.ModalResponse.OK) {
-            let result = openPanel.url
-
-                   if (result != nil) {
-                       do
-                       {
-                           SignImage.image=NSImage(data: try Data(contentsOf: result!))
-                       }
-                       catch
-                       {
-                           SignImage.image =  NSImage(named: NSImage.Name("sgn"))
-                           UserDefaults.standard.removeObject(forKey: "usersign")
-                       }
-                      
-                   
-                       print("sign imported: \(result!)")
-                   }
-               } else {
-                   print("Cancel")
-                   return // User clicked cancel
-               }
-    }
-    
-    @IBAction func ClearSignButton_Click(_ sender: Any) {
-        SignImage.image =  NSImage(named: NSImage.Name("sgn"))
-        UserDefaults.standard.removeObject(forKey: "usersign")
-    }
-    
-    /// Save info button cliick event.
-    @IBAction func SaveButton_Click(_ sender: Any) {
-        
-        let flat=FlatCount_TextControl.stringValue
-        let name=AptName_TextControl.stringValue
-        let issuer = Issuer_TextControl.stringValue.localizedCapitalized
-        let pay=DefaultPay_TextControl.stringValue
-        let count=Counter_TextControl.stringValue
-        
-       
-    
-     
-        let flats = Int(flat)
-        let pays=Double(pay)
-        print(flat)
-        print(pay)
-        print(issuer)
-        print(name)
-        
-        if(!AptName_TextControl.stringValue.isEmpty && !FlatCount_TextControl.stringValue.isEmpty && !Counter_TextControl.stringValue.isEmpty && !Issuer_TextControl.stringValue.isEmpty && flats != nil && pays != nil )
-        {
-            print("OK")
-            UserDefaults.standard.set(name, forKey: "aptname")
-            
-            UserDefaults.standard.set(count, forKey: "seqNumber")
-            
-            UserDefaults.standard.set(issuer, forKey: "issuer")
-            
-            UserDefaults.standard.set(flat, forKey: "flatcount")
-            
-            UserDefaults.standard.set(pay, forKey: "defaultpay")
-            
-            if(SignImage.image !=  NSImage(named: NSImage.Name("sgn")))
-            {
-           
-                let imageData = NSImagePNGRepresentation(image: SignImage.image!)
-                UserDefaults.standard.set(imageData,forKey: "usersign")
-                
-  
-            }
-            
-            let answer = showDialog(title: localizedString(forKey: "infoTitle"), text: localizedString(forKey: "restartMessage"), buttonName: localizedString(forKey: "okText"), alertType: .informational)
-            
-            print(answer)
-            self.view.window?.close()
+        .alert(item: $validationError) { issue in
+            Alert(
+                title: Text("Doğrulama Hatası"),
+                message: Text(issue.message),
+                dismissButton: .default(Text("Tamam"))
+            )
         }
-       else
-       
-       {
-           print("Error - Check areas!")
-           
-           let answer = showDialog(title: localizedString(forKey: "errorTitle"), text: localizedString(forKey: "errorMessage"), buttonName: localizedString(forKey: "okText"), alertType: .warning)
-           
-           print(answer)
-       }
-        
-        /// Retuns value of translated key.
-        ///
-        /// - Warning: The returned String is  localized.
-        /// - Parameter forKey: The forKey  is String object.
-        /// - Returns: bStringoolean.
-        
-        
-        func localizedString(forKey key: String) -> String {
-            var result = Bundle.main.localizedString(forKey: key, value: nil, table: nil)
+    }
 
-            if result == key {
-                result = Bundle.main.localizedString(forKey: key, value: nil, table: "File")
-            }
-
-            return result
+    private var availableApartments: [Int] {
+        if let count = Int(flatCount), count > 0 {
+            return Array(1...count)
         }
-     
+        return [1]
     }
-    /// Prints OK Cancel Dialog
-    ///
-    /// - Warning: The returned alert is  localized.
-    /// - Parameter title: The title  is String object.
-    /// - Parameter text: The text  is String object.
-    /// - Parameter alertType: The text  is NSAlert.Style object.
-    /// - Parameter buttonName: The text  is String object.
-    /// - Returns: boolean.
-    
-    func showDialog(title: String, text: String, buttonName:String, alertType: NSAlert.Style ) -> Bool {
-        let alert = NSAlert()
-        alert.messageText = title
-        alert.informativeText = text
-        alert.alertStyle = alertType
-        alert.addButton(withTitle: buttonName)
-     
-        return alert.runModal() == .alertFirstButtonReturn
-    }
-    /// Retuns value of translated key.
-    ///
-    /// - Warning: The returned String is  localized.
-    /// - Parameter forKey: The forKey  is String object.
-    /// - Returns: String.
-    
-    
-    func localizedString(forKey key: String) -> String {
-        var result = Bundle.main.localizedString(forKey: key, value: nil, table: nil)
 
-        if result == key {
-            result = Bundle.main.localizedString(forKey: key, value: nil, table: "File")
+    private func loadFromStore() {
+        apartmentName = settings.apartmentName
+        issuer = settings.issuer
+        defaultPayment = settings.defaultPayment
+        flatCount = String(settings.flatCount)
+        sequenceNumber = String(settings.seqNumber)
+        selectedApartment = settings.apartmentNumbers.first ?? 1
+        selectedOwner = settings.owner(for: selectedApartment)
+    }
+
+    private func saveSettings() {
+        let trimmedApartmentName = apartmentName.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedIssuer = issuer.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedDefaultPayment = defaultPayment.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard let flats = Int(flatCount), flats > 0 else {
+            validationError = ValidationError(message: "Daire sayısı pozitif tam sayı olmalıdır.")
+            return
+        }
+        guard let sequence = Int(sequenceNumber), sequence > 0 else {
+            validationError = ValidationError(message: "Sıra numarası pozitif tam sayı olmalıdır.")
+            return
+        }
+        guard Double(trimmedDefaultPayment.replacingOccurrences(of: ",", with: ".")) != nil else {
+            validationError = ValidationError(message: "Varsayılan tutar sayısal olmalıdır.")
+            return
+        }
+        guard !trimmedApartmentName.isEmpty, !trimmedIssuer.isEmpty else {
+            validationError = ValidationError(message: "Apartman adı ve tahsil eden boş bırakılamaz.")
+            return
         }
 
-        return result
-    }
-    
+        settings.apartmentName = trimmedApartmentName
+        settings.issuer = trimmedIssuer.localizedCapitalized
+        settings.defaultPayment = trimmedDefaultPayment
+        settings.flatCount = flats
+        settings.seqNumber = sequence
+        settings.saveOwner(selectedOwner.localizedCapitalized, apartmentNumber: selectedApartment)
 
+        presentationMode.wrappedValue.dismiss()
+    }
 }
-
-
-#if os(macOS)
-
-func NSImagePNGRepresentation(image:NSImage) -> Data? {
-    guard let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil)
-        else { return nil }
-    let imageRep = NSBitmapImageRep(cgImage: cgImage)
-    imageRep.size = image.size // display size in points
-    return imageRep.representation(using: .png, properties: [:])
-}
-
-#endif
-
