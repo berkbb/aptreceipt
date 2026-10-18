@@ -10,14 +10,16 @@ struct ReceiptPreviewSheet: View {
     @Environment(\.presentationMode) private var presentationMode
     @State private var exportSuccess = false
 
+    private var l10n: L10n { settings.l10n }
+
     var body: some View {
         VStack(spacing: 0) {
             // Sheet Header
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Makbuz Önizleme")
+                    Text(l10n.previewTitle)
                         .font(.headline)
-                    Text("Oluşturulan makbuzu inceleyin ve cihazınıza kaydedin")
+                    Text(l10n.previewSubtitle)
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -44,7 +46,8 @@ struct ReceiptPreviewSheet: View {
                 ReceiptDocumentView(
                     draft: draft,
                     apartmentName: settings.apartmentName,
-                    signatureImage: settings.signatureImage
+                    signatureImage: settings.signatureImage,
+                    l10n: l10n
                 )
                 .frame(width: 780, height: 540)
                 .padding(24)
@@ -56,14 +59,14 @@ struct ReceiptPreviewSheet: View {
             // Footer Actions
             HStack(spacing: 12) {
                 if exportSuccess {
-                    Label("Makbuz başarıyla kaydedildi!", systemImage: "checkmark.circle.fill")
+                    Label(l10n.saveSuccess, systemImage: "checkmark.circle.fill")
                         .foregroundColor(.green)
                         .font(.callout)
                 }
 
                 Spacer()
 
-                Button("Kapat") {
+                Button(l10n.close) {
                     presentationMode.wrappedValue.dismiss()
                 }
                 .buttonStyle(.bordered)
@@ -72,7 +75,7 @@ struct ReceiptPreviewSheet: View {
                 Button {
                     saveReceiptImage()
                 } label: {
-                    Label("JPEG Olarak Kaydet", systemImage: "arrow.down.doc.fill")
+                    Label(l10n.saveAsJPEG, systemImage: "arrow.down.doc.fill")
                         .padding(.horizontal, 4)
                 }
                 .buttonStyle(.borderedProminent)
@@ -98,7 +101,7 @@ struct ReceiptPreviewSheet: View {
             .folding(options: .diacriticInsensitive, locale: .current)
             .replacingOccurrences(of: " ", with: "_")
             .lowercased()
-        panel.nameFieldStringValue = "makbuz_\(safeReceiver)_\(safeMonth).jpg"
+        panel.nameFieldStringValue = "receipt_\(safeReceiver)_\(safeMonth).jpg"
 
         guard panel.runModal() == .OK, let url = panel.url else {
             return
@@ -107,7 +110,8 @@ struct ReceiptPreviewSheet: View {
         let document = ReceiptDocumentView(
             draft: draft,
             apartmentName: settings.apartmentName,
-            signatureImage: settings.signatureImage
+            signatureImage: settings.signatureImage,
+            l10n: l10n
         )
         .frame(width: 780, height: 540)
 
@@ -133,20 +137,35 @@ struct ReceiptDocumentView: View {
     let draft: ReceiptDraft
     let apartmentName: String
     let signatureImage: NSImage?
+    let l10n: L10n
+
+    // Fixed print colors (independent of Dark Mode)
+    private let textDark = Color(red: 0.10, green: 0.12, blue: 0.16)
+    private let textMuted = Color(red: 0.42, green: 0.46, blue: 0.52)
+    private let textSecondary = Color(red: 0.28, green: 0.32, blue: 0.38)
+    private let borderNavy = Color(red: 0.16, green: 0.24, blue: 0.36)
 
     private var formattedAmount: String {
         let formatter = NumberFormatter()
         formatter.numberStyle = .currency
-        formatter.locale = Locale(identifier: "tr_TR")
+        formatter.locale = l10n.locale
         return formatter.string(from: NSNumber(value: draft.amount)) ?? "₺\(draft.amount)"
     }
 
     private var mainTitle: String {
-        apartmentName.isEmpty ? "APARTMAN YÖNETİMİ" : apartmentName.uppercased()
+        apartmentName.isEmpty ? l10n.defaultBuildingName : apartmentName.uppercased()
     }
 
     private var receiptBadgeText: String {
-        draft.kind == .income ? "TAHSİLAT MAKBUZU" : "GİDER / TEDİYE MAKBUZU"
+        draft.kind == .income ? l10n.incomeBadge : l10n.outcomeBadge
+    }
+
+    private var badgeColor: Color {
+        draft.kind == .income ? Color(red: 0.12, green: 0.52, blue: 0.24) : Color(red: 0.82, green: 0.34, blue: 0.12)
+    }
+
+    private var badgeBackground: Color {
+        draft.kind == .income ? Color(red: 0.92, green: 0.97, blue: 0.93) : Color(red: 0.99, green: 0.94, blue: 0.92)
     }
 
     var body: some View {
@@ -155,97 +174,107 @@ struct ReceiptDocumentView: View {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(mainTitle)
-                        .font(.system(size: 20, weight: .bold))
-                        .foregroundColor(.primary)
+                        .font(.system(size: 22, weight: .bold))
+                        .foregroundColor(textDark)
                     Text(receiptBadgeText)
                         .font(.system(size: 13, weight: .bold))
-                        .foregroundColor(draft.kind == .income ? Color(red: 0.1, green: 0.5, blue: 0.2) : Color(red: 0.8, green: 0.3, blue: 0.1))
+                        .foregroundColor(badgeColor)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(badgeBackground)
+                        .clipShape(RoundedRectangle(cornerRadius: 4))
                 }
 
                 Spacer()
 
                 VStack(alignment: .trailing, spacing: 4) {
                     HStack(spacing: 4) {
-                        Text("Makbuz No:")
+                        Text(l10n.receiptNo)
                             .font(.system(size: 12, weight: .semibold))
-                            .foregroundColor(.secondary)
-                        Text(String(format: "%04d", draft.sequenceNumber))
-                            .font(.system(size: 15, weight: .bold, design: .monospaced))
-                            .foregroundColor(.primary)
+                            .foregroundColor(textMuted)
+                        Text(String(format: "#%04d", draft.sequenceNumber))
+                            .font(.system(size: 16, weight: .bold, design: .monospaced))
+                            .foregroundColor(textDark)
                     }
 
                     HStack(spacing: 4) {
-                        Text("Düzenleme:")
+                        Text(l10n.issueDate)
                             .font(.system(size: 11))
-                            .foregroundColor(.secondary)
+                            .foregroundColor(textMuted)
                         Text(draft.createdDate)
                             .font(.system(size: 11, weight: .medium))
-                            .foregroundColor(.primary)
+                            .foregroundColor(textDark)
                     }
                 }
             }
-            .padding(.bottom, 14)
+            .padding(.bottom, 12)
 
-            // Double line divider
+            // Double header rule
             Rectangle()
-                .fill(Color.primary.opacity(0.8))
-                .frame(height: 2)
+                .fill(borderNavy)
+                .frame(height: 2.5)
             Rectangle()
-                .fill(Color.primary.opacity(0.3))
+                .fill(borderNavy.opacity(0.35))
                 .frame(height: 1)
                 .padding(.top, 2)
                 .padding(.bottom, 16)
 
             // Metadata Grid
-            VStack(spacing: 10) {
+            VStack(spacing: 12) {
                 HStack(alignment: .top) {
-                    receiptField(label: "Ödeyen (Muhatap)", value: draft.receiver)
+                    receiptField(label: l10n.receiverLabel, value: draft.receiver)
                     if draft.showApartmentNumber {
-                        receiptField(label: "Daire No", value: "Daire \(draft.apartmentNumber)")
+                        receiptField(label: l10n.flatNumber, value: "\(l10n.flatPrefix) \(draft.apartmentNumber)")
+                    } else {
+                        receiptField(label: l10n.flatNumber, value: "—")
                     }
                 }
 
                 HStack(alignment: .top) {
-                    receiptField(label: "Tahsil Eden (Yetkili)", value: draft.issuer)
-                    receiptField(label: "Ait Olduğu Dönem", value: draft.monthYear)
+                    receiptField(label: l10n.issuerLabel, value: draft.issuer)
+                    receiptField(label: l10n.period, value: draft.monthYear)
                 }
             }
             .padding(.bottom, 16)
 
             // Amount Highlight Box
             HStack {
-                Text("Tahsil Edilen Tutar:")
+                Text(l10n.totalCollected)
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(.primary)
+                    .foregroundColor(textDark)
 
                 Spacer()
 
                 Text(formattedAmount)
-                    .font(.system(size: 24, weight: .bold, design: .rounded))
-                    .foregroundColor(draft.kind == .income ? Color(red: 0.1, green: 0.5, blue: 0.2) : Color(red: 0.8, green: 0.3, blue: 0.1))
+                    .font(.system(size: 26, weight: .bold, design: .rounded))
+                    .foregroundColor(badgeColor)
             }
             .padding(14)
-            .background(Color.secondary.opacity(0.08))
-            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .background(badgeBackground)
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
             .overlay(
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .stroke(badgeColor.opacity(0.4), lineWidth: 1.5)
             )
-            .padding(.bottom, 16)
+            .padding(.bottom, 14)
 
-            // Description Section
+            // Description Box
             VStack(alignment: .leading, spacing: 6) {
-                Text("Açıklama:")
-                    .font(.system(size: 12, weight: .bold))
-                    .foregroundColor(.secondary)
+                Text(l10n.descriptionHeader)
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundColor(textMuted)
 
-                Text(draft.notes)
-                    .font(.system(size: 13))
-                    .foregroundColor(.primary)
+                Text(draft.notes.isEmpty ? "-" : draft.notes)
+                    .font(.system(size: 12))
+                    .foregroundColor(textDark)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(10)
-                    .background(Color.secondary.opacity(0.04))
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .background(Color(red: 0.96, green: 0.97, blue: 0.98))
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 6)
+                            .stroke(Color(red: 0.88, green: 0.90, blue: 0.93), lineWidth: 1)
+                    )
             }
 
             Spacer(minLength: 12)
@@ -253,12 +282,12 @@ struct ReceiptDocumentView: View {
             // Footer Signature & Disclaimer
             HStack(alignment: .bottom) {
                 VStack(alignment: .leading, spacing: 3) {
-                    Text("Bu belge apartman yönetimi kayıtları uyarınca elektronik ortamda tanzim edilmiştir.")
+                    Text(l10n.electronicDisclaimer)
                         .font(.system(size: 9))
-                        .foregroundColor(.secondary)
-                    Text("Apartman Makbuzu v3.1.0 • berkbb")
+                        .foregroundColor(textMuted)
+                    Text("\(l10n.appTitle) v3.2.0 • \(l10n.publisher)")
                         .font(.system(size: 9))
-                        .foregroundColor(.secondary.opacity(0.8))
+                        .foregroundColor(textMuted.opacity(0.8))
                 }
 
                 Spacer()
@@ -268,45 +297,44 @@ struct ReceiptDocumentView: View {
                         Image(nsImage: signatureImage)
                             .resizable()
                             .scaledToFit()
-                            .frame(height: 60)
+                            .frame(height: 54)
                     } else {
                         Rectangle()
                             .fill(Color.clear)
-                            .frame(width: 140, height: 44)
+                            .frame(width: 130, height: 40)
                     }
 
                     Rectangle()
-                        .fill(Color.secondary.opacity(0.4))
+                        .fill(textMuted.opacity(0.5))
                         .frame(width: 140, height: 1)
 
-                    Text("Yetkili İmzası")
+                    Text(l10n.authorizedSignature)
                         .font(.system(size: 10, weight: .medium))
-                        .foregroundColor(.secondary)
+                        .foregroundColor(textSecondary)
                 }
             }
         }
         .padding(28)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .foregroundColor(.black)
         .background(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .fill(Color.white)
-                .shadow(color: Color.black.opacity(0.08), radius: 12, x: 0, y: 4)
+                .shadow(color: Color.black.opacity(0.12), radius: 10, x: 0, y: 3)
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(Color.secondary.opacity(0.2), lineWidth: 1.5)
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(Color(red: 0.82, green: 0.86, blue: 0.92), lineWidth: 1.5)
         )
     }
 
     private func receiptField(label: String, value: String) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(label)
-                .font(.system(size: 10, weight: .semibold))
-                .foregroundColor(.secondary)
+                .font(.system(size: 10, weight: .bold))
+                .foregroundColor(textMuted)
             Text(value)
-                .font(.system(size: 13, weight: .medium))
-                .foregroundColor(.primary)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundColor(textDark)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
