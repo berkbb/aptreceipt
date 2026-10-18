@@ -128,6 +128,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         )
         .frame(width: 595, height: 842)
         render(view: docView, size: CGSize(width: 595, height: 842), to: outDir.appendingPathComponent("02_receipt_document.png"))
+        renderPDF(view: docView.environment(\.colorScheme, .light), size: CGSize(width: 595, height: 842), to: outDir.appendingPathComponent("02_receipt_document.pdf"))
 
         // 3. Settings View (About & License)
         let settingsView = SettingsView(settings: settings, initialTab: .about)
@@ -202,6 +203,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         hosting.cacheDisplay(in: hosting.bounds, to: rep)
         guard let pngData = rep.representation(using: .png, properties: [:]) else { return }
         try? pngData.write(to: fileURL)
+    }
+
+    @MainActor
+    private func renderPDF<V: View>(view: V, size: CGSize, to fileURL: URL) {
+        let renderer = ImageRenderer(content: view)
+        renderer.proposedSize = ProposedViewSize(size)
+        var box = CGRect(origin: .zero, size: size)
+        guard let consumer = CGDataConsumer(url: fileURL as CFURL),
+              let pdfContext = CGContext(consumer: consumer, mediaBox: &box, nil) else {
+            return
+        }
+        pdfContext.beginPDFPage(nil)
+        renderer.render { size, context in
+            context(pdfContext)
+        }
+        pdfContext.endPDFPage()
+        pdfContext.closePDF()
     }
 }
 

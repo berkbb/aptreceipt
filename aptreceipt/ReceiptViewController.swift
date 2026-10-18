@@ -386,18 +386,25 @@ struct ReceiptPreviewSheet: View {
             l10n: l10n
         )
         .frame(width: 595, height: 842)
+        .environment(\.colorScheme, .light)
 
-        let hosting = NSHostingView(rootView: document)
-        hosting.frame = NSRect(x: 0, y: 0, width: 595, height: 842)
-        hosting.layoutSubtreeIfNeeded()
+        let renderer = ImageRenderer(content: document)
+        renderer.proposedSize = ProposedViewSize(width: 595, height: 842)
 
-        let pdfData = hosting.dataWithPDF(inside: hosting.bounds)
-        do {
-            try pdfData.write(to: url)
-            successMessage = l10n.saveSuccessPDF
-        } catch {
+        var box = CGRect(origin: .zero, size: CGSize(width: 595, height: 842))
+        guard let consumer = CGDataConsumer(url: url as CFURL),
+              let pdfContext = CGContext(consumer: consumer, mediaBox: &box, nil) else {
             return
         }
+
+        pdfContext.beginPDFPage(nil)
+        renderer.render { size, context in
+            context(pdfContext)
+        }
+        pdfContext.endPDFPage()
+        pdfContext.closePDF()
+
+        successMessage = l10n.saveSuccessPDF
     }
 
     // MARK: - JPEG Bitmap Export
@@ -424,20 +431,16 @@ struct ReceiptPreviewSheet: View {
             l10n: l10n
         )
         .frame(width: 595, height: 842)
+        .environment(\.colorScheme, .light)
 
-        let hosting = NSHostingView(rootView: document)
-        hosting.frame = NSRect(x: 0, y: 0, width: 595, height: 842)
-        hosting.layoutSubtreeIfNeeded()
+        let renderer = ImageRenderer(content: document)
+        renderer.scale = 2.0
+        renderer.proposedSize = ProposedViewSize(width: 595, height: 842)
 
-        guard let rep = hosting.bitmapImageRepForCachingDisplay(in: hosting.bounds) else {
-            return
+        if let image = renderer.nsImage {
+            image.writeJPEG(toURL: url)
+            successMessage = l10n.saveSuccessJPEG
         }
-
-        hosting.cacheDisplay(in: hosting.bounds, to: rep)
-        let image = NSImage(size: hosting.bounds.size)
-        image.addRepresentation(rep)
-        image.writeJPEG(toURL: url)
-        successMessage = l10n.saveSuccessJPEG
     }
 }
 
