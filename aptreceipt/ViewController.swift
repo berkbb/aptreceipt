@@ -493,26 +493,25 @@ struct MainScreen: View {
         VStack(spacing: 0) {
             // Top Bar
             headerBar
-                .padding(.horizontal, 24)
-                .padding(.vertical, 16)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 12)
                 .background(Color(NSColor.windowBackgroundColor))
 
             Divider()
 
             // Main Content Area: Left Form + Right Live Preview
             HSplitView {
-                // Left Form
+                // Left Form (Hero Deck)
                 ScrollView {
-                    VStack(spacing: 18) {
-                        receiptTypeSection
-                        apartmentAndPeriodSection
-                        partiesSection
-                        financialSection
+                    VStack(spacing: 12) {
+                        heroReceiptTypeSelector
+                        propertyAndPartiesHeroSection
+                        financialAndNotesHeroSection
                         actionButtons
                     }
-                    .padding(24)
+                    .padding(16)
                 }
-                .frame(minWidth: 460, idealWidth: 540)
+                .frame(minWidth: 440, idealWidth: 500)
 
                 // Right Live Preview
                 VStack(spacing: 16) {
@@ -580,22 +579,29 @@ struct MainScreen: View {
     // MARK: - Header Bar
 
     private var headerBar: some View {
-        HStack(spacing: 14) {
-            if let icon = NSApplication.shared.applicationIconImage {
+        HStack(spacing: 12) {
+            if let logo = settings.logoImage {
+                Image(nsImage: logo)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 36, height: 36)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .shadow(color: Color.black.opacity(0.1), radius: 3, x: 0, y: 1)
+            } else if let icon = NSApplication.shared.applicationIconImage {
                 Image(nsImage: icon)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 44, height: 44)
-                    .shadow(color: Color.black.opacity(0.12), radius: 4, x: 0, y: 2)
+                    .frame(width: 36, height: 36)
+                    .shadow(color: Color.black.opacity(0.12), radius: 3, x: 0, y: 1)
             }
 
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 8) {
                     Text(l10n.appTitle)
-                        .font(.system(size: 20, weight: .bold))
+                        .font(.system(size: 18, weight: .bold))
                     if !settings.apartmentName.isEmpty {
                         Text(settings.apartmentName)
-                            .font(.system(size: 12, weight: .medium))
+                            .font(.system(size: 11, weight: .semibold))
                             .foregroundColor(.accentColor)
                             .padding(.horizontal, 8)
                             .padding(.vertical, 2)
@@ -629,43 +635,117 @@ struct MainScreen: View {
         SettingsWindowManager.shared.show(settings: settings)
     }
 
-    // MARK: - Sections
+    // MARK: - Hero Sections (Left Side)
 
-    private var receiptTypeSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Label(l10n.receiptType, systemImage: "doc.plaintext.fill")
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundColor(.secondary)
-
-            Picker("", selection: $viewModel.receiptKind) {
-                ForEach(ReceiptKind.allCases) { kind in
-                    HStack {
-                        Image(systemName: kind.iconName)
-                        Text(kind.title(l10n: l10n))
-                    }
-                    .tag(kind)
+    // 1. Hero Mode Switcher (Income vs Expense)
+    private var heroReceiptTypeSelector: some View {
+        HStack(spacing: 10) {
+            // Income Button
+            Button {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.75)) {
+                    viewModel.receiptKind = .income
                 }
+            } label: {
+                HStack(spacing: 10) {
+                    ZStack {
+                        Circle()
+                            .fill(viewModel.receiptKind == .income ? Color.green : Color.secondary.opacity(0.12))
+                            .frame(width: 30, height: 30)
+                        Image(systemName: "arrow.down.left")
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundColor(viewModel.receiptKind == .income ? .white : .secondary)
+                    }
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(l10n.incomeTitle)
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundColor(viewModel.receiptKind == .income ? .primary : .secondary)
+                        Text(l10n.incomeBadge)
+                            .font(.system(size: 9, weight: .semibold))
+                            .foregroundColor(viewModel.receiptKind == .income ? .green : .secondary.opacity(0.6))
+                    }
+                    Spacer()
+                }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 7)
+                .background(
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .fill(viewModel.receiptKind == .income ? Color.green.opacity(0.12) : Color(NSColor.controlBackgroundColor))
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .stroke(viewModel.receiptKind == .income ? Color.green.opacity(0.5) : Color.secondary.opacity(0.15), lineWidth: viewModel.receiptKind == .income ? 1.5 : 1)
+                )
             }
-            .pickerStyle(.segmented)
-            .labelsHidden()
+            .buttonStyle(.plain)
+
+            // Expense Button
+            Button {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.75)) {
+                    viewModel.receiptKind = .outcome
+                }
+            } label: {
+                HStack(spacing: 10) {
+                    ZStack {
+                        Circle()
+                            .fill(viewModel.receiptKind == .outcome ? Color.orange : Color.secondary.opacity(0.12))
+                            .frame(width: 30, height: 30)
+                        Image(systemName: "arrow.up.right")
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundColor(viewModel.receiptKind == .outcome ? .white : .secondary)
+                    }
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(l10n.outcomeTitle)
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundColor(viewModel.receiptKind == .outcome ? .primary : .secondary)
+                        Text(l10n.outcomeBadge)
+                            .font(.system(size: 9, weight: .semibold))
+                            .foregroundColor(viewModel.receiptKind == .outcome ? .orange : .secondary.opacity(0.6))
+                    }
+                    Spacer()
+                }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 7)
+                .background(
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .fill(viewModel.receiptKind == .outcome ? Color.orange.opacity(0.12) : Color(NSColor.controlBackgroundColor))
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .stroke(viewModel.receiptKind == .outcome ? Color.orange.opacity(0.5) : Color.secondary.opacity(0.15), lineWidth: viewModel.receiptKind == .outcome ? 1.5 : 1)
+                )
+            }
+            .buttonStyle(.plain)
         }
-        .padding(14)
-        .background(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(Color(NSColor.controlBackgroundColor))
-        )
     }
 
-    private var apartmentAndPeriodSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Label(l10n.flatAndPeriod, systemImage: "calendar.badge.clock")
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundColor(.secondary)
+    // 2. Property & Parties Hero Section
+    private var propertyAndPartiesHeroSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            // Header Row: Property & Print Flat Toggle
+            HStack {
+                Label(l10n.flatAndPeriod, systemImage: "building.2.crop.circle.fill")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundColor(.secondary)
+                Spacer()
+                Toggle(isOn: $viewModel.printApartmentNumber) {
+                    Text(l10n.printFlatNumber)
+                        .font(.system(size: 11))
+                        .foregroundColor(.secondary)
+                }
+                .toggleStyle(.checkbox)
+            }
 
-            HStack(spacing: 16) {
-                VStack(alignment: .leading, spacing: 6) {
+            // Flat & Period Row
+            HStack(spacing: 10) {
+                // Flat Selector
+                HStack(spacing: 6) {
+                    Image(systemName: "door.left.hand.closed")
+                        .foregroundColor(.accentColor)
+                        .font(.system(size: 12))
                     Text(l10n.flatNumber)
-                        .font(.caption)
+                        .font(.system(size: 11, weight: .medium))
                         .foregroundColor(.secondary)
                     Picker("", selection: $viewModel.selectedApartment) {
                         ForEach(settings.apartmentNumbers, id: \.self) { number in
@@ -677,170 +757,227 @@ struct MainScreen: View {
                         viewModel.updateApartment(newValue, settings: settings)
                     }
                 }
+                .padding(.horizontal, 8)
+                .padding(.vertical, 5)
+                .background(Color(NSColor.textBackgroundColor))
+                .clipShape(RoundedRectangle(cornerRadius: 7))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 7)
+                        .stroke(Color.secondary.opacity(0.15), lineWidth: 1)
+                )
 
                 Spacer()
 
-                VStack(alignment: .leading, spacing: 6) {
+                // Date Picker
+                HStack(spacing: 6) {
+                    Image(systemName: "calendar")
+                        .foregroundColor(.secondary)
+                        .font(.system(size: 12))
                     Text(l10n.period)
-                        .font(.caption)
+                        .font(.system(size: 11, weight: .medium))
                         .foregroundColor(.secondary)
                     DatePicker("", selection: $viewModel.receiptDate, displayedComponents: .date)
                         .labelsHidden()
                 }
+                .padding(.horizontal, 8)
+                .padding(.vertical, 5)
+                .background(Color(NSColor.textBackgroundColor))
+                .clipShape(RoundedRectangle(cornerRadius: 7))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 7)
+                        .stroke(Color.secondary.opacity(0.15), lineWidth: 1)
+                )
             }
 
             Divider()
 
-            Toggle(isOn: $viewModel.printApartmentNumber) {
-                Label(l10n.printFlatNumber, systemImage: "checkmark.seal")
-                    .font(.callout)
-            }
-            .toggleStyle(.checkbox)
-        }
-        .padding(14)
-        .background(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(Color(NSColor.controlBackgroundColor))
-        )
-    }
-
-    private var partiesSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Label(l10n.parties, systemImage: "person.2.fill")
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundColor(.secondary)
-
-            VStack(alignment: .leading, spacing: 6) {
-                Text(l10n.issuerLabel)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                HStack {
-                    Image(systemName: "person.badge.shield.checkmark.fill")
-                        .foregroundColor(.secondary)
-                    TextField(l10n.issuerPlaceholder, text: $viewModel.issuerName)
-                        .textFieldStyle(.plain)
-                }
-                .padding(8)
-                .background(Color(NSColor.textBackgroundColor))
-                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-            }
-
-            VStack(alignment: .leading, spacing: 6) {
-                HStack {
-                    Text(l10n.receiverLabel)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    Spacer()
-                    Button(l10n.fetchSavedResident) {
-                        viewModel.ownerName = settings.owner(for: viewModel.selectedApartment)
-                    }
-                    .buttonStyle(.link)
-                    .font(.caption2)
-                }
-
-                HStack {
-                    Image(systemName: "person.fill")
-                        .foregroundColor(.secondary)
-                    TextField(l10n.receiverPlaceholder, text: $viewModel.ownerName)
-                        .textFieldStyle(.plain)
-                }
-                .padding(8)
-                .background(Color(NSColor.textBackgroundColor))
-                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-            }
-        }
-        .padding(14)
-        .background(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(Color(NSColor.controlBackgroundColor))
-        )
-    }
-
-    private var financialSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Label(l10n.financialDetails, systemImage: "banknote.fill")
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundColor(.secondary)
-
-            HStack(spacing: 14) {
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("\(l10n.amount) (\(settings.currency.symbol))")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+            // Parties Fields
+            VStack(spacing: 8) {
+                // Resident / Payer
+                VStack(alignment: .leading, spacing: 3) {
                     HStack {
-                        Text(settings.currency.symbol)
-                            .font(.system(size: 14, weight: .bold))
+                        Text(l10n.receiverLabel)
+                            .font(.system(size: 11, weight: .medium))
                             .foregroundColor(.secondary)
+                        Spacer()
+                        Button {
+                            viewModel.ownerName = settings.owner(for: viewModel.selectedApartment)
+                        } label: {
+                            HStack(spacing: 3) {
+                                Image(systemName: "person.crop.circle.badge.checkmark")
+                                Text(l10n.fetchSavedResident)
+                            }
+                            .font(.system(size: 10, weight: .semibold))
+                        }
+                        .buttonStyle(.link)
+                    }
+
+                    HStack(spacing: 8) {
+                        Image(systemName: "person.fill")
+                            .foregroundColor(.accentColor)
+                            .font(.system(size: 12))
+                        TextField(l10n.receiverPlaceholder, text: $viewModel.ownerName)
+                            .textFieldStyle(.plain)
+                            .font(.system(size: 12))
+                    }
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 6)
+                    .background(Color(NSColor.textBackgroundColor))
+                    .clipShape(RoundedRectangle(cornerRadius: 7))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 7)
+                            .stroke(Color.secondary.opacity(0.15), lineWidth: 1)
+                    )
+                }
+
+                // Issuer / Collector
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(l10n.issuerLabel)
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundColor(.secondary)
+
+                    HStack(spacing: 8) {
+                        Image(systemName: "person.badge.shield.checkmark.fill")
+                            .foregroundColor(.secondary)
+                            .font(.system(size: 12))
+                        TextField(l10n.issuerPlaceholder, text: $viewModel.issuerName)
+                            .textFieldStyle(.plain)
+                            .font(.system(size: 12))
+                    }
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 6)
+                    .background(Color(NSColor.textBackgroundColor))
+                    .clipShape(RoundedRectangle(cornerRadius: 7))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 7)
+                            .stroke(Color.secondary.opacity(0.15), lineWidth: 1)
+                    )
+                }
+            }
+        }
+        .padding(12)
+        .background(Color(NSColor.controlBackgroundColor))
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+    }
+
+    // 3. Financial & Description Hero Section
+    private var financialAndNotesHeroSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Label(l10n.financialDetails, systemImage: "banknote.fill")
+                .font(.system(size: 12, weight: .bold))
+                .foregroundColor(.secondary)
+
+            HStack(spacing: 10) {
+                // Hero Amount
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("\(l10n.amount) (\(settings.currency.symbol))")
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundColor(.secondary)
+
+                    HStack(spacing: 6) {
+                        Text(settings.currency.symbol)
+                            .font(.system(size: 16, weight: .bold, design: .rounded))
+                            .foregroundColor(.accentColor)
                         TextField("0.00", text: $viewModel.totalAmount)
                             .textFieldStyle(.plain)
+                            .font(.system(size: 16, weight: .bold, design: .rounded))
                     }
-                    .padding(8)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 6)
                     .background(Color(NSColor.textBackgroundColor))
-                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: 7))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 7)
+                            .stroke(Color.accentColor.opacity(0.35), lineWidth: 1.2)
+                    )
                 }
 
-                VStack(alignment: .leading, spacing: 6) {
+                // Sequence No
+                VStack(alignment: .leading, spacing: 3) {
                     Text(l10n.sequenceNo)
-                        .font(.caption)
+                        .font(.system(size: 11, weight: .medium))
                         .foregroundColor(.secondary)
-                    HStack {
+
+                    HStack(spacing: 6) {
                         Image(systemName: "number.square.fill")
                             .foregroundColor(.secondary)
+                            .font(.system(size: 13))
                         TextField("1", text: $viewModel.sequenceNumber)
                             .textFieldStyle(.plain)
+                            .font(.system(size: 14, weight: .semibold, design: .monospaced))
                     }
-                    .padding(8)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 7)
                     .background(Color(NSColor.textBackgroundColor))
-                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: 7))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 7)
+                            .stroke(Color.secondary.opacity(0.15), lineWidth: 1)
+                    )
                 }
+                .frame(width: 120)
             }
 
-            VStack(alignment: .leading, spacing: 6) {
+            // Description / Notes
+            VStack(alignment: .leading, spacing: 3) {
                 Text(l10n.notesLabel)
-                    .font(.caption)
+                    .font(.system(size: 11, weight: .medium))
                     .foregroundColor(.secondary)
-                HStack(alignment: .top) {
+
+                HStack(alignment: .top, spacing: 8) {
                     Image(systemName: "text.alignleft")
                         .foregroundColor(.secondary)
+                        .font(.system(size: 12))
                         .padding(.top, 2)
                     TextField(l10n.notesPlaceholder, text: $viewModel.notes)
                         .textFieldStyle(.plain)
+                        .font(.system(size: 12))
                 }
-                .padding(8)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 6)
                 .background(Color(NSColor.textBackgroundColor))
-                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: 7))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 7)
+                        .stroke(Color.secondary.opacity(0.15), lineWidth: 1)
+                )
             }
         }
-        .padding(14)
-        .background(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(Color(NSColor.controlBackgroundColor))
-        )
+        .padding(12)
+        .background(Color(NSColor.controlBackgroundColor))
+        .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 
+    // 4. Action Buttons
     private var actionButtons: some View {
         HStack(spacing: 12) {
             Button(role: .destructive) {
                 viewModel.resetForm(settings: settings)
             } label: {
                 Label(l10n.clearForm, systemImage: "arrow.counterclockwise")
+                    .font(.system(size: 12, weight: .medium))
             }
             .buttonStyle(.bordered)
-            .controlSize(.large)
+            .controlSize(.regular)
 
             Spacer()
 
             Button {
                 viewModel.createReceipt(settings: settings)
             } label: {
-                Label(l10n.createReceipt, systemImage: "doc.badge.plus")
-                    .padding(.horizontal, 6)
+                HStack(spacing: 6) {
+                    Image(systemName: "doc.badge.plus")
+                    Text(l10n.createReceipt)
+                }
+                .font(.system(size: 13, weight: .bold))
+                .padding(.horizontal, 10)
+                .padding(.vertical, 3)
             }
             .buttonStyle(.borderedProminent)
-            .controlSize(.large)
+            .controlSize(.regular)
             .keyboardShortcut(.defaultAction)
         }
-        .padding(.top, 6)
+        .padding(.top, 2)
     }
 }
 
