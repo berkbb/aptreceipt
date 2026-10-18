@@ -268,15 +268,27 @@ func buildExportFileName(draft: ReceiptDraft, apartmentName: String, language: A
     switch language {
     case .turkish:
         defaultApt = "apartman"
-        receiptType = draft.kind == .income ? "tahsilat_makbuzu" : "gider_makbuzu"
+        switch draft.kind {
+        case .income: receiptType = "tahsilat_makbuzu"
+        case .outcome: receiptType = "gider_makbuzu"
+        case .managementExpense: receiptType = "yonetim_harcama_makbuzu"
+        }
         flatPrefix = "daire"
     case .romanian:
         defaultApt = "asociatie_proprietari"
-        receiptType = draft.kind == .income ? "chitanta_incasare" : "dispozitie_plata"
+        switch draft.kind {
+        case .income: receiptType = "chitanta_incasare"
+        case .outcome: receiptType = "dispozitie_plata"
+        case .managementExpense: receiptType = "dispozitie_plata_administratie"
+        }
         flatPrefix = "ap"
     default:
         defaultApt = "building"
-        receiptType = draft.kind == .income ? "income_receipt" : "expense_receipt"
+        switch draft.kind {
+        case .income: receiptType = "income_receipt"
+        case .outcome: receiptType = "expense_receipt"
+        case .managementExpense: receiptType = "management_expense_receipt"
+        }
         flatPrefix = "flat"
     }
 
@@ -538,18 +550,34 @@ struct ReceiptDocumentView: View {
     }
 
     private var receiptBadgeText: String {
-        draft.kind == .income ? l10n.incomeBadge : l10n.outcomeBadge
+        switch draft.kind {
+        case .income: return l10n.incomeBadge
+        case .outcome: return l10n.outcomeBadge
+        case .managementExpense: return l10n.managementExpenseBadge
+        }
     }
 
     private var documentSerialFormatted: String {
         let prefix: String
         switch l10n.resolvedLanguage {
         case .turkish:
-            prefix = draft.kind == .income ? "TAH" : "GID"
+            switch draft.kind {
+            case .income: prefix = "TAH"
+            case .outcome: prefix = "GID"
+            case .managementExpense: prefix = "HAR"
+            }
         case .romanian:
-            prefix = draft.kind == .income ? "INC" : "DIS"
+            switch draft.kind {
+            case .income: prefix = "INC"
+            case .outcome: prefix = "DIS"
+            case .managementExpense: prefix = "ADM"
+            }
         default:
-            prefix = draft.kind == .income ? "REC" : "EXP"
+            switch draft.kind {
+            case .income: prefix = "REC"
+            case .outcome: prefix = "EXP"
+            case .managementExpense: prefix = "MGT"
+            }
         }
         return String(format: "%@-%04d", prefix, draft.sequenceNumber)
     }
@@ -559,18 +587,38 @@ struct ReceiptDocumentView: View {
     }
 
     private var itemDescriptionText: String {
-        if !draft.notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+        if !draft.notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && draft.notes != "-" {
             return draft.notes
         }
-        return draft.kind == .income ? l10n.defaultItemNameIncome : l10n.defaultItemNameExpense
+        switch draft.kind {
+        case .income: return l10n.defaultItemNameIncome
+        case .outcome: return l10n.defaultItemNameExpense
+        case .managementExpense: return l10n.defaultItemNameManagementExpense
+        }
     }
 
     private var badgeColor: Color {
-        draft.kind == .income ? Color(red: 0.10, green: 0.50, blue: 0.25) : Color(red: 0.78, green: 0.30, blue: 0.12)
+        switch draft.kind {
+        case .income: return Color(red: 0.10, green: 0.50, blue: 0.25)
+        case .outcome: return Color(red: 0.78, green: 0.30, blue: 0.12)
+        case .managementExpense: return Color(red: 0.18, green: 0.35, blue: 0.78)
+        }
     }
 
     private var badgeBackground: Color {
-        draft.kind == .income ? Color(red: 0.92, green: 0.97, blue: 0.93) : Color(red: 0.99, green: 0.94, blue: 0.92)
+        switch draft.kind {
+        case .income: return Color(red: 0.92, green: 0.97, blue: 0.93)
+        case .outcome: return Color(red: 0.99, green: 0.94, blue: 0.92)
+        case .managementExpense: return Color(red: 0.92, green: 0.94, blue: 0.99)
+        }
+    }
+
+    private var documentType: String {
+        switch draft.kind {
+        case .income: return l10n.incomeDocumentType
+        case .outcome: return l10n.expenseDocumentType
+        case .managementExpense: return l10n.managementExpenseDocumentType
+        }
     }
 
     var body: some View {
@@ -650,7 +698,7 @@ struct ReceiptDocumentView: View {
                         Text(l10n.invoiceTypeLabel + ":")
                             .font(.system(size: 10))
                             .foregroundColor(textMuted)
-                        Text(draft.kind == .income ? l10n.incomeDocumentType : l10n.expenseDocumentType)
+                        Text(documentType)
                             .font(.system(size: 10, weight: .medium))
                             .foregroundColor(textSecondary)
                     }
@@ -681,7 +729,7 @@ struct ReceiptDocumentView: View {
 
                     infoRow(label: l10n.invoiceBuildingLabel, value: mainTitle)
                     infoRow(label: l10n.invoiceManagerLabel, value: draft.issuer)
-                    infoRow(label: l10n.invoiceTypeLabel + ":", value: draft.kind == .income ? l10n.incomeDocumentType : l10n.expenseDocumentType)
+                    infoRow(label: l10n.invoiceTypeLabel + ":", value: documentType)
                 }
                 .padding(10)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -694,7 +742,7 @@ struct ReceiptDocumentView: View {
 
                 // Right: Payer / Resident Card
                 VStack(alignment: .leading, spacing: 5) {
-                    Text(l10n.payerSectionTitle)
+                    Text(draft.kind == .managementExpense ? l10n.vendorSectionTitle : l10n.payerSectionTitle)
                         .font(.system(size: 9.5, weight: .bold))
                         .foregroundColor(textMuted)
                         .tracking(0.5)
@@ -703,7 +751,7 @@ struct ReceiptDocumentView: View {
 
                     let receiverTitle = draft.kind == .income ? l10n.invoicePayerResidentLabel : l10n.invoiceVendorLabel
                     infoRow(label: receiverTitle, value: draft.receiver)
-                    let flatText = draft.showApartmentNumber ? "\(l10n.flatPrefix) \(draft.apartmentNumber)" : l10n.commonAreaLabel
+                    let flatText = (draft.showApartmentNumber && draft.apartmentNumber > 0) ? "\(l10n.flatPrefix) \(draft.apartmentNumber)" : l10n.commonAreaLabel
                     infoRow(label: l10n.invoiceUnitLabel, value: flatText)
                     infoRow(label: l10n.period, value: draft.monthYear)
                 }

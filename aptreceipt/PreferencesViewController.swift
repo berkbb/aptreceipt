@@ -46,17 +46,16 @@ enum SettingsTab: String, CaseIterable, Identifiable {
 
 // MARK: - Settings View
 
-@MainActor
 struct SettingsView: View {
     @ObservedObject var settings: ReceiptSettingsStore
     @StateObject private var viewModel = SettingsViewModel()
     @Environment(\.presentationMode) private var presentationMode
-    @State private var selectedTab: SettingsTab = .general
-    @State private var isPresentingLicense: Bool = false
 
     init(settings: ReceiptSettingsStore, initialTab: SettingsTab = .general) {
         self.settings = settings
-        _selectedTab = State(initialValue: initialTab)
+        let vm = SettingsViewModel()
+        vm.selectedTab = initialTab
+        _viewModel = StateObject(wrappedValue: vm)
     }
 
     private var l10n: L10n {
@@ -100,21 +99,21 @@ struct SettingsView: View {
             HStack(spacing: 6) {
                 ForEach(SettingsTab.allCases) { tab in
                     Button {
-                        selectedTab = tab
+                        viewModel.selectedTab = tab
                     } label: {
                         HStack(spacing: 5) {
                             Image(systemName: tab.iconName)
                             Text(tab.title(l10n: l10n))
                         }
-                        .font(.system(size: 12, weight: selectedTab == tab ? .bold : .medium))
+                        .font(.system(size: 12, weight: viewModel.selectedTab == tab ? .bold : .medium))
                         .padding(.horizontal, 12)
                         .padding(.vertical, 6)
                         .background(
-                            selectedTab == tab
+                            viewModel.selectedTab == tab
                             ? Color.accentColor.opacity(0.18)
                             : Color.clear
                         )
-                        .foregroundColor(selectedTab == tab ? .accentColor : .secondary)
+                        .foregroundColor(viewModel.selectedTab == tab ? .accentColor : .secondary)
                         .clipShape(Capsule())
                     }
                     .buttonStyle(.plain)
@@ -130,7 +129,7 @@ struct SettingsView: View {
             // Active Tab Content
             ScrollView {
                 VStack(spacing: 16) {
-                    switch selectedTab {
+                    switch viewModel.selectedTab {
                     case .general:
                         generalSettingsTab
                     case .residents:
@@ -779,7 +778,7 @@ struct SettingsView: View {
                         .foregroundColor(.secondary)
 
                     Button {
-                        isPresentingLicense = true
+                        settings.showLicenseViewer = true
                     } label: {
                         Label(l10n.viewLicenseButton, systemImage: "doc.text.magnifyingglass")
                             .font(.callout.bold())
@@ -803,7 +802,7 @@ struct SettingsView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 16)
-        .sheet(isPresented: $isPresentingLicense) {
+        .sheet(isPresented: $settings.showLicenseViewer) {
             LicenseViewerSheet(l10n: l10n)
         }
     }
@@ -824,6 +823,7 @@ struct SettingsView: View {
 
 @MainActor
 final class SettingsViewModel: ObservableObject {
+    @Published var selectedTab: SettingsTab = .general
     @Published var apartmentName: String = ""
     @Published var issuer: String = ""
     @Published var defaultPayment: String = ""

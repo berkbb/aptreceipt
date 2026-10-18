@@ -181,18 +181,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             .frame(width: 680, height: 580)
         render(view: settingsView, size: CGSize(width: 680, height: 580), to: outDir.appendingPathComponent("03_settings_view.png"))
 
-        // 4. Expense Receipt Document
+        // 4. Management Expense Receipt Document
         let sampleOutcomeDraft = ReceiptDraft(
             receiver: "Asansör Bakım Servisi",
             issuer: "Ahmet Yılmaz",
             notes: "2026 Ekim ayı bina asansörü periyodik bakım ve kontrol bedeli",
             monthYear: "Ekim 2026",
-            apartmentNumber: 1,
+            apartmentNumber: 0,
             amount: 3450.0,
             sequenceNumber: 105,
             createdDate: "18 Ekim 2026",
             showApartmentNumber: false,
-            kind: .outcome,
+            kind: .managementExpense,
             currency: .turkishLira
         )
         let docOutcomeView = ReceiptDocumentView(
@@ -239,6 +239,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             .frame(width: 420, height: 460)
         render(view: aboutView, size: CGSize(width: 420, height: 460), to: outDir.appendingPathComponent("07_about_window.png"))
 
+        // 8. Management Expense Dashboard
+        let settingsMgt = ReceiptSettingsStore()
+        settingsMgt.apartmentName = "Güleryüz Apartmanı"
+        settingsMgt.issuer = "Ahmet Yılmaz"
+        settingsMgt.defaultPayment = "3450"
+        settingsMgt.seqNumber = 105
+        settingsMgt.flatCount = 10
+        settingsMgt.language = .turkish
+        settingsMgt.currency = .turkishLira
+
+        let mgtDashboardView = MainScreen(
+            settings: settingsMgt,
+            initialKind: .managementExpense,
+            initialVendor: "Kaya Asansör Ltd. Şti.",
+            initialNotes: "2026 Ekim ayı bina asansörü periyodik bakım ve kontrol bedeli"
+        )
+        .frame(width: 1080, height: 740)
+        render(view: mgtDashboardView, size: CGSize(width: 1080, height: 740), to: outDir.appendingPathComponent("08_management_expense_dashboard.png"))
+
         print("Screenshots successfully generated in \(outDir.path)")
     }
 
@@ -276,7 +295,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 struct AboutWindowView: View {
     @ObservedObject var settings: ReceiptSettingsStore
-    @State private var isPresentingLicense = false
 
     private var l10n: L10n {
         settings.l10n
@@ -355,7 +373,7 @@ struct AboutWindowView: View {
                         .multilineTextAlignment(.center)
 
                     Button {
-                        isPresentingLicense = true
+                        settings.showLicenseViewer = true
                     } label: {
                         Label(l10n.viewLicenseButton, systemImage: "doc.text.magnifyingglass")
                             .font(.system(size: 12, weight: .medium))
@@ -381,7 +399,7 @@ struct AboutWindowView: View {
         }
         .frame(width: 420, height: 460)
         .background(Color(NSColor.windowBackgroundColor))
-        .sheet(isPresented: $isPresentingLicense) {
+        .sheet(isPresented: $settings.showLicenseViewer) {
             LicenseViewerSheet(l10n: l10n)
         }
     }

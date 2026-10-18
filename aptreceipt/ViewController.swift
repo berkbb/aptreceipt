@@ -240,9 +240,11 @@ struct L10n {
     // Receipt Type
     var receiptType: String { tr("Receipt Type", "Makbuz Türü", "Tip Chitanță") }
     var incomeTitle: String { tr("Income (Collection)", "Gelir (Tahsilat)", "Încasare (Întreținere)") }
-    var outcomeTitle: String { tr("Expense (Disbursement)", "Gider (Tediye)", "Plată (Cheltuială)") }
+    var outcomeTitle: String { tr("Resident Refund", "Sakin İadesi", "Restituire Locatar") }
+    var managementExpenseTitle: String { tr("Management Expense", "Yönetim Harcaması", "Cheltuieli Administrație") }
     var incomeBadge: String { tr("INCOME RECEIPT", "TAHSİLAT MAKBUZU", "CHITANȚĂ DE ÎNCASARE") }
-    var outcomeBadge: String { tr("EXPENSE RECEIPT", "GİDER / TEDİYE MAKBUZU", "DISPOZIȚIE DE PLATĂ") }
+    var outcomeBadge: String { tr("REFUND RECEIPT", "GİDER / İADE MAKBUZU", "DISPOZIȚIE DE PLATĂ") }
+    var managementExpenseBadge: String { tr("OPERATING EXPENSE", "İŞLETME GİDERİ", "CHELTUIALĂ ADMINISTRAȚIE") }
 
     // Flat & Period
     var flatAndPeriod: String { tr("Apartment & Period", "Daire ve Dönem", "Apartament & Perioadă") }
@@ -318,15 +320,34 @@ struct L10n {
     var legalStatutoryNotice: String { tr("Issued in accordance with Property Ownership Law as an official management receipt.", "634 Sayılı Kat Mülkiyeti Kanunu uyarınca bina işletme ve aidat hesabına mahsuben düzenlenmiştir.", "Emis în conformitate cu legislația privind asociațiile de proprietari pentru evidența cheltuielilor comune.") }
     var statutoryTaxNotice: String { tr("Exempt from VAT under Property Management Law.", "634 sayılı KMK uyarınca bina işletme gider ve aidatları KDV'den muaftır.", "Scutit de TVA conform normelor asociațiilor de proprietari.") }
     var incomeDocumentType: String { tr("Collection Receipt", "Tahsilat Makbuzu", "Chitanță Încasare") }
-    var expenseDocumentType: String { tr("Operating Expense Receipt", "İşletme Gider Makbuzu", "Dispoziție de Plată") }
+    var expenseDocumentType: String { tr("Resident Refund Voucher", "Sakin İade / Tediye Makbuzu", "Dispoziție de Plată Locatar") }
+    var managementExpenseDocumentType: String { tr("Operating Expenditure Voucher", "Yönetim İşletme Gider Belgesi", "Dispoziție de Plată Cheltuieli Administrative") }
     var defaultItemNameIncome: String { tr("Common Expense & Dues Contribution", "Ortak Gider ve Aidat Avans Katılım Payı", "Cotă întreținere și fond de rulment") }
-    var defaultItemNameExpense: String { tr("Building Maintenance & Operating Expense", "Apartman İşletme ve Bakım Hizmet Gideri", "Servicii de întreținere și reparații imobil") }
+    var defaultItemNameExpense: String { tr("Resident Expense Reimbursement / Refund", "Sakin İade ve Mahsup Ödemesi", "Restituire avans / decont locatar") }
+    var defaultItemNameManagementExpense: String { tr("Building Maintenance & Operating Expense", "Bina İşletme, Bakım ve Hizmet Alım Gideri", "Servicii de întreținere și reparații imobil") }
     var commonAreaLabel: String { tr("Common Area / General", "Ortak Alan / Genel", "Spații Comune / General") }
     var invoiceBuildingLabel: String { tr("Building:", "Bina / Site:", "Imobil / Asociație:") }
     var invoiceManagerLabel: String { tr("Manager:", "Yönetici:", "Administrator:") }
     var invoicePayerResidentLabel: String { tr("Resident / Payer:", "Sakin / Muhatap:", "Locatar / Proprietar:") }
     var invoiceVendorLabel: String { tr("Payee / Vendor:", "Ödeme Yapılan:", "Furnizor / Beneficiar:") }
     var invoiceUnitLabel: String { tr("Unit / Flat:", "Bağımsız Bölüm:", "Apartament:") }
+    var vendorLabel: String { tr("Vendor / Service Provider (Payee):", "Firma / Usta / Hizmet Sağlayıcı (Alacaklı):", "Furnizor / Prestator Servicii (Beneficiar):") }
+    var vendorPlaceholder: String { tr("e.g. Acme Elevator Ltd. / John Technician", "Örn: Kaya Asansör Ltd. / Ahmet Usta", "Ex: Lift Service SRL / Ion Tehnician") }
+    var managerPayerLabel: String { tr("Payer (Manager / Building Management):", "Ödeyen (Yönetici / Apartman Yönetimi):", "Plătitor (Administrator / Asociație):") }
+    var vendorSectionTitle: String { tr("PAYEE / VENDOR & SERVICE PROVIDER", "ALACAKLI / FİRMA & HİZMET SAĞLAYICI", "BENEFICIAR / FURNIZOR SERVICII") }
+
+    // Quick Expense Presets
+    var quickPresetsLabel: String { tr("Quick Expense Presets:", "Hızlı Harcama Şablonları:", "Categorii Rapide de Cheltuieli:") }
+    var presetElevator: String { tr("Elevator", "Asansör Bakımı", "Lift") }
+    var presetElevatorDesc: String { tr("Elevator periodic maintenance and safety inspection", "Asansör periyodik bakım ve kontrol hizmeti", "Întreținere periodică și revizie lift") }
+    var presetCleaning: String { tr("Cleaning", "Temizlik & Malzeme", "Curățenie") }
+    var presetCleaningDesc: String { tr("Common area cleaning and hygiene supplies", "Apartman ortak alan temizliği ve sarf malzeme bedeli", "Curățenie spații comune și consumabile") }
+    var presetUtilities: String { tr("Utilities", "Ortak Elektrik / Su", "Utilități") }
+    var presetUtilitiesDesc: String { tr("Building common electricity, lighting, and utilities", "Apartman ortak alan elektrik ve aydınlatma gideri", "Utilități și energie electrică spații comune") }
+    var presetRepairs: String { tr("Repairs", "Tesisat & Onarım", "Reparații") }
+    var presetRepairsDesc: String { tr("Plumbing, roof, and facility repair labor", "Bina ortak tesisat bakım ve onarım işçilik bedeli", "Reparații și întreținere instalații imobil") }
+    var presetGardening: String { tr("Gardening", "Bahçe & Peyzaj", "Curte & Grădină") }
+    var presetGardeningDesc: String { tr("Garden, landscaping, and outdoor maintenance", "Bahçe düzenleme ve çevre bakım hizmeti", "Întreținere curte și spații verzi") }
 
     // Settings Tabs
     var tabBuilding: String { tr("Building", "Apartman", "Imobil") }
@@ -487,6 +508,22 @@ struct MainScreen: View {
     @ObservedObject var settings: ReceiptSettingsStore
     @StateObject private var viewModel = MainScreenViewModel()
 
+    init(settings: ReceiptSettingsStore, initialKind: ReceiptKind = .income, initialVendor: String? = nil, initialNotes: String? = nil) {
+        self.settings = settings
+        let vm = MainScreenViewModel()
+        vm.syncWithSettings(settings)
+        if initialKind != .income {
+            vm.setReceiptKind(initialKind, settings: settings)
+            if let vendor = initialVendor {
+                vm.ownerName = vendor
+            }
+            if let notes = initialNotes {
+                vm.notes = notes
+            }
+        }
+        _viewModel = StateObject(wrappedValue: vm)
+    }
+
     private var l10n: L10n { settings.l10n }
 
     var body: some View {
@@ -555,7 +592,9 @@ struct MainScreen: View {
             }
         }
         .onAppear {
-            viewModel.syncWithSettings(settings)
+            if viewModel.receiptKind == .income && viewModel.ownerName.isEmpty {
+                viewModel.syncWithSettings(settings)
+            }
         }
         .sheet(item: $viewModel.previewDraft) { draft in
             ReceiptPreviewSheet(draft: draft, settings: settings)
@@ -637,87 +676,81 @@ struct MainScreen: View {
 
     // MARK: - Hero Sections (Left Side)
 
-    // 1. Hero Mode Switcher (Income vs Expense)
+    // 1. Hero Mode Switcher (Income vs Expense vs Management Spending)
     private var heroReceiptTypeSelector: some View {
-        HStack(spacing: 10) {
-            // Income Button
-            Button {
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.75)) {
-                    viewModel.receiptKind = .income
-                }
-            } label: {
-                HStack(spacing: 10) {
-                    ZStack {
-                        Circle()
-                            .fill(viewModel.receiptKind == .income ? Color.green : Color.secondary.opacity(0.12))
-                            .frame(width: 30, height: 30)
-                        Image(systemName: "arrow.down.left")
-                            .font(.system(size: 12, weight: .bold))
-                            .foregroundColor(viewModel.receiptKind == .income ? .white : .secondary)
-                    }
+        HStack(spacing: 8) {
+            // Income
+            modeHeroCard(
+                kind: .income,
+                title: l10n.incomeTitle,
+                subtitle: l10n.incomeBadge,
+                icon: "arrow.down.left",
+                activeColor: Color.green
+            )
 
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(l10n.incomeTitle)
-                            .font(.system(size: 12, weight: .bold))
-                            .foregroundColor(viewModel.receiptKind == .income ? .primary : .secondary)
-                        Text(l10n.incomeBadge)
-                            .font(.system(size: 9, weight: .semibold))
-                            .foregroundColor(viewModel.receiptKind == .income ? .green : .secondary.opacity(0.6))
-                    }
-                    Spacer()
-                }
-                .padding(.horizontal, 10)
-                .padding(.vertical, 7)
-                .background(
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .fill(viewModel.receiptKind == .income ? Color.green.opacity(0.12) : Color(NSColor.controlBackgroundColor))
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .stroke(viewModel.receiptKind == .income ? Color.green.opacity(0.5) : Color.secondary.opacity(0.15), lineWidth: viewModel.receiptKind == .income ? 1.5 : 1)
-                )
-            }
-            .buttonStyle(.plain)
+            // Resident Refund
+            modeHeroCard(
+                kind: .outcome,
+                title: l10n.outcomeTitle,
+                subtitle: l10n.outcomeBadge,
+                icon: "arrow.up.right",
+                activeColor: Color.orange
+            )
 
-            // Expense Button
-            Button {
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.75)) {
-                    viewModel.receiptKind = .outcome
-                }
-            } label: {
-                HStack(spacing: 10) {
-                    ZStack {
-                        Circle()
-                            .fill(viewModel.receiptKind == .outcome ? Color.orange : Color.secondary.opacity(0.12))
-                            .frame(width: 30, height: 30)
-                        Image(systemName: "arrow.up.right")
-                            .font(.system(size: 12, weight: .bold))
-                            .foregroundColor(viewModel.receiptKind == .outcome ? .white : .secondary)
-                    }
-
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(l10n.outcomeTitle)
-                            .font(.system(size: 12, weight: .bold))
-                            .foregroundColor(viewModel.receiptKind == .outcome ? .primary : .secondary)
-                        Text(l10n.outcomeBadge)
-                            .font(.system(size: 9, weight: .semibold))
-                            .foregroundColor(viewModel.receiptKind == .outcome ? .orange : .secondary.opacity(0.6))
-                    }
-                    Spacer()
-                }
-                .padding(.horizontal, 10)
-                .padding(.vertical, 7)
-                .background(
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .fill(viewModel.receiptKind == .outcome ? Color.orange.opacity(0.12) : Color(NSColor.controlBackgroundColor))
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .stroke(viewModel.receiptKind == .outcome ? Color.orange.opacity(0.5) : Color.secondary.opacity(0.15), lineWidth: viewModel.receiptKind == .outcome ? 1.5 : 1)
-                )
-            }
-            .buttonStyle(.plain)
+            // Management Operating Expense
+            modeHeroCard(
+                kind: .managementExpense,
+                title: l10n.managementExpenseTitle,
+                subtitle: l10n.managementExpenseBadge,
+                icon: "briefcase.fill",
+                activeColor: Color(red: 0.22, green: 0.42, blue: 0.88)
+            )
         }
+    }
+
+    private func modeHeroCard(kind: ReceiptKind, title: String, subtitle: String, icon: String, activeColor: Color) -> some View {
+        let isSelected = viewModel.receiptKind == kind
+        return Button {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.75)) {
+                viewModel.setReceiptKind(kind, settings: settings)
+            }
+        } label: {
+            HStack(spacing: 7) {
+                ZStack {
+                    Circle()
+                        .fill(isSelected ? activeColor : Color.secondary.opacity(0.12))
+                        .frame(width: 26, height: 26)
+                    Image(systemName: icon)
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundColor(isSelected ? .white : .secondary)
+                }
+
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(title)
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundColor(isSelected ? .primary : .secondary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                    Text(subtitle)
+                        .font(.system(size: 8.5, weight: .semibold))
+                        .foregroundColor(isSelected ? activeColor : .secondary.opacity(0.6))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.75)
+                }
+                Spacer(minLength: 0)
+            }
+            .padding(.horizontal, 7)
+            .padding(.vertical, 7)
+            .background(
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .fill(isSelected ? activeColor.opacity(0.12) : Color(NSColor.controlBackgroundColor))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .stroke(isSelected ? activeColor.opacity(0.55) : Color.secondary.opacity(0.15), lineWidth: isSelected ? 1.5 : 1)
+            )
+        }
+        .buttonStyle(.plain)
     }
 
     // 2. Property & Parties Hero Section
@@ -725,10 +758,15 @@ struct MainScreen: View {
         VStack(alignment: .leading, spacing: 10) {
             // Header Row: Property & Print Flat Toggle
             HStack {
-                Label(l10n.flatAndPeriod, systemImage: "building.2.crop.circle.fill")
-                    .font(.system(size: 12, weight: .bold))
-                    .foregroundColor(.secondary)
+                Label(
+                    viewModel.receiptKind == .managementExpense ? l10n.managementExpenseTitle : l10n.flatAndPeriod,
+                    systemImage: viewModel.receiptKind == .managementExpense ? "briefcase.fill" : "building.2.crop.circle.fill"
+                )
+                .font(.system(size: 12, weight: .bold))
+                .foregroundColor(.secondary)
+
                 Spacer()
+
                 Toggle(isOn: $viewModel.printApartmentNumber) {
                     Text(l10n.printFlatNumber)
                         .font(.system(size: 11))
@@ -741,13 +779,16 @@ struct MainScreen: View {
             HStack(spacing: 10) {
                 // Flat Selector
                 HStack(spacing: 6) {
-                    Image(systemName: "door.left.hand.closed")
+                    Image(systemName: viewModel.receiptKind == .managementExpense ? "building.2" : "door.left.hand.closed")
                         .foregroundColor(.accentColor)
                         .font(.system(size: 12))
-                    Text(l10n.flatNumber)
+                    Text(viewModel.receiptKind == .managementExpense ? l10n.invoiceUnitLabel : l10n.flatNumber)
                         .font(.system(size: 11, weight: .medium))
                         .foregroundColor(.secondary)
                     Picker("", selection: $viewModel.selectedApartment) {
+                        if viewModel.receiptKind == .managementExpense {
+                            Text(l10n.commonAreaLabel).tag(0)
+                        }
                         ForEach(settings.apartmentNumbers, id: \.self) { number in
                             Text("\(l10n.flatPrefix) \(number)").tag(number)
                         }
@@ -792,72 +833,177 @@ struct MainScreen: View {
             Divider()
 
             // Parties Fields
-            VStack(spacing: 8) {
-                // Resident / Payer
-                VStack(alignment: .leading, spacing: 3) {
-                    HStack {
-                        Text(l10n.receiverLabel)
+            if viewModel.receiptKind == .managementExpense {
+                // Management Expense Mode: Vendor (Payee) & Manager (Payer)
+                VStack(spacing: 8) {
+                    // Vendor / Payee
+                    VStack(alignment: .leading, spacing: 3) {
+                        HStack {
+                            Text(l10n.vendorLabel)
+                                .font(.system(size: 11, weight: .medium))
+                                .foregroundColor(.secondary)
+                            Spacer()
+                            if !viewModel.ownerName.isEmpty {
+                                Button(l10n.clearForm) {
+                                    viewModel.ownerName = ""
+                                }
+                                .font(.system(size: 10, weight: .semibold))
+                                .buttonStyle(.link)
+                            }
+                        }
+
+                        HStack(spacing: 8) {
+                            Image(systemName: "building.2.fill")
+                                .foregroundColor(Color(red: 0.22, green: 0.42, blue: 0.88))
+                                .font(.system(size: 12))
+                            TextField(l10n.vendorPlaceholder, text: $viewModel.ownerName)
+                                .textFieldStyle(.plain)
+                                .font(.system(size: 12))
+                        }
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 6)
+                        .background(Color(NSColor.textBackgroundColor))
+                        .clipShape(RoundedRectangle(cornerRadius: 7))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 7)
+                                .stroke(Color.secondary.opacity(0.15), lineWidth: 1)
+                        )
+                    }
+
+                    // Manager / Payer
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text(l10n.managerPayerLabel)
                             .font(.system(size: 11, weight: .medium))
                             .foregroundColor(.secondary)
-                        Spacer()
-                        Button {
-                            viewModel.ownerName = settings.owner(for: viewModel.selectedApartment)
-                        } label: {
-                            HStack(spacing: 3) {
-                                Image(systemName: "person.crop.circle.badge.checkmark")
-                                Text(l10n.fetchSavedResident)
-                            }
-                            .font(.system(size: 10, weight: .semibold))
+
+                        HStack(spacing: 8) {
+                            Image(systemName: "person.badge.shield.checkmark.fill")
+                                .foregroundColor(.secondary)
+                                .font(.system(size: 12))
+                            TextField(l10n.issuerPlaceholder, text: $viewModel.issuerName)
+                                .textFieldStyle(.plain)
+                                .font(.system(size: 12))
                         }
-                        .buttonStyle(.link)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 6)
+                        .background(Color(NSColor.textBackgroundColor))
+                        .clipShape(RoundedRectangle(cornerRadius: 7))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 7)
+                                .stroke(Color.secondary.opacity(0.15), lineWidth: 1)
+                        )
                     }
 
-                    HStack(spacing: 8) {
-                        Image(systemName: "person.fill")
-                            .foregroundColor(.accentColor)
-                            .font(.system(size: 12))
-                        TextField(l10n.receiverPlaceholder, text: $viewModel.ownerName)
-                            .textFieldStyle(.plain)
-                            .font(.system(size: 12))
-                    }
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 6)
-                    .background(Color(NSColor.textBackgroundColor))
-                    .clipShape(RoundedRectangle(cornerRadius: 7))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 7)
-                            .stroke(Color.secondary.opacity(0.15), lineWidth: 1)
-                    )
-                }
-
-                // Issuer / Collector
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(l10n.issuerLabel)
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundColor(.secondary)
-
-                    HStack(spacing: 8) {
-                        Image(systemName: "person.badge.shield.checkmark.fill")
+                    // Quick Expense Presets Row
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(l10n.quickPresetsLabel)
+                            .font(.system(size: 10, weight: .semibold))
                             .foregroundColor(.secondary)
-                            .font(.system(size: 12))
-                        TextField(l10n.issuerPlaceholder, text: $viewModel.issuerName)
-                            .textFieldStyle(.plain)
-                            .font(.system(size: 12))
+
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 6) {
+                                expensePresetChip(title: l10n.presetElevator, icon: "arrow.up.and.down.square.fill", text: l10n.presetElevatorDesc)
+                                expensePresetChip(title: l10n.presetCleaning, icon: "sparkles", text: l10n.presetCleaningDesc)
+                                expensePresetChip(title: l10n.presetUtilities, icon: "bolt.fill", text: l10n.presetUtilitiesDesc)
+                                expensePresetChip(title: l10n.presetRepairs, icon: "wrench.and.screwdriver.fill", text: l10n.presetRepairsDesc)
+                                expensePresetChip(title: l10n.presetGardening, icon: "leaf.fill", text: l10n.presetGardeningDesc)
+                            }
+                            .padding(.vertical, 2)
+                        }
                     }
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 6)
-                    .background(Color(NSColor.textBackgroundColor))
-                    .clipShape(RoundedRectangle(cornerRadius: 7))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 7)
-                            .stroke(Color.secondary.opacity(0.15), lineWidth: 1)
-                    )
+                }
+            } else {
+                // Income & Resident Refund Modes
+                VStack(spacing: 8) {
+                    // Resident / Payer
+                    VStack(alignment: .leading, spacing: 3) {
+                        HStack {
+                            Text(l10n.receiverLabel)
+                                .font(.system(size: 11, weight: .medium))
+                                .foregroundColor(.secondary)
+                            Spacer()
+                            Button {
+                                viewModel.ownerName = settings.owner(for: viewModel.selectedApartment)
+                            } label: {
+                                HStack(spacing: 3) {
+                                    Image(systemName: "person.crop.circle.badge.checkmark")
+                                    Text(l10n.fetchSavedResident)
+                                }
+                                .font(.system(size: 10, weight: .semibold))
+                            }
+                            .buttonStyle(.link)
+                        }
+
+                        HStack(spacing: 8) {
+                            Image(systemName: "person.fill")
+                                .foregroundColor(.accentColor)
+                                .font(.system(size: 12))
+                            TextField(l10n.receiverPlaceholder, text: $viewModel.ownerName)
+                                .textFieldStyle(.plain)
+                                .font(.system(size: 12))
+                        }
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 6)
+                        .background(Color(NSColor.textBackgroundColor))
+                        .clipShape(RoundedRectangle(cornerRadius: 7))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 7)
+                                .stroke(Color.secondary.opacity(0.15), lineWidth: 1)
+                        )
+                    }
+
+                    // Issuer / Collector
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text(l10n.issuerLabel)
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundColor(.secondary)
+
+                        HStack(spacing: 8) {
+                            Image(systemName: "person.badge.shield.checkmark.fill")
+                                .foregroundColor(.secondary)
+                                .font(.system(size: 12))
+                            TextField(l10n.issuerPlaceholder, text: $viewModel.issuerName)
+                                .textFieldStyle(.plain)
+                                .font(.system(size: 12))
+                        }
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 6)
+                        .background(Color(NSColor.textBackgroundColor))
+                        .clipShape(RoundedRectangle(cornerRadius: 7))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 7)
+                                .stroke(Color.secondary.opacity(0.15), lineWidth: 1)
+                        )
+                    }
                 }
             }
         }
         .padding(12)
         .background(Color(NSColor.controlBackgroundColor))
         .clipShape(RoundedRectangle(cornerRadius: 10))
+    }
+
+    private func expensePresetChip(title: String, icon: String, text: String) -> some View {
+        Button {
+            viewModel.applyPreset(notesText: text)
+        } label: {
+            HStack(spacing: 4) {
+                Image(systemName: icon)
+                    .font(.system(size: 9))
+                Text(title)
+                    .font(.system(size: 10, weight: .medium))
+            }
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(Color.secondary.opacity(0.1))
+            .foregroundColor(.primary)
+            .clipShape(Capsule())
+            .overlay(
+                Capsule()
+                    .stroke(Color.secondary.opacity(0.2), lineWidth: 0.8)
+            )
+        }
+        .buttonStyle(.plain)
     }
 
     // 3. Financial & Description Hero Section
@@ -1039,6 +1185,22 @@ struct LiveReceiptPreview: View {
         return "\(currency.symbol) 0,00"
     }
 
+    private var badgeText: String {
+        switch kind {
+        case .income: return l10n.incomeBadge
+        case .outcome: return l10n.outcomeBadge
+        case .managementExpense: return l10n.managementExpenseBadge
+        }
+    }
+
+    private var badgeColor: Color {
+        switch kind {
+        case .income: return .green
+        case .outcome: return .orange
+        case .managementExpense: return Color(red: 0.22, green: 0.42, blue: 0.88)
+        }
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             // Header
@@ -1061,9 +1223,9 @@ struct LiveReceiptPreview: View {
                     Text(apartmentName.isEmpty ? l10n.defaultBuildingName : apartmentName.uppercased())
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(.primary)
-                    Text(kind == .income ? l10n.incomeBadge : l10n.outcomeBadge)
+                    Text(badgeText)
                         .font(.system(size: 11, weight: .semibold))
-                        .foregroundColor(kind == .income ? .green : .orange)
+                        .foregroundColor(badgeColor)
                 }
 
                 Spacer()
@@ -1081,11 +1243,21 @@ struct LiveReceiptPreview: View {
 
             // Info rows
             VStack(spacing: 8) {
-                previewRow(label: l10n.receiverLabel, value: receiver)
-                if showApartmentNumber {
-                    previewRow(label: l10n.flatNumber, value: "\(l10n.flatPrefix) \(apartmentNumber)")
+                if kind == .managementExpense {
+                    previewRow(label: l10n.invoiceVendorLabel, value: receiver)
+                    if showApartmentNumber && apartmentNumber > 0 {
+                        previewRow(label: l10n.flatNumber, value: "\(l10n.flatPrefix) \(apartmentNumber)")
+                    } else {
+                        previewRow(label: l10n.invoiceUnitLabel, value: l10n.commonAreaLabel)
+                    }
+                    previewRow(label: l10n.managerPayerLabel, value: issuer)
+                } else {
+                    previewRow(label: l10n.receiverLabel, value: receiver)
+                    if showApartmentNumber {
+                        previewRow(label: l10n.flatNumber, value: "\(l10n.flatPrefix) \(apartmentNumber)")
+                    }
+                    previewRow(label: l10n.issuerLabel, value: issuer)
                 }
-                previewRow(label: l10n.issuerLabel, value: issuer)
                 previewRow(label: l10n.dateLabel, value: Date().dayMonthYearString(locale: l10n.locale))
             }
 
@@ -1192,9 +1364,37 @@ final class MainScreenViewModel: ObservableObject {
         receiptKind = .income
     }
 
+    func setReceiptKind(_ kind: ReceiptKind, settings: ReceiptSettingsStore) {
+        receiptKind = kind
+        if kind == .managementExpense {
+            selectedApartment = 0
+            printApartmentNumber = false
+            if ownerName == settings.owner(for: selectedApartment) {
+                ownerName = ""
+            }
+        } else {
+            if selectedApartment == 0 {
+                selectedApartment = settings.apartmentNumbers.first ?? 1
+            }
+            printApartmentNumber = true
+            if ownerName.isEmpty {
+                ownerName = settings.owner(for: selectedApartment)
+            }
+        }
+    }
+
+    func applyPreset(notesText: String, suggestedVendor: String? = nil) {
+        notes = notesText
+        if let vendor = suggestedVendor, ownerName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            ownerName = vendor
+        }
+    }
+
     func updateApartment(_ number: Int, settings: ReceiptSettingsStore) {
         selectedApartment = number
-        ownerName = settings.owner(for: number)
+        if receiptKind != .managementExpense {
+            ownerName = settings.owner(for: number)
+        }
     }
 
     func resetForm(settings: ReceiptSettingsStore) {
@@ -1224,16 +1424,19 @@ final class MainScreenViewModel: ObservableObject {
             return
         }
 
+        let effectiveApartment = selectedApartment
+        let effectiveShowApartment = receiptKind == .managementExpense ? (selectedApartment > 0 && printApartmentNumber) : printApartmentNumber
+
         previewDraft = ReceiptDraft(
             receiver: trimmedOwner.localizedCapitalized,
             issuer: trimmedIssuer.localizedCapitalized,
             notes: notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "-" : notes,
             monthYear: receiptDate.monthYearString(locale: settings.currentLocale),
-            apartmentNumber: selectedApartment,
+            apartmentNumber: effectiveApartment,
             amount: amount,
             sequenceNumber: sequence,
             createdDate: Date().dayMonthYearString(locale: settings.currentLocale),
-            showApartmentNumber: printApartmentNumber,
+            showApartmentNumber: effectiveShowApartment,
             kind: receiptKind,
             currency: settings.currency
         )
@@ -1260,6 +1463,7 @@ struct ValidationError: Identifiable {
 enum ReceiptKind: String, CaseIterable, Identifiable {
     case income
     case outcome
+    case managementExpense = "management_expense"
 
     var id: String { rawValue }
 
@@ -1269,6 +1473,8 @@ enum ReceiptKind: String, CaseIterable, Identifiable {
             return l10n.incomeTitle
         case .outcome:
             return l10n.outcomeTitle
+        case .managementExpense:
+            return l10n.managementExpenseTitle
         }
     }
 
@@ -1278,6 +1484,8 @@ enum ReceiptKind: String, CaseIterable, Identifiable {
             return "arrow.down.left.circle.fill"
         case .outcome:
             return "arrow.up.right.circle.fill"
+        case .managementExpense:
+            return "briefcase.fill"
         }
     }
 }
