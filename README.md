@@ -1,44 +1,61 @@
-<img src="/aptreceipt/Assets.xcassets/Logo.imageset/aparment_macos-2@256.png" width="256" />
+<img src="aptreceipt/Assets.xcassets/Logo.imageset/aparment_macos-2@256.png" width="160" alt="Apartment Receipt Logo" />
 
 # Apartment Receipt Generator for macOS
 
-## Generates apartment income / expense receipt with given data. After that , you can export receipt as an image.
+A modern, native macOS application to effortlessly generate, manage, and export official apartment income and expense receipts.
 
-### Features:
+## Features
 
-* Income / exprense receipts.
-* Saves app data to shared preferences.
-* Auto increased receipt number.
-* Import and print  the signature onto receipt.
-* Export receipt as a image.
+- **Income & Expense Receipts:** Generate official collection (income) and disbursement (expense) receipts.
+- **Real-Time Live Receipt Preview:** Live interactive preview card dynamically updates as you type.
+- **Multilingual Support (1-to-1):** Full support for English and Turkish with instant language switching in Settings.
+- **Automatic Theme Support:** Light, Dark, and Automatic System appearance modes.
+- **Dedicated Settings Window:** Accessible from the macOS Menu Bar (`Cmd+,` / `Preferences`) with tabbed sections for Building Details, Residents Directory, Appearance & Language, Signature, and About.
+- **Residents Directory:** Save flat numbers and resident names for one-click auto-fill.
+- **Digital Signature:** Import authorized signature images (PNG/JPEG) to print directly onto exported receipts.
+- **High-Resolution Export:** Export receipts as crystal-clear JPEG image files.
+- **Auto-Incrementing Sequence Numbers:** Receipt numbers increment automatically after generation.
 
+---
 
+## UI Screenshots
 
-### UI screenshots:
 <table>
 <tr>
-<td>
-  <img width="752" alt="Ekran Resmi 2023-03-24 19 11 29" src="https://user-images.githubusercontent.com/23173536/227581673-58262298-7893-4e3e-96d1-ed9caa0c99e7.png">
-</td>
-<td>
-  <img width="752" alt="Ekran Resmi 2023-03-24 19 11 48" src="https://user-images.githubusercontent.com/23173536/227581730-44871ccb-984c-4e9e-8d65-ac13acb49dce.png">
-</td>
-  <td>
-<img width="752" alt="Ekran Resmi 2023-03-24 19 11 59" src="https://user-images.githubusercontent.com/23173536/227581858-7e4127f0-8ffe-446e-856f-060e495e1497.png">
-</td>
+  <td align="center"><b>Main Dashboard (Turkish)</b></td>
+  <td align="center"><b>Main Dashboard (English)</b></td>
 </tr>
 <tr>
-<td>
-  <img width="752" alt="Ekran Resmi 2023-03-24 19 12 08" src="https://user-images.githubusercontent.com/23173536/227581885-5cd516f9-bfed-44ac-bdfd-2c754fa551b2.png">
-</td>
-<td>
-  <img width="752" alt="Ekran Resmi 2023-03-24 19 12 57" src="https://user-images.githubusercontent.com/23173536/227581941-88fb1351-84bf-4dd1-9d9b-9d22bbd74cda.png">
-</td>
+  <td><img src="docs/screenshots/01_main_dashboard.png" width="480" alt="Main Dashboard Turkish" /></td>
+  <td><img src="docs/screenshots/05_main_dashboard_en.png" width="480" alt="Main Dashboard English" /></td>
+</tr>
+<tr>
+  <td align="center"><b>Income Receipt Certificate</b></td>
+  <td align="center"><b>Expense Receipt Certificate</b></td>
+</tr>
+<tr>
+  <td><img src="docs/screenshots/02_receipt_document.png" width="480" alt="Income Receipt Certificate" /></td>
+  <td><img src="docs/screenshots/04_receipt_outcome.png" width="480" alt="Expense Receipt Certificate" /></td>
+</tr>
+<tr>
+  <td colspan="2" align="center"><b>Preferences & Settings Window</b></td>
+</tr>
+<tr>
+  <td colspan="2" align="center"><img src="docs/screenshots/03_settings_view.png" width="600" alt="Preferences & Settings" /></td>
 </tr>
 </table>
 
+---
+
+## Requirements
+
+- macOS 13.0 (Ventura) or later
+- Apple Silicon or Intel Mac
+
+---
+
 ## License
 
-This project is licensed under the GNU General Public License v3.0 (GPL-3.0) - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the **GNU General Public License v3.0 (GPL-3.0)** - see the [LICENSE](LICENSE) file for details.
 
 Publisher: **berkbb**
