@@ -124,7 +124,15 @@ struct SampleData {
                     1: "Mehmet Kaya",
                     2: "Ayşe Demir",
                     3: "Mustafa Çelik",
-                    4: "Fatma Şahin"
+                    4: "Fatma Şahin",
+                    5: "Ali Öztürk",
+                    6: "Zeynep Arslan",
+                    7: "Emre Koç",
+                    8: "Hatice Aydın",
+                    9: "Burak Doğan",
+                    10: "Elif Yıldız",
+                    11: "Serkan Şimşek",
+                    12: "Gamze Kurt"
                 ],
                 sampleNotes: "2026 Ekim ayı aidatı ve asansör periyodik bakım gider payı"
             )
@@ -139,7 +147,15 @@ struct SampleData {
                     1: "Elena Radu",
                     2: "Ion Ionescu",
                     3: "Maria Dumitrescu",
-                    4: "Mihai Stan"
+                    4: "Mihai Stan",
+                    5: "Alexandru Georgescu",
+                    6: "Andreea Ilie",
+                    7: "Cristian Vasile",
+                    8: "Ana Marin",
+                    9: "Florin Tudor",
+                    10: "Gabriela Dobre",
+                    11: "Dan Barbu",
+                    12: "Simona Nistor"
                 ],
                 sampleNotes: "Cotă întreținere octombrie 2026 și fond reparații ascensor"
             )
@@ -154,7 +170,15 @@ struct SampleData {
                     1: "Jane Smith",
                     2: "Robert Johnson",
                     3: "Emily Davis",
-                    4: "Michael Brown"
+                    4: "Michael Brown",
+                    5: "Sarah Wilson",
+                    6: "David Miller",
+                    7: "Jessica Taylor",
+                    8: "James Anderson",
+                    9: "Laura Thomas",
+                    10: "Daniel Martinez",
+                    11: "Olivia White",
+                    12: "Matthew Harris"
                 ],
                 sampleNotes: "October 2026 monthly dues and elevator maintenance fee"
             )
@@ -399,6 +423,15 @@ struct L10n {
     var residentNamePlaceholder: String { tr("Resident Full Name", "Daire Sakini Adı Soyadı", "Nume și Prenume Locatar") }
     var saveButton: String { tr("Save", "Kaydet", "Salvează") }
     var residentSavedFeedback: String { tr("resident saved successfully.", "sakini başarıyla kaydedildi.", "locatarul a fost salvat cu succes.") }
+    var totalFlatsBadge: String { tr("Total Flats", "Toplam Daire", "Total Apartamente") }
+    var registeredResidentsBadge: String { tr("Registered", "Kayıtlı", "Înregistrați") }
+    var vacantFlatsBadge: String { tr("Unassigned", "Boş / İsimsiz", "Neatribuiți") }
+    var searchNeighborsPlaceholder: String { tr("Search flat or resident…", "Daire no veya sakin adıyla ara…", "Caută apartament sau locatar…") }
+    var fillSampleResidentsButton: String { tr("Fill Sample Residents", "Örnek Sakinleri Doldur", "Completează locatari exemplu") }
+    var clearAllResidentsButton: String { tr("Clear All", "Tümünü Temizle", "Șterge toți") }
+    var flatUnassigned: String { tr("No resident assigned", "Sakin ismi girilmedi", "Niciun locatar înregistrat") }
+    var flatAssigned: String { tr("Registered Resident", "Kayıtlı Sakin", "Locatar Înregistrat") }
+    var noMatchingResidents: String { tr("No matching flats found.", "Aramanızla eşleşen daire bulunamadı.", "Niciun apartament găsit.") }
 
     // Signature Tab
     var signatureTitle: String { tr("Authorized Signature", "Yetkili İmzası", "Semnătură Autorizată") }

@@ -272,51 +272,220 @@ struct SettingsView: View {
         }
     }
 
-    // MARK: - Tab 2: Residents Directory
+    // MARK: - Tab 2: Residents Directory (Hero Scroller List)
 
     private var residentsTab: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text(l10n.residentsDirectoryTitle)
-                .font(.system(size: 14, weight: .bold))
+            // Header
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    Label(l10n.residentsDirectoryTitle, systemImage: "person.2.fill")
+                        .font(.system(size: 14, weight: .bold))
+                    Text(l10n.residentsDirectoryDesc)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                Spacer()
+            }
 
-            Text(l10n.residentsDirectoryDesc)
-                .font(.caption)
-                .foregroundColor(.secondary)
+            // Hero Summary & Action Bar
+            VStack(spacing: 10) {
+                HStack(spacing: 8) {
+                    // Total Flats Badge
+                    HStack(spacing: 5) {
+                        Image(systemName: "building.2.fill")
+                            .foregroundColor(.accentColor)
+                        Text("\(viewModel.availableApartments.count) \(l10n.totalFlatsBadge)")
+                            .font(.system(size: 11, weight: .semibold))
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                    .background(Color.accentColor.opacity(0.12))
+                    .clipShape(Capsule())
 
-            HStack(spacing: 12) {
-                Picker(l10n.flatLabel, selection: $viewModel.selectedApartment) {
-                    ForEach(viewModel.availableApartments, id: \.self) { number in
-                        Text("\(l10n.flatPrefix) \(number)").tag(number)
+                    // Registered Badge
+                    HStack(spacing: 5) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundColor(.green)
+                        Text("\(viewModel.registeredCount) \(l10n.registeredResidentsBadge)")
+                            .font(.system(size: 11, weight: .semibold))
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                    .background(Color.green.opacity(0.12))
+                    .clipShape(Capsule())
+
+                    // Unassigned Badge
+                    if viewModel.unassignedCount > 0 {
+                        HStack(spacing: 5) {
+                            Image(systemName: "circle.dashed")
+                                .foregroundColor(.orange)
+                            Text("\(viewModel.unassignedCount) \(l10n.vacantFlatsBadge)")
+                                .font(.system(size: 11, weight: .semibold))
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(Color.orange.opacity(0.12))
+                        .clipShape(Capsule())
+                    }
+
+                    Spacer()
+
+                    // Quick Action: Fill Sample Residents
+                    Button {
+                        viewModel.fillSampleResidents(for: viewModel.language)
+                    } label: {
+                        Label(l10n.fillSampleResidentsButton, systemImage: "sparkles")
+                            .font(.system(size: 11, weight: .medium))
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+
+                    // Quick Action: Clear All
+                    Button(role: .destructive) {
+                        viewModel.clearAllResidents()
+                    } label: {
+                        Label(l10n.clearAllResidentsButton, systemImage: "trash")
+                            .font(.system(size: 11, weight: .medium))
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+                }
+
+                // Search & Filter Bar
+                HStack(spacing: 8) {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundColor(.secondary)
+                        .font(.system(size: 12))
+
+                    TextField(l10n.searchNeighborsPlaceholder, text: $viewModel.residentSearchQuery)
+                        .textFieldStyle(.plain)
+                        .font(.system(size: 12))
+
+                    if !viewModel.residentSearchQuery.isEmpty {
+                        Button {
+                            viewModel.residentSearchQuery = ""
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundColor(.secondary)
+                                .font(.system(size: 12))
+                        }
+                        .buttonStyle(.plain)
                     }
                 }
-                .frame(width: 140)
-                .onChange(of: viewModel.selectedApartment) { newValue in
-                    viewModel.selectedOwner = settings.owner(for: newValue)
-                }
-
-                TextField(l10n.residentNamePlaceholder, text: $viewModel.selectedOwner)
-                    .textFieldStyle(.roundedBorder)
-
-                Button(l10n.saveButton) {
-                    settings.saveOwner(viewModel.selectedOwner.localizedCapitalized, apartmentNumber: viewModel.selectedApartment)
-                    viewModel.showOwnerSavedFeedback = true
-                }
-                .buttonStyle(.bordered)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(Color(NSColor.textBackgroundColor))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
+                )
             }
             .padding(12)
             .background(Color(NSColor.controlBackgroundColor))
             .clipShape(RoundedRectangle(cornerRadius: 10))
 
-            if viewModel.showOwnerSavedFeedback {
-                HStack {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundColor(.green)
-                    Text("\(l10n.flatPrefix) \(viewModel.selectedApartment) \(l10n.residentSavedFeedback)")
-                        .font(.caption)
-                        .foregroundColor(.green)
+            // Flats Hero List
+            if viewModel.filteredApartments.isEmpty {
+                VStack(spacing: 8) {
+                    Image(systemName: "magnifyingglass")
+                        .font(.system(size: 28))
+                        .foregroundColor(.secondary.opacity(0.6))
+                    Text(l10n.noMatchingResidents)
+                        .font(.system(size: 13))
+                        .foregroundColor(.secondary)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 30)
+            } else {
+                LazyVStack(spacing: 8) {
+                    ForEach(viewModel.filteredApartments, id: \.self) { flat in
+                        residentCard(flat: flat)
+                    }
                 }
             }
         }
+    }
+
+    private func residentCard(flat: Int) -> some View {
+        let nameBinding = viewModel.bindingForResident(at: flat)
+        let isAssigned = !nameBinding.wrappedValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+
+        return HStack(spacing: 12) {
+            // Flat Badge
+            VStack(spacing: 1) {
+                Text(l10n.flatPrefix.uppercased())
+                    .font(.system(size: 9, weight: .bold))
+                    .foregroundColor(isAssigned ? .white.opacity(0.9) : .secondary)
+                Text("\(flat)")
+                    .font(.system(size: 16, weight: .heavy))
+                    .foregroundColor(isAssigned ? .white : .primary)
+            }
+            .frame(width: 48, height: 42)
+            .background(
+                isAssigned
+                ? LinearGradient(
+                    colors: [Color.accentColor, Color.accentColor.opacity(0.75)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                : LinearGradient(
+                    colors: [Color.secondary.opacity(0.15), Color.secondary.opacity(0.1)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+
+            // Resident Name Field & Indicator
+            VStack(alignment: .leading, spacing: 3) {
+                TextField(l10n.residentNamePlaceholder, text: nameBinding)
+                    .textFieldStyle(.plain)
+                    .font(.system(size: 13, weight: .medium))
+
+                HStack(spacing: 4) {
+                    if isAssigned {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.system(size: 9))
+                            .foregroundColor(.green)
+                        Text(l10n.flatAssigned)
+                            .font(.system(size: 10))
+                            .foregroundColor(.secondary)
+                    } else {
+                        Image(systemName: "circle.dashed")
+                            .font(.system(size: 9))
+                            .foregroundColor(.secondary.opacity(0.6))
+                        Text(l10n.flatUnassigned)
+                            .font(.system(size: 10))
+                            .foregroundColor(.secondary.opacity(0.7))
+                    }
+                }
+            }
+
+            Spacer()
+
+            // Clear Button
+            if isAssigned {
+                Button {
+                    viewModel.clearResident(for: flat)
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.system(size: 14))
+                        .foregroundColor(.secondary.opacity(0.6))
+                }
+                .buttonStyle(.plain)
+                .help(l10n.clearAllResidentsButton)
+            }
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(Color(NSColor.controlBackgroundColor))
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(isAssigned ? Color.accentColor.opacity(0.25) : Color.secondary.opacity(0.12), lineWidth: 1)
+        )
     }
 
     // MARK: - Tab 3: Appearance & Language
@@ -581,17 +750,74 @@ final class SettingsViewModel: ObservableObject {
     @Published var showRestartAlert: Bool = false
     @Published var showSampleDefaultsFeedback: Bool = false
 
+    @Published var residents: [Int: String] = [:]
+    @Published var residentSearchQuery: String = ""
+
     @Published var selectedApartment: Int = 1
     @Published var selectedOwner: String = ""
     @Published var showOwnerSavedFeedback: Bool = false
 
     @Published var validationError: ValidationError?
 
+    var totalFlatCount: Int {
+        Int(flatCount) ?? 1
+    }
+
     var availableApartments: [Int] {
         if let count = Int(flatCount), count > 0 {
             return Array(1...count)
         }
         return [1]
+    }
+
+    var registeredCount: Int {
+        availableApartments.filter { flat in
+            let name = residents[flat]?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            return !name.isEmpty
+        }.count
+    }
+
+    var unassignedCount: Int {
+        max(0, availableApartments.count - registeredCount)
+    }
+
+    var filteredApartments: [Int] {
+        let query = residentSearchQuery.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        if query.isEmpty {
+            return availableApartments
+        }
+        return availableApartments.filter { flat in
+            let flatStr = String(flat)
+            let name = (residents[flat] ?? "").lowercased()
+            return flatStr.contains(query) || name.contains(query)
+        }
+    }
+
+    func bindingForResident(at flat: Int) -> Binding<String> {
+        Binding<String>(
+            get: { self.residents[flat] ?? "" },
+            set: { self.residents[flat] = $0 }
+        )
+    }
+
+    func clearResident(for flat: Int) {
+        residents[flat] = ""
+    }
+
+    func fillSampleResidents(for targetLang: AppLanguage) {
+        let samples = SampleData.defaults(for: targetLang)
+        let maxFlats = max(1, totalFlatCount)
+        for (apt, name) in samples.residents {
+            if apt <= maxFlats {
+                residents[apt] = name
+            }
+        }
+    }
+
+    func clearAllResidents() {
+        for apt in availableApartments {
+            residents[apt] = ""
+        }
     }
 
     func load(from settings: ReceiptSettingsStore) {
@@ -606,6 +832,12 @@ final class SettingsViewModel: ObservableObject {
         selectedApartment = settings.apartmentNumbers.first ?? 1
         selectedOwner = settings.owner(for: selectedApartment)
         showOwnerSavedFeedback = false
+
+        var loaded: [Int: String] = [:]
+        for apt in 1...settings.flatCount {
+            loaded[apt] = settings.owner(for: apt)
+        }
+        residents = loaded
     }
 
     func loadSampleDefaults(for targetLang: AppLanguage) {
@@ -615,6 +847,13 @@ final class SettingsViewModel: ObservableObject {
         defaultPayment = samples.defaultPayment
         flatCount = String(samples.flatCount)
         currency = samples.currency
+
+        var loaded: [Int: String] = [:]
+        for (apt, name) in samples.residents {
+            loaded[apt] = name
+        }
+        residents = loaded
+
         selectedOwner = samples.residents[selectedApartment] ?? (samples.residents[1] ?? "")
         showSampleDefaultsFeedback = true
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
@@ -654,8 +893,9 @@ final class SettingsViewModel: ObservableObject {
         settings.theme = theme
         settings.currency = currency
 
-        if !selectedOwner.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            settings.saveOwner(selectedOwner.localizedCapitalized, apartmentNumber: selectedApartment)
+        for apt in 1...flats {
+            let name = (residents[apt] ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+            settings.saveOwner(name.localizedCapitalized, apartmentNumber: apt)
         }
 
         return true

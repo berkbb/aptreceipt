@@ -423,11 +423,13 @@ final class SettingsWindowManager: NSObject, NSWindowDelegate {
         }
 
         let newWindow = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 680, height: 600),
-            styleMask: [.titled, .closable, .miniaturizable],
+            contentRect: NSRect(x: 0, y: 0, width: 700, height: 550),
+            styleMask: [.titled, .closable, .miniaturizable, .resizable],
             backing: .buffered,
             defer: false
         )
+        newWindow.minSize = NSSize(width: 640, height: 480)
+        newWindow.maxSize = NSSize(width: 900, height: 750)
         newWindow.title = actualSettings.l10n.settingsTitle
         newWindow.isReleasedWhenClosed = false
         newWindow.delegate = self
