@@ -329,9 +329,51 @@ struct L10n {
     var currencyEUR: String { tr("Euro", "Euro", "Euro") }
     var currencyGBP: String { tr("British Pound", "İngiliz Sterlini", "Liră Sterlină") }
 
+    // MARK: - Menu Bar Strings
+    var menuApp: String { tr("Apartment Receipt Creator", "Apartman Makbuzu Oluşturucu", "Creator Chitanțe Bloc") }
+    var menuFile: String { tr("File", "Dosya", "Fișier") }
+    var menuEdit: String { tr("Edit", "Düzenle", "Editare") }
+    var menuView: String { tr("View", "Görünüm", "Vizualizare") }
+    var menuWindow: String { tr("Window", "Pencere", "Fereastră") }
+    var menuHelp: String { tr("Help", "Yardım", "Ajutor") }
+
+    // App Submenu
+    var menuAboutApp: String { tr("About Apartment Receipt Creator", "Apartman Makbuzu Oluşturucu Hakkında", "Despre Creator Chitanțe Bloc") }
+    var menuSettings: String { tr("Settings…", "Ayarlar…", "Configurări…") }
+    var menuServices: String { tr("Services", "Servisler", "Servicii") }
+    var menuHideApp: String { tr("Hide Apartment Receipt Creator", "Apartman Makbuzu Oluşturucu'yu Gizle", "Ascunde Creator Chitanțe Bloc") }
+    var menuHideOthers: String { tr("Hide Others", "Diğerlerini Gizle", "Ascunde celelalte") }
+    var menuShowAll: String { tr("Show All", "Tümünü Göster", "Afișează toate") }
+    var menuQuitApp: String { tr("Quit Apartment Receipt Creator", "Apartman Makbuzu Oluşturucu'dan Çık", "Închide Creator Chitanțe Bloc") }
+
+    // File Submenu
+    var menuNewWindow: String { tr("New Receipt", "Yeni Makbuz", "Chitanță nouă") }
+    var menuCloseWindow: String { tr("Close Window", "Pencereyi Kapat", "Închide fereastra") }
+
+    // Edit Submenu
+    var menuUndo: String { tr("Undo", "Geri Al", "Anulează") }
+    var menuRedo: String { tr("Redo", "Yinele", "Refă") }
+    var menuCut: String { tr("Cut", "Kes", "Decupează") }
+    var menuCopy: String { tr("Copy", "Kopyala", "Copiază") }
+    var menuPaste: String { tr("Paste", "Yapıştır", "Lipește") }
+    var menuPasteAndMatch: String { tr("Paste and Match Style", "Yapıştır ve Stili Eşleştir", "Lipește și potrivește stilul") }
+    var menuDelete: String { tr("Delete", "Sil", "Șterge") }
+    var menuSelectAll: String { tr("Select All", "Tümünü Seç", "Selectează tot") }
+
+    // View Submenu
+    var menuFullScreen: String { tr("Toggle Full Screen", "Tam Ekrana Geç", "Comută pe ecran complet") }
+
+    // Window Submenu
+    var menuMinimize: String { tr("Minimize", "Simge Durumuna Küçült", "Minimizează") }
+    var menuZoom: String { tr("Zoom", "Büyüt", "Zoom") }
+    var menuBringAllToFront: String { tr("Bring All to Front", "Tümünü Öne Getir", "Adu toate în față") }
+
+    // Help Submenu
+    var menuHelpItem: String { tr("Apartment Receipt Creator Help", "Apartman Makbuzu Oluşturucu Yardımı", "Ajutor Creator Chitanțe Bloc") }
+
     // Language Restart Warning Strings
     var restartWarningTitle: String { tr("Application Restart Recommended", "Uygulamanın Yeniden Başlatılması Önerilir", "Repornirea Aplicației Recomandată") }
-    var restartMenuBarNotice: String { tr("Menu bar items cannot be updated dynamically without restarting the application. Please restart the app for language changes to take full effect.", "Menü çubuğu (Menu Bar) başlıklarının seçilen dile tam olarak çevrilebilmesi için uygulamanın yeniden başlatılması gerekmektedir.", "Elementele din bara de meniu nu se pot actualiza dinamic fără repornirea aplicației. Vă rugăm să reporniți aplicația pentru aplicarea completă a limbii.") }
+    var restartMenuBarNotice: String { tr("Menubar and interface are dynamically translated. Restarting the application is recommended to also reload system-level dialogs.", "Menü çubuğu ve arayüz dinamik olarak çevrilir. Sistem düzeyindeki iletişim kutularının da güncellenmesi için uygulamanın yeniden başlatılması önerilir.", "Bara de meniu și interfața sunt traduse dinamic. Se recomandă repornirea aplicației pentru actualizarea ferestrelor de dialog de sistem.") }
 
     // Sample Defaults Strings
     var sampleDefaultsSection: String { tr("Sample Defaults", "Örnek Değerler", "Valori Exemplu") }
@@ -1066,7 +1108,17 @@ final class ReceiptSettingsStore: ObservableObject {
         didSet { defaults.set(String(seqNumber), forKey: Keys.seqNumber) }
     }
     @Published var language: AppLanguage {
-        didSet { defaults.set(language.rawValue, forKey: Keys.language) }
+        didSet {
+            defaults.set(language.rawValue, forKey: Keys.language)
+            let appleLang: String
+            switch language {
+            case .turkish: appleLang = "tr"
+            case .romanian: appleLang = "ro"
+            case .english, .system: appleLang = "en"
+            }
+            defaults.set([appleLang], forKey: "AppleLanguages")
+            NotificationCenter.default.post(name: .appLanguageDidChange, object: nil)
+        }
     }
     @Published var theme: AppTheme {
         didSet {
@@ -1453,3 +1505,6 @@ PROVIDE THE PROGRAM "AS IS" WITHOUT WARRANTY OF ANY KIND.
     }
 }
 
+extension Notification.Name {
+    static let appLanguageDidChange = Notification.Name("appLanguageDidChange")
+}
