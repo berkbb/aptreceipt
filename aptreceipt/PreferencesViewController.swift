@@ -7,6 +7,7 @@ import UniformTypeIdentifiers
 enum SettingsTab: String, CaseIterable, Identifiable {
     case general = "building"
     case residents = "residents"
+    case vendors = "vendors"
     case appearance = "appearance"
     case signature = "signature"
     case about = "about"
@@ -19,6 +20,8 @@ enum SettingsTab: String, CaseIterable, Identifiable {
             return l10n.tabBuilding
         case .residents:
             return l10n.tabResidents
+        case .vendors:
+            return l10n.tabVendors
         case .appearance:
             return l10n.tabAppearance
         case .signature:
@@ -34,6 +37,8 @@ enum SettingsTab: String, CaseIterable, Identifiable {
             return "building.2.fill"
         case .residents:
             return "person.2.fill"
+        case .vendors:
+            return "briefcase.fill"
         case .appearance:
             return "paintbrush.fill"
         case .signature:
@@ -140,6 +145,8 @@ struct SettingsView: View {
                         generalSettingsTab
                     case .residents:
                         residentsTab
+                    case .vendors:
+                        vendorsTab
                     case .appearance:
                         appearanceTab
                     case .signature:
@@ -789,7 +796,291 @@ struct SettingsView: View {
         )
     }
 
-    // MARK: - Tab 3: Appearance & Language
+    // MARK: - Tab: Vendors & Services
+
+    private var vendorsTab: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            // Header
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    Label(l10n.vendorsTitle, systemImage: "briefcase.fill")
+                        .font(.system(size: 14, weight: .bold))
+                    Text(l10n.vendorsSubtitle)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                Spacer()
+            }
+
+            // Hero Status Bar
+            HStack(spacing: 8) {
+                // Registered Vendors Badge
+                HStack(spacing: 5) {
+                    Image(systemName: "building.2.fill")
+                        .foregroundColor(Color(red: 0.22, green: 0.42, blue: 0.88))
+                    Text("\(viewModel.vendors.count) \(l10n.registeredVendorsBadge)")
+                        .font(.system(size: 11, weight: .semibold))
+                }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 5)
+                .background(Color(red: 0.22, green: 0.42, blue: 0.88).opacity(0.12))
+                .clipShape(Capsule())
+
+                // Preset Services Badge
+                HStack(spacing: 5) {
+                    Image(systemName: "sparkles")
+                        .foregroundColor(.orange)
+                    Text("\(viewModel.expenseServices.count) \(l10n.presetServicesBadge)")
+                        .font(.system(size: 11, weight: .semibold))
+                }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 5)
+                .background(Color.orange.opacity(0.12))
+                .clipShape(Capsule())
+
+                Spacer()
+
+                // Restore Defaults
+                Button {
+                    viewModel.loadSampleVendorsAndServices(for: viewModel.language)
+                } label: {
+                    Label(l10n.loadSampleVendorsButton, systemImage: "arrow.counterclockwise")
+                        .font(.system(size: 11, weight: .medium))
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+            }
+
+            // Success feedback banner
+            if viewModel.showSampleVendorsFeedback {
+                HStack(spacing: 6) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundColor(.green)
+                    Text(l10n.sampleVendorsLoadedFeedback)
+                        .font(.system(size: 11, weight: .medium))
+                }
+                .padding(8)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color.green.opacity(0.12))
+                .clipShape(RoundedRectangle(cornerRadius: 6))
+            }
+
+            // Section 1: Vendor Directory
+            VStack(alignment: .leading, spacing: 10) {
+                Label(l10n.vendorListHeader, systemImage: "building.2.crop.circle.fill")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundColor(.secondary)
+
+                // Add Vendor Box
+                VStack(spacing: 8) {
+                    HStack(spacing: 8) {
+                        TextField(l10n.vendorNameField, text: $viewModel.newVendorName)
+                            .textFieldStyle(.roundedBorder)
+                        TextField(l10n.vendorCategoryField, text: $viewModel.newVendorCategory)
+                            .textFieldStyle(.roundedBorder)
+                            .frame(width: 150)
+                    }
+
+                    HStack(spacing: 8) {
+                        TextField(l10n.vendorContactField, text: $viewModel.newVendorContact)
+                            .textFieldStyle(.roundedBorder)
+
+                        Button {
+                            viewModel.addVendor()
+                        } label: {
+                            HStack(spacing: 4) {
+                                Image(systemName: "plus.circle.fill")
+                                Text(l10n.saveVendorButton)
+                            }
+                            .font(.system(size: 11, weight: .semibold))
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.regular)
+                        .disabled(viewModel.newVendorName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    }
+                }
+                .padding(10)
+                .background(Color(NSColor.textBackgroundColor))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+
+                // Search Bar
+                HStack(spacing: 6) {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundColor(.secondary)
+                    TextField(l10n.searchVendorsPlaceholder, text: $viewModel.vendorSearchQuery)
+                        .textFieldStyle(.plain)
+                    if !viewModel.vendorSearchQuery.isEmpty {
+                        Button {
+                            viewModel.vendorSearchQuery = ""
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundColor(.secondary)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.horizontal, 8)
+                .padding(.vertical, 5)
+                .background(Color(NSColor.textBackgroundColor))
+                .clipShape(RoundedRectangle(cornerRadius: 6))
+
+                // Vendor List
+                if viewModel.filteredVendors.isEmpty {
+                    Text(l10n.noVendorsFound)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .padding(.vertical, 8)
+                } else {
+                    VStack(spacing: 6) {
+                        ForEach(viewModel.filteredVendors) { vendor in
+                            HStack(spacing: 10) {
+                                Image(systemName: "building.2.fill")
+                                    .foregroundColor(Color(red: 0.22, green: 0.42, blue: 0.88))
+                                    .font(.system(size: 13))
+
+                                VStack(alignment: .leading, spacing: 2) {
+                                    HStack(spacing: 6) {
+                                        Text(vendor.name)
+                                            .font(.system(size: 12, weight: .bold))
+                                        if !vendor.category.isEmpty {
+                                            Text(vendor.category)
+                                                .font(.system(size: 9, weight: .semibold))
+                                                .padding(.horizontal, 6)
+                                                .padding(.vertical, 2)
+                                                .background(Color.secondary.opacity(0.12))
+                                                .clipShape(Capsule())
+                                        }
+                                    }
+                                    if !vendor.contactInfo.isEmpty {
+                                        Text(vendor.contactInfo)
+                                            .font(.system(size: 10))
+                                            .foregroundColor(.secondary)
+                                    }
+                                }
+
+                                Spacer()
+
+                                Button {
+                                    viewModel.deleteVendor(id: vendor.id)
+                                } label: {
+                                    Image(systemName: "trash")
+                                        .font(.system(size: 11))
+                                        .foregroundColor(.red.opacity(0.8))
+                                }
+                                .buttonStyle(.plain)
+                                .help(l10n.deleteButton)
+                            }
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 7)
+                            .background(Color(NSColor.textBackgroundColor))
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                        }
+                    }
+                }
+            }
+            .padding(12)
+            .background(Color(NSColor.controlBackgroundColor))
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+
+            // Section 2: Ready-Made Services
+            VStack(alignment: .leading, spacing: 10) {
+                Label(l10n.serviceListHeader, systemImage: "sparkles.rectangle.stack.fill")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundColor(.secondary)
+
+                // Add Service Box
+                VStack(spacing: 8) {
+                    HStack(spacing: 8) {
+                        TextField(l10n.serviceNameField, text: $viewModel.newServiceName)
+                            .textFieldStyle(.roundedBorder)
+                        TextField(l10n.serviceSuggestedVendorField, text: $viewModel.newServiceSuggestedVendor)
+                            .textFieldStyle(.roundedBorder)
+                            .frame(width: 170)
+                    }
+
+                    HStack(spacing: 8) {
+                        TextField(l10n.serviceDescriptionField, text: $viewModel.newServiceDescription)
+                            .textFieldStyle(.roundedBorder)
+
+                        Button {
+                            viewModel.addExpenseService()
+                        } label: {
+                            HStack(spacing: 4) {
+                                Image(systemName: "plus.circle.fill")
+                                Text(l10n.saveServiceButton)
+                            }
+                            .font(.system(size: 11, weight: .semibold))
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.regular)
+                        .disabled(viewModel.newServiceName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    }
+                }
+                .padding(10)
+                .background(Color(NSColor.textBackgroundColor))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+
+                // Service List
+                if viewModel.expenseServices.isEmpty {
+                    Text(l10n.noServicesFound)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .padding(.vertical, 8)
+                } else {
+                    VStack(spacing: 6) {
+                        ForEach(viewModel.expenseServices) { service in
+                            HStack(spacing: 10) {
+                                Image(systemName: service.iconName.isEmpty ? "briefcase.fill" : service.iconName)
+                                    .foregroundColor(.orange)
+                                    .font(.system(size: 13))
+
+                                VStack(alignment: .leading, spacing: 2) {
+                                    HStack(spacing: 6) {
+                                        Text(service.name)
+                                            .font(.system(size: 12, weight: .bold))
+                                        if let vendor = service.suggestedVendor, !vendor.isEmpty {
+                                            Text(vendor)
+                                                .font(.system(size: 9, weight: .medium))
+                                                .foregroundColor(.secondary)
+                                                .padding(.horizontal, 5)
+                                                .padding(.vertical, 1)
+                                                .background(Color.secondary.opacity(0.1))
+                                                .clipShape(Capsule())
+                                        }
+                                    }
+                                    Text(service.defaultDescription)
+                                        .font(.system(size: 10))
+                                        .foregroundColor(.secondary)
+                                        .lineLimit(2)
+                                }
+
+                                Spacer()
+
+                                Button {
+                                    viewModel.deleteExpenseService(id: service.id)
+                                } label: {
+                                    Image(systemName: "trash")
+                                        .font(.system(size: 11))
+                                        .foregroundColor(.red.opacity(0.8))
+                                }
+                                .buttonStyle(.plain)
+                                .help(l10n.deleteButton)
+                            }
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 7)
+                            .background(Color(NSColor.textBackgroundColor))
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                        }
+                    }
+                }
+            }
+            .padding(12)
+            .background(Color(NSColor.controlBackgroundColor))
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+        }
+    }
+
+    // MARK: - Tab: Appearance & Language
 
     private var appearanceTab: some View {
         VStack(alignment: .leading, spacing: 18) {
@@ -805,43 +1096,13 @@ struct SettingsView: View {
             .background(Color(NSColor.controlBackgroundColor))
             .clipShape(RoundedRectangle(cornerRadius: 10))
 
-            // Language selection
+            // Language selection (Hero Deck)
             VStack(alignment: .leading, spacing: 10) {
                 Label(l10n.languageSection, systemImage: "globe")
                     .font(.system(size: 13, weight: .bold))
                     .foregroundColor(.secondary)
 
-                HStack {
-                    Text(l10n.languageSelection)
-                        .font(.system(size: 12))
-                        .foregroundColor(.secondary)
-                        .frame(width: 200, alignment: .leading)
-
-                    Picker("", selection: $viewModel.language) {
-                        ForEach(AppLanguage.allCases) { lang in
-                            Text(lang.title(l10n: l10n)).tag(lang)
-                        }
-                    }
-                    .labelsHidden()
-                    .onChange(of: viewModel.language) { newLang in
-                        settings.language = newLang
-                        let resolved = L10n(newLang).resolvedLanguage
-                        let newCurrency = AppCurrency.default(for: resolved)
-                        viewModel.currency = newCurrency
-                        settings.currency = newCurrency
-
-                        let sampleApts = [
-                            SampleData.defaults(for: .english).apartmentName,
-                            SampleData.defaults(for: .turkish).apartmentName,
-                            SampleData.defaults(for: .romanian).apartmentName
-                        ]
-                        if sampleApts.contains(viewModel.apartmentName) || viewModel.apartmentName.isEmpty {
-                            viewModel.loadSampleDefaults(for: newLang)
-                            _ = viewModel.save(to: settings)
-                        }
-                        viewModel.showRestartAlert = true
-                    }
-                }
+                languageHeroDeck
 
                 // Restart warning notice
                 HStack(alignment: .top, spacing: 8) {
@@ -918,6 +1179,87 @@ struct SettingsView: View {
         case .light: return "sun.max.fill"
         case .dark: return "moon.stars.fill"
         }
+    }
+
+    // MARK: - Language Hero Deck
+
+    private var languageHeroDeck: some View {
+        let columns = [
+            GridItem(.flexible(), spacing: 10),
+            GridItem(.flexible(), spacing: 10)
+        ]
+        return LazyVGrid(columns: columns, spacing: 10) {
+            languageHeroCard(lang: .turkish, flag: "🇹🇷", title: "Türkçe", desc: l10n.langDescTR)
+            languageHeroCard(lang: .english, flag: "🇬🇧", title: "English", desc: l10n.langDescEN)
+            languageHeroCard(lang: .romanian, flag: "🇷🇴", title: "Română", desc: l10n.langDescRO)
+            languageHeroCard(lang: .system, flag: "🌐", title: l10n.langSystem, desc: l10n.langDescSystem)
+        }
+    }
+
+    private func languageHeroCard(lang: AppLanguage, flag: String, title: String, desc: String) -> some View {
+        let isSelected = viewModel.language == lang
+        return Button {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.75)) {
+                viewModel.language = lang
+                settings.language = lang
+                let resolved = L10n(lang).resolvedLanguage
+                let newCurrency = AppCurrency.default(for: resolved)
+                viewModel.currency = newCurrency
+                settings.currency = newCurrency
+
+                let sampleApts = [
+                    SampleData.defaults(for: .english).apartmentName,
+                    SampleData.defaults(for: .turkish).apartmentName,
+                    SampleData.defaults(for: .romanian).apartmentName
+                ]
+                if sampleApts.contains(viewModel.apartmentName) || viewModel.apartmentName.isEmpty {
+                    viewModel.loadSampleDefaults(for: lang)
+                    _ = viewModel.save(to: settings)
+                }
+                viewModel.showRestartAlert = true
+            }
+        } label: {
+            HStack(alignment: .top, spacing: 10) {
+                Text(flag)
+                    .font(.system(size: 24))
+                    .frame(width: 34, height: 34)
+                    .background(Color.secondary.opacity(0.1))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+
+                VStack(alignment: .leading, spacing: 3) {
+                    HStack {
+                        Text(title)
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundColor(isSelected ? .primary : .secondary)
+                        Spacer()
+                        if isSelected {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundColor(.accentColor)
+                                .font(.system(size: 13))
+                        }
+                    }
+
+                    Text(desc)
+                        .font(.system(size: 10))
+                        .foregroundColor(.secondary)
+                        .lineLimit(2)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            .padding(10)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                isSelected
+                ? Color.accentColor.opacity(0.12)
+                : Color(NSColor.textBackgroundColor)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 9))
+            .overlay(
+                RoundedRectangle(cornerRadius: 9)
+                    .stroke(isSelected ? Color.accentColor : Color.secondary.opacity(0.18), lineWidth: isSelected ? 1.5 : 1)
+            )
+        }
+        .buttonStyle(.plain)
     }
 
     // MARK: - Tab 4: Signature
@@ -1084,6 +1426,18 @@ final class SettingsViewModel: ObservableObject {
     @Published var residents: [Int: String] = [:]
     @Published var residentSearchQuery: String = ""
 
+    @Published var vendors: [VendorRecord] = []
+    @Published var vendorSearchQuery: String = ""
+    @Published var newVendorName: String = ""
+    @Published var newVendorCategory: String = ""
+    @Published var newVendorContact: String = ""
+
+    @Published var expenseServices: [ExpenseServicePreset] = []
+    @Published var newServiceName: String = ""
+    @Published var newServiceDescription: String = ""
+    @Published var newServiceSuggestedVendor: String = ""
+    @Published var showSampleVendorsFeedback: Bool = false
+
     @Published var selectedApartment: Int = 1
     @Published var selectedOwner: String = ""
     @Published var showOwnerSavedFeedback: Bool = false
@@ -1124,6 +1478,63 @@ final class SettingsViewModel: ObservableObject {
         }
     }
 
+    var filteredVendors: [VendorRecord] {
+        let query = vendorSearchQuery.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        if query.isEmpty {
+            return vendors
+        }
+        return vendors.filter { v in
+            v.name.lowercased().contains(query) || v.category.lowercased().contains(query) || v.contactInfo.lowercased().contains(query)
+        }
+    }
+
+    func addVendor() {
+        let trimmedName = newVendorName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedName.isEmpty else { return }
+        let trimmedCategory = newVendorCategory.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedContact = newVendorContact.trimmingCharacters(in: .whitespacesAndNewlines)
+        let vendor = VendorRecord(name: trimmedName, category: trimmedCategory, contactInfo: trimmedContact)
+        vendors.append(vendor)
+        newVendorName = ""
+        newVendorCategory = ""
+        newVendorContact = ""
+    }
+
+    func deleteVendor(id: UUID) {
+        vendors.removeAll { $0.id == id }
+    }
+
+    func addExpenseService() {
+        let trimmedName = newServiceName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedName.isEmpty else { return }
+        let trimmedDesc = newServiceDescription.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedVendor = newServiceSuggestedVendor.trimmingCharacters(in: .whitespacesAndNewlines)
+        let service = ExpenseServicePreset(
+            name: trimmedName,
+            defaultDescription: trimmedDesc.isEmpty ? trimmedName : trimmedDesc,
+            iconName: "briefcase.fill",
+            suggestedVendor: trimmedVendor.isEmpty ? nil : trimmedVendor
+        )
+        expenseServices.append(service)
+        newServiceName = ""
+        newServiceDescription = ""
+        newServiceSuggestedVendor = ""
+    }
+
+    func deleteExpenseService(id: UUID) {
+        expenseServices.removeAll { $0.id == id }
+    }
+
+    func loadSampleVendorsAndServices(for targetLang: AppLanguage) {
+        let samples = SampleData.defaults(for: targetLang)
+        vendors = samples.defaultVendors
+        expenseServices = samples.defaultServices
+        showSampleVendorsFeedback = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            self.showSampleVendorsFeedback = false
+        }
+    }
+
     func bindingForResident(at flat: Int) -> Binding<String> {
         Binding<String>(
             get: { self.residents[flat] ?? "" },
@@ -1160,6 +1571,8 @@ final class SettingsViewModel: ObservableObject {
         language = settings.language
         theme = settings.theme
         currency = settings.currency
+        vendors = settings.vendors
+        expenseServices = settings.expenseServices
         selectedApartment = settings.apartmentNumbers.first ?? 1
         selectedOwner = settings.owner(for: selectedApartment)
         showOwnerSavedFeedback = false
@@ -1178,6 +1591,8 @@ final class SettingsViewModel: ObservableObject {
         defaultPayment = samples.defaultPayment
         flatCount = String(samples.flatCount)
         currency = samples.currency
+        vendors = samples.defaultVendors
+        expenseServices = samples.defaultServices
 
         var loaded: [Int: String] = [:]
         for (apt, name) in samples.residents {
@@ -1233,6 +1648,8 @@ final class SettingsViewModel: ObservableObject {
         settings.language = language
         settings.theme = theme
         settings.currency = currency
+        settings.vendors = vendors
+        settings.expenseServices = expenseServices
 
         for apt in 1...flats {
             let name = (residents[apt] ?? "").trimmingCharacters(in: .whitespacesAndNewlines)

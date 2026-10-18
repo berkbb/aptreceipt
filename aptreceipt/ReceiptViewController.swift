@@ -751,8 +751,10 @@ struct ReceiptDocumentView: View {
 
                     let receiverTitle = draft.kind == .income ? l10n.invoicePayerResidentLabel : l10n.invoiceVendorLabel
                     infoRow(label: receiverTitle, value: draft.receiver)
-                    let flatText = (draft.showApartmentNumber && draft.apartmentNumber > 0) ? "\(l10n.flatPrefix) \(draft.apartmentNumber)" : l10n.commonAreaLabel
-                    infoRow(label: l10n.invoiceUnitLabel, value: flatText)
+                    if draft.kind != .managementExpense {
+                        let flatText = (draft.showApartmentNumber && draft.apartmentNumber > 0) ? "\(l10n.flatPrefix) \(draft.apartmentNumber)" : l10n.commonAreaLabel
+                        infoRow(label: l10n.invoiceUnitLabel, value: flatText)
+                    }
                     infoRow(label: l10n.period, value: draft.monthYear)
                 }
                 .padding(10)

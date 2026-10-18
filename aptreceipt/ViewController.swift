@@ -100,6 +100,23 @@ enum AppCurrency: String, CaseIterable, Identifiable, Codable {
     }
 }
 
+// MARK: - Vendor & Service Models
+
+struct VendorRecord: Identifiable, Codable, Hashable {
+    var id: UUID = UUID()
+    var name: String
+    var category: String = ""
+    var contactInfo: String = ""
+}
+
+struct ExpenseServicePreset: Identifiable, Codable, Hashable {
+    var id: UUID = UUID()
+    var name: String
+    var defaultDescription: String
+    var iconName: String = "briefcase.fill"
+    var suggestedVendor: String? = nil
+}
+
 // MARK: - Language Default Sample Data
 
 struct SampleData {
@@ -110,6 +127,8 @@ struct SampleData {
     let currency: AppCurrency
     let residents: [Int: String]
     let sampleNotes: String
+    let defaultVendors: [VendorRecord]
+    let defaultServices: [ExpenseServicePreset]
 
     static func defaults(for language: AppLanguage) -> SampleData {
         switch language {
@@ -134,7 +153,21 @@ struct SampleData {
                     11: "Serkan Şimşek",
                     12: "Gamze Kurt"
                 ],
-                sampleNotes: "2026 Ekim ayı aidatı ve asansör periyodik bakım gider payı"
+                sampleNotes: "2026 Ekim ayı aidatı ve asansör periyodik bakım gider payı",
+                defaultVendors: [
+                    VendorRecord(name: "Kaya Asansör Ltd. Şti.", category: "Asansör Bakımı", contactInfo: "0312 444 01 23"),
+                    VendorRecord(name: "Pırıl Temizlik Hizmetleri", category: "Temizlik & Sarf", contactInfo: "0532 111 22 33"),
+                    VendorRecord(name: "Başkent Ortak Elektrik A.Ş.", category: "Ortak Elektrik", contactInfo: "Abone No: 98412"),
+                    VendorRecord(name: "Usta Tesisat & Onarım (Ahmet Usta)", category: "Tesisat & Onarım", contactInfo: "0555 987 65 43"),
+                    VendorRecord(name: "Yeşil Vadi Peyzaj & Bahçe", category: "Bahçe & Peyzaj", contactInfo: "0312 321 00 11")
+                ],
+                defaultServices: [
+                    ExpenseServicePreset(name: "Asansör Bakımı", defaultDescription: "2026 periyodik bina asansörü bakım, yağlama ve kontrol bedeli", iconName: "arrow.up.and.down.circle.fill", suggestedVendor: "Kaya Asansör Ltd. Şti."),
+                    ExpenseServicePreset(name: "Temizlik & Malzeme", defaultDescription: "Bina ortak alan temizliği ve hijyen sarf malzeme bedeli", iconName: "sparkles", suggestedVendor: "Pırıl Temizlik Hizmetleri"),
+                    ExpenseServicePreset(name: "Ortak Elektrik / Su", defaultDescription: "Merdiven otomatiği, hidrofor ve çevre aydınlatma ortak elektrik gideri", iconName: "bolt.fill", suggestedVendor: "Başkent Ortak Elektrik A.Ş."),
+                    ExpenseServicePreset(name: "Tesisat & Onarım", defaultDescription: "Bina ortak su tesisatı, çatı izolasyonu ve onarım işçiliği", iconName: "wrench.and.screwdriver.fill", suggestedVendor: "Usta Tesisat & Onarım (Ahmet Usta)"),
+                    ExpenseServicePreset(name: "Bahçe & Peyzaj", defaultDescription: "Site çevre düzenlemesi, bahçe çim biçme ve budama hizmeti", iconName: "leaf.fill", suggestedVendor: "Yeşil Vadi Peyzaj & Bahçe")
+                ]
             )
         case .romanian:
             return SampleData(
@@ -157,7 +190,21 @@ struct SampleData {
                     11: "Dan Barbu",
                     12: "Simona Nistor"
                 ],
-                sampleNotes: "Cotă întreținere octombrie 2026 și fond reparații ascensor"
+                sampleNotes: "Cotă întreținere octombrie 2026 și fond reparații ascensor",
+                defaultVendors: [
+                    VendorRecord(name: "Ascensor Servicii SRL", category: "Întreținere Lift", contactInfo: "021 334 55 66"),
+                    VendorRecord(name: "Curățenie Totală SRL", category: "Curățenie & Consumabile", contactInfo: "0722 111 222"),
+                    VendorRecord(name: "Enel Energie Muntenia SA", category: "Energie Electrică", contactInfo: "Cod Client: 88412"),
+                    VendorRecord(name: "Instalații Sanitare (Ion Meșter)", category: "Instalații & Reparații", contactInfo: "0744 987 654"),
+                    VendorRecord(name: "Spații Verzi & Grădinărit SRL", category: "Peisagistică", contactInfo: "021 456 78 90")
+                ],
+                defaultServices: [
+                    ExpenseServicePreset(name: "Întreținere Lift", defaultDescription: "Revizie tehnică lunară, gresare și verificare periodică ascensor", iconName: "arrow.up.and.down.circle.fill", suggestedVendor: "Ascensor Servicii SRL"),
+                    ExpenseServicePreset(name: "Curățenie Spații Comune", defaultDescription: "Servicii de curățenie scară bloc și produse igienico-sanitare", iconName: "sparkles", suggestedVendor: "Curățenie Totală SRL"),
+                    ExpenseServicePreset(name: "Energie Electrică Spații Comune", defaultDescription: "Factură energie electrică iluminat casa scării și hidrofor", iconName: "bolt.fill", suggestedVendor: "Enel Energie Muntenia SA"),
+                    ExpenseServicePreset(name: "Reparații & Instalații", defaultDescription: "Lucrări de reparații instalații sanitare comune și hidroizolație", iconName: "wrench.and.screwdriver.fill", suggestedVendor: "Instalații Sanitare (Ion Meșter)"),
+                    ExpenseServicePreset(name: "Întreținere Spații Verzi", defaultDescription: "Tuns gazon, toaletare arbuști și curățenie curte bloc", iconName: "leaf.fill", suggestedVendor: "Spații Verzi & Grădinărit SRL")
+                ]
             )
         case .english, .system:
             return SampleData(
@@ -180,7 +227,21 @@ struct SampleData {
                     11: "Olivia White",
                     12: "Matthew Harris"
                 ],
-                sampleNotes: "October 2026 monthly dues and elevator maintenance fee"
+                sampleNotes: "October 2026 monthly dues and elevator maintenance fee",
+                defaultVendors: [
+                    VendorRecord(name: "Apex Elevator Services Inc.", category: "Elevator Maintenance", contactInfo: "+1 (555) 019-2834"),
+                    VendorRecord(name: "CleanPro Facilities LLC", category: "Janitorial & Supplies", contactInfo: "+1 (555) 014-9988"),
+                    VendorRecord(name: "City Power & Utilities Co.", category: "Common Utilities", contactInfo: "Acct: #94018"),
+                    VendorRecord(name: "Mastercraft Plumbing & Repairs", category: "Repairs & Maintenance", contactInfo: "+1 (555) 018-7722"),
+                    VendorRecord(name: "GreenThumb Grounds & Landscaping", category: "Grounds & Lawn", contactInfo: "+1 (555) 012-3344")
+                ],
+                defaultServices: [
+                    ExpenseServicePreset(name: "Elevator Maintenance", defaultDescription: "Monthly periodic elevator safety inspection, lubrication, and service", iconName: "arrow.up.and.down.circle.fill", suggestedVendor: "Apex Elevator Services Inc."),
+                    ExpenseServicePreset(name: "Janitorial & Supplies", defaultDescription: "Common area janitorial cleaning services and hygiene supplies", iconName: "sparkles", suggestedVendor: "CleanPro Facilities LLC"),
+                    ExpenseServicePreset(name: "Common Utilities & Power", defaultDescription: "Common stairwell lighting, water booster pump, and outdoor electric bill", iconName: "bolt.fill", suggestedVendor: "City Power & Utilities Co."),
+                    ExpenseServicePreset(name: "Facility Repairs & Plumbing", defaultDescription: "Facility maintenance, emergency plumbing, and common repairs labor", iconName: "wrench.and.screwdriver.fill", suggestedVendor: "Mastercraft Plumbing & Repairs"),
+                    ExpenseServicePreset(name: "Grounds & Landscaping", defaultDescription: "Garden upkeep, lawn mowing, and exterior landscaping service", iconName: "leaf.fill", suggestedVendor: "GreenThumb Grounds & Landscaping")
+                ]
             )
         }
     }
@@ -518,6 +579,42 @@ struct L10n {
     var sampleScenarioDescEN: String { tr("Sunshine Residence • 12 units • $1,750 • John Doe", "Sunshine Residence • 12 daire • 1.750 $ • John Doe", "Sunshine Residence • 12 ap. • 1.750 $ • John Doe") }
     var sampleScenarioDescRO: String { tr("Asociația Parcul Tineretului • 12 ap. • 1,750 lei • Andrei Popescu", "Asociația Parcul Tineretului • 12 daire • 1.750 lei • Andrei Popescu", "Asociația Parcul Tineretului • 12 ap. • 1.750 lei • Andrei Popescu") }
     var applyScenarioButton: String { tr("Apply Preset", "Şablonu Uygula", "Aplică Șablonul") }
+
+    // Vendors & Services Tab Strings
+    var tabVendors: String { tr("Vendors & Services", "Tedarikçi & Hizmet", "Furnizori & Servicii") }
+    var vendorsTitle: String { tr("Vendor Directory & Services", "Tedarikçi & Hizmet Yönetimi", "Gestiune Furnizori & Servicii") }
+    var vendorsSubtitle: String { tr("Manage regular vendors, contractors, and preset operating expense services", "Düzenli çalıştığınız firma, usta ve hazır işletme gider kalemlerini yönetin", "Gestionați furnizorii uzuali și serviciile de întreținere") }
+    var registeredVendorsBadge: String { tr("Registered Vendors", "Kayıtlı Firma", "Furnizori Înregistrați") }
+    var presetServicesBadge: String { tr("Preset Services", "Hazır Servis", "Servicii Predefinite") }
+    var addVendorButton: String { tr("Add New Vendor", "Yeni Firma Ekle", "Adaugă Furnizor Nou") }
+    var vendorNameField: String { tr("Company / Vendor Name:", "Firma / Usta Adı:", "Nume Furnizor:") }
+    var vendorCategoryField: String { tr("Service Category:", "Hizmet Kategorisi:", "Categorie Serviciu:") }
+    var vendorContactField: String { tr("Contact / Phone / Tax ID:", "İletişim / Telefon / Vergi No:", "Contact / Telefon / CUI:") }
+    var saveVendorButton: String { tr("Save Vendor", "Firmayı Kaydet", "Salvează Furnizor") }
+    var deleteButton: String { tr("Delete", "Sil", "Șterge") }
+    var vendorListHeader: String { tr("Saved Vendors & Contractors", "Kayıtlı Firmalar ve Ustalar", "Furnizori și Meșteri Înregistrați") }
+    var serviceListHeader: String { tr("Ready-Made Expense Services", "Hazır Harcama Hizmetleri", "Servicii Predefinite de Cheltuieli") }
+    var serviceNameField: String { tr("Service Title:", "Hizmet Adı:", "Denumire Serviciu:") }
+    var serviceDescriptionField: String { tr("Default Description:", "Varsayılan Açıklama:", "Descriere Implicită:") }
+    var serviceSuggestedVendorField: String { tr("Suggested Vendor (Optional):", "Önerilen Firma (İsteğe Bağlı):", "Furnizor Sugerat (Opțional):") }
+    var addServiceButton: String { tr("Add New Service", "Yeni Servis Ekle", "Adaugă Serviciu Nou") }
+    var saveServiceButton: String { tr("Save Service", "Servisi Kaydet", "Salvează Serviciu") }
+    var loadSampleVendorsButton: String { tr("Restore Sample Vendors", "Örnek Tedarikçileri Yükle", "Încarcă Furnizori Exemplu") }
+    var sampleVendorsLoadedFeedback: String { tr("Sample vendors and services loaded successfully.", "Örnek firma ve servisler başarıyla yüklendi.", "Furnizorii și serviciile exemplu au fost încărcate cu succes.") }
+    var selectSavedVendor: String { tr("Select from Saved Vendors…", "Kayıtlı Firmalardan Seç…", "Selectează din Furnizori…") }
+    var selectSavedService: String { tr("Select from Ready Services…", "Hazır Servislerden Seç…", "Selectează din Servicii…") }
+    var searchVendorsPlaceholder: String { tr("Search vendor or category…", "Firma adı veya kategori ara…", "Caută furnizor sau categorie…") }
+    var noVendorsFound: String { tr("No vendors found.", "Kayıtlı firma bulunamadı.", "Niciun furnizor găsit.") }
+    var noServicesFound: String { tr("No preset services found.", "Kayıtlı hazır servis bulunamadı.", "Niciun serviciu găsit.") }
+    var commonAreaOperatingBadge: String { tr("COMMON AREA / OPERATING EXPENDITURE", "ORTAK ALAN / BİNA İŞLETME GİDERİ", "SPAȚII COMUNE / CHELTUIELI ADMINISTRATIVE") }
+    var payeeVendorCardTitle: String { tr("PAYEE (VENDOR / CONTRACTOR / SERVICE PROVIDER)", "ÖDEME YAPILAN (FİRMA / TEDARİKÇİ / USTA)", "BENEFICIAR (FURNIZOR / PRESTATOR SERVICII)") }
+    var serviceExpenseCardTitle: String { tr("EXPENSE SERVICE & DESCRIPTION", "HİZMET KALEMİ VE HARCAMA AÇIKLAMASI", "SERVICIU & DESCRIERE CHELTUIALĂ") }
+    var quickServicesLabel: String { tr("Ready Services (1-Click):", "Hazır Servisler (Tek Tık):", "Servicii Rapide:") }
+    var customExpenseNotePlaceholder: String { tr("Describe expense or enter invoice number…", "Harcama açıklaması veya fatura no yazın…", "Descrieți cheltuiala sau introduceți numărul facturii…") }
+    var langDescTR: String { tr("Turkish Lira (₺) • Turkish condominium standard", "Türk Lirası (₺) • Türkiye apartman standardı", "Liră Turcească (₺) • Standard asociație Turcia") }
+    var langDescEN: String { tr("US Dollar ($) • International condominium standard", "Amerikan Doları ($) • Uluslararası apartman standardı", "Dolar SUA ($) • Standard internațional condominiu") }
+    var langDescRO: String { tr("Romanian Leu (Lei) • Romanian association standard", "Rumen Leyi (Lei) • Romanya asociație de proprietari", "Leu Românesc (Lei) • Standard asociație România") }
+    var langDescSystem: String { tr("Follows macOS system language and locale", "macOS sistem dilini ve bölgesini takip eder", "Urmează limba și regiunea sistemului macOS") }
 }
 
 // MARK: - Main Screen
@@ -774,99 +871,92 @@ struct MainScreen: View {
     // 2. Property & Parties Hero Section
     private var propertyAndPartiesHeroSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            // Header Row: Property & Print Flat Toggle
-            HStack {
-                Label(
-                    viewModel.receiptKind == .managementExpense ? l10n.managementExpenseTitle : l10n.flatAndPeriod,
-                    systemImage: viewModel.receiptKind == .managementExpense ? "briefcase.fill" : "building.2.crop.circle.fill"
-                )
-                .font(.system(size: 12, weight: .bold))
-                .foregroundColor(.secondary)
-
-                Spacer()
-
-                Toggle(isOn: $viewModel.printApartmentNumber) {
-                    Text(l10n.printFlatNumber)
-                        .font(.system(size: 11))
-                        .foregroundColor(.secondary)
-                }
-                .toggleStyle(.checkbox)
-            }
-
-            // Flat & Period Row
-            HStack(spacing: 10) {
-                // Flat Selector
-                HStack(spacing: 6) {
-                    Image(systemName: viewModel.receiptKind == .managementExpense ? "building.2" : "door.left.hand.closed")
-                        .foregroundColor(.accentColor)
-                        .font(.system(size: 12))
-                    Text(viewModel.receiptKind == .managementExpense ? l10n.invoiceUnitLabel : l10n.flatNumber)
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundColor(.secondary)
-                    Picker("", selection: $viewModel.selectedApartment) {
-                        if viewModel.receiptKind == .managementExpense {
-                            Text(l10n.commonAreaLabel).tag(0)
-                        }
-                        ForEach(settings.apartmentNumbers, id: \.self) { number in
-                            Text("\(l10n.flatPrefix) \(number)").tag(number)
-                        }
-                    }
-                    .labelsHidden()
-                    .onChange(of: viewModel.selectedApartment) { newValue in
-                        viewModel.updateApartment(newValue, settings: settings)
-                    }
-                }
-                .padding(.horizontal, 8)
-                .padding(.vertical, 5)
-                .background(Color(NSColor.textBackgroundColor))
-                .clipShape(RoundedRectangle(cornerRadius: 7))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 7)
-                        .stroke(Color.secondary.opacity(0.15), lineWidth: 1)
-                )
-
-                Spacer()
-
-                // Date Picker
-                HStack(spacing: 6) {
-                    Image(systemName: "calendar")
-                        .foregroundColor(.secondary)
-                        .font(.system(size: 12))
-                    Text(l10n.period)
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundColor(.secondary)
-                    DatePicker("", selection: $viewModel.receiptDate, displayedComponents: .date)
-                        .labelsHidden()
-                }
-                .padding(.horizontal, 8)
-                .padding(.vertical, 5)
-                .background(Color(NSColor.textBackgroundColor))
-                .clipShape(RoundedRectangle(cornerRadius: 7))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 7)
-                        .stroke(Color.secondary.opacity(0.15), lineWidth: 1)
-                )
-            }
-
-            Divider()
-
-            // Parties Fields
             if viewModel.receiptKind == .managementExpense {
-                // Management Expense Mode: Vendor (Payee) & Manager (Payer)
+                // Header Row for Management Expense (No flat toggle, dedicated operating badge)
+                HStack {
+                    Label(l10n.managementExpenseTitle, systemImage: "briefcase.fill")
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundColor(Color(red: 0.22, green: 0.42, blue: 0.88))
+
+                    Spacer()
+
+                    // Date Picker
+                    HStack(spacing: 6) {
+                        Image(systemName: "calendar")
+                            .foregroundColor(.secondary)
+                            .font(.system(size: 12))
+                        Text(l10n.period)
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundColor(.secondary)
+                        DatePicker("", selection: $viewModel.receiptDate, displayedComponents: .date)
+                            .labelsHidden()
+                    }
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 5)
+                    .background(Color(NSColor.textBackgroundColor))
+                    .clipShape(RoundedRectangle(cornerRadius: 7))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 7)
+                            .stroke(Color.secondary.opacity(0.15), lineWidth: 1)
+                    )
+                }
+
+                // Operating badge
+                HStack(spacing: 6) {
+                    Image(systemName: "building.2.fill")
+                        .foregroundColor(Color(red: 0.22, green: 0.42, blue: 0.88))
+                        .font(.system(size: 11))
+                    Text(l10n.commonAreaOperatingBadge)
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundColor(Color(red: 0.22, green: 0.42, blue: 0.88))
+                    Spacer()
+                }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(Color(red: 0.22, green: 0.42, blue: 0.88).opacity(0.1))
+                .clipShape(RoundedRectangle(cornerRadius: 7))
+
+                Divider()
+
+                // Parties Fields: Vendor (Payee) & Manager (Payer)
                 VStack(spacing: 8) {
                     // Vendor / Payee
                     VStack(alignment: .leading, spacing: 3) {
                         HStack {
-                            Text(l10n.vendorLabel)
-                                .font(.system(size: 11, weight: .medium))
+                            Text(l10n.payeeVendorCardTitle)
+                                .font(.system(size: 10, weight: .bold))
                                 .foregroundColor(.secondary)
                             Spacer()
+
                             if !viewModel.ownerName.isEmpty {
                                 Button(l10n.clearForm) {
                                     viewModel.ownerName = ""
                                 }
                                 .font(.system(size: 10, weight: .semibold))
                                 .buttonStyle(.link)
+                            }
+
+                            if !settings.vendors.isEmpty {
+                                Menu {
+                                    ForEach(settings.vendors) { vendor in
+                                        Button {
+                                            viewModel.ownerName = vendor.name
+                                        } label: {
+                                            if vendor.category.isEmpty {
+                                                Text(vendor.name)
+                                            } else {
+                                                Text("\(vendor.name) (\(vendor.category))")
+                                            }
+                                        }
+                                    }
+                                } label: {
+                                    HStack(spacing: 3) {
+                                        Image(systemName: "list.bullet.rectangle.portrait")
+                                        Text(l10n.selectSavedVendor)
+                                    }
+                                    .font(.system(size: 10, weight: .semibold))
+                                }
+                                .menuStyle(.borderlessButton)
                             }
                         }
 
@@ -912,25 +1002,115 @@ struct MainScreen: View {
                         )
                     }
 
-                    // Quick Expense Presets Row
+                    // Ready-Made Expense Services Row
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(l10n.quickPresetsLabel)
-                            .font(.system(size: 10, weight: .semibold))
-                            .foregroundColor(.secondary)
+                        HStack {
+                            Text(l10n.quickServicesLabel)
+                                .font(.system(size: 10, weight: .bold))
+                                .foregroundColor(.secondary)
+                            Spacer()
+                        }
 
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 6) {
-                                expensePresetChip(title: l10n.presetElevator, icon: "arrow.up.and.down.square.fill", text: l10n.presetElevatorDesc)
-                                expensePresetChip(title: l10n.presetCleaning, icon: "sparkles", text: l10n.presetCleaningDesc)
-                                expensePresetChip(title: l10n.presetUtilities, icon: "bolt.fill", text: l10n.presetUtilitiesDesc)
-                                expensePresetChip(title: l10n.presetRepairs, icon: "wrench.and.screwdriver.fill", text: l10n.presetRepairsDesc)
-                                expensePresetChip(title: l10n.presetGardening, icon: "leaf.fill", text: l10n.presetGardeningDesc)
+                                ForEach(settings.expenseServices) { service in
+                                    Button {
+                                        viewModel.applyPreset(notesText: service.defaultDescription, suggestedVendor: service.suggestedVendor)
+                                    } label: {
+                                        HStack(spacing: 4) {
+                                            Image(systemName: service.iconName.isEmpty ? "briefcase.fill" : service.iconName)
+                                                .font(.system(size: 9))
+                                            Text(service.name)
+                                                .font(.system(size: 10, weight: .medium))
+                                        }
+                                        .padding(.horizontal, 8)
+                                        .padding(.vertical, 4)
+                                        .background(Color.secondary.opacity(0.1))
+                                        .foregroundColor(.primary)
+                                        .clipShape(Capsule())
+                                        .overlay(
+                                            Capsule()
+                                                .stroke(Color.secondary.opacity(0.2), lineWidth: 0.8)
+                                        )
+                                    }
+                                    .buttonStyle(.plain)
+                                }
                             }
                             .padding(.vertical, 2)
                         }
                     }
                 }
             } else {
+                // Header Row: Property & Print Flat Toggle
+                HStack {
+                    Label(l10n.flatAndPeriod, systemImage: "building.2.crop.circle.fill")
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundColor(.secondary)
+
+                    Spacer()
+
+                    Toggle(isOn: $viewModel.printApartmentNumber) {
+                        Text(l10n.printFlatNumber)
+                            .font(.system(size: 11))
+                            .foregroundColor(.secondary)
+                    }
+                    .toggleStyle(.checkbox)
+                }
+
+                // Flat & Period Row
+                HStack(spacing: 10) {
+                    // Flat Selector
+                    HStack(spacing: 6) {
+                        Image(systemName: "door.left.hand.closed")
+                            .foregroundColor(.accentColor)
+                            .font(.system(size: 12))
+                        Text(l10n.flatNumber)
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundColor(.secondary)
+                        Picker("", selection: $viewModel.selectedApartment) {
+                            ForEach(settings.apartmentNumbers, id: \.self) { number in
+                                Text("\(l10n.flatPrefix) \(number)").tag(number)
+                            }
+                        }
+                        .labelsHidden()
+                        .onChange(of: viewModel.selectedApartment) { newValue in
+                            viewModel.updateApartment(newValue, settings: settings)
+                        }
+                    }
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 5)
+                    .background(Color(NSColor.textBackgroundColor))
+                    .clipShape(RoundedRectangle(cornerRadius: 7))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 7)
+                            .stroke(Color.secondary.opacity(0.15), lineWidth: 1)
+                    )
+
+                    Spacer()
+
+                    // Date Picker
+                    HStack(spacing: 6) {
+                        Image(systemName: "calendar")
+                            .foregroundColor(.secondary)
+                            .font(.system(size: 12))
+                        Text(l10n.period)
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundColor(.secondary)
+                        DatePicker("", selection: $viewModel.receiptDate, displayedComponents: .date)
+                            .labelsHidden()
+                    }
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 5)
+                    .background(Color(NSColor.textBackgroundColor))
+                    .clipShape(RoundedRectangle(cornerRadius: 7))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 7)
+                            .stroke(Color.secondary.opacity(0.15), lineWidth: 1)
+                    )
+                }
+
+                Divider()
+
                 // Income & Resident Refund Modes
                 VStack(spacing: 8) {
                     // Resident / Payer
@@ -1093,7 +1273,7 @@ struct MainScreen: View {
                         .foregroundColor(.secondary)
                         .font(.system(size: 12))
                         .padding(.top, 2)
-                    TextField(l10n.notesPlaceholder, text: $viewModel.notes)
+                    TextField(viewModel.receiptKind == .managementExpense ? l10n.customExpenseNotePlaceholder : l10n.notesPlaceholder, text: $viewModel.notes)
                         .textFieldStyle(.plain)
                         .font(.system(size: 12))
                 }
@@ -1263,11 +1443,6 @@ struct LiveReceiptPreview: View {
             VStack(spacing: 8) {
                 if kind == .managementExpense {
                     previewRow(label: l10n.invoiceVendorLabel, value: receiver)
-                    if showApartmentNumber && apartmentNumber > 0 {
-                        previewRow(label: l10n.flatNumber, value: "\(l10n.flatPrefix) \(apartmentNumber)")
-                    } else {
-                        previewRow(label: l10n.invoiceUnitLabel, value: l10n.commonAreaLabel)
-                    }
                     previewRow(label: l10n.managerPayerLabel, value: issuer)
                 } else {
                     previewRow(label: l10n.receiverLabel, value: receiver)
@@ -1442,8 +1617,8 @@ final class MainScreenViewModel: ObservableObject {
             return
         }
 
-        let effectiveApartment = selectedApartment
-        let effectiveShowApartment = receiptKind == .managementExpense ? (selectedApartment > 0 && printApartmentNumber) : printApartmentNumber
+        let effectiveApartment = receiptKind == .managementExpense ? 0 : selectedApartment
+        let effectiveShowApartment = receiptKind == .managementExpense ? false : printApartmentNumber
 
         previewDraft = ReceiptDraft(
             receiver: trimmedOwner.localizedCapitalized,
@@ -1582,6 +1757,20 @@ final class ReceiptSettingsStore: ObservableObject {
             }
         }
     }
+    @Published var vendors: [VendorRecord] {
+        didSet {
+            if let data = try? JSONEncoder().encode(vendors) {
+                defaults.set(data, forKey: Keys.vendors)
+            }
+        }
+    }
+    @Published var expenseServices: [ExpenseServicePreset] {
+        didSet {
+            if let data = try? JSONEncoder().encode(expenseServices) {
+                defaults.set(data, forKey: Keys.expenseServices)
+            }
+        }
+    }
     @Published var showLicenseViewer: Bool = false
 
     var l10n: L10n {
@@ -1624,6 +1813,22 @@ final class ReceiptSettingsStore: ObservableObject {
             defaultPayment = defaults.string(forKey: Keys.defaultPayment) ?? ""
             flatCount = max(1, ReceiptSettingsStore.readInt(defaults, key: Keys.flatCount, fallback: 1))
             seqNumber = max(1, ReceiptSettingsStore.readInt(defaults, key: Keys.seqNumber, fallback: 1))
+        }
+
+        if let vendorData = defaults.data(forKey: Keys.vendors),
+           let savedVendors = try? JSONDecoder().decode([VendorRecord].self, from: vendorData),
+           !savedVendors.isEmpty {
+            vendors = savedVendors
+        } else {
+            vendors = SampleData.defaults(for: resolvedLang).defaultVendors
+        }
+
+        if let serviceData = defaults.data(forKey: Keys.expenseServices),
+           let savedServices = try? JSONDecoder().decode([ExpenseServicePreset].self, from: serviceData),
+           !savedServices.isEmpty {
+            expenseServices = savedServices
+        } else {
+            expenseServices = SampleData.defaults(for: resolvedLang).defaultServices
         }
 
         let savedTheme = defaults.string(forKey: Keys.theme) ?? AppTheme.system.rawValue
@@ -1724,6 +1929,29 @@ final class ReceiptSettingsStore: ObservableObject {
         }
     }
 
+    func addVendor(_ vendor: VendorRecord) {
+        vendors.append(vendor)
+    }
+
+    func deleteVendor(id: UUID) {
+        vendors.removeAll { $0.id == id }
+    }
+
+    func addExpenseService(_ service: ExpenseServicePreset) {
+        expenseServices.append(service)
+    }
+
+    func deleteExpenseService(id: UUID) {
+        expenseServices.removeAll { $0.id == id }
+    }
+
+    func loadSampleVendorsAndServices(for targetLang: AppLanguage? = nil) {
+        let lang = targetLang ?? language
+        let samples = SampleData.defaults(for: lang)
+        vendors = samples.defaultVendors
+        expenseServices = samples.defaultServices
+    }
+
     private static func readInt(_ defaults: UserDefaults, key: String, fallback: Int) -> Int {
         if let value = defaults.object(forKey: key) as? Int {
             return value
@@ -1745,6 +1973,8 @@ final class ReceiptSettingsStore: ObservableObject {
         static let language = "app_language"
         static let theme = "app_theme"
         static let currency = "app_currency"
+        static let vendors = "vendors_list"
+        static let expenseServices = "expense_services_list"
 
         static func owner(_ number: Int) -> String {
             "homeowner_\(number)"

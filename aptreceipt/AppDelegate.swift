@@ -258,6 +258,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         .frame(width: 1080, height: 740)
         render(view: mgtDashboardView, size: CGSize(width: 1080, height: 740), to: outDir.appendingPathComponent("08_management_expense_dashboard.png"))
 
+        // 9. Settings Vendors & Services Tab
+        let vendorsSettingsView = SettingsView(settings: settings, initialTab: .vendors)
+            .frame(width: 740, height: 600)
+        render(view: vendorsSettingsView, size: CGSize(width: 740, height: 600), to: outDir.appendingPathComponent("09_settings_vendors.png"))
+
+        // 10. Settings Appearance & Language Hero Deck
+        let appearanceSettingsView = SettingsView(settings: settings, initialTab: .appearance)
+            .frame(width: 740, height: 600)
+        render(view: appearanceSettingsView, size: CGSize(width: 740, height: 600), to: outDir.appendingPathComponent("10_settings_appearance.png"))
+
         print("Screenshots successfully generated in \(outDir.path)")
     }
 
