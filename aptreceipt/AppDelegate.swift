@@ -253,32 +253,12 @@ struct AboutWindowView: View {
         VStack(spacing: 0) {
             // Header with App Icon and Meta
             VStack(spacing: 12) {
-                if let appIcon = NSImage(named: "AppIcon") ?? NSImage(named: "Logo") {
+                if let appIcon = NSApplication.shared.applicationIconImage {
                     Image(nsImage: appIcon)
                         .resizable()
                         .scaledToFit()
                         .frame(width: 80, height: 80)
-                        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
                         .shadow(color: Color.black.opacity(0.18), radius: 6, x: 0, y: 3)
-                } else {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 18, style: .continuous)
-                            .fill(
-                                LinearGradient(
-                                    colors: [Color.accentColor, Color.accentColor.opacity(0.8)],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                            )
-                            .frame(width: 80, height: 80)
-                            .shadow(color: Color.accentColor.opacity(0.3), radius: 6, x: 0, y: 3)
-
-                        Image(systemName: "building.2.crop.circle.fill")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 46, height: 46)
-                            .foregroundColor(.white)
-                    }
                 }
 
                 VStack(spacing: 4) {

@@ -67,11 +67,18 @@ struct SettingsView: View {
         VStack(spacing: 0) {
             // Header
             HStack(spacing: 12) {
-                Image(systemName: "gearshape.2.fill")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 22, height: 22)
-                    .foregroundColor(.accentColor)
+                if let icon = NSApplication.shared.applicationIconImage {
+                    Image(nsImage: icon)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 30, height: 30)
+                } else {
+                    Image(systemName: "gearshape.2.fill")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 22, height: 22)
+                        .foregroundColor(.accentColor)
+                }
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(l10n.settingsTitle)
@@ -481,23 +488,12 @@ struct SettingsView: View {
 
     private var aboutTab: some View {
         VStack(spacing: 16) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .fill(
-                        LinearGradient(
-                            colors: [Color.accentColor, Color.accentColor.opacity(0.75)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(width: 68, height: 68)
-                    .shadow(color: Color.accentColor.opacity(0.35), radius: 8, x: 0, y: 4)
-
-                Image(systemName: "building.2.crop.circle.fill")
+            if let icon = NSApplication.shared.applicationIconImage {
+                Image(nsImage: icon)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 40, height: 40)
-                    .foregroundColor(.white)
+                    .frame(width: 76, height: 76)
+                    .shadow(color: Color.black.opacity(0.18), radius: 6, x: 0, y: 3)
             }
 
             VStack(spacing: 4) {

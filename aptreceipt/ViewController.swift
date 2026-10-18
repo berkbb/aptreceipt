@@ -532,20 +532,12 @@ struct MainScreen: View {
 
     private var headerBar: some View {
         HStack(spacing: 14) {
-            ZStack {
-                Circle()
-                    .fill(
-                        LinearGradient(
-                            colors: [Color.accentColor, Color.accentColor.opacity(0.7)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(width: 44, height: 44)
-                Image(systemName: "building.2.crop.circle.fill")
+            if let icon = NSApplication.shared.applicationIconImage {
+                Image(nsImage: icon)
                     .resizable()
-                    .frame(width: 24, height: 24)
-                    .foregroundColor(.white)
+                    .scaledToFit()
+                    .frame(width: 44, height: 44)
+                    .shadow(color: Color.black.opacity(0.12), radius: 4, x: 0, y: 2)
             }
 
             VStack(alignment: .leading, spacing: 2) {
