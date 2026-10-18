@@ -471,6 +471,14 @@ struct L10n {
     var totalFlatsPlaceholder: String { tr("e.g. 12", "Örn: 12", "Ex: 12") }
     var publisherLabel: String { tr("Publisher", "Yayıncı", "Editor") }
     var licenseLabel: String { tr("License", "Lisans", "Licență") }
+
+    // Building Logo
+    var buildingLogoSection: String { tr("Building / Site Logo", "Bina / Site Logosu", "Siglă / Logo Imobil") }
+    var buildingLogoDesc: String { tr("Upload your building or community logo (PNG or JPG). If none is uploaded, a clean default 2D logo will be displayed on receipts.", "Makbuzlarda yer alacak bina veya site logosunu (PNG veya JPG) yükleyin. Yüklenmezse şık bir varsayılan 2D logo kullanılır.", "Încărcați sigla asociației sau a imobilului (PNG sau JPG). Dacă nu este adăugată, pe chitanțe va apărea o siglă 2D implicită.") }
+    var uploadLogoButton: String { tr("Upload Building Logo...", "Site Logosu Yükle...", "Încarcă Siglă Imobil...") }
+    var removeLogoButton: String { tr("Remove Logo", "Logoyu Kaldır", "Șterge Sigla") }
+    var activeLogoBadge: String { tr("Custom Logo Active", "Özel Logo Yüklendi", "Siglă Personalizată Activă") }
+    var default2DLogoBadge: String { tr("Default 2D Logo Active", "Varsayılan 2D Logo Aktif", "Siglă 2D Implicită Activă") }
 }
 
 // MARK: - Main Screen
@@ -537,7 +545,8 @@ struct MainScreen: View {
                             notes: viewModel.notes,
                             signatureImage: settings.signatureImage,
                             currency: settings.currency,
-                            l10n: l10n
+                            l10n: l10n,
+                            logoImage: settings.logoImage
                         )
                         .padding(20)
                     }
@@ -835,6 +844,33 @@ struct MainScreen: View {
     }
 }
 
+// MARK: - Default 2D Building Logo
+
+struct Default2DBuildingLogo: View {
+    var size: CGFloat = 48
+    var foregroundColor: Color = Color(red: 0.12, green: 0.18, blue: 0.28)
+    var backgroundColor: Color = Color(red: 0.94, green: 0.96, blue: 0.98)
+    var borderColor: Color = Color(red: 0.82, green: 0.86, blue: 0.90)
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: size * 0.18, style: .continuous)
+                .fill(backgroundColor)
+            RoundedRectangle(cornerRadius: size * 0.18, style: .continuous)
+                .stroke(borderColor, lineWidth: 1)
+
+            VStack(spacing: 0) {
+                Image(systemName: "building.2.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: size * 0.56, height: size * 0.56)
+                    .foregroundColor(foregroundColor)
+            }
+        }
+        .frame(width: size, height: size)
+    }
+}
+
 // MARK: - Live Preview Widget
 
 struct LiveReceiptPreview: View {
@@ -851,6 +887,7 @@ struct LiveReceiptPreview: View {
     let signatureImage: NSImage?
     let currency: AppCurrency
     let l10n: L10n
+    var logoImage: NSImage? = nil
 
     private var formattedAmount: String {
         let normalized = amountString.trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: ",", with: ".")
@@ -868,7 +905,21 @@ struct LiveReceiptPreview: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             // Header
-            HStack(alignment: .top) {
+            HStack(alignment: .top, spacing: 10) {
+                if let logo = logoImage {
+                    Image(nsImage: logo)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 36, height: 36)
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 6)
+                                .stroke(Color.secondary.opacity(0.2), lineWidth: 0.8)
+                        )
+                } else {
+                    Default2DBuildingLogo(size: 36)
+                }
+
                 VStack(alignment: .leading, spacing: 3) {
                     Text(apartmentName.isEmpty ? l10n.defaultBuildingName : apartmentName.uppercased())
                         .font(.system(size: 13, weight: .bold))
@@ -1159,6 +1210,15 @@ final class ReceiptSettingsStore: ObservableObject {
             }
         }
     }
+    @Published var logoData: Data? {
+        didSet {
+            if let logoData {
+                defaults.set(logoData, forKey: Keys.logo)
+            } else {
+                defaults.removeObject(forKey: Keys.logo)
+            }
+        }
+    }
     @Published var showLicenseViewer: Bool = false
 
     var l10n: L10n {
@@ -1209,6 +1269,7 @@ final class ReceiptSettingsStore: ObservableObject {
         applyTheme(resolvedTheme)
 
         signatureData = defaults.data(forKey: Keys.signature)
+        logoData = defaults.data(forKey: Keys.logo)
     }
 
     func loadSampleDefaults(for targetLang: AppLanguage? = nil) {
@@ -1274,6 +1335,32 @@ final class ReceiptSettingsStore: ObservableObject {
         }
     }
 
+    var logoImage: NSImage? {
+        guard let logoData else { return nil }
+        return NSImage(data: logoData)
+    }
+
+    func clearLogo() {
+        logoData = nil
+    }
+
+    func importLogo() {
+        let panel = NSOpenPanel()
+        panel.canCreateDirectories = false
+        panel.allowsMultipleSelection = false
+        panel.canChooseFiles = true
+        panel.canChooseDirectories = false
+        panel.allowedContentTypes = [.png, .jpeg]
+
+        if panel.runModal() == .OK, let url = panel.url {
+            do {
+                logoData = try Data(contentsOf: url)
+            } catch {
+                logoData = nil
+            }
+        }
+    }
+
     private static func readInt(_ defaults: UserDefaults, key: String, fallback: Int) -> Int {
         if let value = defaults.object(forKey: key) as? Int {
             return value
@@ -1291,6 +1378,7 @@ final class ReceiptSettingsStore: ObservableObject {
         static let flatCount = "flatcount"
         static let seqNumber = "seqNumber"
         static let signature = "usersign"
+        static let logo = "building_logo"
         static let language = "app_language"
         static let theme = "app_theme"
         static let currency = "app_currency"

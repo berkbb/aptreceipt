@@ -112,7 +112,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             ReceiptSettingsStore.Keys.seqNumber,
             ReceiptSettingsStore.Keys.language,
             ReceiptSettingsStore.Keys.theme,
-            ReceiptSettingsStore.Keys.currency
+            ReceiptSettingsStore.Keys.currency,
+            ReceiptSettingsStore.Keys.logo
         ]
         var backupDict: [String: Any] = [:]
         for key in backupKeys {

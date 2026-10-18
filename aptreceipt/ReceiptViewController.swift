@@ -367,6 +367,7 @@ struct ReceiptPreviewSheet: View {
                         draft: draft,
                         apartmentName: settings.apartmentName,
                         signatureImage: settings.signatureImage,
+                        logoImage: settings.logoImage,
                         l10n: l10n
                     )
                     .frame(width: 595, height: 842)
@@ -442,6 +443,7 @@ struct ReceiptPreviewSheet: View {
             draft: draft,
             apartmentName: settings.apartmentName,
             signatureImage: settings.signatureImage,
+            logoImage: settings.logoImage,
             l10n: l10n
         )
         .frame(width: 595, height: 842)
@@ -487,6 +489,7 @@ struct ReceiptPreviewSheet: View {
             draft: draft,
             apartmentName: settings.apartmentName,
             signatureImage: settings.signatureImage,
+            logoImage: settings.logoImage,
             l10n: l10n
         )
         .frame(width: 595, height: 842)
@@ -509,6 +512,7 @@ struct ReceiptDocumentView: View {
     let draft: ReceiptDraft
     let apartmentName: String
     let signatureImage: NSImage?
+    var logoImage: NSImage? = nil
     let l10n: L10n
 
     // Strict Print Colors (Dark Mode Proof)
@@ -572,7 +576,21 @@ struct ReceiptDocumentView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             // MARK: 1. Official Header
-            HStack(alignment: .top) {
+            HStack(alignment: .top, spacing: 14) {
+                if let logo = logoImage {
+                    Image(nsImage: logo)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 52, height: 52)
+                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                .stroke(borderSubtle, lineWidth: 1)
+                        )
+                } else {
+                    Default2DBuildingLogo(size: 52)
+                }
+
                 VStack(alignment: .leading, spacing: 5) {
                     Text(mainTitle)
                         .font(.system(size: 19, weight: .bold))

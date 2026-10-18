@@ -207,7 +207,78 @@ struct SettingsView: View {
             .background(Color(NSColor.controlBackgroundColor))
             .clipShape(RoundedRectangle(cornerRadius: 10))
 
-            // Group 2: Mali Ayarlar
+            // Group 2: Bina / Site Logosu (Building Logo)
+            VStack(alignment: .leading, spacing: 12) {
+                Label(l10n.buildingLogoSection, systemImage: "photo.badge.plus")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(.secondary)
+
+                Text(l10n.buildingLogoDesc)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+
+                HStack(spacing: 16) {
+                    // Logo Preview Card
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(Color(NSColor.textBackgroundColor))
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
+
+                        if let logo = settings.logoImage {
+                            Image(nsImage: logo)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 58, height: 58)
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                        } else {
+                            Default2DBuildingLogo(size: 58)
+                        }
+                    }
+                    .frame(width: 76, height: 76)
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack(spacing: 6) {
+                            if settings.logoImage != nil {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .foregroundColor(.green)
+                                Text(l10n.activeLogoBadge)
+                                    .font(.caption.bold())
+                                    .foregroundColor(.green)
+                            } else {
+                                Image(systemName: "sparkles")
+                                    .foregroundColor(.accentColor)
+                                Text(l10n.default2DLogoBadge)
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+
+                        HStack(spacing: 10) {
+                            Button {
+                                settings.importLogo()
+                            } label: {
+                                Label(l10n.uploadLogoButton, systemImage: "arrow.up.doc.fill")
+                            }
+                            .buttonStyle(.borderedProminent)
+
+                            if settings.logoImage != nil {
+                                Button(role: .destructive) {
+                                    settings.clearLogo()
+                                } label: {
+                                    Label(l10n.removeLogoButton, systemImage: "trash.fill")
+                                }
+                                .buttonStyle(.bordered)
+                            }
+                        }
+                    }
+                }
+            }
+            .padding(14)
+            .background(Color(NSColor.controlBackgroundColor))
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+
+            // Group 3: Mali Ayarlar
             VStack(alignment: .leading, spacing: 10) {
                 Label(l10n.financialSettings, systemImage: "banknote.fill")
                     .font(.system(size: 13, weight: .bold))
