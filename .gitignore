@@ -1,11 +1,31 @@
+# macOS
+.DS_Store
+*/.DS_Store
+**/.DS_Store
+.AppleDouble
+.LSOverride
 
-aptreceipt/.DS_Store
-.DS_Store
-.DS_Store
-aptreceipt/.DS_Store
-aptreceipt/Assets.xcassets/.DS_Store
-aptreceipt/en.lproj/.DS_Store
-aptreceipt/tr.lproj/.DS_Store
-*.bak
-.deriveddata/
+# Project build & release outputs
 artifacts/
+build/
+.build/
+.deriveddata/
+DerivedData/
+
+# Xcode user-specific data
+xcuserdata/
+*.xcuserdatad/
+*.xcuserstate
+*.xcbkptlist
+
+# Swift Package Manager & Crash logs
+.swiftpm/
+*.dSYM/
+*.dSYM.zip
+*.crash
+
+# Backups & Editor temporary files
+*.bak
+*.tmp
+*.swp
+*~
