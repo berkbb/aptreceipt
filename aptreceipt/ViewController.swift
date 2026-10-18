@@ -711,6 +711,14 @@ struct MainScreen: View {
                 viewModel.syncWithSettings(settings)
             }
         }
+        .onReceive(NotificationCenter.default.publisher(for: .settingsDidSave)) { _ in
+            viewModel.updateLiveFromSettings(settings)
+        }
+        .onReceive(settings.objectWillChange) { _ in
+            DispatchQueue.main.async {
+                viewModel.updateLiveFromSettings(settings)
+            }
+        }
         .sheet(item: $viewModel.previewDraft) { draft in
             ReceiptPreviewSheet(draft: draft, settings: settings)
         }
@@ -1590,6 +1598,24 @@ final class MainScreenViewModel: ObservableObject {
         }
     }
 
+    func updateLiveFromSettings(_ settings: ReceiptSettingsStore) {
+        issuerName = settings.issuer
+        sequenceNumber = String(settings.seqNumber)
+        if receiptKind == .income {
+            totalAmount = settings.defaultPayment
+            ownerName = settings.owner(for: selectedApartment)
+        } else if receiptKind == .outcome {
+            ownerName = settings.owner(for: selectedApartment)
+        }
+        if selectedApartment > settings.flatCount {
+            selectedApartment = max(1, settings.flatCount)
+            if receiptKind != .managementExpense {
+                ownerName = settings.owner(for: selectedApartment)
+            }
+        }
+        objectWillChange.send()
+    }
+
     func resetForm(settings: ReceiptSettingsStore) {
         syncWithSettings(settings)
     }
@@ -1702,6 +1728,8 @@ struct ReceiptDraft: Identifiable {
 
 @MainActor
 final class ReceiptSettingsStore: ObservableObject {
+    static let shared = ReceiptSettingsStore()
+
     @Published var apartmentName: String {
         didSet { defaults.set(apartmentName, forKey: Keys.apartmentName) }
     }
@@ -2212,4 +2240,5 @@ PROVIDE THE PROGRAM "AS IS" WITHOUT WARRANTY OF ANY KIND.
 
 extension Notification.Name {
     static let appLanguageDidChange = Notification.Name("appLanguageDidChange")
+    static let settingsDidSave = Notification.Name("settingsDidSave")
 }

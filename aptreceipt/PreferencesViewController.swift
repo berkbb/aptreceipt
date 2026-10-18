@@ -165,6 +165,7 @@ struct SettingsView: View {
             HStack {
                 Button(l10n.cancel) {
                     presentationMode.wrappedValue.dismiss()
+                    SettingsWindowManager.shared.close()
                 }
                 .keyboardShortcut(.cancelAction)
 
@@ -172,7 +173,9 @@ struct SettingsView: View {
 
                 Button(l10n.saveAndClose) {
                     if viewModel.save(to: settings) {
+                        NotificationCenter.default.post(name: .settingsDidSave, object: settings)
                         presentationMode.wrappedValue.dismiss()
+                        SettingsWindowManager.shared.close()
                     }
                 }
                 .buttonStyle(.borderedProminent)
@@ -1655,6 +1658,9 @@ final class SettingsViewModel: ObservableObject {
             let name = (residents[apt] ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
             settings.saveOwner(name.localizedCapitalized, apartmentNumber: apt)
         }
+
+        settings.objectWillChange.send()
+        NotificationCenter.default.post(name: .settingsDidSave, object: settings)
 
         return true
     }

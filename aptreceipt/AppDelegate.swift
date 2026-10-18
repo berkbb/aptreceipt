@@ -4,7 +4,7 @@ import SwiftUI
 @main
 struct AptReceiptApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
-    @StateObject private var settings = ReceiptSettingsStore()
+    @StateObject private var settings = ReceiptSettingsStore.shared
 
     var body: some Scene {
         WindowGroup(settings.l10n.appTitle) {
@@ -18,12 +18,12 @@ struct AptReceiptApp: App {
         .commands {
             CommandGroup(replacing: .appInfo) {
                 Button(settings.l10n.menuAboutApp) {
-                    AboutWindowManager.shared.show(settings: settings)
+                    AboutWindowManager.shared.show(settings: ReceiptSettingsStore.shared)
                 }
             }
             CommandGroup(replacing: .appSettings) {
                 Button(settings.l10n.menuSettings) {
-                    SettingsWindowManager.shared.show(settings: settings)
+                    SettingsWindowManager.shared.show(settings: ReceiptSettingsStore.shared)
                 }
                 .keyboardShortcut(",", modifiers: .command)
             }
@@ -48,7 +48,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
 
-        let settings = ReceiptSettingsStore()
+        let settings = ReceiptSettingsStore.shared
         settings.applyTheme(settings.theme)
 
         MenuBarManager.shared.install(settings: settings)
@@ -58,28 +58,28 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {
-        let settings = ReceiptSettingsStore()
+        let settings = ReceiptSettingsStore.shared
         MenuBarManager.shared.updateMenuBar(with: settings.l10n)
     }
 
     @MainActor
     @objc func orderFrontStandardAboutPanel(_ sender: Any?) {
-        AboutWindowManager.shared.show()
+        AboutWindowManager.shared.show(settings: ReceiptSettingsStore.shared)
     }
 
     @MainActor
     @objc func showAboutWindow(_ sender: Any?) {
-        AboutWindowManager.shared.show()
+        AboutWindowManager.shared.show(settings: ReceiptSettingsStore.shared)
     }
 
     @MainActor
     @objc func showPreferencesWindow(_ sender: Any?) {
-        SettingsWindowManager.shared.show()
+        SettingsWindowManager.shared.show(settings: ReceiptSettingsStore.shared)
     }
 
     @MainActor
     @objc func showSettingsWindow(_ sender: Any?) {
-        SettingsWindowManager.shared.show()
+        SettingsWindowManager.shared.show(settings: ReceiptSettingsStore.shared)
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
@@ -423,7 +423,7 @@ final class AboutWindowManager: NSObject, NSWindowDelegate {
     private var window: NSWindow?
 
     func show(settings: ReceiptSettingsStore? = nil) {
-        let actualSettings = settings ?? ReceiptSettingsStore()
+        let actualSettings = settings ?? ReceiptSettingsStore.shared
         if let window = window {
             window.title = actualSettings.l10n.aboutWindowHeader
             window.contentView = NSHostingView(
@@ -471,7 +471,7 @@ final class SettingsWindowManager: NSObject, NSWindowDelegate {
     }
 
     func show(settings: ReceiptSettingsStore? = nil, tab: SettingsTab = .general) {
-        let actualSettings = settings ?? ReceiptSettingsStore()
+        let actualSettings = settings ?? ReceiptSettingsStore.shared
         if let window = window {
             window.title = actualSettings.l10n.settingsTitle
             window.contentView = NSHostingView(
@@ -502,6 +502,11 @@ final class SettingsWindowManager: NSObject, NSWindowDelegate {
         self.window = newWindow
         newWindow.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
+    }
+
+    func close() {
+        window?.close()
+        window = nil
     }
 
     func windowWillClose(_ notification: Notification) {
