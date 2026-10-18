@@ -1,0 +1,22 @@
+/* 
+  File.strings
+  Romanian
+  Strings for alerts and receipt transformations.
+
+  Created by berkbb on 18.10.2026.
+  
+*/
+
+"okText" = "OK";
+"errorTitle" = "Eroare";
+"errorMessage" = "Vă rugăm să verificați toate câmpurile.";
+"saveImageTitle"="Unde doriți să salvați chitanța?";
+"openImageTitle"="Selectați fișierul semnăturii";
+"infoTitle"="Informație";
+"restartMessage"="Vă rugăm să reporniți aplicația pentru ca modificările să aibă efect.";
+"switchON"="Număr Apartament ACTIVAT";
+"switchOFF"="Număr Apartament DEZACTIVAT";
+"incomeTitle"="Chitanță de Încasare";
+"outcomeTitle"="Dispoziție de Plată";
+"totalMessage_Outcome"="Următoarea sumă a fost plătită către:";
+"totalMessage_Income"="Următoarea sumă a fost încasată de la:";

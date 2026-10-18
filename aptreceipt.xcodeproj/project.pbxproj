@@ -53,10 +53,13 @@
 		9A9CF89627E204930042D276 /* aptreceiptUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = aptreceiptUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		9A9CF8B527E22E670042D276 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		9A9CF8B727E22E6B0042D276 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		9A9CF8BA27E22E6B0042D276 /* ro */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ro; path = ro.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		9AA07CFE27E3455A00389D27 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Main.strings; sourceTree = "<group>"; };
 		9AA07D0027E3456600389D27 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Main.strings; sourceTree = "<group>"; };
+		9AA07D0227E3456600389D27 /* ro */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ro; path = ro.lproj/Main.strings; sourceTree = "<group>"; };
 		9ADECA1527E5DC3500EB0A7F /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/File.strings; sourceTree = "<group>"; };
 		9ADECA1827E5DD2D00EB0A7F /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/File.strings; sourceTree = "<group>"; };
+		9ADECA1A27E5DD2D00EB0A7F /* ro */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ro; path = ro.lproj/File.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -224,6 +227,7 @@
 				en,
 				Base,
 				tr,
+				ro,
 			);
 			mainGroup = 9A9CF86C27E204920042D276;
 			productRefGroup = 9A9CF87627E204920042D276 /* Products */;
@@ -316,6 +320,7 @@
 				9A9CF87F27E204920042D276 /* Base */,
 				9AA07CFE27E3455A00389D27 /* en */,
 				9AA07D0027E3456600389D27 /* tr */,
+				9AA07D0227E3456600389D27 /* ro */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -325,6 +330,7 @@
 			children = (
 				9A9CF8B527E22E670042D276 /* en */,
 				9A9CF8B727E22E6B0042D276 /* tr */,
+				9A9CF8BA27E22E6B0042D276 /* ro */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -334,6 +340,7 @@
 			children = (
 				9ADECA1527E5DC3500EB0A7F /* en */,
 				9ADECA1827E5DD2D00EB0A7F /* tr */,
+				9ADECA1A27E5DD2D00EB0A7F /* ro */,
 			);
 			name = File.strings;
 			sourceTree = "<group>";

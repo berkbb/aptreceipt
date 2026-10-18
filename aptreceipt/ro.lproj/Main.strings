@@ -1,0 +1,180 @@
+/*
+ 
+ Romanian
+ Main.strings for storyboard and menu localization.
+ 
+ Created by berkbb on 18.10.2026.
+ 
+ */
+
+/* Class = "NSMenuItem"; title = "aptreceipt"; ObjectID = "1Xt-HY-uBw"; */
+"1Xt-HY-uBw.title" = "Creator Chitanțe Bloc";
+
+/* Class = "NSMenuItem"; title = "Quit aptreceipt"; ObjectID = "4sb-4s-VLi"; */
+"4sb-4s-VLi.title" = "Închide Creator Chitanțe Bloc";
+
+/* Class = "NSMenuItem"; title = "Edit"; ObjectID = "5QF-Oa-p0T"; */
+"5QF-Oa-p0T.title" = "Editare";
+
+/* Class = "NSMenuItem"; title = "About aptreceipt"; ObjectID = "5kV-Vb-QxS"; */
+"5kV-Vb-QxS.title" = "Despre Creator Chitanțe Bloc";
+
+/* Class = "NSMenuItem"; title = "Redo"; ObjectID = "6dh-zS-Vam"; */
+"6dh-zS-Vam.title" = "Refă";
+
+/* Class = "NSTextFieldCell"; title = "Month and Year"; ObjectID = "6oS-eN-6Cl"; */
+"6oS-eN-6Cl.title" = "Lună și An";
+
+/* Class = "NSMenu"; title = "Main Menu"; ObjectID = "AYu-sK-qS6"; */
+"AYu-sK-qS6.title" = "Meniu Principal";
+
+/* Class = "NSMenuItem"; title = "Preferences…"; ObjectID = "BOF-NM-1cW"; */
+"BOF-NM-1cW.title" = "Preferințe…";
+
+/* Class = "NSMenu"; title = "Help"; ObjectID = "F2S-fz-NVQ"; */
+"F2S-fz-NVQ.title" = "Ajutor";
+
+/* Class = "NSMenuItem"; title = "aptreceipt Help"; ObjectID = "FKE-Sm-Kum"; */
+"FKE-Sm-Kum.title" = "Ajutor Creator Chitanțe Bloc";
+
+/* Class = "NSTextFieldCell"; title = "Info (Optional)"; ObjectID = "GuW-Si-e02"; */
+"GuW-Si-e02.title" = "Informații (opțional)";
+
+/* Class = "NSButtonCell"; title = "Clear"; ObjectID = "H4j-Dg-rWq"; */
+"H4j-Dg-rWq.title" = "Șterge";
+
+/* Class = "NSWindow"; title = "Receipt Creator"; ObjectID = "IQv-IB-iLA"; */
+"IQv-IB-iLA.title" = "Creator Chitanțe Bloc";
+
+/* Class = "NSMenuItem"; title = "Show All"; ObjectID = "Kd2-mp-pUS"; */
+"Kd2-mp-pUS.title" = "Afișează toate";
+
+/* Class = "NSMenuItem"; title = "Bring All to Front"; ObjectID = "LE2-aR-0XJ"; */
+"LE2-aR-0XJ.title" = "Adu toate în față";
+
+/* Class = "NSTextFieldCell"; title = "Sequence Number"; ObjectID = "LNc-qU-B39"; */
+"LNc-qU-B39.title" = "Număr de ordine";
+
+/* Class = "NSMenuItem"; title = "Services"; ObjectID = "NMo-om-nkz"; */
+"NMo-om-nkz.title" = "Servicii";
+
+/* Class = "NSMenuItem"; title = "Minimize"; ObjectID = "OY7-WF-poV"; */
+"OY7-WF-poV.title" = "Minimizează";
+
+/* Class = "NSMenuItem"; title = "Hide aptreceipt"; ObjectID = "Olw-nP-bQN"; */
+"Olw-nP-bQN.title" = "Ascunde Creator Chitanțe Bloc";
+
+/* Class = "NSTextFieldCell"; title = "Apartment Number"; ObjectID = "QV4-Cn-Glw"; */
+"QV4-Cn-Glw.title" = "Număr Apartament";
+
+/* Class = "NSMenuItem"; title = "Zoom"; ObjectID = "R4o-n2-Eq4"; */
+"R4o-n2-Eq4.title" = "Zoom";
+
+/* Class = "NSMenuItem"; title = "Clear"; ObjectID = "RoQ-8Y-tb7"; */
+"RoQ-8Y-tb7.title" = "Șterge";
+
+/* Class = "NSMenuItem"; title = "Select All"; ObjectID = "Ruw-6m-B2m"; */
+"Ruw-6m-B2m.title" = "Selectează tot";
+
+/* Class = "NSMenu"; title = "Window"; ObjectID = "Td7-aD-5lo"; */
+"Td7-aD-5lo.title" = "Fereastră";
+
+/* Class = "NSMenuItem"; title = "Hide Others"; ObjectID = "Vdr-fp-XzO"; */
+"Vdr-fp-XzO.title" = "Ascunde celelalte";
+
+/* Class = "NSMenu"; title = "Edit"; ObjectID = "W48-6f-4Dl"; */
+"W48-6f-4Dl.title" = "Editare";
+
+/* Class = "NSMenuItem"; title = "Create"; ObjectID = "Was-JA-tGl"; */
+"Was-JA-tGl.title" = "Creează";
+
+/* Class = "NSMenuItem"; title = "Paste and Match Style"; ObjectID = "WeT-3V-zwk"; */
+"WeT-3V-zwk.title" = "Lipește și potrivește stilul";
+
+/* Class = "NSMenuItem"; title = "Window"; ObjectID = "aUF-d1-5bR"; */
+"aUF-d1-5bR.title" = "Fereastră";
+
+/* Class = "NSMenu"; title = "File"; ObjectID = "bib-Uj-vzu"; */
+"bib-Uj-vzu.title" = "Fișier";
+
+/* Class = "NSTextFieldCell"; title = "Who will receive the receipt?"; ObjectID = "blF-Hb-3vE"; */
+"blF-Hb-3vE.title" = "Cine primește chitanța?";
+
+/* Class = "NSMenuItem"; title = "File"; ObjectID = "dMs-cI-mzQ"; */
+"dMs-cI-mzQ.title" = "Fișier";
+
+/* Class = "NSMenuItem"; title = "Undo"; ObjectID = "dRJ-4n-Yzg"; */
+"dRJ-4n-Yzg.title" = "Anulează";
+
+/* Class = "NSMenuItem"; title = "Paste"; ObjectID = "gVA-U4-sdL"; */
+"gVA-U4-sdL.title" = "Lipește";
+
+/* Class = "NSMenu"; title = "Services"; ObjectID = "hz9-B4-Xy5"; */
+"hz9-B4-Xy5.title" = "Servicii";
+
+/* Class = "NSBox"; title = "Box"; ObjectID = "kGq-ve-2B4"; */
+"kGq-ve-2B4.title" = "Casetă";
+
+/* Class = "NSTextFieldCell"; title = "Total"; ObjectID = "l6U-yF-woz"; */
+"l6U-yF-woz.title" = "Sumă";
+
+/* Class = "NSTextFieldCell"; title = "Who will issue the receipt?"; ObjectID = "lcm-bR-oBw"; */
+"lcm-bR-oBw.title" = "Cine emite chitanța?";
+
+/* Class = "NSButtonCell"; title = "Create"; ObjectID = "Ey7-vW-mwb"; */
+"Ey7-vW-mwb.title" = "Creează";
+
+/* Class = "NSMenuItem"; title = "Delete"; ObjectID = "pa3-QI-u2k"; */
+"pa3-QI-u2k.title" = "Șterge";
+
+/* Class = "NSMenu"; title = "aptreceipt"; ObjectID = "uQy-DD-JDr"; */
+"uQy-DD-JDr.title" = "Creator Chitanțe Bloc";
+
+/* Class = "NSMenuItem"; title = "Cut"; ObjectID = "uRl-iY-unG"; */
+"uRl-iY-unG.title" = "Decupează";
+
+/* Class = "NSTextFieldCell"; title = "Mustafa Cem Babadoğan"; ObjectID = "vqn-9J-cOF"; */
+"vqn-9J-cOF.title" = "Mustafa Cem Babadoğan";
+
+/* Class = "NSMenuItem"; title = "Help"; ObjectID = "wpr-3q-Mcd"; */
+"wpr-3q-Mcd.title" = "Ajutor";
+
+/* Class = "NSMenuItem"; title = "Copy"; ObjectID = "x3v-GG-iWU"; */
+"x3v-GG-iWU.title" = "Copiază";
+
+// Main UI
+"ui8-yM-YDs.title"="Nume bloc / imobil?";
+"Ino-7I-4x1.title"="Câte apartamente sunt în bloc?";
+"god-J5-b8y.title"="Nume casier / administrator?";
+"u2a-8R-TMO.title"="Sumă cotă implicită?";
+"lLV-YL-TwZ.title"="Nume locatari";
+"wMi-vY-UeN.title"="Număr apartament?";
+"6Z4-Vo-4ca.title"="Nume proprietar?";
+"Nzm-M8-e6n.title"="Salvează Tot";
+"0Ys-6W-uS3.title"="Tip";
+"Ivx-12-OhM.title"="Încasare";
+"chy-UL-fIn.title"="Plată";
+"2c2-fr-xSb.title"="Număr Apartament ACTIVAT";
+"wwm-jb-00B.title"="Preferințe";
+"PsQ-Gr-ol5.title"="Adaugă";
+"hr6-xo-dd5.title"="Semnătură (opțional)";
+"TLT-gK-rDX.title"="Șterge";
+"DdK-Nl-cHZ.title"="Importă";
+"TZ0-b9-ept.title"="Resetează";
+
+// Receipt Area
+"p78-b8-iO5.title" = "Chitanță Asociație de Proprietari";
+"GwO-Ca-QIE.title"="Număr Apartament:";
+"L06-1k-law.title"="Lună - An:";
+"3KZ-tY-wFg.title"="Data Emiterii:";
+"eGY-W7-GTJ.title"="Număr Chitanță:";
+"Em8-wX-gH0.title"="Sumă: ";
+"nXt-6V-YcU.title"="Emis de:";
+"pS3-aq-brw.title"="Mențiuni:";
+"42J-eD-UcN.title"="Anulează";
+"K7i-VG-DKe.title"="Salvează";
+"52B-ls-IgM.title"="Contor ordine";
+
+"Zqb-4B-rdJ.label"="Apartament";
+"omw-Mg-ghP.label"="Locatar";
+"wVe-6h-UrH.label"="Altele";
