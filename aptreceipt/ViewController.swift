@@ -52,6 +52,116 @@ enum AppTheme: String, CaseIterable, Identifiable {
     }
 }
 
+enum AppCurrency: String, CaseIterable, Identifiable, Codable {
+    case turkishLira = "TRY"
+    case romanianLeu = "RON"
+    case usDollar = "USD"
+    case euro = "EUR"
+    case britishPound = "GBP"
+
+    var id: String { rawValue }
+
+    var code: String { rawValue }
+
+    var symbol: String {
+        switch self {
+        case .turkishLira: return "₺"
+        case .romanianLeu: return "Lei"
+        case .usDollar: return "$"
+        case .euro: return "€"
+        case .britishPound: return "£"
+        }
+    }
+
+    func title(l10n: L10n) -> String {
+        switch self {
+        case .turkishLira:
+            return "\(l10n.currencyTRY) (\(symbol))"
+        case .romanianLeu:
+            return "\(l10n.currencyRON) (\(symbol))"
+        case .usDollar:
+            return "\(l10n.currencyUSD) (\(symbol))"
+        case .euro:
+            return "\(l10n.currencyEUR) (\(symbol))"
+        case .britishPound:
+            return "\(l10n.currencyGBP) (\(symbol))"
+        }
+    }
+
+    static func `default`(for language: AppLanguage) -> AppCurrency {
+        switch language {
+        case .turkish:
+            return .turkishLira
+        case .romanian:
+            return .romanianLeu
+        case .english, .system:
+            return .usDollar
+        }
+    }
+}
+
+// MARK: - Language Default Sample Data
+
+struct SampleData {
+    let apartmentName: String
+    let issuer: String
+    let defaultPayment: String
+    let flatCount: Int
+    let currency: AppCurrency
+    let residents: [Int: String]
+    let sampleNotes: String
+
+    static func defaults(for language: AppLanguage) -> SampleData {
+        switch language {
+        case .turkish:
+            return SampleData(
+                apartmentName: "Güleryüz Apartmanı",
+                issuer: "Ahmet Yılmaz",
+                defaultPayment: "1750",
+                flatCount: 12,
+                currency: .turkishLira,
+                residents: [
+                    1: "Mehmet Kaya",
+                    2: "Ayşe Demir",
+                    3: "Mustafa Çelik",
+                    4: "Fatma Şahin"
+                ],
+                sampleNotes: "2026 Ekim ayı aidatı ve asansör periyodik bakım gider payı"
+            )
+        case .romanian:
+            return SampleData(
+                apartmentName: "Asociația Parcul Tineretului",
+                issuer: "Andrei Popescu",
+                defaultPayment: "1750",
+                flatCount: 12,
+                currency: .romanianLeu,
+                residents: [
+                    1: "Elena Radu",
+                    2: "Ion Ionescu",
+                    3: "Maria Dumitrescu",
+                    4: "Mihai Stan"
+                ],
+                sampleNotes: "Cotă întreținere octombrie 2026 și fond reparații ascensor"
+            )
+        case .english, .system:
+            return SampleData(
+                apartmentName: "Sunshine Residence",
+                issuer: "John Doe",
+                defaultPayment: "1750",
+                flatCount: 12,
+                currency: .usDollar,
+                residents: [
+                    1: "Jane Smith",
+                    2: "Robert Johnson",
+                    3: "Emily Davis",
+                    4: "Michael Brown"
+                ],
+                sampleNotes: "October 2026 monthly dues and elevator maintenance fee"
+            )
+        }
+    }
+}
+
 // MARK: - 1-to-1 Localization Store (L10n)
 
 struct L10n {
@@ -127,7 +237,7 @@ struct L10n {
 
     // Financial & Notes
     var financialDetails: String { tr("Financial Details & Description", "Mali Detaylar ve Açıklama", "Detalii Financiare & Descriere") }
-    var amount: String { tr("Amount (₺)", "Tutar (₺)", "Sumă (₺)") }
+    var amount: String { tr("Amount", "Tutar", "Sumă") }
     var sequenceNo: String { tr("Sequence No", "Sıra No", "Nr. Chitanță") }
     var notesLabel: String { tr("Description / Notes", "Açıklama / Notlar", "Descriere / Mențiuni") }
     var notesPlaceholder: String { tr("e.g. October 2026 monthly dues and maintenance fee", "Örn: 2026 Ekim ayı aidatı ve ortak alan gideri", "Ex: Cotă întreținere octombrie 2026 și fond reparații") }
@@ -207,8 +317,27 @@ struct L10n {
     var defaultManager: String { tr("Default Manager (Collector):", "Varsayılan Yönetici (Tahsil Eden):", "Administrator Implicit (Casier):") }
     var totalFlats: String { tr("Total Number of Flats:", "Toplam Daire Sayısı:", "Număr Total Apartamente:") }
     var financialSettings: String { tr("Financial & Receipt Defaults", "Mali & Makbuz Değerleri", "Setări Financiare & Valori Implicite") }
-    var defaultDues: String { tr("Default Dues Amount (₺):", "Varsayılan Aidat Tutarı (₺):", "Sumă Cotă Implicită (₺):") }
+    var defaultDues: String { tr("Default Dues Amount:", "Varsayılan Aidat Tutarı:", "Sumă Cotă Implicită:") }
     var nextReceiptNo: String { tr("Next Receipt No:", "Sıradaki Makbuz No:", "Număr Următor Chitanță:") }
+
+    // Currency Strings
+    var currencySection: String { tr("Currency & Formatting", "Para Birimi ve Biçimlendirme", "Monedă & Formatare") }
+    var currencySelection: String { tr("Default Currency:", "Varsayılan Para Birimi:", "Monedă Implicită:") }
+    var currencyTRY: String { tr("Turkish Lira", "Türk Lirası", "Liră Turcească") }
+    var currencyRON: String { tr("Romanian Leu", "Rumen Leyi", "Leu Românesc") }
+    var currencyUSD: String { tr("US Dollar", "Amerikan Doları", "Dolar SUA") }
+    var currencyEUR: String { tr("Euro", "Euro", "Euro") }
+    var currencyGBP: String { tr("British Pound", "İngiliz Sterlini", "Liră Sterlină") }
+
+    // Language Restart Warning Strings
+    var restartWarningTitle: String { tr("Application Restart Recommended", "Uygulamanın Yeniden Başlatılması Önerilir", "Repornirea Aplicației Recomandată") }
+    var restartMenuBarNotice: String { tr("Menu bar items cannot be updated dynamically without restarting the application. Please restart the app for language changes to take full effect.", "Menü çubuğu (Menu Bar) başlıklarının seçilen dile tam olarak çevrilebilmesi için uygulamanın yeniden başlatılması gerekmektedir.", "Elementele din bara de meniu nu se pot actualiza dinamic fără repornirea aplicației. Vă rugăm să reporniți aplicația pentru aplicarea completă a limbii.") }
+
+    // Sample Defaults Strings
+    var sampleDefaultsSection: String { tr("Sample Defaults", "Örnek Değerler", "Valori Exemplu") }
+    var sampleDefaultsDesc: String { tr("Quickly populate building, manager, and resident data with realistic samples for the selected language.", "Seçilen dile uygun gerçekçi apartman, yönetici ve sakin örnek verilerini forma yükleyin.", "Completați rapid datele imobilului, administratorului și locatarilor cu valori exemplu.") }
+    var loadSampleDefaultsButton: String { tr("Load Sample Defaults", "Varsayılan Örnek Değerleri Yükle", "Încarcă Valori Exemplu") }
+    var sampleDefaultsLoadedFeedback: String { tr("Sample defaults loaded successfully.", "Örnek değerler başarıyla yüklendi.", "Valorile exemplu au fost încărcate cu succes.") }
 
     // Appearance & Language Tab
     var appearanceSection: String { tr("Appearance and Theme", "Görünüm ve Tema", "Aspect și Temă") }
@@ -325,6 +454,7 @@ struct MainScreen: View {
                             sequenceNumber: viewModel.sequenceNumber,
                             notes: viewModel.notes,
                             signatureImage: settings.signatureImage,
+                            currency: settings.currency,
                             l10n: l10n
                         )
                         .padding(20)
@@ -562,11 +692,11 @@ struct MainScreen: View {
 
             HStack(spacing: 14) {
                 VStack(alignment: .leading, spacing: 6) {
-                    Text(l10n.amount)
+                    Text("\(l10n.amount) (\(settings.currency.symbol))")
                         .font(.caption)
                         .foregroundColor(.secondary)
                     HStack {
-                        Text("₺")
+                        Text(settings.currency.symbol)
                             .font(.system(size: 14, weight: .bold))
                             .foregroundColor(.secondary)
                         TextField("0.00", text: $viewModel.totalAmount)
@@ -656,6 +786,7 @@ struct LiveReceiptPreview: View {
     let sequenceNumber: String
     let notes: String
     let signatureImage: NSImage?
+    let currency: AppCurrency
     let l10n: L10n
 
     private var formattedAmount: String {
@@ -664,9 +795,11 @@ struct LiveReceiptPreview: View {
             let formatter = NumberFormatter()
             formatter.numberStyle = .currency
             formatter.locale = l10n.locale
-            return formatter.string(from: NSNumber(value: val)) ?? "₺\(amountString)"
+            formatter.currencySymbol = currency.symbol
+            formatter.currencyCode = currency.code
+            return formatter.string(from: NSNumber(value: val)) ?? "\(currency.symbol) \(amountString)"
         }
-        return "₺ 0,00"
+        return "\(currency.symbol) 0,00"
     }
 
     var body: some View {
@@ -850,7 +983,8 @@ final class MainScreenViewModel: ObservableObject {
             sequenceNumber: sequence,
             createdDate: Date().dayMonthYearString(locale: settings.currentLocale),
             showApartmentNumber: printApartmentNumber,
-            kind: receiptKind
+            kind: receiptKind,
+            currency: settings.currency
         )
 
         settings.seqNumber = sequence + 1
@@ -909,6 +1043,7 @@ struct ReceiptDraft: Identifiable {
     let createdDate: String
     let showApartmentNumber: Bool
     let kind: ReceiptKind
+    var currency: AppCurrency = .turkishLira
 }
 
 // MARK: - Store
@@ -939,6 +1074,9 @@ final class ReceiptSettingsStore: ObservableObject {
             applyTheme(theme)
         }
     }
+    @Published var currency: AppCurrency {
+        didSet { defaults.set(currency.rawValue, forKey: Keys.currency) }
+    }
     @Published var signatureData: Data? {
         didSet {
             if let signatureData {
@@ -961,14 +1099,33 @@ final class ReceiptSettingsStore: ObservableObject {
     private let defaults = UserDefaults.standard
 
     init() {
-        apartmentName = defaults.string(forKey: Keys.apartmentName) ?? ""
-        issuer = defaults.string(forKey: Keys.issuer) ?? ""
-        defaultPayment = defaults.string(forKey: Keys.defaultPayment) ?? ""
-        flatCount = max(1, ReceiptSettingsStore.readInt(defaults, key: Keys.flatCount, fallback: 1))
-        seqNumber = max(1, ReceiptSettingsStore.readInt(defaults, key: Keys.seqNumber, fallback: 1))
-
         let savedLang = defaults.string(forKey: Keys.language) ?? AppLanguage.system.rawValue
-        language = AppLanguage(rawValue: savedLang) ?? .system
+        let resolvedLang = AppLanguage(rawValue: savedLang) ?? .system
+        language = resolvedLang
+
+        let savedCurrency = defaults.string(forKey: Keys.currency)
+        let resolvedCurrency = savedCurrency.flatMap(AppCurrency.init(rawValue:)) ?? AppCurrency.default(for: resolvedLang)
+        currency = resolvedCurrency
+
+        let isConfigured = defaults.object(forKey: Keys.apartmentName) != nil
+        if !isConfigured {
+            let samples = SampleData.defaults(for: resolvedLang)
+            apartmentName = samples.apartmentName
+            issuer = samples.issuer
+            defaultPayment = samples.defaultPayment
+            flatCount = samples.flatCount
+            currency = samples.currency
+            seqNumber = 1
+            for (apt, name) in samples.residents {
+                defaults.set(name, forKey: Keys.owner(apt))
+            }
+        } else {
+            apartmentName = defaults.string(forKey: Keys.apartmentName) ?? ""
+            issuer = defaults.string(forKey: Keys.issuer) ?? ""
+            defaultPayment = defaults.string(forKey: Keys.defaultPayment) ?? ""
+            flatCount = max(1, ReceiptSettingsStore.readInt(defaults, key: Keys.flatCount, fallback: 1))
+            seqNumber = max(1, ReceiptSettingsStore.readInt(defaults, key: Keys.seqNumber, fallback: 1))
+        }
 
         let savedTheme = defaults.string(forKey: Keys.theme) ?? AppTheme.system.rawValue
         let resolvedTheme = AppTheme(rawValue: savedTheme) ?? .system
@@ -976,6 +1133,19 @@ final class ReceiptSettingsStore: ObservableObject {
         applyTheme(resolvedTheme)
 
         signatureData = defaults.data(forKey: Keys.signature)
+    }
+
+    func loadSampleDefaults(for targetLang: AppLanguage? = nil) {
+        let lang = targetLang ?? language
+        let samples = SampleData.defaults(for: lang)
+        apartmentName = samples.apartmentName
+        issuer = samples.issuer
+        defaultPayment = samples.defaultPayment
+        flatCount = samples.flatCount
+        currency = samples.currency
+        for (apt, name) in samples.residents {
+            saveOwner(name, apartmentNumber: apt)
+        }
     }
 
     func applyTheme(_ targetTheme: AppTheme) {
@@ -1047,6 +1217,7 @@ final class ReceiptSettingsStore: ObservableObject {
         static let signature = "usersign"
         static let language = "app_language"
         static let theme = "app_theme"
+        static let currency = "app_currency"
 
         static func owner(_ number: Int) -> String {
             "homeowner_\(number)"

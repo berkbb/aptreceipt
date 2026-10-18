@@ -173,6 +173,13 @@ struct SettingsView: View {
                 dismissButton: .default(Text(l10n.okButton))
             )
         }
+        .alert(isPresented: $viewModel.showRestartAlert) {
+            Alert(
+                title: Text(l10n.restartWarningTitle),
+                message: Text(l10n.restartMenuBarNotice),
+                dismissButton: .default(Text(l10n.okButton))
+            )
+        }
     }
 
     // MARK: - Tab 1: General Settings
@@ -199,8 +206,58 @@ struct SettingsView: View {
                     .font(.system(size: 13, weight: .bold))
                     .foregroundColor(.secondary)
 
-                settingsField(title: l10n.defaultDues, text: $viewModel.defaultPayment, placeholder: "Örn: 1500")
-                settingsField(title: l10n.nextReceiptNo, text: $viewModel.sequenceNumber, placeholder: "Örn: 1")
+                settingsField(title: "\(l10n.defaultDues) (\(viewModel.currency.symbol))", text: $viewModel.defaultPayment, placeholder: "1750")
+                settingsField(title: l10n.nextReceiptNo, text: $viewModel.sequenceNumber, placeholder: "1")
+
+                HStack {
+                    Text(l10n.currencySelection)
+                        .font(.system(size: 12))
+                        .foregroundColor(.secondary)
+                        .frame(width: 200, alignment: .leading)
+
+                    Picker("", selection: $viewModel.currency) {
+                        ForEach(AppCurrency.allCases) { curr in
+                            Text(curr.title(l10n: l10n)).tag(curr)
+                        }
+                    }
+                    .labelsHidden()
+                    .onChange(of: viewModel.currency) { newCurr in
+                        settings.currency = newCurr
+                    }
+                }
+            }
+            .padding(14)
+            .background(Color(NSColor.controlBackgroundColor))
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+
+            // Group 3: Örnek Değerler / Sample Defaults
+            VStack(alignment: .leading, spacing: 10) {
+                Label(l10n.sampleDefaultsSection, systemImage: "sparkles")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(.secondary)
+
+                Text(l10n.sampleDefaultsDesc)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+
+                HStack(spacing: 12) {
+                    Button {
+                        viewModel.loadSampleDefaults(for: viewModel.language)
+                    } label: {
+                        Label(l10n.loadSampleDefaultsButton, systemImage: "arrow.counterclockwise.circle.fill")
+                    }
+                    .buttonStyle(.borderedProminent)
+
+                    if viewModel.showSampleDefaultsFeedback {
+                        HStack(spacing: 4) {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundColor(.green)
+                            Text(l10n.sampleDefaultsLoadedFeedback)
+                                .font(.caption)
+                                .foregroundColor(.green)
+                        }
+                    }
+                }
             }
             .padding(14)
             .background(Color(NSColor.controlBackgroundColor))
@@ -306,6 +363,48 @@ struct SettingsView: View {
                     .labelsHidden()
                     .onChange(of: viewModel.language) { newLang in
                         settings.language = newLang
+                        viewModel.showRestartAlert = true
+                    }
+                }
+
+                // Restart warning notice
+                HStack(alignment: .top, spacing: 8) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundColor(.orange)
+                        .font(.system(size: 13))
+                    Text(l10n.restartMenuBarNotice)
+                        .font(.system(size: 11))
+                        .foregroundColor(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(10)
+                .background(Color.orange.opacity(0.08))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+            }
+            .padding(14)
+            .background(Color(NSColor.controlBackgroundColor))
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+
+            // Currency selection
+            VStack(alignment: .leading, spacing: 10) {
+                Label(l10n.currencySection, systemImage: "coloncurrencysign.circle.fill")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(.secondary)
+
+                HStack {
+                    Text(l10n.currencySelection)
+                        .font(.system(size: 12))
+                        .foregroundColor(.secondary)
+                        .frame(width: 200, alignment: .leading)
+
+                    Picker("", selection: $viewModel.currency) {
+                        ForEach(AppCurrency.allCases) { curr in
+                            Text(curr.title(l10n: l10n)).tag(curr)
+                        }
+                    }
+                    .labelsHidden()
+                    .onChange(of: viewModel.currency) { newCurrency in
+                        settings.currency = newCurrency
                     }
                 }
             }
@@ -482,6 +581,9 @@ final class SettingsViewModel: ObservableObject {
     @Published var sequenceNumber: String = "1"
     @Published var language: AppLanguage = .system
     @Published var theme: AppTheme = .system
+    @Published var currency: AppCurrency = .turkishLira
+    @Published var showRestartAlert: Bool = false
+    @Published var showSampleDefaultsFeedback: Bool = false
 
     @Published var selectedApartment: Int = 1
     @Published var selectedOwner: String = ""
@@ -504,9 +606,24 @@ final class SettingsViewModel: ObservableObject {
         sequenceNumber = String(settings.seqNumber)
         language = settings.language
         theme = settings.theme
+        currency = settings.currency
         selectedApartment = settings.apartmentNumbers.first ?? 1
         selectedOwner = settings.owner(for: selectedApartment)
         showOwnerSavedFeedback = false
+    }
+
+    func loadSampleDefaults(for targetLang: AppLanguage) {
+        let samples = SampleData.defaults(for: targetLang)
+        apartmentName = samples.apartmentName
+        issuer = samples.issuer
+        defaultPayment = samples.defaultPayment
+        flatCount = String(samples.flatCount)
+        currency = samples.currency
+        selectedOwner = samples.residents[selectedApartment] ?? (samples.residents[1] ?? "")
+        showSampleDefaultsFeedback = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            self.showSampleDefaultsFeedback = false
+        }
     }
 
     func save(to settings: ReceiptSettingsStore) -> Bool {
@@ -539,6 +656,7 @@ final class SettingsViewModel: ObservableObject {
         settings.seqNumber = sequence
         settings.language = language
         settings.theme = theme
+        settings.currency = currency
 
         if !selectedOwner.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             settings.saveOwner(selectedOwner.localizedCapitalized, apartmentNumber: selectedApartment)

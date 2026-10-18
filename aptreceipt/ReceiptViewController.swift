@@ -15,30 +15,89 @@ struct NumberToWords {
     ]
     private static let englishTens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"]
 
-    static func convert(_ amount: Double, language: AppLanguage) -> String {
+    static func convert(_ amount: Double, language: AppLanguage, currency: AppCurrency = .turkishLira) -> String {
         let rounded = (amount * 100.0).rounded() / 100.0
         let integerPart = Int(floor(rounded))
-        let kurusPart = Int(((rounded - Double(integerPart)) * 100.0).rounded())
+        let fractionalPart = Int(((rounded - Double(integerPart)) * 100.0).rounded())
 
         switch language {
         case .turkish:
+            let mainUnit: String
+            let fracUnit: String
+            switch currency {
+            case .turkishLira:
+                mainUnit = "Türk Lirası"
+                fracUnit = "Kuruş"
+            case .romanianLeu:
+                mainUnit = "Rumen Leyi"
+                fracUnit = "Bani"
+            case .usDollar:
+                mainUnit = "Amerikan Doları"
+                fracUnit = "Sent"
+            case .euro:
+                mainUnit = "Euro"
+                fracUnit = "Sent"
+            case .britishPound:
+                mainUnit = "İngiliz Sterlini"
+                fracUnit = "Peni"
+            }
             let lirasText = integerToTurkishWords(integerPart)
-            let kurusText = integerToTurkishWords(kurusPart)
-            let lirasString = lirasText.isEmpty ? "Sıfır Türk Lirası" : "\(lirasText) Türk Lirası"
-            let kurusString = kurusText.isEmpty ? "Sıfır Kuruş" : "\(kurusText) Kuruş"
+            let kurusText = integerToTurkishWords(fractionalPart)
+            let lirasString = lirasText.isEmpty ? "Sıfır \(mainUnit)" : "\(lirasText) \(mainUnit)"
+            let kurusString = kurusText.isEmpty ? "Sıfır \(fracUnit)" : "\(kurusText) \(fracUnit)"
             return "\(lirasString) \(kurusString)"
+
         case .romanian:
+            let mainUnit: String
+            let fracUnit: String
+            switch currency {
+            case .turkishLira:
+                mainUnit = integerPart == 1 ? "Liră Turcească" : "Lire Turcești"
+                fracUnit = fractionalPart == 1 ? "Kuruș" : "Kuruși"
+            case .romanianLeu:
+                mainUnit = integerPart == 1 ? "Leu" : "Lei"
+                fracUnit = fractionalPart == 1 ? "Ban" : "Bani"
+            case .usDollar:
+                mainUnit = integerPart == 1 ? "Dolar SUA" : "Dolari SUA"
+                fracUnit = fractionalPart == 1 ? "Cent" : "Cenți"
+            case .euro:
+                mainUnit = "Euro"
+                fracUnit = fractionalPart == 1 ? "Cent" : "Cenți"
+            case .britishPound:
+                mainUnit = integerPart == 1 ? "Liră Sterlină" : "Lire Sterline"
+                fracUnit = fractionalPart == 1 ? "Pence" : "Pence"
+            }
             let leiText = integerToRomanianWords(integerPart)
-            let baniText = integerToRomanianWords(kurusPart)
-            let leiString = leiText.isEmpty ? "Zero Lei" : "\(leiText) Lei"
-            let baniString = baniText.isEmpty ? "Zero Bani" : "\(baniText) Bani"
+            let baniText = integerToRomanianWords(fractionalPart)
+            let leiString = leiText.isEmpty ? "Zero \(mainUnit)" : "\(leiText) \(mainUnit)"
+            let baniString = baniText.isEmpty ? "Zero \(fracUnit)" : "\(baniText) \(fracUnit)"
             return "\(leiString) și \(baniString)"
+
         default:
-            let lirasText = integerToEnglishWords(integerPart)
-            let centsText = integerToEnglishWords(kurusPart)
-            let lirasString = lirasText.isEmpty ? "Zero Turkish Liras" : "\(lirasText) Turkish Liras"
-            let centsString = centsText.isEmpty ? "Zero Cents" : "\(centsText) Cents"
-            return "\(lirasString) and \(centsString)"
+            let mainUnit: String
+            let fracUnit: String
+            switch currency {
+            case .turkishLira:
+                mainUnit = integerPart == 1 ? "Turkish Lira" : "Turkish Liras"
+                fracUnit = fractionalPart == 1 ? "Kurus" : "Kurus"
+            case .romanianLeu:
+                mainUnit = integerPart == 1 ? "Romanian Leu" : "Romanian Lei"
+                fracUnit = fractionalPart == 1 ? "Ban" : "Bani"
+            case .usDollar:
+                mainUnit = integerPart == 1 ? "US Dollar" : "US Dollars"
+                fracUnit = fractionalPart == 1 ? "Cent" : "Cents"
+            case .euro:
+                mainUnit = "Euro"
+                fracUnit = fractionalPart == 1 ? "Cent" : "Cents"
+            case .britishPound:
+                mainUnit = integerPart == 1 ? "British Pound" : "British Pounds"
+                fracUnit = fractionalPart == 1 ? "Penny" : "Pence"
+            }
+            let mainText = integerToEnglishWords(integerPart)
+            let fracText = integerToEnglishWords(fractionalPart)
+            let mainString = mainText.isEmpty ? "Zero \(mainUnit)" : "\(mainText) \(mainUnit)"
+            let fracString = fracText.isEmpty ? "Zero \(fracUnit)" : "\(fracText) \(fracUnit)"
+            return "\(mainString) and \(fracString)"
         }
     }
 
@@ -465,7 +524,9 @@ struct ReceiptDocumentView: View {
         let formatter = NumberFormatter()
         formatter.numberStyle = .currency
         formatter.locale = l10n.locale
-        return formatter.string(from: NSNumber(value: draft.amount)) ?? "₺\(draft.amount)"
+        formatter.currencySymbol = draft.currency.symbol
+        formatter.currencyCode = draft.currency.code
+        return formatter.string(from: NSNumber(value: draft.amount)) ?? "\(draft.currency.symbol) \(draft.amount)"
     }
 
     private var mainTitle: String {
@@ -490,7 +551,7 @@ struct ReceiptDocumentView: View {
     }
 
     private var amountInWords: String {
-        NumberToWords.convert(draft.amount, language: l10n.resolvedLanguage)
+        NumberToWords.convert(draft.amount, language: l10n.resolvedLanguage, currency: draft.currency)
     }
 
     private var itemDescriptionText: String {
