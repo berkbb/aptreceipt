@@ -5,8 +5,9 @@ import SwiftUI
 
 enum AppLanguage: String, CaseIterable, Identifiable {
     case system = "system"
-    case turkish = "tr"
     case english = "en"
+    case turkish = "tr"
+    case romanian = "ro"
 
     var id: String { rawValue }
 
@@ -14,10 +15,12 @@ enum AppLanguage: String, CaseIterable, Identifiable {
         switch self {
         case .system:
             return l10n.langSystem
-        case .turkish:
-            return "Türkçe"
         case .english:
             return "English"
+        case .turkish:
+            return "Türkçe"
+        case .romanian:
+            return "Română"
         }
     }
 }
@@ -58,138 +61,202 @@ struct L10n {
         self.language = language
     }
 
-    var isTurkish: Bool {
-        if language == .system {
-            let preferred = Locale.preferredLanguages.first?.prefix(2) ?? "tr"
-            return preferred == "tr"
+    var resolvedLanguage: AppLanguage {
+        if language != .system {
+            return language
         }
-        return language == .turkish
+        // Locale dependent, defaults to English
+        let preferred = Locale.preferredLanguages.first?.prefix(2).lowercased() ?? ""
+        if preferred == "tr" {
+            return .turkish
+        } else if preferred == "ro" {
+            return .romanian
+        } else {
+            return .english
+        }
     }
 
+    var isTurkish: Bool { resolvedLanguage == .turkish }
+    var isRomanian: Bool { resolvedLanguage == .romanian }
+    var isEnglish: Bool { resolvedLanguage == .english }
+
     var locale: Locale {
-        isTurkish ? Locale(identifier: "tr_TR") : Locale(identifier: "en_US")
+        switch resolvedLanguage {
+        case .turkish: return Locale(identifier: "tr_TR")
+        case .romanian: return Locale(identifier: "ro_RO")
+        default: return Locale(identifier: "en_US")
+        }
+    }
+
+    private func tr(_ en: String, _ tr: String, _ ro: String) -> String {
+        switch resolvedLanguage {
+        case .turkish: return tr
+        case .romanian: return ro
+        default: return en
+        }
     }
 
     // App Header & Base
-    var appTitle: String { isTurkish ? "Apartman Makbuzu" : "Apartment Receipt" }
-    var appSubtitle: String { isTurkish ? "Gelir ve gider makbuzlarınızı kolayca yönetin ve dışa aktarın" : "Easily manage and export apartment income and expense receipts" }
-    var preferences: String { isTurkish ? "Tercihler" : "Preferences" }
-    var settingsTitle: String { isTurkish ? "Tercihler & Ayarlar" : "Preferences & Settings" }
-    var settingsSubtitle: String { isTurkish ? "Apartman bilgileri, dil, tema ve imzanızı düzenleyin" : "Configure building details, language, theme, and signature" }
+    var appTitle: String { tr("Apartment Receipt", "Apartman Makbuzu", "Chitanță Asociație") }
+    var appSubtitle: String { tr("Easily manage and export apartment income and expense receipts", "Gelir ve gider makbuzlarınızı kolayca yönetin ve dışa aktarın", "Gestionați și exportați cu ușurință chitanțele de încasări și plăți") }
+    var preferences: String { tr("Preferences", "Tercihler", "Preferințe") }
+    var settingsTitle: String { tr("Preferences & Settings", "Tercihler & Ayarlar", "Preferințe & Setări") }
+    var settingsSubtitle: String { tr("Configure building details, language, theme, and signature", "Apartman bilgileri, dil, tema ve imzanızı düzenleyin", "Configurați datele imobilului, limba, tema și semnătura") }
 
     // Receipt Type
-    var receiptType: String { isTurkish ? "Makbuz Türü" : "Receipt Type" }
-    var incomeTitle: String { isTurkish ? "Gelir (Tahsilat)" : "Income (Collection)" }
-    var outcomeTitle: String { isTurkish ? "Gider (Tediye)" : "Expense (Payment)" }
-    var incomeBadge: String { isTurkish ? "TAHSİLAT MAKBUZU" : "INCOME RECEIPT" }
-    var outcomeBadge: String { isTurkish ? "GİDER / TEDİYE MAKBUZU" : "EXPENSE RECEIPT" }
+    var receiptType: String { tr("Receipt Type", "Makbuz Türü", "Tip Chitanță") }
+    var incomeTitle: String { tr("Income (Collection)", "Gelir (Tahsilat)", "Încasare (Întreținere)") }
+    var outcomeTitle: String { tr("Expense (Disbursement)", "Gider (Tediye)", "Plată (Cheltuială)") }
+    var incomeBadge: String { tr("INCOME RECEIPT", "TAHSİLAT MAKBUZU", "CHITANȚĂ DE ÎNCASARE") }
+    var outcomeBadge: String { tr("EXPENSE RECEIPT", "GİDER / TEDİYE MAKBUZU", "DISPOZIȚIE DE PLATĂ") }
 
     // Flat & Period
-    var flatAndPeriod: String { isTurkish ? "Daire ve Dönem" : "Apartment & Period" }
-    var flatNumber: String { isTurkish ? "Daire Numarası" : "Apartment Number" }
-    var flatPrefix: String { isTurkish ? "Daire" : "Flat" }
-    var period: String { isTurkish ? "Dönem" : "Period" }
-    var printFlatNumber: String { isTurkish ? "Daire numarasını makbuz üzerine yazdır" : "Print apartment number on receipt" }
+    var flatAndPeriod: String { tr("Apartment & Period", "Daire ve Dönem", "Apartament & Perioadă") }
+    var flatNumber: String { tr("Apartment Number", "Daire Numarası", "Număr Apartament") }
+    var flatPrefix: String { tr("Flat", "Daire", "Ap.") }
+    var period: String { tr("Period", "Dönem", "Perioadă") }
+    var printFlatNumber: String { tr("Print apartment number on receipt", "Daire numarasını makbuz üzerine yazdır", "Includeți numărul apartamentului pe chitanță") }
 
     // Parties
-    var parties: String { isTurkish ? "Taraflar" : "Parties" }
-    var issuerLabel: String { isTurkish ? "Tahsil Eden (Yönetici / Yetkili)" : "Collector (Manager / Authorized)" }
-    var issuerPlaceholder: String { isTurkish ? "Örn: Ahmet Yılmaz" : "e.g. John Doe" }
-    var receiverLabel: String { isTurkish ? "Ödeyen (Daire Sakini / Muhatap)" : "Payer (Resident / Recipient)" }
-    var receiverPlaceholder: String { isTurkish ? "Örn: Mehmet Demir" : "e.g. Jane Smith" }
-    var fetchSavedResident: String { isTurkish ? "Kayıtlı Sakini Getir" : "Load Saved Resident" }
+    var parties: String { tr("Parties", "Taraflar", "Părți Implicate") }
+    var issuerLabel: String { tr("Collector (Manager / Authorized):", "Tahsil Eden (Yönetici / Yetkili):", "Casier / Administrator:") }
+    var issuerPlaceholder: String { tr("e.g. John Doe", "Örn: Ahmet Yılmaz", "Ex: Ion Popescu") }
+    var receiverLabel: String { tr("Payer (Resident / Recipient):", "Ödeyen (Daire Sakini / Muhatap):", "Plătitor (Locatar / Proprietar):") }
+    var receiverPlaceholder: String { tr("e.g. Jane Smith", "Örn: Mehmet Demir", "Ex: Maria Ionescu") }
+    var fetchSavedResident: String { tr("Load Saved Resident", "Kayıtlı Sakini Getir", "Selectează Locatar Înregistrat") }
 
     // Financial & Notes
-    var financialDetails: String { isTurkish ? "Mali Detaylar ve Açıklama" : "Financial Details & Description" }
-    var amount: String { isTurkish ? "Tutar (₺)" : "Amount (₺)" }
-    var sequenceNo: String { isTurkish ? "Sıra No" : "Sequence No" }
-    var notesLabel: String { isTurkish ? "Açıklama / Notlar" : "Description / Notes" }
-    var notesPlaceholder: String { isTurkish ? "Örn: 2026 Ekim ayı aidatı ve ortak alan gideri" : "e.g. October 2026 monthly dues and maintenance fee" }
+    var financialDetails: String { tr("Financial Details & Description", "Mali Detaylar ve Açıklama", "Detalii Financiare & Descriere") }
+    var amount: String { tr("Amount (₺)", "Tutar (₺)", "Sumă (₺)") }
+    var sequenceNo: String { tr("Sequence No", "Sıra No", "Nr. Chitanță") }
+    var notesLabel: String { tr("Description / Notes", "Açıklama / Notlar", "Descriere / Mențiuni") }
+    var notesPlaceholder: String { tr("e.g. October 2026 monthly dues and maintenance fee", "Örn: 2026 Ekim ayı aidatı ve ortak alan gideri", "Ex: Cotă întreținere octombrie 2026 și fond reparații") }
 
     // Actions
-    var clearForm: String { isTurkish ? "Formu Temizle" : "Clear Form" }
-    var createReceipt: String { isTurkish ? "Makbuz Oluştur & Önizle" : "Create & Preview Receipt" }
+    var clearForm: String { tr("Clear Form", "Formu Temizle", "Resetează Formularul") }
+    var createReceipt: String { tr("Create & Preview Receipt", "Makbuz Oluştur & Önizle", "Generează & Previzualizează") }
 
     // Live Preview & Document
-    var livePreview: String { isTurkish ? "Canlı Önizleme" : "Live Preview" }
-    var printViewBadge: String { isTurkish ? "Baskı Görünümü" : "Print View" }
-    var totalPaid: String { isTurkish ? "Ödenen Tutar:" : "Total Paid:" }
-    var totalCollected: String { isTurkish ? "Tahsil Edilen Tutar:" : "Collected Amount:" }
-    var descriptionHeader: String { isTurkish ? "Açıklama:" : "Description:" }
-    var receiptNo: String { isTurkish ? "Makbuz No:" : "Receipt No:" }
-    var issueDate: String { isTurkish ? "Düzenleme Tarihi:" : "Issue Date:" }
-    var dateLabel: String { isTurkish ? "Tarih" : "Date" }
-    var authorizedSignature: String { isTurkish ? "Yetkili İmzası" : "Authorized Signature" }
-    var electronicDisclaimer: String { isTurkish ? "Bu belge apartman yönetimi kayıtları uyarınca elektronik ortamda tanzim edilmiştir." : "This document has been issued electronically pursuant to building management records." }
-    var defaultBuildingName: String { isTurkish ? "APARTMAN YÖNETİMİ" : "BUILDING MANAGEMENT" }
+    var livePreview: String { tr("Live Preview", "Canlı Önizleme", "Previzualizare în Timp Real") }
+    var printViewBadge: String { tr("Print View", "Baskı Görünümü", "Format Tipărire") }
+    var totalPaid: String { tr("Total Paid:", "Ödenen Tutar:", "Sumă Plătită:") }
+    var totalCollected: String { tr("Collected Amount:", "Tahsil Edilen Tutar:", "Sumă Încasată:") }
+    var descriptionHeader: String { tr("Description:", "Açıklama:", "Descriere:") }
+    var receiptNo: String { tr("Receipt No:", "Makbuz No:", "Chitanță Nr.:") }
+    var issueDate: String { tr("Issue Date:", "Düzenleme Tarihi:", "Data Emiterii:") }
+    var dateLabel: String { tr("Date", "Tarih", "Dată") }
+    var authorizedSignature: String { tr("Authorized Signature", "Yetkili İmzası", "Semnătura Autorizată") }
+    var electronicDisclaimer: String { tr("This document has been issued electronically pursuant to building management records.", "Bu belge apartman yönetimi kayıtları uyarınca elektronik ortamda tanzim edilmiştir.", "Acest document a fost emis electronic conform evidențelor asociației de proprietari.") }
+    var defaultBuildingName: String { tr("BUILDING MANAGEMENT", "APARTMAN YÖNETİMİ", "ASOCIAȚIA DE PROPRIETARI") }
 
     // Sheet Actions
-    var previewTitle: String { isTurkish ? "Makbuz Önizleme" : "Receipt Preview" }
-    var previewSubtitle: String { isTurkish ? "Oluşturulan makbuzu inceleyin ve cihazınıza kaydedin" : "Review the generated receipt and save to your device" }
-    var close: String { isTurkish ? "Kapat" : "Close" }
-    var cancel: String { isTurkish ? "İptal" : "Cancel" }
-    var saveAndClose: String { isTurkish ? "Kaydet ve Kapat" : "Save & Close" }
-    var saveAsJPEG: String { isTurkish ? "JPEG Olarak Kaydet" : "Save as JPEG" }
-    var saveSuccess: String { isTurkish ? "Makbuz başarıyla kaydedildi!" : "Receipt saved successfully!" }
+    var previewTitle: String { tr("Receipt Preview", "Makbuz Önizleme", "Previzualizare Chitanță") }
+    var previewSubtitle: String { tr("Review the receipt in A4 invoice format, export as PDF or JPEG", "A4 fatura formatında oluşturulan makbuzu inceleyin, PDF veya JPEG olarak kaydedin", "Examinați chitanța în format A4 și exportați ca PDF sau JPEG") }
+    var close: String { tr("Close", "Kapat", "Închide") }
+    var cancel: String { tr("Cancel", "İptal", "Anulează") }
+    var saveAndClose: String { tr("Save & Close", "Kaydet ve Kapat", "Salvează și Închide") }
+    var saveAsJPEG: String { tr("Save as JPEG", "JPEG Olarak Kaydet", "Salvare ca JPEG") }
+    var saveAsPDF: String { tr("Save as PDF", "PDF Olarak Kaydet", "Salvare ca PDF") }
+    var saveSuccess: String { tr("Receipt saved successfully!", "Makbuz başarıyla kaydedildi!", "Chitanța a fost salvată cu succes!") }
+    var saveSuccessPDF: String { tr("PDF document saved successfully!", "PDF belgesi başarıyla kaydedildi!", "Documentul PDF a fost salvat cu succes!") }
+    var saveSuccessJPEG: String { tr("JPEG image saved successfully!", "JPEG görseli başarıyla kaydedildi!", "Imaginea JPEG a fost salvată cu succes!") }
+
+    // Invoice Specific Strings
+    var invoiceDocumentTitle: String { tr("DUES & EXPENSE RECEIPT", "AİDAT VE GİDER MAKBUZU", "CHITANȚĂ COTE ÎNTREȚINERE") }
+    var invoiceSubHeader: String { tr("Official Property & Building Management Document", "Apartman ve Site Yönetimi Resmi İşletme Belgesi", "Document Oficial de Gestiune al Asociației de Proprietari") }
+    var invoiceTypeLabel: String { tr("DOCUMENT TYPE", "BELGE TÜRÜ", "TIP DOCUMENT") }
+    var serialLabel: String { tr("SERIAL NO", "SERİ NO", "SERIE DOCUMENT") }
+    var managerSectionTitle: String { tr("ISSUER / MANAGEMENT", "DÜZENLEYEN / YÖNETİM", "EMITENT / ADMINISTRAȚIE") }
+    var payerSectionTitle: String { tr("PAYER / RESIDENT", "MUHATAP / SAKİN", "DESTINATAR / LOCATAR") }
+    var itemNo: String { tr("Item", "S.No", "Nr.") }
+    var itemDescription: String { tr("Service & Description Item", "Hizmet ve Açıklama Kalemi", "Denumire Serviciu / Cheltuială") }
+    var itemPeriod: String { tr("Period", "Dönem", "Lună") }
+    var itemUnit: String { tr("Unit", "Birim", "Unitate") }
+    var unitMonth: String { tr("1 Month", "1 Ay", "1 Lună") }
+    var itemAmount: String { tr("Amount", "Tutar", "Sumă") }
+    var subtotal: String { tr("Subtotal:", "Ara Toplam:", "Subtotal:") }
+    var vatTax: String { tr("VAT / Tax Exemption:", "KDV / Vergi Muafiyeti:", "TVA / Scutire:") }
+    var vatExempt: String { tr("0% (Exempt)", "%0 (Muaf)", "0% (Scutit de TVA)") }
+    var grandTotal: String { tr("GRAND TOTAL:", "GENEL TOPLAM:", "TOTAL GENERAL:") }
+    var inWordsPrefix: String { tr("In Words:", "Yalnız:", "În litere:") }
+    var signatureStamp: String { tr("AUTHORIZED STAMP & SIGNATURE", "YÖNETİCİ KAŞE / İMZA", "ȘTAMPILĂ ȘI SEMNĂTURĂ") }
+    var barcodeSerialText: String { tr("ELECTRONIC OFFICIAL RECORD", "ELEKTRONİK RESMİ KAYIT BELGESİ", "DOCUMENT ELECTRONIC OFICIAL") }
+    var legalStatutoryNotice: String { tr("Issued in accordance with Property Ownership Law as an official management receipt.", "634 Sayılı Kat Mülkiyeti Kanunu uyarınca bina işletme ve aidat hesabına mahsuben düzenlenmiştir.", "Emis în conformitate cu legislația privind asociațiile de proprietari pentru evidența cheltuielilor comune.") }
+    var statutoryTaxNotice: String { tr("Exempt from VAT under Property Management Law.", "634 sayılı KMK uyarınca bina işletme gider ve aidatları KDV'den muaftır.", "Scutit de TVA conform normelor asociațiilor de proprietari.") }
+    var incomeDocumentType: String { tr("Collection Receipt", "Tahsilat Makbuzu", "Chitanță Încasare") }
+    var expenseDocumentType: String { tr("Operating Expense Receipt", "İşletme Gider Makbuzu", "Dispoziție de Plată") }
+    var defaultItemNameIncome: String { tr("Common Expense & Dues Contribution", "Ortak Gider ve Aidat Avans Katılım Payı", "Cotă întreținere și fond de rulment") }
+    var defaultItemNameExpense: String { tr("Building Maintenance & Operating Expense", "Apartman İşletme ve Bakım Hizmet Gideri", "Servicii de întreținere și reparații imobil") }
+    var commonAreaLabel: String { tr("Common Area / General", "Ortak Alan / Genel", "Spații Comune / General") }
+    var invoiceBuildingLabel: String { tr("Building:", "Bina / Site:", "Imobil / Asociație:") }
+    var invoiceManagerLabel: String { tr("Manager:", "Yönetici:", "Administrator:") }
+    var invoicePayerResidentLabel: String { tr("Resident / Payer:", "Sakin / Muhatap:", "Locatar / Proprietar:") }
+    var invoiceVendorLabel: String { tr("Payee / Vendor:", "Ödeme Yapılan:", "Furnizor / Beneficiar:") }
+    var invoiceUnitLabel: String { tr("Unit / Flat:", "Bağımsız Bölüm:", "Apartament:") }
 
     // Settings Tabs
-    var tabBuilding: String { isTurkish ? "Apartman" : "Building" }
-    var tabResidents: String { isTurkish ? "Sakinler" : "Residents" }
-    var tabAppearance: String { isTurkish ? "Görünüm & Dil" : "Appearance & Language" }
-    var tabSignature: String { isTurkish ? "İmza" : "Signature" }
-    var tabAbout: String { isTurkish ? "Hakkında" : "About" }
+    var tabBuilding: String { tr("Building", "Apartman", "Imobil") }
+    var tabResidents: String { tr("Residents", "Sakinler", "Locatari") }
+    var tabAppearance: String { tr("Appearance & Language", "Görünüm & Dil", "Aspect & Limbă") }
+    var tabSignature: String { tr("Signature", "İmza", "Semnătură") }
+    var tabAbout: String { tr("About", "Hakkında", "Despre") }
 
     // Settings Form Fields
-    var buildingDetails: String { isTurkish ? "Apartman Bilgileri" : "Building Information" }
-    var buildingName: String { isTurkish ? "Apartman Adı:" : "Building Name:" }
-    var defaultManager: String { isTurkish ? "Varsayılan Yönetici (Tahsil Eden):" : "Default Manager (Collector):" }
-    var totalFlats: String { isTurkish ? "Toplam Daire Sayısı:" : "Total Number of Flats:" }
-    var financialSettings: String { isTurkish ? "Mali & Makbuz Değerleri" : "Financial & Receipt Defaults" }
-    var defaultDues: String { isTurkish ? "Varsayılan Aidat Tutarı (₺):" : "Default Dues Amount (₺):" }
-    var nextReceiptNo: String { isTurkish ? "Sıradaki Makbuz No:" : "Next Receipt No:" }
+    var buildingDetails: String { tr("Building Information", "Apartman Bilgileri", "Informații Imobil / Asociație") }
+    var buildingName: String { tr("Building Name:", "Apartman Adı:", "Nume Imobil / Asociație:") }
+    var defaultManager: String { tr("Default Manager (Collector):", "Varsayılan Yönetici (Tahsil Eden):", "Administrator Implicit (Casier):") }
+    var totalFlats: String { tr("Total Number of Flats:", "Toplam Daire Sayısı:", "Număr Total Apartamente:") }
+    var financialSettings: String { tr("Financial & Receipt Defaults", "Mali & Makbuz Değerleri", "Setări Financiare & Valori Implicite") }
+    var defaultDues: String { tr("Default Dues Amount (₺):", "Varsayılan Aidat Tutarı (₺):", "Sumă Cotă Implicită (₺):") }
+    var nextReceiptNo: String { tr("Next Receipt No:", "Sıradaki Makbuz No:", "Număr Următor Chitanță:") }
 
     // Appearance & Language Tab
-    var appearanceSection: String { isTurkish ? "Görünüm ve Tema" : "Appearance & Theme" }
-    var themeSelection: String { isTurkish ? "Tema Seçimi:" : "Theme Selection:" }
-    var themeSystem: String { isTurkish ? "Sistem (Otomatik)" : "System (Automatic)" }
-    var themeLight: String { isTurkish ? "Açık Tema" : "Light Theme" }
-    var themeDark: String { isTurkish ? "Koyu Tema" : "Dark Theme" }
+    var appearanceSection: String { tr("Appearance and Theme", "Görünüm ve Tema", "Aspect și Temă") }
+    var themeSelection: String { tr("Theme Selection:", "Tema Seçimi:", "Selectare Temă:") }
+    var themeSystem: String { tr("System (Automatic)", "Sistem (Otomatik)", "Sistem (Automat)") }
+    var themeLight: String { tr("Light Theme", "Açık Tema", "Temă Luminoasă") }
+    var themeDark: String { tr("Dark Theme", "Koyu Tema", "Temă Întunecată") }
 
-    var languageSection: String { isTurkish ? "Uygulama Dili" : "Application Language" }
-    var languageSelection: String { isTurkish ? "Dil Seçimi:" : "Language Selection:" }
-    var langSystem: String { isTurkish ? "Sistem Dili (Otomatik)" : "System Default (Automatic)" }
+    var languageSection: String { tr("Application Language", "Uygulama Dili", "Limba Aplicației") }
+    var languageSelection: String { tr("Language Selection:", "Dil Seçimi:", "Selectare Limbă:") }
+    var langSystem: String { tr("System Default (Automatic)", "Sistem Dili (Otomatik)", "Sistem (Automat)") }
 
     // Residents Directory
-    var residentsDirectoryTitle: String { isTurkish ? "Daire Sakinleri Rehberi" : "Residents Directory" }
-    var residentsDirectoryDesc: String { isTurkish ? "Her daire için kayıtlı ev sahibi veya kiracı ismini belirleyin. Makbuz oluştururken daire seçildiğinde otomatik doldurulacaktır." : "Assign resident or owner names for each flat. Selecting a flat will automatically fill in their name." }
-    var flatLabel: String { isTurkish ? "Daire:" : "Flat:" }
-    var residentNamePlaceholder: String { isTurkish ? "Daire Sakini Adı Soyadı" : "Resident Full Name" }
-    var saveButton: String { isTurkish ? "Kaydet" : "Save" }
-    var residentSavedFeedback: String { isTurkish ? "sakini başarıyla kaydedildi." : "resident saved successfully." }
+    var residentsDirectoryTitle: String { tr("Residents Directory", "Daire Sakinleri Rehberi", "Registru Locatari") }
+    var residentsDirectoryDesc: String { tr("Assign resident or owner names for each flat. Selecting a flat will automatically fill in their name.", "Her daire için kayıtlı ev sahibi veya kiracı ismini belirleyin. Makbuz oluştururken daire seçildiğinde otomatik doldurulacaktır.", "Înregistrați numele locatarilor pentru fiecare apartament.") }
+    var flatLabel: String { tr("Flat:", "Daire:", "Apartament:") }
+    var residentNamePlaceholder: String { tr("Resident Full Name", "Daire Sakini Adı Soyadı", "Nume și Prenume Locatar") }
+    var saveButton: String { tr("Save", "Kaydet", "Salvează") }
+    var residentSavedFeedback: String { tr("resident saved successfully.", "sakini başarıyla kaydedildi.", "locatarul a fost salvat cu succes.") }
 
     // Signature Tab
-    var signatureTitle: String { isTurkish ? "Yetkili İmzası" : "Authorized Signature" }
-    var signatureDesc: String { isTurkish ? "Makbuzların alt kısmında yer alacak imza görselini (PNG veya JPG) yükleyin." : "Upload the signature image (PNG or JPG) to appear at the bottom of receipts." }
-    var uploadSignatureButton: String { isTurkish ? "İmza Görseli Yükle..." : "Upload Signature Image..." }
-    var removeSignatureButton: String { isTurkish ? "İmzayı Kaldır" : "Remove Signature" }
-    var loadedSignature: String { isTurkish ? "Yüklü İmza" : "Loaded Signature" }
-    var noSignatureYet: String { isTurkish ? "Henüz imza yüklenmedi" : "No signature uploaded yet" }
+    var signatureTitle: String { tr("Authorized Signature", "Yetkili İmzası", "Semnătură Autorizată") }
+    var signatureDesc: String { tr("Upload the signature image (PNG or JPG) to appear at the bottom of receipts.", "Makbuzların alt kısmında yer alacak imza görselini (PNG veya JPG) yükleyin.", "Încărcați imaginea semnăturii pentru a apărea pe chitanțe.") }
+    var uploadSignatureButton: String { tr("Upload Signature Image...", "İmza Görseli Yükle...", "Încarcă Imagine Semnătură...") }
+    var removeSignatureButton: String { tr("Remove Signature", "İmzayı Kaldır", "Șterge Semnătura") }
+    var loadedSignature: String { tr("Loaded Signature", "Yüklü İmza", "Semnătură Încărcată") }
+    var noSignatureYet: String { tr("No signature uploaded yet", "Henüz imza yüklenmedi", "Nicio semnătură încărcată încă") }
 
-    // About Tab
-    var appVersionText: String { isTurkish ? "Sürüm 3.2.0" : "Version 3.2.0" }
-    var publisher: String { isTurkish ? "Yayıncı: berkbb" : "Publisher: berkbb" }
-    var license: String { isTurkish ? "Lisans: GNU General Public License v3.0 (GPL-3.0)" : "License: GNU General Public License v3.0 (GPL-3.0)" }
-    var copyright: String { isTurkish ? "Copyright © 2023-2026 berkbb. Tüm hakları saklıdır." : "Copyright © 2023-2026 berkbb. All rights reserved." }
+    // About Tab & License
+    var appVersionText: String { tr("Version 3.2.0 (Build 5)", "Sürüm 3.2.0 (Yapı 5)", "Versiunea 3.2.0 (Build 5)") }
+    var publisher: String { tr("Publisher: berkbb", "Yayıncı: berkbb", "Editor: berkbb") }
+    var license: String { tr("License: GNU General Public License v3.0 (GPL-3.0)", "Lisans: GNU Genel Kamu Lisansı v3.0 (GPL-3.0)", "Licență: GNU General Public License v3.0 (GPL-3.0)") }
+    var copyright: String { tr("Copyright © 2023-2026 berkbb. All rights reserved.", "Copyright © 2023-2026 berkbb. Tüm hakları saklıdır.", "Copyright © 2023-2026 berkbb. Toate drepturile rezervate.") }
+    var viewLicenseButton: String { tr("View License (GNU GPL v3)", "Lisansı Görüntüle (GNU GPL v3)", "Vizualizează Licența (GNU GPL v3)") }
+    var licenseViewerTitle: String { tr("GNU General Public License v3.0", "GNU Genel Kamu Lisansı v3.0", "Licența Publică Generală GNU v3.0") }
+    var licenseViewerSubtitle: String { tr("Free and open-source software license. Publisher: berkbb", "Özgür ve açık kaynak kodlu yazılım lisansı. Yayıncı: berkbb", "Licență software liberă și cu sursă deschisă. Editor: berkbb") }
+    var copyLicenseText: String { tr("Copy License Text", "Lisans Metnini Kopyala", "Copiază Textul Licenței") }
+    var licenseCopied: String { tr("Copied!", "Kopyalandı!", "Copiat!") }
 
     // Validation Messages
-    var validationErrorTitle: String { isTurkish ? "Doğrulama Hatası" : "Validation Error" }
-    var okButton: String { isTurkish ? "Tamam" : "OK" }
-    var errIssuerRequired: String { isTurkish ? "Tahsil eden (yetkili) bilgisi zorunludur." : "Collector information is required." }
-    var errReceiverRequired: String { isTurkish ? "Ödeyen (muhatap) bilgisi zorunludur." : "Payer information is required." }
-    var errSequenceInvalid: String { isTurkish ? "Sıra numarası pozitif bir tam sayı olmalıdır." : "Sequence number must be a positive integer." }
-    var errAmountInvalid: String { isTurkish ? "Tutar geçerli bir sayı olmalıdır." : "Amount must be a valid number." }
-    var errBuildingIssuerRequired: String { isTurkish ? "Apartman adı ve varsayılan yönetici boş bırakılamaz." : "Building name and default manager cannot be empty." }
-    var errFlatCountInvalid: String { isTurkish ? "Daire sayısı pozitif bir tam sayı olmalıdır." : "Flat count must be a positive integer." }
+    var validationErrorTitle: String { tr("Validation Error", "Doğrulama Hatası", "Eroare de Validare") }
+    var okButton: String { tr("OK", "Tamam", "OK") }
+    var errIssuerRequired: String { tr("Collector information is required.", "Tahsil eden (yetkili) bilgisi zorunludur.", "Informațiile administratorului/casierului sunt obligatorii.") }
+    var errReceiverRequired: String { tr("Payer information is required.", "Ödeyen (muhatap) bilgisi zorunludur.", "Informațiile plătitorului sunt obligatorii.") }
+    var errSequenceInvalid: String { tr("Sequence number must be a positive integer.", "Sıra numarası pozitif bir tam sayı olmalıdır.", "Numărul de serie trebuie să fie un număr întreg pozitiv.") }
+    var errAmountInvalid: String { tr("Amount must be a valid number.", "Tutar geçerli bir sayı olmalıdır.", "Suma trebuie să fie un număr valid.") }
+    var errBuildingIssuerRequired: String { tr("Building name and default manager cannot be empty.", "Apartman adı ve varsayılan yönetici boş bırakılamaz.", "Numele imobilului și administratorul nu pot fi goale.") }
+    var errFlatCountInvalid: String { tr("Flat count must be a positive integer.", "Daire sayısı pozitif bir tam sayı olmalıdır.", "Numărul de apartamente trebuie să fie pozitiv.") }
 }
 
 // MARK: - Main Screen
@@ -274,6 +341,9 @@ struct MainScreen: View {
             SettingsView(settings: settings)
                 .frame(width: 680, height: 580)
         }
+        .sheet(isPresented: $settings.showLicenseViewer) {
+            LicenseViewerSheet(l10n: l10n)
+        }
         .alert(item: $viewModel.validationError) { issue in
             Alert(
                 title: Text(l10n.validationErrorTitle),
@@ -327,11 +397,14 @@ struct MainScreen: View {
             Button {
                 openSettingsWindow()
             } label: {
-                Label(l10n.preferences, systemImage: "gearshape.fill")
-                    .padding(.horizontal, 4)
+                Image(systemName: "gearshape.fill")
+                    .font(.system(size: 13, weight: .semibold))
+                    .padding(2)
             }
             .buttonStyle(.bordered)
             .controlSize(.regular)
+            .help(l10n.preferences)
+            .accessibilityLabel(l10n.preferences)
             .keyboardShortcut(",", modifiers: .command)
         }
     }
@@ -872,6 +945,7 @@ final class ReceiptSettingsStore: ObservableObject {
             }
         }
     }
+    @Published var showLicenseViewer: Bool = false
 
     var l10n: L10n {
         L10n(language)
@@ -994,3 +1068,214 @@ extension Date {
         return formatter.string(from: self)
     }
 }
+
+// MARK: - Read-Only License Viewer Sheet
+
+struct LicenseViewerSheet: View {
+    let l10n: L10n
+    @Environment(\.presentationMode) private var presentationMode
+    @State private var copied = false
+
+    private let licenseText = """
+                    GNU GENERAL PUBLIC LICENSE
+                       Version 3, 29 June 2007
+
+ Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>
+ Everyone is permitted to copy and distribute verbatim copies
+ of this license document, but changing it is not allowed.
+
+                            Preamble
+
+  The GNU General Public License is a free, copyleft license for
+software and other kinds of works.
+
+  The licenses for most software and other practical works are designed
+to take away your freedom to share and change the works.  By contrast,
+the GNU General Public License is intended to guarantee your freedom to
+share and change all versions of a program--to make sure it remains free
+software for all its users.  We, the Free Software Foundation, use the
+GNU General Public License for most of our software; it applies also to
+any other work released this way by its authors.  You can apply it to
+your programs, too.
+
+  When we speak of free software, we are referring to freedom, not
+price.  Our General Public Licenses are designed to make sure that you
+have the freedom to distribute copies of free software (and charge for
+them if you wish), that you receive source code or can get it if you
+want it, that you can change the software or use pieces of it in new
+free programs, and that you know you can do these things.
+
+  To protect your rights, we need to prevent others from denying you
+these rights or asking you to surrender the rights.  Therefore, you have
+certain responsibilities if you distribute copies of the software, or if
+you modify it: responsibilities to respect the freedom of others.
+
+  For example, if you distribute copies of such a program, whether
+gratis or for a fee, you must pass on to the recipients the same
+freedoms that you received.  You must make sure that they, too, receive
+or can get the source code.  And you must show them these terms so they
+know their rights.
+
+  Developers that use the GNU GPL protect your rights with two steps:
+(1) assert copyright on the software, and (2) offer you this License
+giving you legal permission to copy, distribute and/or modify it.
+
+                       TERMS AND CONDITIONS
+
+  0. Definitions.
+  "This License" refers to version 3 of the GNU General Public License.
+  "Copyright" also means copyright-like laws that apply to other kinds of works.
+  "The Program" refers to any copyrightable work licensed under this License.
+  "Publisher" refers to berkbb.
+
+  1. Source Code.
+  The "source code" for a work means the preferred form of the work
+for making modifications to it. "Object code" means any non-source
+form of a work.
+
+  2. Basic Permissions.
+  All rights granted under this License are granted for the term of
+copyright on the Program, and are irrevocable provided the stated
+conditions are met.
+
+  3. Protecting Users' Legal Rights From Anti-Circumvention Law.
+  No covered work shall be deemed part of an effective technological
+measure under any applicable law fulfilling obligations under article 11
+of the WIPO copyright treaty adopted on 20 December 1996.
+
+  4. Conveying Verbatim Copies.
+  You may convey verbatim copies of the Program's source code as you
+receive it, in any medium, provided that you conspicuously and
+appropriately publish on each copy an appropriate copyright notice;
+keep intact all notices stating that this License applies to it.
+
+  5. Conveying Modified Source Versions.
+  You may convey a work based on the Program, or the modifications to
+produce it from the Program, in the form of source code under the
+terms of section 4, provided that you also meet all of these conditions:
+    a) The work must carry prominent notices stating that you modified it.
+    b) The work must carry prominent notices stating that it is released
+       under this License.
+
+  NO WARRANTY
+  BECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE PROGRAM "AS IS" WITHOUT WARRANTY OF ANY KIND.
+"""
+
+    var body: some View {
+        VStack(spacing: 0) {
+            // Header
+            HStack(spacing: 12) {
+                Image(systemName: "doc.text.magnifyingglass")
+                    .font(.title2)
+                    .foregroundColor(.accentColor)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(l10n.licenseViewerTitle)
+                        .font(.headline)
+                    Text(l10n.licenseViewerSubtitle)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+
+                Spacer()
+
+                Button {
+                    presentationMode.wrappedValue.dismiss()
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.title3)
+                        .foregroundColor(.secondary)
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 14)
+            .background(Color(NSColor.windowBackgroundColor))
+
+            Divider()
+
+            // Publisher & License Banner
+            HStack(spacing: 16) {
+                HStack(spacing: 6) {
+                    Image(systemName: "person.badge.shield.checkmark.fill")
+                        .foregroundColor(.accentColor)
+                    Text("Publisher:")
+                        .font(.caption.bold())
+                        .foregroundColor(.secondary)
+                    Text("berkbb")
+                        .font(.caption.bold())
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 2)
+                        .background(Color.accentColor.opacity(0.15))
+                        .clipShape(Capsule())
+                }
+
+                HStack(spacing: 6) {
+                    Image(systemName: "lock.shield.fill")
+                        .foregroundColor(.green)
+                    Text("License:")
+                        .font(.caption.bold())
+                        .foregroundColor(.secondary)
+                    Text("GNU GPL v3.0")
+                        .font(.caption.bold())
+                }
+
+                Spacer()
+
+                Button {
+                    NSPasteboard.general.clearContents()
+                    NSPasteboard.general.setString(licenseText, forType: .string)
+                    copied = true
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                        copied = false
+                    }
+                } label: {
+                    Label(copied ? l10n.licenseCopied : l10n.copyLicenseText, systemImage: copied ? "checkmark" : "doc.on.doc")
+                        .font(.caption)
+                }
+                .buttonStyle(.bordered)
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 10)
+            .background(Color(NSColor.controlBackgroundColor).opacity(0.5))
+
+            Divider()
+
+            // Scrollable Read-Only License Text
+            ScrollView {
+                Text(licenseText)
+                    .font(.system(size: 11, design: .monospaced))
+                    .foregroundColor(Color(NSColor.textColor))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(16)
+                    .textSelection(.enabled)
+            }
+            .background(Color(NSColor.textBackgroundColor))
+
+            Divider()
+
+            // Footer
+            HStack {
+                Text(l10n.copyright)
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+
+                Spacer()
+
+                Button(l10n.close) {
+                    presentationMode.wrappedValue.dismiss()
+                }
+                .buttonStyle(.borderedProminent)
+                .keyboardShortcut(.cancelAction)
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 12)
+            .background(Color(NSColor.windowBackgroundColor))
+        }
+        .frame(width: 640, height: 540)
+    }
+}
+

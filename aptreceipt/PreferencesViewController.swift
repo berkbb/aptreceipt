@@ -52,6 +52,12 @@ struct SettingsView: View {
     @StateObject private var viewModel = SettingsViewModel()
     @Environment(\.presentationMode) private var presentationMode
     @State private var selectedTab: SettingsTab = .general
+    @State private var isPresentingLicense: Bool = false
+
+    init(settings: ReceiptSettingsStore, initialTab: SettingsTab = .general) {
+        self.settings = settings
+        _selectedTab = State(initialValue: initialTab)
+    }
 
     private var l10n: L10n {
         L10n(viewModel.language)
@@ -375,36 +381,82 @@ struct SettingsView: View {
     // MARK: - Tab 5: About (Gözden geçirilmiş)
 
     private var aboutTab: some View {
-        VStack(spacing: 14) {
-            Image(systemName: "building.2.crop.circle.fill")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 56, height: 56)
-                .foregroundColor(.accentColor)
+        VStack(spacing: 16) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: [Color.accentColor, Color.accentColor.opacity(0.75)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 68, height: 68)
+                    .shadow(color: Color.accentColor.opacity(0.35), radius: 8, x: 0, y: 4)
+
+                Image(systemName: "building.2.crop.circle.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 40, height: 40)
+                    .foregroundColor(.white)
+            }
 
             VStack(spacing: 4) {
                 Text(l10n.appTitle)
-                    .font(.title3.bold())
+                    .font(.title2.bold())
                 Text(l10n.appVersionText)
-                    .font(.caption)
+                    .font(.subheadline)
                     .foregroundColor(.secondary)
             }
 
-            Divider()
-                .frame(width: 280)
+            // Publisher Card
+            VStack(spacing: 12) {
+                HStack(spacing: 8) {
+                    Image(systemName: "person.badge.shield.checkmark.fill")
+                        .foregroundColor(.accentColor)
+                        .font(.title3)
+                    Text(l10n.publisher)
+                        .font(.headline)
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                .background(Color.accentColor.opacity(0.12))
+                .clipShape(Capsule())
 
-            VStack(spacing: 6) {
-                Text(l10n.publisher)
-                    .font(.callout)
-                Text(l10n.license)
-                    .font(.callout)
+                // License Card & Clickable Viewer
+                VStack(spacing: 10) {
+                    Text(l10n.license)
+                        .font(.callout)
+                        .foregroundColor(.secondary)
+
+                    Button {
+                        isPresentingLicense = true
+                    } label: {
+                        Label(l10n.viewLicenseButton, systemImage: "doc.text.magnifyingglass")
+                            .font(.callout.bold())
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.regular)
+                }
+                .padding(14)
+                .frame(maxWidth: 380)
+                .background(Color(NSColor.controlBackgroundColor))
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
+                )
+
                 Text(l10n.copyright)
-                    .font(.caption2)
+                    .font(.caption)
                     .foregroundColor(.secondary)
             }
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 20)
+        .padding(.vertical, 16)
+        .sheet(isPresented: $isPresentingLicense) {
+            LicenseViewerSheet(l10n: l10n)
+        }
     }
 
     private func settingsField(title: String, text: Binding<String>, placeholder: String) -> some View {
