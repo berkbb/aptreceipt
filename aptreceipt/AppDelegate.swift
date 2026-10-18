@@ -98,6 +98,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         settings.seqNumber = 104
         settings.flatCount = 12
         settings.language = .turkish
+        settings.currency = .turkishLira
         settings.theme = .system
         settings.saveOwner("Mehmet Kaya", apartmentNumber: 1)
         settings.saveOwner("Ayşe Demir", apartmentNumber: 2)
@@ -118,7 +119,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             sequenceNumber: 104,
             createdDate: "18 Ekim 2026",
             showApartmentNumber: true,
-            kind: .income
+            kind: .income,
+            currency: .turkishLira
         )
         let docView = ReceiptDocumentView(
             draft: sampleDraft,
@@ -146,7 +148,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             sequenceNumber: 105,
             createdDate: "18 Ekim 2026",
             showApartmentNumber: false,
-            kind: .outcome
+            kind: .outcome,
+            currency: .turkishLira
         )
         let docOutcomeView = ReceiptDocumentView(
             draft: sampleOutcomeDraft,
@@ -165,6 +168,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         settingsEN.seqNumber = 104
         settingsEN.flatCount = 12
         settingsEN.language = .english
+        settingsEN.currency = .usDollar
         settingsEN.saveOwner("Jane Smith", apartmentNumber: 1)
 
         let mainViewEN = MainScreen(settings: settingsEN)
@@ -179,6 +183,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         settingsRO.seqNumber = 104
         settingsRO.flatCount = 12
         settingsRO.language = .romanian
+        settingsRO.currency = .romanianLeu
         settingsRO.saveOwner("Elena Radu", apartmentNumber: 1)
 
         let mainViewRO = MainScreen(settings: settingsRO)
