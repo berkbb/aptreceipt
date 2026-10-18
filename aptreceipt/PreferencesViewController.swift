@@ -199,9 +199,9 @@ struct SettingsView: View {
                     .font(.system(size: 13, weight: .bold))
                     .foregroundColor(.secondary)
 
-                settingsField(title: l10n.buildingName, text: $viewModel.apartmentName, placeholder: "Örn: Güneş Apartmanı")
-                settingsField(title: l10n.defaultManager, text: $viewModel.issuer, placeholder: "Örn: Ahmet Yılmaz")
-                settingsField(title: l10n.totalFlats, text: $viewModel.flatCount, placeholder: "Örn: 10")
+                settingsField(title: l10n.buildingName, text: $viewModel.apartmentName, placeholder: l10n.buildingNamePlaceholder)
+                settingsField(title: l10n.defaultManager, text: $viewModel.issuer, placeholder: l10n.defaultManagerPlaceholder)
+                settingsField(title: l10n.totalFlats, text: $viewModel.flatCount, placeholder: l10n.totalFlatsPlaceholder)
             }
             .padding(14)
             .background(Color(NSColor.controlBackgroundColor))
@@ -539,6 +539,20 @@ struct SettingsView: View {
                     .labelsHidden()
                     .onChange(of: viewModel.language) { newLang in
                         settings.language = newLang
+                        let resolved = L10n(newLang).resolvedLanguage
+                        let newCurrency = AppCurrency.default(for: resolved)
+                        viewModel.currency = newCurrency
+                        settings.currency = newCurrency
+
+                        let sampleApts = [
+                            SampleData.defaults(for: .english).apartmentName,
+                            SampleData.defaults(for: .turkish).apartmentName,
+                            SampleData.defaults(for: .romanian).apartmentName
+                        ]
+                        if sampleApts.contains(viewModel.apartmentName) || viewModel.apartmentName.isEmpty {
+                            viewModel.loadSampleDefaults(for: newLang)
+                            _ = viewModel.save(to: settings)
+                        }
                         viewModel.showRestartAlert = true
                     }
                 }

@@ -191,7 +191,7 @@ struct SampleData {
 struct L10n {
     let language: AppLanguage
 
-    init(_ language: AppLanguage = .system) {
+    init(_ language: AppLanguage = .english) {
         self.language = language
     }
 
@@ -464,6 +464,13 @@ struct L10n {
     var errAmountInvalid: String { tr("Amount must be a valid number.", "Tutar geçerli bir sayı olmalıdır.", "Suma trebuie să fie un număr valid.") }
     var errBuildingIssuerRequired: String { tr("Building name and default manager cannot be empty.", "Apartman adı ve varsayılan yönetici boş bırakılamaz.", "Numele imobilului și administratorul nu pot fi goale.") }
     var errFlatCountInvalid: String { tr("Flat count must be a positive integer.", "Daire sayısı pozitif bir tam sayı olmalıdır.", "Numărul de apartamente trebuie să fie pozitiv.") }
+
+    // Placeholders & Labels
+    var buildingNamePlaceholder: String { tr("e.g. Sunshine Residence", "Örn: Güleryüz Apartmanı", "Ex: Asociația Parcul Tineretului") }
+    var defaultManagerPlaceholder: String { tr("e.g. John Doe", "Örn: Ahmet Yılmaz", "Ex: Andrei Popescu") }
+    var totalFlatsPlaceholder: String { tr("e.g. 12", "Örn: 12", "Ex: 12") }
+    var publisherLabel: String { tr("Publisher", "Yayıncı", "Editor") }
+    var licenseLabel: String { tr("License", "Lisans", "Licență") }
 }
 
 // MARK: - Main Screen
@@ -1165,8 +1172,8 @@ final class ReceiptSettingsStore: ObservableObject {
     private let defaults = UserDefaults.standard
 
     init() {
-        let savedLang = defaults.string(forKey: Keys.language) ?? AppLanguage.system.rawValue
-        let resolvedLang = AppLanguage(rawValue: savedLang) ?? .system
+        let savedLang = defaults.string(forKey: Keys.language) ?? AppLanguage.english.rawValue
+        let resolvedLang = AppLanguage(rawValue: savedLang) ?? .english
         language = resolvedLang
 
         let savedCurrency = defaults.string(forKey: Keys.currency)
@@ -1174,7 +1181,10 @@ final class ReceiptSettingsStore: ObservableObject {
         currency = resolvedCurrency
 
         let isConfigured = defaults.object(forKey: Keys.apartmentName) != nil
-        if !isConfigured {
+        let savedApt = defaults.string(forKey: Keys.apartmentName) ?? ""
+        let isScreenshotPollution = (savedApt == "Asociația Parcul Tineretului" || savedApt.isEmpty) && (resolvedLang == .english || resolvedLang == .system)
+
+        if !isConfigured || isScreenshotPollution {
             let samples = SampleData.defaults(for: resolvedLang)
             apartmentName = samples.apartmentName
             issuer = samples.issuer
@@ -1442,7 +1452,7 @@ PROVIDE THE PROGRAM "AS IS" WITHOUT WARRANTY OF ANY KIND.
                 HStack(spacing: 6) {
                     Image(systemName: "person.badge.shield.checkmark.fill")
                         .foregroundColor(.accentColor)
-                    Text("Publisher:")
+                    Text("\(l10n.publisherLabel):")
                         .font(.caption.bold())
                         .foregroundColor(.secondary)
                     Text("berkbb")
@@ -1456,7 +1466,7 @@ PROVIDE THE PROGRAM "AS IS" WITHOUT WARRANTY OF ANY KIND.
                 HStack(spacing: 6) {
                     Image(systemName: "lock.shield.fill")
                         .foregroundColor(.green)
-                    Text("License:")
+                    Text("\(l10n.licenseLabel):")
                         .font(.caption.bold())
                         .foregroundColor(.secondary)
                     Text("GNU GPL v3.0")

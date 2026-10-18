@@ -102,6 +102,38 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let outDir = URL(fileURLWithPath: currentDir).appendingPathComponent("docs/screenshots")
         try? FileManager.default.createDirectory(at: outDir, withIntermediateDirectories: true)
 
+        // Backup existing live user defaults so screenshot generation never mutates real user data
+        let defaults = UserDefaults.standard
+        let backupKeys = [
+            ReceiptSettingsStore.Keys.apartmentName,
+            ReceiptSettingsStore.Keys.issuer,
+            ReceiptSettingsStore.Keys.defaultPayment,
+            ReceiptSettingsStore.Keys.flatCount,
+            ReceiptSettingsStore.Keys.seqNumber,
+            ReceiptSettingsStore.Keys.language,
+            ReceiptSettingsStore.Keys.theme,
+            ReceiptSettingsStore.Keys.currency
+        ]
+        var backupDict: [String: Any] = [:]
+        for key in backupKeys {
+            if let val = defaults.object(forKey: key) {
+                backupDict[key] = val
+            }
+        }
+        for i in 1...50 {
+            let key = ReceiptSettingsStore.Keys.owner(i)
+            if let val = defaults.object(forKey: key) {
+                backupDict[key] = val
+            }
+        }
+        defer {
+            let bundleID = Bundle.main.bundleIdentifier ?? "com.berkbb.aptreceipt"
+            defaults.removePersistentDomain(forName: bundleID)
+            for (key, val) in backupDict {
+                defaults.set(val, forKey: key)
+            }
+        }
+
         let settings = ReceiptSettingsStore()
         settings.apartmentName = "Güleryüz Apartmanı"
         settings.issuer = "Ahmet Yılmaz"
