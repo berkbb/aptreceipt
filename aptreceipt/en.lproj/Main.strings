@@ -10,16 +10,16 @@
  */
 
 /* Class = "NSMenuItem"; title = "aptreceipt"; ObjectID = "1Xt-HY-uBw"; */
-"1Xt-HY-uBw.title" = "Apartment Receipt Creator";
+"1Xt-HY-uBw.title" = "AptReceipt";
 
 /* Class = "NSMenuItem"; title = "Quit aptreceipt"; ObjectID = "4sb-4s-VLi"; */
-"4sb-4s-VLi.title" = "Quit Apartment Receipt Creator";
+"4sb-4s-VLi.title" = "Quit AptReceipt";
 
 /* Class = "NSMenuItem"; title = "Edit"; ObjectID = "5QF-Oa-p0T"; */
 "5QF-Oa-p0T.title" = "Edit";
 
 /* Class = "NSMenuItem"; title = "About aptreceipt"; ObjectID = "5kV-Vb-QxS"; */
-"5kV-Vb-QxS.title" = "About Apartment Receipt Creator";
+"5kV-Vb-QxS.title" = "About AptReceipt";
 
 /* Class = "NSMenuItem"; title = "Redo"; ObjectID = "6dh-zS-Vam"; */
 "6dh-zS-Vam.title" = "Redo";
@@ -40,7 +40,7 @@
 "F2S-fz-NVQ.title" = "Help";
 
 /* Class = "NSMenuItem"; title = "aptreceipt Help"; ObjectID = "FKE-Sm-Kum"; */
-"FKE-Sm-Kum.title" = "Apartment Receipt Creator Help";
+"FKE-Sm-Kum.title" = "AptReceipt Help";
 
 /* Class = "NSTextFieldCell"; title = "Info (Optional)"; ObjectID = "GuW-Si-e02"; */
 "GuW-Si-e02.title" = "Info (optional)";
@@ -49,7 +49,7 @@
 "H4j-Dg-rWq.title" = "Clear";
 
 /* Class = "NSWindow"; title = "Receipt Creator"; ObjectID = "IQv-IB-iLA"; */
-"IQv-IB-iLA.title" = "Apartment Receipt Creator";
+"IQv-IB-iLA.title" = "AptReceipt";
 
 ///* Class = "NSMenuItem"; title = "2"; ObjectID = "Ihk-7E-fpB"; */
 //"Ihk-7E-fpB.title" = "2";
@@ -70,7 +70,7 @@
 "OY7-WF-poV.title" = "Minimize";
 
 /* Class = "NSMenuItem"; title = "Hide aptreceipt"; ObjectID = "Olw-nP-bQN"; */
-"Olw-nP-bQN.title" = "Hide Apartment Receipt Creator";
+"Olw-nP-bQN.title" = "Hide AptReceipt";
 
 /* Class = "NSTextFieldCell"; title = "Apartment Number"; ObjectID = "QV4-Cn-Glw"; */
 "QV4-Cn-Glw.title" = "Apartment Number";
@@ -151,7 +151,7 @@
 "pa3-QI-u2k.title" = "Delete";
 
 /* Class = "NSMenu"; title = "aptreceipt"; ObjectID = "uQy-DD-JDr"; */
-"uQy-DD-JDr.title" = "Apartment Receipt Creator";
+"uQy-DD-JDr.title" = "AptReceipt";
 
 /* Class = "NSMenuItem"; title = "Cut"; ObjectID = "uRl-iY-unG"; */
 "uRl-iY-unG.title" = "Cut";

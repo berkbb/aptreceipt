@@ -207,7 +207,7 @@ struct L10n {
     }
 
     // App Header & Base
-    var appTitle: String { tr("Apartment Receipt", "Apartman Makbuzu", "Chitanță Asociație") }
+    var appTitle: String { "AptReceipt" }
     var appSubtitle: String { tr("Easily manage and export apartment income and expense receipts", "Gelir ve gider makbuzlarınızı kolayca yönetin ve dışa aktarın", "Gestionați și exportați cu ușurință chitanțele de încasări și plăți") }
     var preferences: String { tr("Preferences", "Tercihler", "Preferințe") }
     var settingsTitle: String { tr("Preferences & Settings", "Tercihler & Ayarlar", "Preferințe & Setări") }
@@ -330,7 +330,7 @@ struct L10n {
     var currencyGBP: String { tr("British Pound", "İngiliz Sterlini", "Liră Sterlină") }
 
     // MARK: - Menu Bar Strings
-    var menuApp: String { tr("Apartment Receipt Creator", "Apartman Makbuzu Oluşturucu", "Creator Chitanțe Bloc") }
+    var menuApp: String { "AptReceipt" }
     var menuFile: String { tr("File", "Dosya", "Fișier") }
     var menuEdit: String { tr("Edit", "Düzenle", "Editare") }
     var menuView: String { tr("View", "Görünüm", "Vizualizare") }
@@ -338,13 +338,13 @@ struct L10n {
     var menuHelp: String { tr("Help", "Yardım", "Ajutor") }
 
     // App Submenu
-    var menuAboutApp: String { tr("About Apartment Receipt Creator", "Apartman Makbuzu Oluşturucu Hakkında", "Despre Creator Chitanțe Bloc") }
+    var menuAboutApp: String { tr("About AptReceipt", "AptReceipt Hakkında", "Despre AptReceipt") }
     var menuSettings: String { tr("Settings…", "Ayarlar…", "Configurări…") }
     var menuServices: String { tr("Services", "Servisler", "Servicii") }
-    var menuHideApp: String { tr("Hide Apartment Receipt Creator", "Apartman Makbuzu Oluşturucu'yu Gizle", "Ascunde Creator Chitanțe Bloc") }
+    var menuHideApp: String { tr("Hide AptReceipt", "AptReceipt'i Gizle", "Ascunde AptReceipt") }
     var menuHideOthers: String { tr("Hide Others", "Diğerlerini Gizle", "Ascunde celelalte") }
     var menuShowAll: String { tr("Show All", "Tümünü Göster", "Afișează toate") }
-    var menuQuitApp: String { tr("Quit Apartment Receipt Creator", "Apartman Makbuzu Oluşturucu'dan Çık", "Închide Creator Chitanțe Bloc") }
+    var menuQuitApp: String { tr("Quit AptReceipt", "AptReceipt'ten Çık", "Închide AptReceipt") }
 
     // File Submenu
     var menuNewWindow: String { tr("New Receipt", "Yeni Makbuz", "Chitanță nouă") }
@@ -369,7 +369,7 @@ struct L10n {
     var menuBringAllToFront: String { tr("Bring All to Front", "Tümünü Öne Getir", "Adu toate în față") }
 
     // Help Submenu
-    var menuHelpItem: String { tr("Apartment Receipt Creator Help", "Apartman Makbuzu Oluşturucu Yardımı", "Ajutor Creator Chitanțe Bloc") }
+    var menuHelpItem: String { tr("AptReceipt Help", "AptReceipt Yardımı", "Ajutor AptReceipt") }
 
     // Language Restart Warning Strings
     var restartWarningTitle: String { tr("Application Restart Recommended", "Uygulamanın Yeniden Başlatılması Önerilir", "Repornirea Aplicației Recomandată") }
@@ -418,7 +418,7 @@ struct L10n {
     var licenseViewerSubtitle: String { tr("Free and open-source software license. Publisher: berkbb", "Özgür ve açık kaynak kodlu yazılım lisansı. Yayıncı: berkbb", "Licență software liberă și cu sursă deschisă. Editor: berkbb") }
     var copyLicenseText: String { tr("Copy License Text", "Lisans Metnini Kopyala", "Copiază Textul Licenței") }
     var licenseCopied: String { tr("Copied!", "Kopyalandı!", "Copiat!") }
-    var aboutWindowHeader: String { tr("About Apartment Receipt", "Apartman Makbuzu Hakkında", "Despre Chitanță Asociație") }
+    var aboutWindowHeader: String { tr("About AptReceipt", "AptReceipt Hakkında", "Despre AptReceipt") }
     var githubRepository: String { tr("GitHub Repository", "GitHub Deposu", "Depozit GitHub") }
     var appDescription: String { tr("Modern, secure and trilingual apartment dues & expense receipt generator.", "Modern, güvenli ve üç dilli apartman aidat ve gider makbuzu oluşturucu.", "Generator modern, sigur și trilingv de chitanțe de încasare și dispoziții de plată.") }
 

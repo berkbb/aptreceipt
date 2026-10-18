@@ -8,16 +8,16 @@
  */
 
 /* Class = "NSMenuItem"; title = "aptreceipt"; ObjectID = "1Xt-HY-uBw"; */
-"1Xt-HY-uBw.title" = "Creator Chitanțe Bloc";
+"1Xt-HY-uBw.title" = "AptReceipt";
 
 /* Class = "NSMenuItem"; title = "Quit aptreceipt"; ObjectID = "4sb-4s-VLi"; */
-"4sb-4s-VLi.title" = "Închide Creator Chitanțe Bloc";
+"4sb-4s-VLi.title" = "Închide AptReceipt";
 
 /* Class = "NSMenuItem"; title = "Edit"; ObjectID = "5QF-Oa-p0T"; */
 "5QF-Oa-p0T.title" = "Editare";
 
 /* Class = "NSMenuItem"; title = "About aptreceipt"; ObjectID = "5kV-Vb-QxS"; */
-"5kV-Vb-QxS.title" = "Despre Creator Chitanțe Bloc";
+"5kV-Vb-QxS.title" = "Despre AptReceipt";
 
 /* Class = "NSMenuItem"; title = "Redo"; ObjectID = "6dh-zS-Vam"; */
 "6dh-zS-Vam.title" = "Refă";
@@ -35,7 +35,7 @@
 "F2S-fz-NVQ.title" = "Ajutor";
 
 /* Class = "NSMenuItem"; title = "aptreceipt Help"; ObjectID = "FKE-Sm-Kum"; */
-"FKE-Sm-Kum.title" = "Ajutor Creator Chitanțe Bloc";
+"FKE-Sm-Kum.title" = "Ajutor AptReceipt";
 
 /* Class = "NSTextFieldCell"; title = "Info (Optional)"; ObjectID = "GuW-Si-e02"; */
 "GuW-Si-e02.title" = "Informații (opțional)";
@@ -44,7 +44,7 @@
 "H4j-Dg-rWq.title" = "Șterge";
 
 /* Class = "NSWindow"; title = "Receipt Creator"; ObjectID = "IQv-IB-iLA"; */
-"IQv-IB-iLA.title" = "Creator Chitanțe Bloc";
+"IQv-IB-iLA.title" = "AptReceipt";
 
 /* Class = "NSMenuItem"; title = "Show All"; ObjectID = "Kd2-mp-pUS"; */
 "Kd2-mp-pUS.title" = "Afișează toate";
@@ -62,7 +62,7 @@
 "OY7-WF-poV.title" = "Minimizează";
 
 /* Class = "NSMenuItem"; title = "Hide aptreceipt"; ObjectID = "Olw-nP-bQN"; */
-"Olw-nP-bQN.title" = "Ascunde Creator Chitanțe Bloc";
+"Olw-nP-bQN.title" = "Ascunde AptReceipt";
 
 /* Class = "NSTextFieldCell"; title = "Apartment Number"; ObjectID = "QV4-Cn-Glw"; */
 "QV4-Cn-Glw.title" = "Număr Apartament";
@@ -128,7 +128,7 @@
 "pa3-QI-u2k.title" = "Șterge";
 
 /* Class = "NSMenu"; title = "aptreceipt"; ObjectID = "uQy-DD-JDr"; */
-"uQy-DD-JDr.title" = "Creator Chitanțe Bloc";
+"uQy-DD-JDr.title" = "AptReceipt";
 
 /* Class = "NSMenuItem"; title = "Cut"; ObjectID = "uRl-iY-unG"; */
 "uRl-iY-unG.title" = "Decupează";
