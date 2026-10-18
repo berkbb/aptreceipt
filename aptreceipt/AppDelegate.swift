@@ -176,10 +176,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         render(view: docView, size: CGSize(width: 595, height: 842), to: outDir.appendingPathComponent("02_receipt_document.png"))
         renderPDF(view: docView.environment(\.colorScheme, .light), size: CGSize(width: 595, height: 842), to: outDir.appendingPathComponent("02_receipt_document.pdf"))
 
-        // 3. Settings View (About & License)
-        let settingsView = SettingsView(settings: settings, initialTab: .about)
-            .frame(width: 680, height: 580)
-        render(view: settingsView, size: CGSize(width: 680, height: 580), to: outDir.appendingPathComponent("03_settings_view.png"))
+        // 3. Settings View (Hero Building & Settings)
+        let settingsView = SettingsView(settings: settings, initialTab: .general)
+            .frame(width: 740, height: 600)
+        render(view: settingsView, size: CGSize(width: 740, height: 600), to: outDir.appendingPathComponent("03_settings_view.png"))
 
         // 4. Management Expense Receipt Document
         let sampleOutcomeDraft = ReceiptDraft(
@@ -474,13 +474,13 @@ final class SettingsWindowManager: NSObject, NSWindowDelegate {
         }
 
         let newWindow = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 700, height: 550),
+            contentRect: NSRect(x: 0, y: 0, width: 750, height: 600),
             styleMask: [.titled, .closable, .miniaturizable, .resizable],
             backing: .buffered,
             defer: false
         )
-        newWindow.minSize = NSSize(width: 640, height: 480)
-        newWindow.maxSize = NSSize(width: 900, height: 750)
+        newWindow.minSize = NSSize(width: 680, height: 520)
+        newWindow.maxSize = NSSize(width: 960, height: 800)
         newWindow.title = actualSettings.l10n.settingsTitle
         newWindow.isReleasedWhenClosed = false
         newWindow.delegate = self

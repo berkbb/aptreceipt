@@ -95,33 +95,39 @@ struct SettingsView: View {
 
             Divider()
 
-            // Tab Bar
+            // Tab Bar (Hero Segmented Deck)
             HStack(spacing: 6) {
                 ForEach(SettingsTab.allCases) { tab in
+                    let isSelected = viewModel.selectedTab == tab
                     Button {
                         viewModel.selectedTab = tab
                     } label: {
-                        HStack(spacing: 5) {
+                        HStack(spacing: 6) {
                             Image(systemName: tab.iconName)
+                                .font(.system(size: 11, weight: isSelected ? .bold : .medium))
                             Text(tab.title(l10n: l10n))
+                                .font(.system(size: 12, weight: isSelected ? .bold : .medium))
                         }
-                        .font(.system(size: 12, weight: viewModel.selectedTab == tab ? .bold : .medium))
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 7)
                         .background(
-                            viewModel.selectedTab == tab
+                            isSelected
                             ? Color.accentColor.opacity(0.18)
                             : Color.clear
                         )
-                        .foregroundColor(viewModel.selectedTab == tab ? .accentColor : .secondary)
+                        .foregroundColor(isSelected ? .accentColor : .secondary)
                         .clipShape(Capsule())
+                        .overlay(
+                            Capsule()
+                                .stroke(isSelected ? Color.accentColor.opacity(0.35) : Color.clear, lineWidth: 1)
+                        )
                     }
                     .buttonStyle(.plain)
                 }
                 Spacer()
             }
             .padding(.horizontal, 16)
-            .padding(.vertical, 10)
+            .padding(.vertical, 8)
             .background(Color(NSColor.controlBackgroundColor).opacity(0.6))
 
             Divider()
@@ -192,82 +198,43 @@ struct SettingsView: View {
 
     private var generalSettingsTab: some View {
         VStack(alignment: .leading, spacing: 18) {
-            // Group 1: Apartman Bilgileri
-            VStack(alignment: .leading, spacing: 10) {
+            // Hero Showcase: Apartman Başlık & Durum Kartı
+            buildingHeroCard
+
+            // Group 1: Apartman Bilgileri & Hızlı Daire Seçici
+            VStack(alignment: .leading, spacing: 12) {
                 Label(l10n.buildingDetails, systemImage: "building.2.fill")
                     .font(.system(size: 13, weight: .bold))
                     .foregroundColor(.secondary)
 
                 settingsField(title: l10n.buildingName, text: $viewModel.apartmentName, placeholder: l10n.buildingNamePlaceholder)
                 settingsField(title: l10n.defaultManager, text: $viewModel.issuer, placeholder: l10n.defaultManagerPlaceholder)
-                settingsField(title: l10n.totalFlats, text: $viewModel.flatCount, placeholder: l10n.totalFlatsPlaceholder)
-            }
-            .padding(14)
-            .background(Color(NSColor.controlBackgroundColor))
-            .clipShape(RoundedRectangle(cornerRadius: 10))
 
-            // Group 2: Bina / Site Logosu (Building Logo)
-            VStack(alignment: .leading, spacing: 12) {
-                Label(l10n.buildingLogoSection, systemImage: "photo.badge.plus")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(.secondary)
+                // Total Flats with Interactive Hero Chips
+                VStack(alignment: .leading, spacing: 8) {
+                    settingsField(title: l10n.totalFlats, text: $viewModel.flatCount, placeholder: l10n.totalFlatsPlaceholder)
 
-                Text(l10n.buildingLogoDesc)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                    HStack(spacing: 8) {
+                        Text(l10n.heroQuickFlats)
+                            .font(.system(size: 11))
+                            .foregroundColor(.secondary)
+                            .frame(width: 200, alignment: .leading)
 
-                HStack(spacing: 16) {
-                    // Logo Preview Card
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(Color(NSColor.textBackgroundColor))
-                        RoundedRectangle(cornerRadius: 10)
-                            .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
-
-                        if let logo = settings.logoImage {
-                            Image(nsImage: logo)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 58, height: 58)
-                                .clipShape(RoundedRectangle(cornerRadius: 8))
-                        } else {
-                            Default2DBuildingLogo(size: 58)
-                        }
-                    }
-                    .frame(width: 76, height: 76)
-
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack(spacing: 6) {
-                            if settings.logoImage != nil {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .foregroundColor(.green)
-                                Text(l10n.activeLogoBadge)
-                                    .font(.caption.bold())
-                                    .foregroundColor(.green)
-                            } else {
-                                Image(systemName: "sparkles")
-                                    .foregroundColor(.accentColor)
-                                Text(l10n.default2DLogoBadge)
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
-                        }
-
-                        HStack(spacing: 10) {
-                            Button {
-                                settings.importLogo()
-                            } label: {
-                                Label(l10n.uploadLogoButton, systemImage: "arrow.up.doc.fill")
-                            }
-                            .buttonStyle(.borderedProminent)
-
-                            if settings.logoImage != nil {
-                                Button(role: .destructive) {
-                                    settings.clearLogo()
+                        HStack(spacing: 5) {
+                            ForEach([6, 8, 10, 12, 16, 20, 24, 30], id: \.self) { count in
+                                let isSelected = viewModel.flatCount == String(count)
+                                Button {
+                                    viewModel.setQuickFlatCount(count)
                                 } label: {
-                                    Label(l10n.removeLogoButton, systemImage: "trash.fill")
+                                    Text("\(count)")
+                                        .font(.system(size: 11, weight: isSelected ? .bold : .medium))
+                                        .padding(.horizontal, 9)
+                                        .padding(.vertical, 4)
+                                        .background(isSelected ? Color.accentColor : Color.secondary.opacity(0.12))
+                                        .foregroundColor(isSelected ? .white : .primary)
+                                        .clipShape(Capsule())
                                 }
-                                .buttonStyle(.bordered)
+                                .buttonStyle(.plain)
                             }
                         }
                     }
@@ -277,8 +244,9 @@ struct SettingsView: View {
             .background(Color(NSColor.controlBackgroundColor))
             .clipShape(RoundedRectangle(cornerRadius: 10))
 
-            // Group 3: Mali Ayarlar
-            VStack(alignment: .leading, spacing: 10) {
+
+            // Group 2: Mali Ayarlar & Hero Para Birimi Kartları
+            VStack(alignment: .leading, spacing: 12) {
                 Label(l10n.financialSettings, systemImage: "banknote.fill")
                     .font(.system(size: 13, weight: .bold))
                     .foregroundColor(.secondary)
@@ -286,45 +254,30 @@ struct SettingsView: View {
                 settingsField(title: "\(l10n.defaultDues) (\(viewModel.currency.symbol))", text: $viewModel.defaultPayment, placeholder: "1750")
                 settingsField(title: l10n.nextReceiptNo, text: $viewModel.sequenceNumber, placeholder: "1")
 
-                HStack {
+                VStack(alignment: .leading, spacing: 8) {
                     Text(l10n.currencySelection)
                         .font(.system(size: 12))
                         .foregroundColor(.secondary)
-                        .frame(width: 200, alignment: .leading)
 
-                    Picker("", selection: $viewModel.currency) {
-                        ForEach(AppCurrency.allCases) { curr in
-                            Text(curr.title(l10n: l10n)).tag(curr)
-                        }
-                    }
-                    .labelsHidden()
-                    .onChange(of: viewModel.currency) { newCurr in
-                        settings.currency = newCurr
-                    }
+                    currencyHeroDeck
                 }
             }
             .padding(14)
             .background(Color(NSColor.controlBackgroundColor))
             .clipShape(RoundedRectangle(cornerRadius: 10))
 
-            // Group 3: Örnek Değerler / Sample Defaults
-            VStack(alignment: .leading, spacing: 10) {
-                Label(l10n.sampleDefaultsSection, systemImage: "sparkles")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(.secondary)
-
-                Text(l10n.sampleDefaultsDesc)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-
-                HStack(spacing: 12) {
-                    Button {
-                        viewModel.loadSampleDefaults(for: viewModel.language)
-                    } label: {
-                        Label(l10n.loadSampleDefaultsButton, systemImage: "arrow.counterclockwise.circle.fill")
+            // Group 3: Hızlı Başlangıç Senaryo Kartları
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Label(l10n.quickScenarioTitle, systemImage: "sparkles.rectangle.stack.fill")
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundColor(.secondary)
+                        Text(l10n.quickScenarioSubtitle)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
                     }
-                    .buttonStyle(.borderedProminent)
-
+                    Spacer()
                     if viewModel.showSampleDefaultsFeedback {
                         HStack(spacing: 4) {
                             Image(systemName: "checkmark.circle.fill")
@@ -335,10 +288,288 @@ struct SettingsView: View {
                         }
                     }
                 }
+
+                HStack(spacing: 10) {
+                    scenarioHeroCard(
+                        flag: "🇹🇷",
+                        title: l10n.sampleScenarioTR,
+                        desc: l10n.sampleScenarioDescTR,
+                        lang: .turkish,
+                        color: .red
+                    )
+
+                    scenarioHeroCard(
+                        flag: "🇬🇧",
+                        title: l10n.sampleScenarioEN,
+                        desc: l10n.sampleScenarioDescEN,
+                        lang: .english,
+                        color: .blue
+                    )
+
+                    scenarioHeroCard(
+                        flag: "🇷🇴",
+                        title: l10n.sampleScenarioRO,
+                        desc: l10n.sampleScenarioDescRO,
+                        lang: .romanian,
+                        color: .yellow
+                    )
+                }
             }
             .padding(14)
             .background(Color(NSColor.controlBackgroundColor))
             .clipShape(RoundedRectangle(cornerRadius: 10))
+        }
+    }
+
+    // MARK: - Building Hero Showcase Card
+
+    private var buildingHeroCard: some View {
+        VStack(spacing: 12) {
+            HStack(spacing: 16) {
+                // Interactive Building Logo Avatar
+                ZStack {
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .fill(Color(NSColor.textBackgroundColor))
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .stroke(Color.accentColor.opacity(0.25), lineWidth: 1.5)
+
+                    if let logo = settings.logoImage {
+                        Image(nsImage: logo)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 52, height: 52)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                    } else {
+                        Default2DBuildingLogo(size: 52)
+                    }
+                }
+                .frame(width: 68, height: 68)
+                .shadow(color: Color.black.opacity(0.06), radius: 4, x: 0, y: 2)
+
+                // Building Identity Details
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack(spacing: 8) {
+                        Text(l10n.buildingHeroBadge)
+                            .font(.system(size: 9, weight: .bold))
+                            .padding(.horizontal, 7)
+                            .padding(.vertical, 3)
+                            .background(Color.accentColor.opacity(0.14))
+                            .foregroundColor(.accentColor)
+                            .clipShape(Capsule())
+
+                        if settings.logoImage != nil {
+                            HStack(spacing: 3) {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .foregroundColor(.green)
+                                    .font(.system(size: 10))
+                                Text(l10n.activeLogoBadge)
+                                    .font(.system(size: 10, weight: .semibold))
+                                    .foregroundColor(.green)
+                            }
+                        } else {
+                            HStack(spacing: 3) {
+                                Image(systemName: "sparkles")
+                                    .foregroundColor(.accentColor)
+                                    .font(.system(size: 10))
+                                Text(l10n.default2DLogoBadge)
+                                    .font(.system(size: 10))
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                    }
+
+                    Text(viewModel.apartmentName.isEmpty ? l10n.buildingNamePlaceholder : viewModel.apartmentName)
+                        .font(.system(size: 17, weight: .bold))
+                        .foregroundColor(viewModel.apartmentName.isEmpty ? .secondary : .primary)
+                        .lineLimit(1)
+
+                    HStack(spacing: 6) {
+                        Image(systemName: "person.badge.shield.checkmark.fill")
+                            .font(.system(size: 11))
+                            .foregroundColor(.secondary)
+                        Text(viewModel.issuer.isEmpty ? l10n.heroNotSpecified : "\(l10n.heroStatsManager): \(viewModel.issuer)")
+                            .font(.system(size: 12))
+                            .foregroundColor(.secondary)
+                            .lineLimit(1)
+                    }
+                }
+
+                Spacer()
+
+                // Logo Action Buttons
+                VStack(spacing: 6) {
+                    Button {
+                        settings.importLogo()
+                    } label: {
+                        Label(l10n.uploadLogoButton, systemImage: "arrow.up.doc.fill")
+                            .font(.system(size: 11, weight: .medium))
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.small)
+
+                    if settings.logoImage != nil {
+                        Button(role: .destructive) {
+                            settings.clearLogo()
+                        } label: {
+                            Label(l10n.removeLogoButton, systemImage: "trash.fill")
+                                .font(.system(size: 11, weight: .medium))
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+                    }
+                }
+            }
+
+            Divider()
+
+            // 4 Live Stats Chips
+            HStack(spacing: 8) {
+                heroStatChip(
+                    icon: "building.2.fill",
+                    label: "\(viewModel.flatCount) \(l10n.heroStatsFlats)",
+                    color: .accentColor
+                )
+
+                heroStatChip(
+                    icon: "person.fill",
+                    label: viewModel.issuer.isEmpty ? "-" : viewModel.issuer,
+                    color: .purple
+                )
+
+                heroStatChip(
+                    icon: "banknote.fill",
+                    label: "\(viewModel.defaultPayment) \(viewModel.currency.symbol)",
+                    color: .green
+                )
+
+                heroStatChip(
+                    icon: "number.circle.fill",
+                    label: "#\(viewModel.sequenceNumber)",
+                    color: .orange
+                )
+            }
+        }
+        .padding(14)
+        .background(
+            LinearGradient(
+                colors: [
+                    Color(NSColor.controlBackgroundColor),
+                    Color(NSColor.controlBackgroundColor).opacity(0.85)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(Color.accentColor.opacity(0.2), lineWidth: 1)
+        )
+        .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 2)
+    }
+
+    private func heroStatChip(icon: String, label: String, color: Color) -> some View {
+        HStack(spacing: 5) {
+            Image(systemName: icon)
+                .font(.system(size: 10, weight: .semibold))
+                .foregroundColor(color)
+            Text(label)
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundColor(.primary)
+                .lineLimit(1)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 6)
+        .padding(.horizontal, 8)
+        .background(color.opacity(0.09))
+        .clipShape(RoundedRectangle(cornerRadius: 6))
+    }
+
+    // MARK: - Scenario Hero Card
+
+    private func scenarioHeroCard(flag: String, title: String, desc: String, lang: AppLanguage, color: Color) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 6) {
+                Text(flag)
+                    .font(.system(size: 16))
+                Text(title)
+                    .font(.system(size: 11, weight: .bold))
+                    .lineLimit(1)
+            }
+
+            Text(desc)
+                .font(.system(size: 10))
+                .foregroundColor(.secondary)
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Spacer()
+
+            Button {
+                viewModel.loadSampleDefaults(for: lang)
+            } label: {
+                HStack(spacing: 4) {
+                    Image(systemName: "arrow.counterclockwise")
+                        .font(.system(size: 10))
+                    Text(l10n.applyScenarioButton)
+                        .font(.system(size: 10, weight: .semibold))
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 4)
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.small)
+        }
+        .padding(10)
+        .frame(maxWidth: .infinity, minHeight: 110)
+        .background(Color(NSColor.textBackgroundColor))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(Color.secondary.opacity(0.18), lineWidth: 1)
+        )
+    }
+
+    // MARK: - Currency Hero Deck
+
+    private var currencyHeroDeck: some View {
+        HStack(spacing: 8) {
+            ForEach(AppCurrency.allCases) { curr in
+                let isSelected = viewModel.currency == curr
+                Button {
+                    viewModel.currency = curr
+                    settings.currency = curr
+                } label: {
+                    HStack(spacing: 6) {
+                        Text(curr.symbol)
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundColor(isSelected ? .accentColor : .secondary)
+                        VStack(alignment: .leading, spacing: 1) {
+                            Text(curr.code)
+                                .font(.system(size: 11, weight: .bold))
+                                .foregroundColor(isSelected ? .primary : .secondary)
+                            Text(curr.title(l10n: l10n))
+                                .font(.system(size: 9))
+                                .foregroundColor(.secondary)
+                                .lineLimit(1)
+                        }
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(
+                        isSelected
+                        ? Color.accentColor.opacity(0.12)
+                        : Color(NSColor.textBackgroundColor)
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(isSelected ? Color.accentColor : Color.secondary.opacity(0.18), lineWidth: isSelected ? 1.5 : 1)
+                    )
+                }
+                .buttonStyle(.plain)
+            }
         }
     }
 
@@ -562,28 +793,13 @@ struct SettingsView: View {
 
     private var appearanceTab: some View {
         VStack(alignment: .leading, spacing: 18) {
-            // Theme selection
+            // Theme selection (Hero Deck)
             VStack(alignment: .leading, spacing: 10) {
                 Label(l10n.appearanceSection, systemImage: "circle.righthalf.filled")
                     .font(.system(size: 13, weight: .bold))
                     .foregroundColor(.secondary)
 
-                HStack {
-                    Text(l10n.themeSelection)
-                        .font(.system(size: 12))
-                        .foregroundColor(.secondary)
-                        .frame(width: 200, alignment: .leading)
-
-                    Picker("", selection: $viewModel.theme) {
-                        ForEach(AppTheme.allCases) { theme in
-                            Text(theme.title(l10n: l10n)).tag(theme)
-                        }
-                    }
-                    .labelsHidden()
-                    .onChange(of: viewModel.theme) { newTheme in
-                        settings.theme = newTheme
-                    }
-                }
+                themeHeroDeck
             }
             .padding(14)
             .background(Color(NSColor.controlBackgroundColor))
@@ -645,32 +861,62 @@ struct SettingsView: View {
             .background(Color(NSColor.controlBackgroundColor))
             .clipShape(RoundedRectangle(cornerRadius: 10))
 
-            // Currency selection
+            // Currency selection (Hero Deck)
             VStack(alignment: .leading, spacing: 10) {
                 Label(l10n.currencySection, systemImage: "coloncurrencysign.circle.fill")
                     .font(.system(size: 13, weight: .bold))
                     .foregroundColor(.secondary)
 
-                HStack {
-                    Text(l10n.currencySelection)
-                        .font(.system(size: 12))
-                        .foregroundColor(.secondary)
-                        .frame(width: 200, alignment: .leading)
-
-                    Picker("", selection: $viewModel.currency) {
-                        ForEach(AppCurrency.allCases) { curr in
-                            Text(curr.title(l10n: l10n)).tag(curr)
-                        }
-                    }
-                    .labelsHidden()
-                    .onChange(of: viewModel.currency) { newCurrency in
-                        settings.currency = newCurrency
-                    }
-                }
+                currencyHeroDeck
             }
             .padding(14)
             .background(Color(NSColor.controlBackgroundColor))
             .clipShape(RoundedRectangle(cornerRadius: 10))
+        }
+    }
+
+    // MARK: - Theme Hero Deck
+
+    private var themeHeroDeck: some View {
+        HStack(spacing: 10) {
+            ForEach(AppTheme.allCases) { theme in
+                let isSelected = viewModel.theme == theme
+                Button {
+                    viewModel.theme = theme
+                    settings.theme = theme
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: themeIcon(theme))
+                            .font(.system(size: 13))
+                            .foregroundColor(isSelected ? .accentColor : .secondary)
+                        Text(theme.title(l10n: l10n))
+                            .font(.system(size: 12, weight: isSelected ? .bold : .medium))
+                            .foregroundColor(isSelected ? .primary : .secondary)
+                    }
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 8)
+                    .frame(maxWidth: .infinity)
+                    .background(
+                        isSelected
+                        ? Color.accentColor.opacity(0.14)
+                        : Color(NSColor.textBackgroundColor)
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(isSelected ? Color.accentColor : Color.secondary.opacity(0.2), lineWidth: isSelected ? 1.5 : 1)
+                    )
+                }
+                .buttonStyle(.plain)
+            }
+        }
+    }
+
+    private func themeIcon(_ theme: AppTheme) -> String {
+        switch theme {
+        case .system: return "laptopcomputer"
+        case .light: return "sun.max.fill"
+        case .dark: return "moon.stars.fill"
         }
     }
 
@@ -943,6 +1189,16 @@ final class SettingsViewModel: ObservableObject {
         showSampleDefaultsFeedback = true
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
             self.showSampleDefaultsFeedback = false
+        }
+    }
+
+    func setQuickFlatCount(_ count: Int) {
+        flatCount = String(count)
+        let samples = SampleData.defaults(for: language)
+        for (apt, name) in samples.residents {
+            if apt <= count && (residents[apt] == nil || residents[apt]?.isEmpty == true) {
+                residents[apt] = name
+            }
         }
     }
 

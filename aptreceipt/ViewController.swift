@@ -500,6 +500,24 @@ struct L10n {
     var removeLogoButton: String { tr("Remove Logo", "Logoyu Kaldır", "Șterge Sigla") }
     var activeLogoBadge: String { tr("Custom Logo Active", "Özel Logo Yüklendi", "Siglă Personalizată Activă") }
     var default2DLogoBadge: String { tr("Default 2D Logo Active", "Varsayılan 2D Logo Aktif", "Siglă 2D Implicită Activă") }
+
+    // Settings Hero Strings
+    var buildingHeroBadge: String { tr("BUILDING PROFILE", "BİNA PROFİLİ", "PROFIL IMOBIL") }
+    var heroQuickFlats: String { tr("Quick Presets:", "Hızlı Daire Seçimi:", "Presetări Rapide:") }
+    var heroStatsFlats: String { tr("Flats", "Daire", "Apartamente") }
+    var heroStatsManager: String { tr("Manager", "Yönetici", "Administrator") }
+    var heroStatsDues: String { tr("Monthly Dues", "Aylık Aidat", "Cotă Lunară") }
+    var heroStatsNextReceipt: String { tr("Next No", "Sonraki No", "Număr Următor") }
+    var heroNotSpecified: String { tr("Not specified", "Belirtilmedi", "Nespecificat") }
+    var quickScenarioTitle: String { tr("Starter Scenarios & Presets", "Hızlı Başlangıç Senaryoları", "Scenarii Rapide de Pornire") }
+    var quickScenarioSubtitle: String { tr("Populate full realistic building data sets for quick testing or onboarding", "Hızlı deneme veya ilk kurulum için hazır örnek verileri tek tıkla yükleyin", "Completați seturi complete de date reale pentru testare rapidă") }
+    var sampleScenarioTR: String { tr("Turkey / Turkish Condominium", "Türkiye / Türkçe Apartman", "Turcia / Asociație Turcă") }
+    var sampleScenarioEN: String { tr("International / English Condominium", "Uluslararası / İngilizce Apartman", "Internațional / Asociație Engleză") }
+    var sampleScenarioRO: String { tr("Romania / Asociație de Proprietari", "Romanya / Asociație de Proprietari", "România / Asociație de Proprietari") }
+    var sampleScenarioDescTR: String { tr("Güleryüz Apt • 12 flats • 1,750 ₺ • Ahmet Yılmaz", "Güleryüz Apt • 12 daire • 1.750 ₺ • Ahmet Yılmaz", "Güleryüz Apt • 12 ap. • 1.750 ₺ • Ahmet Yılmaz") }
+    var sampleScenarioDescEN: String { tr("Sunshine Residence • 12 units • $1,750 • John Doe", "Sunshine Residence • 12 daire • 1.750 $ • John Doe", "Sunshine Residence • 12 ap. • 1.750 $ • John Doe") }
+    var sampleScenarioDescRO: String { tr("Asociația Parcul Tineretului • 12 ap. • 1,750 lei • Andrei Popescu", "Asociația Parcul Tineretului • 12 daire • 1.750 lei • Andrei Popescu", "Asociația Parcul Tineretului • 12 ap. • 1.750 lei • Andrei Popescu") }
+    var applyScenarioButton: String { tr("Apply Preset", "Şablonu Uygula", "Aplică Șablonul") }
 }
 
 // MARK: - Main Screen
