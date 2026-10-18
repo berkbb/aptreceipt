@@ -94,11 +94,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             signatureImage: nil,
             l10n: settings.l10n
         )
-        .frame(width: 780, height: 540)
-        render(view: docView, size: CGSize(width: 780, height: 540), to: outDir.appendingPathComponent("02_receipt_document.png"))
+        .frame(width: 595, height: 842)
+        render(view: docView, size: CGSize(width: 595, height: 842), to: outDir.appendingPathComponent("02_receipt_document.png"))
 
-        // 3. Settings View
-        let settingsView = SettingsView(settings: settings)
+        // 3. Settings View (About & License)
+        let settingsView = SettingsView(settings: settings, initialTab: .about)
             .frame(width: 680, height: 580)
         render(view: settingsView, size: CGSize(width: 680, height: 580), to: outDir.appendingPathComponent("03_settings_view.png"))
 
@@ -121,8 +121,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             signatureImage: nil,
             l10n: settings.l10n
         )
-        .frame(width: 780, height: 540)
-        render(view: docOutcomeView, size: CGSize(width: 780, height: 540), to: outDir.appendingPathComponent("04_receipt_outcome.png"))
+        .frame(width: 595, height: 842)
+        render(view: docOutcomeView, size: CGSize(width: 595, height: 842), to: outDir.appendingPathComponent("04_receipt_outcome.png"))
 
         // 5. English Main Dashboard
         let settingsEN = ReceiptSettingsStore()
@@ -137,6 +137,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let mainViewEN = MainScreen(settings: settingsEN)
             .frame(width: 1080, height: 740)
         render(view: mainViewEN, size: CGSize(width: 1080, height: 740), to: outDir.appendingPathComponent("05_main_dashboard_en.png"))
+
+        // 6. Romanian Main Dashboard
+        let settingsRO = ReceiptSettingsStore()
+        settingsRO.apartmentName = "Asociația Parcul Tineretului"
+        settingsRO.issuer = "Andrei Popescu"
+        settingsRO.defaultPayment = "1750"
+        settingsRO.seqNumber = 104
+        settingsRO.flatCount = 12
+        settingsRO.language = .romanian
+        settingsRO.saveOwner("Elena Radu", apartmentNumber: 1)
+
+        let mainViewRO = MainScreen(settings: settingsRO)
+            .frame(width: 1080, height: 740)
+        render(view: mainViewRO, size: CGSize(width: 1080, height: 740), to: outDir.appendingPathComponent("06_main_dashboard_ro.png"))
 
         print("Screenshots successfully generated in \(outDir.path)")
     }
