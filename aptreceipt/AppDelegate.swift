@@ -23,7 +23,7 @@ struct AptReceiptApp: App {
             }
             CommandGroup(replacing: .appSettings) {
                 Button(settings.l10n.menuSettings) {
-                    NSApp.sendAction(Selector(("showPreferencesWindow:")), to: nil, from: nil)
+                    SettingsWindowManager.shared.show(settings: settings)
                 }
                 .keyboardShortcut(",", modifiers: .command)
             }
@@ -34,13 +34,6 @@ struct AptReceiptApp: App {
                     }
                 }
             }
-        }
-
-        // Dedicated Settings window accessible from Menu Bar (Cmd+,)
-        Settings {
-            SettingsView(settings: settings)
-                .frame(width: 680, height: 580)
-                .preferredColorScheme(settings.theme.colorScheme)
         }
     }
 }
@@ -77,6 +70,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @MainActor
     @objc func showAboutWindow(_ sender: Any?) {
         AboutWindowManager.shared.show()
+    }
+
+    @MainActor
+    @objc func showPreferencesWindow(_ sender: Any?) {
+        SettingsWindowManager.shared.show()
+    }
+
+    @MainActor
+    @objc func showSettingsWindow(_ sender: Any?) {
+        SettingsWindowManager.shared.show()
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
@@ -409,6 +412,58 @@ final class AboutWindowManager: NSObject, NSWindowDelegate {
         newWindow.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
     }
+
+    func windowWillClose(_ notification: Notification) {
+        self.window = nil
+    }
+}
+
+// MARK: - Settings Window Manager
+
+@MainActor
+final class SettingsWindowManager: NSObject, NSWindowDelegate {
+    static let shared = SettingsWindowManager()
+    private var window: NSWindow?
+
+    private override init() {
+        super.init()
+    }
+
+    func show(settings: ReceiptSettingsStore? = nil, tab: SettingsTab = .general) {
+        let actualSettings = settings ?? ReceiptSettingsStore()
+        if let window = window {
+            window.title = actualSettings.l10n.settingsTitle
+            window.contentView = NSHostingView(
+                rootView: SettingsView(settings: actualSettings, initialTab: tab)
+                    .preferredColorScheme(actualSettings.theme.colorScheme)
+            )
+            window.makeKeyAndOrderFront(nil)
+            NSApp.activate(ignoringOtherApps: true)
+            return
+        }
+
+        let newWindow = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 680, height: 600),
+            styleMask: [.titled, .closable, .miniaturizable],
+            backing: .buffered,
+            defer: false
+        )
+        newWindow.title = actualSettings.l10n.settingsTitle
+        newWindow.isReleasedWhenClosed = false
+        newWindow.delegate = self
+        newWindow.center()
+        newWindow.contentView = NSHostingView(
+            rootView: SettingsView(settings: actualSettings, initialTab: tab)
+                .preferredColorScheme(actualSettings.theme.colorScheme)
+        )
+        self.window = newWindow
+        newWindow.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
+    func windowWillClose(_ notification: Notification) {
+        self.window = nil
+    }
 }
 
 // MARK: - Menu Bar Localization Manager
@@ -560,6 +615,9 @@ final class MenuBarManager: NSObject {
     }
 
     private func localizeAppSubmenu(_ submenu: NSMenu, with l10n: L10n) {
+        var seenSettings = false
+        var itemsToRemove: [NSMenuItem] = []
+
         for item in submenu.items {
             let actionStr = item.action?.description ?? ""
             let titleLower = item.title.lowercased()
@@ -568,8 +626,17 @@ final class MenuBarManager: NSObject {
                 item.title = l10n.menuAboutApp
                 item.target = NSApp.delegate
                 item.action = #selector(AppDelegate.orderFrontStandardAboutPanel(_:))
-            } else if actionStr.contains("showPreferencesWindow") || actionStr.contains("openSettings") || titleLower.contains("preferences") || titleLower.contains("settings") || titleLower.contains("tercihler") || titleLower.contains("ayarlar") || titleLower.contains("preferințe") || titleLower.contains("configurări") {
-                item.title = l10n.menuSettings
+            } else if actionStr.contains("showPreferencesWindow") || actionStr.contains("showSettingsWindow") || actionStr.contains("openSettings") || titleLower.contains("preferences") || titleLower.contains("settings") || titleLower.contains("tercihler") || titleLower.contains("ayarlar") || titleLower.contains("preferințe") || titleLower.contains("configurări") {
+                if seenSettings {
+                    itemsToRemove.append(item)
+                } else {
+                    seenSettings = true
+                    item.title = l10n.menuSettings
+                    item.target = NSApp.delegate
+                    item.action = #selector(AppDelegate.showPreferencesWindow(_:))
+                    item.keyEquivalent = ","
+                    item.keyEquivalentModifierMask = .command
+                }
             } else if item.hasSubmenu || titleLower.contains("service") || titleLower.contains("servis") || titleLower.contains("servici") {
                 item.title = l10n.menuServices
                 item.submenu?.title = l10n.menuServices
@@ -584,6 +651,10 @@ final class MenuBarManager: NSObject {
             } else if item.action == #selector(NSApplication.terminate(_:)) || titleLower.contains("quit ") || titleLower.contains("çık") || titleLower.contains("închide ") {
                 item.title = l10n.menuQuitApp
             }
+        }
+
+        for item in itemsToRemove {
+            submenu.removeItem(item)
         }
     }
 

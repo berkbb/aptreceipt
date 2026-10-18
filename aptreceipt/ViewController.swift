@@ -585,18 +585,7 @@ struct MainScreen: View {
     }
 
     private func openSettingsWindow() {
-        if #available(macOS 14.0, *) {
-            NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
-        } else {
-            NSApp.sendAction(Selector(("showPreferencesWindow:")), to: nil, from: nil)
-        }
-        // If window wasn't opened (e.g. headless or older lifecycle), fallback to sheet
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            let hasSettingsWindow = NSApp.windows.contains { $0.title.contains("Tercihler") || $0.title.contains("Settings") || $0.title.contains("Preferences") }
-            if !hasSettingsWindow {
-                viewModel.isPresentingSettings = true
-            }
-        }
+        SettingsWindowManager.shared.show(settings: settings)
     }
 
     // MARK: - Sections
