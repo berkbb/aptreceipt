@@ -858,7 +858,10 @@ final class ReceiptSettingsStore: ObservableObject {
         didSet { defaults.set(language.rawValue, forKey: Keys.language) }
     }
     @Published var theme: AppTheme {
-        didSet { defaults.set(theme.rawValue, forKey: Keys.theme) }
+        didSet {
+            defaults.set(theme.rawValue, forKey: Keys.theme)
+            applyTheme(theme)
+        }
     }
     @Published var signatureData: Data? {
         didSet {
@@ -891,9 +894,22 @@ final class ReceiptSettingsStore: ObservableObject {
         language = AppLanguage(rawValue: savedLang) ?? .system
 
         let savedTheme = defaults.string(forKey: Keys.theme) ?? AppTheme.system.rawValue
-        theme = AppTheme(rawValue: savedTheme) ?? .system
+        let resolvedTheme = AppTheme(rawValue: savedTheme) ?? .system
+        theme = resolvedTheme
+        applyTheme(resolvedTheme)
 
         signatureData = defaults.data(forKey: Keys.signature)
+    }
+
+    func applyTheme(_ targetTheme: AppTheme) {
+        switch targetTheme {
+        case .system:
+            NSApp.appearance = nil
+        case .light:
+            NSApp.appearance = NSAppearance(named: .aqua)
+        case .dark:
+            NSApp.appearance = NSAppearance(named: .darkAqua)
+        }
     }
 
     var apartmentNumbers: [Int] {

@@ -32,6 +32,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
 
+        let settings = ReceiptSettingsStore()
+        settings.applyTheme(settings.theme)
+
         NSApp.setActivationPolicy(.regular)
         NSApp.activate(ignoringOtherApps: true)
     }

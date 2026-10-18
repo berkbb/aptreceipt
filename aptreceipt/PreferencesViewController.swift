@@ -271,6 +271,9 @@ struct SettingsView: View {
                         }
                     }
                     .labelsHidden()
+                    .onChange(of: viewModel.theme) { newTheme in
+                        settings.theme = newTheme
+                    }
                 }
             }
             .padding(14)
@@ -295,6 +298,9 @@ struct SettingsView: View {
                         }
                     }
                     .labelsHidden()
+                    .onChange(of: viewModel.language) { newLang in
+                        settings.language = newLang
+                    }
                 }
             }
             .padding(14)
