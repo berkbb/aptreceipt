@@ -247,6 +247,9 @@ struct L10n {
     var licenseViewerSubtitle: String { tr("Free and open-source software license. Publisher: berkbb", "Özgür ve açık kaynak kodlu yazılım lisansı. Yayıncı: berkbb", "Licență software liberă și cu sursă deschisă. Editor: berkbb") }
     var copyLicenseText: String { tr("Copy License Text", "Lisans Metnini Kopyala", "Copiază Textul Licenței") }
     var licenseCopied: String { tr("Copied!", "Kopyalandı!", "Copiat!") }
+    var aboutWindowHeader: String { tr("About Apartment Receipt", "Apartman Makbuzu Hakkında", "Despre Chitanță Asociație") }
+    var githubRepository: String { tr("GitHub Repository", "GitHub Deposu", "Depozit GitHub") }
+    var appDescription: String { tr("Modern, secure and trilingual apartment dues & expense receipt generator.", "Modern, güvenli ve üç dilli apartman aidat ve gider makbuzu oluşturucu.", "Generator modern, sigur și trilingv de chitanțe de încasare și dispoziții de plată.") }
 
     // Validation Messages
     var validationErrorTitle: String { tr("Validation Error", "Doğrulama Hatası", "Eroare de Validare") }
