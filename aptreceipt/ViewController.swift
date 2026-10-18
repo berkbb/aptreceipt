@@ -1,98 +1,86 @@
 import AppKit
 import SwiftUI
 
+// MARK: - Main Screen
+
 struct MainScreen: View {
     @StateObject private var settings = ReceiptSettingsStore()
-
-    @State private var selectedApartment = 1
-    @State private var receiptDate = Date()
-    @State private var issuerName = ""
-    @State private var ownerName = ""
-    @State private var sequenceNumber = "1"
-    @State private var totalAmount = ""
-    @State private var notes = ""
-    @State private var printApartmentNumber = true
-    @State private var receiptKind: ReceiptKind = .income
-
-    @State private var previewDraft: ReceiptDraft?
-    @State private var isPresentingSettings = false
-    @State private var validationError: ValidationError?
+    @StateObject private var viewModel = MainScreenViewModel()
 
     var body: some View {
-        VStack(spacing: 16) {
-            HStack {
-                Text("Apartman Makbuzu")
-                    .font(.system(size: 24, weight: .semibold))
-                Spacer()
-                Button("Tercihler") {
-                    isPresentingSettings = true
-                }
-            }
+        VStack(spacing: 0) {
+            // Top Bar
+            headerBar
+                .padding(.horizontal, 24)
+                .padding(.vertical, 16)
+                .background(Color(NSColor.windowBackgroundColor))
 
-            VStack(spacing: 12) {
-                GroupBox(
-                    label: Text("Makbuz Türü")
-                ) {
-                    Picker("Makbuz Türü", selection: $receiptKind) {
-                        ForEach(ReceiptKind.allCases) { kind in
-                            Text(kind.title).tag(kind)
-                        }
+            Divider()
+
+            // Main Content Area: Left Form + Right Live Preview
+            HSplitView {
+                // Left Form
+                ScrollView {
+                    VStack(spacing: 18) {
+                        receiptTypeSection
+                        apartmentAndPeriodSection
+                        partiesSection
+                        financialSection
+                        actionButtons
                     }
-                    .pickerStyle(.segmented)
+                    .padding(24)
                 }
+                .frame(minWidth: 460, idealWidth: 540)
 
-                GroupBox(
-                    label: Text("Makbuz Bilgileri")
-                ) {
-                    VStack(alignment: .leading, spacing: 10) {
-                        HStack {
-                            Picker("Daire No", selection: $selectedApartment) {
-                                ForEach(settings.apartmentNumbers, id: \.self) { number in
-                                    Text("\(number)").tag(number)
-                                }
-                            }
-                            Toggle("Daire numarasını yazdır", isOn: $printApartmentNumber)
-                        }
+                // Right Live Preview
+                VStack(spacing: 16) {
+                    HStack {
+                        Label("Canlı Önizleme", systemImage: "eye.fill")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundColor(.secondary)
+                        Spacer()
+                        Text("Baskı Görünümü")
+                            .font(.caption)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 3)
+                            .background(Color.secondary.opacity(0.12))
+                            .clipShape(Capsule())
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.top, 20)
 
-                        DatePicker("Dönem", selection: $receiptDate, displayedComponents: .date)
-
-                        TextField("Tahsil Eden", text: $issuerName)
-                        TextField("Ödeyen", text: $ownerName)
-                        TextField("Sıra No", text: $sequenceNumber)
-                        TextField("Tutar", text: $totalAmount)
-                        TextField("Açıklama", text: $notes)
+                    ScrollView {
+                        LiveReceiptPreview(
+                            kind: viewModel.receiptKind,
+                            apartmentName: settings.apartmentName,
+                            apartmentNumber: viewModel.selectedApartment,
+                            showApartmentNumber: viewModel.printApartmentNumber,
+                            period: viewModel.receiptDate.monthYearString,
+                            issuer: viewModel.issuerName.isEmpty ? "—" : viewModel.issuerName,
+                            receiver: viewModel.ownerName.isEmpty ? "—" : viewModel.ownerName,
+                            amountString: viewModel.totalAmount,
+                            sequenceNumber: viewModel.sequenceNumber,
+                            notes: viewModel.notes,
+                            signatureImage: settings.signatureImage
+                        )
+                        .padding(20)
                     }
                 }
-            }
-
-            HStack {
-                Button("Temizle") {
-                    resetForm()
-                }
-
-                Spacer()
-
-                Button("Makbuz Oluştur") {
-                    createReceipt()
-                }
-                .keyboardShortcut(.defaultAction)
+                .frame(minWidth: 420, idealWidth: 460)
+                .background(Color(NSColor.underPageBackgroundColor).opacity(0.6))
             }
         }
-        .padding(20)
         .onAppear {
-            resetForm()
+            viewModel.syncWithSettings(settings)
         }
-        .onChange(of: selectedApartment) { newValue in
-            ownerName = settings.owner(for: newValue)
-        }
-        .sheet(item: $previewDraft) { draft in
+        .sheet(item: $viewModel.previewDraft) { draft in
             ReceiptPreviewSheet(draft: draft, settings: settings)
         }
-        .sheet(isPresented: $isPresentingSettings) {
+        .sheet(isPresented: $viewModel.isPresentingSettings) {
             SettingsView(settings: settings)
-                .frame(width: 640, height: 560)
+                .frame(width: 660, height: 560)
         }
-        .alert(item: $validationError) { issue in
+        .alert(item: $viewModel.validationError) { issue in
             Alert(
                 title: Text("Doğrulama Hatası"),
                 message: Text(issue.message),
@@ -101,7 +89,426 @@ struct MainScreen: View {
         }
     }
 
-    private func resetForm() {
+    // MARK: - Header Bar
+
+    private var headerBar: some View {
+        HStack(spacing: 14) {
+            ZStack {
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            colors: [Color.accentColor, Color.accentColor.opacity(0.7)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 44, height: 44)
+                Image(systemName: "building.2.crop.circle.fill")
+                    .resizable()
+                    .frame(width: 24, height: 24)
+                    .foregroundColor(.white)
+            }
+
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(spacing: 8) {
+                    Text("Apartman Makbuzu")
+                        .font(.system(size: 20, weight: .bold))
+                    if !settings.apartmentName.isEmpty {
+                        Text(settings.apartmentName)
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(.accentColor)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 2)
+                            .background(Color.accentColor.opacity(0.12))
+                            .clipShape(Capsule())
+                    }
+                }
+                Text("Gelir ve gider makbuzlarınızı kolayca yönetin ve dışa aktarın")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+
+            Spacer()
+
+            Button {
+                viewModel.isPresentingSettings = true
+            } label: {
+                Label("Tercihler", systemImage: "gearshape.fill")
+                    .padding(.horizontal, 4)
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.regular)
+        }
+    }
+
+    // MARK: - Sections
+
+    private var receiptTypeSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Label("Makbuz Türü", systemImage: "doc.plaintext.fill")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundColor(.secondary)
+
+            Picker("Makbuz Türü", selection: $viewModel.receiptKind) {
+                ForEach(ReceiptKind.allCases) { kind in
+                    HStack {
+                        Image(systemName: kind.iconName)
+                        Text(kind.title)
+                    }
+                    .tag(kind)
+                }
+            }
+            .pickerStyle(.segmented)
+        }
+        .padding(14)
+        .background(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(Color(NSColor.controlBackgroundColor))
+        )
+    }
+
+    private var apartmentAndPeriodSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label("Daire ve Dönem", systemImage: "calendar.badge.clock")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundColor(.secondary)
+
+            HStack(spacing: 16) {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Daire Numarası")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Picker("", selection: $viewModel.selectedApartment) {
+                        ForEach(settings.apartmentNumbers, id: \.self) { number in
+                            Text("Daire \(number)").tag(number)
+                        }
+                    }
+                    .labelsHidden()
+                    .onChange(of: viewModel.selectedApartment) { newValue in
+                        viewModel.updateApartment(newValue, settings: settings)
+                    }
+                }
+
+                Spacer()
+
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Dönem")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    DatePicker("", selection: $viewModel.receiptDate, displayedComponents: .date)
+                        .labelsHidden()
+                }
+            }
+
+            Divider()
+
+            Toggle(isOn: $viewModel.printApartmentNumber) {
+                Label("Daire numarasını makbuz üzerine yazdır", systemImage: "checkmark.seal")
+                    .font(.callout)
+            }
+            .toggleStyle(.checkbox)
+        }
+        .padding(14)
+        .background(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(Color(NSColor.controlBackgroundColor))
+        )
+    }
+
+    private var partiesSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label("Taraflar", systemImage: "person.2.fill")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundColor(.secondary)
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Tahsil Eden (Yönetici / Yetkili)")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                HStack {
+                    Image(systemName: "person.badge.shield.checkmark.fill")
+                        .foregroundColor(.secondary)
+                    TextField("Örn: Ahmet Yılmaz", text: $viewModel.issuerName)
+                        .textFieldStyle(.plain)
+                }
+                .padding(8)
+                .background(Color(NSColor.textBackgroundColor))
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            }
+
+            VStack(alignment: .leading, spacing: 6) {
+                HStack {
+                    Text("Ödeyen (Daire Sakini / Muhatap)")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                    Button("Kayıtlı Sakini Getir") {
+                        viewModel.ownerName = settings.owner(for: viewModel.selectedApartment)
+                    }
+                    .buttonStyle(.link)
+                    .font(.caption2)
+                }
+
+                HStack {
+                    Image(systemName: "person.fill")
+                        .foregroundColor(.secondary)
+                    TextField("Örn: Mehmet Demir", text: $viewModel.ownerName)
+                        .textFieldStyle(.plain)
+                }
+                .padding(8)
+                .background(Color(NSColor.textBackgroundColor))
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            }
+        }
+        .padding(14)
+        .background(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(Color(NSColor.controlBackgroundColor))
+        )
+    }
+
+    private var financialSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label("Mali Detaylar ve Açıklama", systemImage: "banknote.fill")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundColor(.secondary)
+
+            HStack(spacing: 14) {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Tutar (₺)")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    HStack {
+                        Text("₺")
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundColor(.secondary)
+                        TextField("0.00", text: $viewModel.totalAmount)
+                            .textFieldStyle(.plain)
+                    }
+                    .padding(8)
+                    .background(Color(NSColor.textBackgroundColor))
+                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                }
+
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Sıra No")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    HStack {
+                        Image(systemName: "number.square.fill")
+                            .foregroundColor(.secondary)
+                        TextField("1", text: $viewModel.sequenceNumber)
+                            .textFieldStyle(.plain)
+                    }
+                    .padding(8)
+                    .background(Color(NSColor.textBackgroundColor))
+                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                }
+            }
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Açıklama / Notlar")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                HStack(alignment: .top) {
+                    Image(systemName: "text.alignleft")
+                        .foregroundColor(.secondary)
+                        .padding(.top, 2)
+                    TextField("Örn: 2026 Ekim ayı bina aidatı ve ortak alan gideri", text: $viewModel.notes)
+                        .textFieldStyle(.plain)
+                }
+                .padding(8)
+                .background(Color(NSColor.textBackgroundColor))
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            }
+        }
+        .padding(14)
+        .background(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(Color(NSColor.controlBackgroundColor))
+        )
+    }
+
+    private var actionButtons: some View {
+        HStack(spacing: 12) {
+            Button(role: .destructive) {
+                viewModel.resetForm(settings: settings)
+            } label: {
+                Label("Formu Temizle", systemImage: "arrow.counterclockwise")
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.large)
+
+            Spacer()
+
+            Button {
+                viewModel.createReceipt(settings: settings)
+            } label: {
+                Label("Makbuz Oluştur & Önizle", systemImage: "doc.badge.plus")
+                    .padding(.horizontal, 6)
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+            .keyboardShortcut(.defaultAction)
+        }
+        .padding(.top, 6)
+    }
+}
+
+// MARK: - Live Preview Widget
+
+struct LiveReceiptPreview: View {
+    let kind: ReceiptKind
+    let apartmentName: String
+    let apartmentNumber: Int
+    let showApartmentNumber: Bool
+    let period: String
+    let issuer: String
+    let receiver: String
+    let amountString: String
+    let sequenceNumber: String
+    let notes: String
+    let signatureImage: NSImage?
+
+    private var formattedAmount: String {
+        let normalized = amountString.trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: ",", with: ".")
+        if let val = Double(normalized) {
+            let formatter = NumberFormatter()
+            formatter.numberStyle = .currency
+            formatter.locale = Locale(identifier: "tr_TR")
+            return formatter.string(from: NSNumber(value: val)) ?? "₺\(amountString)"
+        }
+        return "₺ 0,00"
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            // Header
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(apartmentName.isEmpty ? "APARTMAN YÖNETİMİ" : apartmentName.uppercased())
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundColor(.primary)
+                    Text(kind == .income ? "TAHSİLAT MAKBUZU" : "GİDER MAKBUZU")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundColor(kind == .income ? .green : .orange)
+                }
+
+                Spacer()
+
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text("Sıra No: #\(sequenceNumber)")
+                        .font(.system(size: 11, weight: .bold, design: .monospaced))
+                    Text(period)
+                        .font(.system(size: 10))
+                        .foregroundColor(.secondary)
+                }
+            }
+
+            Divider()
+
+            // Info rows
+            VStack(spacing: 8) {
+                previewRow(label: "Ödeyen / Sakin", value: receiver)
+                if showApartmentNumber {
+                    previewRow(label: "Daire No", value: "Daire \(apartmentNumber)")
+                }
+                previewRow(label: "Tahsil Eden", value: issuer)
+                previewRow(label: "Tarih", value: Date().dayMonthYearString)
+            }
+
+            // Amount Highlight Box
+            HStack {
+                Text("Ödenen Tutar:")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundColor(.secondary)
+                Spacer()
+                Text(formattedAmount)
+                    .font(.system(size: 18, weight: .bold, design: .rounded))
+                    .foregroundColor(.accentColor)
+            }
+            .padding(12)
+            .background(Color.accentColor.opacity(0.08))
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+
+            // Notes
+            if !notes.isEmpty {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Açıklama:")
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundColor(.secondary)
+                    Text(notes)
+                        .font(.system(size: 11))
+                        .foregroundColor(.primary)
+                        .lineLimit(3)
+                }
+                .padding(8)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color.secondary.opacity(0.06))
+                .clipShape(RoundedRectangle(cornerRadius: 6))
+            }
+
+            // Signature area
+            if let signature = signatureImage {
+                HStack {
+                    Spacer()
+                    VStack(alignment: .center, spacing: 4) {
+                        Image(nsImage: signature)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 44)
+                        Text("Yetkili İmzası")
+                            .font(.system(size: 9))
+                            .foregroundColor(.secondary)
+                    }
+                }
+            }
+        }
+        .padding(20)
+        .background(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(Color(NSColor.textBackgroundColor))
+                .shadow(color: Color.black.opacity(0.06), radius: 8, x: 0, y: 3)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .stroke(Color.secondary.opacity(0.15), lineWidth: 1)
+        )
+    }
+
+    private func previewRow(label: String, value: String) -> some View {
+        HStack {
+            Text(label)
+                .font(.system(size: 11))
+                .foregroundColor(.secondary)
+                .frame(width: 110, alignment: .leading)
+            Text(value)
+                .font(.system(size: 11, weight: .medium))
+                .foregroundColor(.primary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+}
+
+// MARK: - View Model
+
+@MainActor
+final class MainScreenViewModel: ObservableObject {
+    @Published var selectedApartment: Int = 1
+    @Published var receiptDate: Date = Date()
+    @Published var issuerName: String = ""
+    @Published var ownerName: String = ""
+    @Published var sequenceNumber: String = "1"
+    @Published var totalAmount: String = ""
+    @Published var notes: String = ""
+    @Published var printApartmentNumber: Bool = true
+    @Published var receiptKind: ReceiptKind = .income
+
+    @Published var previewDraft: ReceiptDraft?
+    @Published var isPresentingSettings: Bool = false
+    @Published var validationError: ValidationError?
+
+    func syncWithSettings(_ settings: ReceiptSettingsStore) {
         selectedApartment = settings.apartmentNumbers.first ?? 1
         receiptDate = Date()
         issuerName = settings.issuer
@@ -113,25 +520,34 @@ struct MainScreen: View {
         receiptKind = .income
     }
 
-    private func createReceipt() {
+    func updateApartment(_ number: Int, settings: ReceiptSettingsStore) {
+        selectedApartment = number
+        ownerName = settings.owner(for: number)
+    }
+
+    func resetForm(settings: ReceiptSettingsStore) {
+        syncWithSettings(settings)
+    }
+
+    func createReceipt(settings: ReceiptSettingsStore) {
         let trimmedIssuer = issuerName.trimmingCharacters(in: .whitespacesAndNewlines)
         let trimmedOwner = ownerName.trimmingCharacters(in: .whitespacesAndNewlines)
         let trimmedSequence = sequenceNumber.trimmingCharacters(in: .whitespacesAndNewlines)
 
         guard !trimmedIssuer.isEmpty else {
-            validationError = ValidationError(message: "Tahsil eden bilgisi zorunludur.")
+            validationError = ValidationError(message: "Tahsil eden (yetkili) bilgisi zorunludur.")
             return
         }
         guard !trimmedOwner.isEmpty else {
-            validationError = ValidationError(message: "Ödeyen bilgisi zorunludur.")
+            validationError = ValidationError(message: "Ödeyen (muhatap) bilgisi zorunludur.")
             return
         }
         guard let sequence = Int(trimmedSequence), sequence > 0 else {
-            validationError = ValidationError(message: "Sıra numarası pozitif tam sayı olmalıdır.")
+            validationError = ValidationError(message: "Sıra numarası pozitif bir tam sayı olmalıdır.")
             return
         }
         guard let amount = parseAmount(totalAmount), amount >= 0 else {
-            validationError = ValidationError(message: "Tutar sayısal olmalıdır.")
+            validationError = ValidationError(message: "Tutar geçerli bir sayı olmalıdır.")
             return
         }
 
@@ -160,6 +576,8 @@ struct MainScreen: View {
     }
 }
 
+// MARK: - Models
+
 struct ValidationError: Identifiable {
     let id = UUID()
     let message: String
@@ -174,9 +592,18 @@ enum ReceiptKind: String, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .income:
-            return "Gelir"
+            return "Gelir (Tahsilat)"
         case .outcome:
-            return "Gider"
+            return "Gider (Tediye)"
+        }
+    }
+
+    var iconName: String {
+        switch self {
+        case .income:
+            return "arrow.down.left.circle.fill"
+        case .outcome:
+            return "arrow.up.right.circle.fill"
         }
     }
 }
@@ -194,6 +621,8 @@ struct ReceiptDraft: Identifiable {
     let showApartmentNumber: Bool
     let kind: ReceiptKind
 }
+
+// MARK: - Store
 
 @MainActor
 final class ReceiptSettingsStore: ObservableObject {
@@ -261,7 +690,7 @@ final class ReceiptSettingsStore: ObservableObject {
         panel.allowsMultipleSelection = false
         panel.canChooseFiles = true
         panel.canChooseDirectories = false
-        panel.allowedFileTypes = ["png", "jpg", "jpeg"]
+        panel.allowedContentTypes = [.png, .jpeg]
 
         if panel.runModal() == .OK, let url = panel.url {
             do {
@@ -296,18 +725,20 @@ final class ReceiptSettingsStore: ObservableObject {
     }
 }
 
+// MARK: - Extensions
+
 extension Date {
     var monthYearString: String {
         let formatter = DateFormatter()
-        formatter.locale = .current
+        formatter.locale = Locale(identifier: "tr_TR")
         formatter.dateFormat = "MMMM yyyy"
         return formatter.string(from: self)
     }
 
     var dayMonthYearString: String {
         let formatter = DateFormatter()
-        formatter.locale = .current
-        formatter.setLocalizedDateFormatFromTemplate("MMMM d, yyyy")
+        formatter.locale = Locale(identifier: "tr_TR")
+        formatter.setLocalizedDateFormatFromTemplate("d MMMM yyyy")
         return formatter.string(from: self)
     }
 }
