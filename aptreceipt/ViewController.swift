@@ -1,6 +1,9 @@
 import AppKit
 import SwiftUI
 import CoreImage
+@preconcurrency import Vision
+import PDFKit
+import UniformTypeIdentifiers
 
 // MARK: - Language & Theme Enums
 
@@ -440,6 +443,17 @@ struct L10n {
     var residentPhone: String { tr("Phone / WhatsApp:", "Telefon / WhatsApp:", "Telefon / WhatsApp:") }
     var residentPhonePlaceholder: String { tr("e.g. +90 532 123 45 67", "Örn: 0532 123 45 67", "Ex: +40 721 123 456") }
 
+    // Invoice Import & Attachment Strings
+    var importInvoice: String { tr("Import Invoice / Receipt (PDF or Image)", "Fatura / Fiş İçe Aktar (PDF veya Görsel)", "Importă Factură / Bon (PDF sau Imagine)") }
+    var dropInvoiceSubtitle: String { tr("Choose or drag & drop PDF/image • Auto-fills via Apple Vision", "PDF veya görsel seçin • Apple Vision ile otomatik doldurulur", "Alegeți PDF sau imagine • Se completează automat prin Apple Vision") }
+    var scanningInvoice: String { tr("Scanning & analyzing invoice via Apple Vision…", "Apple Vision ile fatura taranıyor ve analiz ediliyor…", "Se scanează și se analizează factura prin Apple Vision…") }
+    var invoiceScanSuccess: String { tr("Invoice imported", "Fatura içe aktarıldı", "Factură importată") }
+    var attachedInvoice: String { tr("Attached Invoice", "Ekli Fatura", "Factură Atașată") }
+    var viewInvoice: String { tr("View", "Görüntüle", "Vizualizează") }
+    var removeInvoice: String { tr("Remove Invoice", "Faturayı Kaldır", "Elimină Factura") }
+    var invoiceNumberPrefix: String { tr("Invoice No", "Fatura No", "Factura Nr") }
+    var viewAttachedInvoice: String { tr("Attached Invoice", "Ekli Faturayı Aç", "Deschide Factura") }
+
     // QR Code Verification Strings
     var qrVerificationNotice: String { tr("Scan with phone camera to verify receipt authenticity", "Belge doğruluğunu teyit etmek için telefon kamerasıyla okutunuz", "Scanați cu camera telefonului pentru a verifica autenticitatea chitanței") }
     var qrCodeActive: String { tr("Verifiable QR Code Active", "Doğrulanabilir QR Kod Aktif", "Cod QR de Verificare Activ") }
@@ -659,6 +673,7 @@ struct L10n {
 struct MainScreen: View {
     @ObservedObject var settings: ReceiptSettingsStore
     @StateObject private var viewModel = MainScreenViewModel()
+    @State private var isInvoiceDropTargeted: Bool = false
 
     init(settings: ReceiptSettingsStore, initialKind: ReceiptKind = .income, initialVendor: String? = nil, initialNotes: String? = nil) {
         self.settings = settings
@@ -996,6 +1011,9 @@ struct MainScreen: View {
 
                 Divider()
 
+                // Invoice / Receipt OCR & Attachment Hero Card
+                invoiceImportHeroCard
+
                 // Parties Fields: Vendor (Payee) & Manager (Payer)
                 VStack(spacing: 8) {
                     // Vendor / Payee
@@ -1257,6 +1275,154 @@ struct MainScreen: View {
         .padding(12)
         .background(Color(NSColor.controlBackgroundColor))
         .clipShape(RoundedRectangle(cornerRadius: 10))
+    }
+
+    // Invoice Import Hero Card with Drag & Drop and Apple Vision OCR
+    private var invoiceImportHeroCard: some View {
+        VStack(spacing: 6) {
+            if viewModel.isScanningInvoice {
+                HStack(spacing: 10) {
+                    ProgressView()
+                        .scaleEffect(0.8)
+                    Text(l10n.scanningInvoice)
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundColor(Color(red: 0.22, green: 0.42, blue: 0.88))
+                    Spacer()
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 10)
+                .background(Color(red: 0.22, green: 0.42, blue: 0.88).opacity(0.08))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(Color(red: 0.22, green: 0.42, blue: 0.88).opacity(0.25), lineWidth: 1)
+                )
+            } else if let path = viewModel.attachedInvoicePath {
+                HStack(spacing: 10) {
+                    Image(systemName: "doc.badge.arrow.up.fill")
+                        .font(.system(size: 16))
+                        .foregroundColor(.green)
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        HStack(spacing: 6) {
+                            Text(l10n.attachedInvoice)
+                                .font(.system(size: 11, weight: .bold))
+                            Text(URL(fileURLWithPath: path).lastPathComponent)
+                                .font(.system(size: 10, weight: .medium, design: .monospaced))
+                                .foregroundColor(.secondary)
+                                .lineLimit(1)
+                        }
+
+                        if let banner = viewModel.invoiceScanBanner {
+                            Text(banner)
+                                .font(.system(size: 10))
+                                .foregroundColor(.secondary)
+                                .lineLimit(1)
+                        }
+                    }
+
+                    Spacer()
+
+                    // View invoice button
+                    Button {
+                        InvoiceAttachmentManager.shared.openAttachment(at: path)
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "eye.fill")
+                            Text(l10n.viewInvoice)
+                        }
+                        .font(.system(size: 10, weight: .semibold))
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+
+                    // Remove invoice button
+                    Button {
+                        viewModel.removeAttachedInvoice()
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: 13))
+                            .foregroundColor(.secondary)
+                    }
+                    .buttonStyle(.plain)
+                    .help(l10n.removeInvoice)
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(Color.green.opacity(0.08))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(Color.green.opacity(0.3), lineWidth: 1)
+                )
+            } else {
+                Button {
+                    chooseInvoiceFile()
+                } label: {
+                    HStack(spacing: 10) {
+                        Image(systemName: "doc.viewfinder.fill")
+                            .font(.system(size: 18))
+                            .foregroundColor(Color(red: 0.22, green: 0.42, blue: 0.88))
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(l10n.importInvoice)
+                                .font(.system(size: 11, weight: .bold))
+                                .foregroundColor(Color(red: 0.22, green: 0.42, blue: 0.88))
+                            Text(l10n.dropInvoiceSubtitle)
+                                .font(.system(size: 9.5))
+                                .foregroundColor(.secondary)
+                        }
+
+                        Spacer()
+
+                        Image(systemName: "arrow.up.doc.fill")
+                            .font(.system(size: 13))
+                            .foregroundColor(Color(red: 0.22, green: 0.42, blue: 0.88))
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(
+                        isInvoiceDropTargeted
+                        ? Color(red: 0.22, green: 0.42, blue: 0.88).opacity(0.15)
+                        : Color(red: 0.22, green: 0.42, blue: 0.88).opacity(0.06)
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(
+                                Color(red: 0.22, green: 0.42, blue: 0.88).opacity(isInvoiceDropTargeted ? 0.7 : 0.3),
+                                style: StrokeStyle(lineWidth: 1, dash: [4, 4])
+                            )
+                    )
+                }
+                .buttonStyle(.plain)
+                .onDrop(of: [UTType.fileURL.identifier], isTargeted: $isInvoiceDropTargeted) { providers in
+                    guard let provider = providers.first else { return false }
+                    _ = provider.loadObject(ofClass: URL.self) { url, _ in
+                        if let validURL = url {
+                            DispatchQueue.main.async {
+                                viewModel.importInvoice(from: validURL, settings: settings)
+                            }
+                        }
+                    }
+                    return true
+                }
+            }
+        }
+    }
+
+    private func chooseInvoiceFile() {
+        let panel = NSOpenPanel()
+        panel.canChooseFiles = true
+        panel.canChooseDirectories = false
+        panel.allowsMultipleSelection = false
+        if #available(macOS 11.0, *) {
+            panel.allowedContentTypes = [.pdf, .png, .jpeg, .tiff]
+        }
+        panel.prompt = l10n.importInvoice
+        if panel.runModal() == .OK, let url = panel.url {
+            viewModel.importInvoice(from: url, settings: settings)
+        }
     }
 
     private func expensePresetChip(title: String, icon: String, text: String) -> some View {
@@ -1646,6 +1812,10 @@ final class MainScreenViewModel: ObservableObject {
     @Published var isPresentingArchive: Bool = false
     @Published var validationError: ValidationError?
 
+    @Published var attachedInvoicePath: String? = nil
+    @Published var isScanningInvoice: Bool = false
+    @Published var invoiceScanBanner: String? = nil
+
     func syncWithSettings(_ settings: ReceiptSettingsStore) {
         selectedApartment = settings.apartmentNumbers.first ?? 1
         receiptDate = Date()
@@ -1656,6 +1826,54 @@ final class MainScreenViewModel: ObservableObject {
         notes = ""
         printApartmentNumber = true
         receiptKind = .income
+        attachedInvoicePath = nil
+        invoiceScanBanner = nil
+    }
+
+    func importInvoice(from url: URL, settings: ReceiptSettingsStore) {
+        isScanningInvoice = true
+        invoiceScanBanner = nil
+
+        let savedPath = InvoiceAttachmentManager.shared.saveAttachment(from: url)
+        self.attachedInvoicePath = savedPath
+
+        Task {
+            let result = await InvoiceOCRParser.parse(fileURL: url, knownVendors: settings.vendors.map { $0.name })
+            await MainActor.run {
+                self.isScanningInvoice = false
+                if let vendor = result.vendorName, !vendor.isEmpty {
+                    self.ownerName = vendor
+                }
+                if let amt = result.amount, amt > 0 {
+                    self.totalAmount = String(format: "%.2f", amt)
+                }
+                if let date = result.invoiceDate {
+                    self.receiptDate = date
+                }
+                if let invNo = result.invoiceNumber, !invNo.isEmpty {
+                    let prefix = settings.l10n.invoiceNumberPrefix
+                    let newNote = "\(prefix): \(invNo)"
+                    if self.notes.isEmpty || self.notes == "-" {
+                        self.notes = newNote
+                    } else if !self.notes.contains(invNo) {
+                        self.notes = "\(newNote) • \(self.notes)"
+                    }
+                }
+
+                let l10n = settings.l10n
+                let vendorStr = result.vendorName ?? l10n.importInvoice
+                let amountStr = result.amount != nil ? String(format: "%.2f %@", result.amount!, settings.currency.symbol) : ""
+                self.invoiceScanBanner = "\(l10n.invoiceScanSuccess): \(vendorStr) \(amountStr)".trimmingCharacters(in: .whitespaces)
+            }
+        }
+    }
+
+    func removeAttachedInvoice() {
+        if let path = attachedInvoicePath {
+            InvoiceAttachmentManager.shared.removeAttachment(at: path)
+        }
+        attachedInvoicePath = nil
+        invoiceScanBanner = nil
     }
 
     func setReceiptKind(_ kind: ReceiptKind, settings: ReceiptSettingsStore) {
@@ -1750,7 +1968,8 @@ final class MainScreenViewModel: ObservableObject {
             createdDate: Date().dayMonthYearString(locale: settings.currentLocale),
             showApartmentNumber: effectiveShowApartment,
             kind: receiptKind,
-            currency: settings.currency
+            currency: settings.currency,
+            invoiceAttachmentPath: attachedInvoicePath
         )
 
         previewDraft = draft
@@ -1829,6 +2048,7 @@ struct ReceiptDraft: Identifiable, Codable {
     let showApartmentNumber: Bool
     let kind: ReceiptKind
     var currency: AppCurrency = .turkishLira
+    var invoiceAttachmentPath: String? = nil
 }
 
 // MARK: - Receipt Archive Record & Persistent Store
@@ -1847,6 +2067,7 @@ struct ReceiptRecord: Identifiable, Codable, Hashable {
     var createdDate: String
     var showApartmentNumber: Bool
     var createdAt: Date = Date()
+    var invoiceAttachmentPath: String? = nil
 
     var kind: ReceiptKind {
         ReceiptKind(rawValue: kindRaw) ?? .income
@@ -1870,6 +2091,7 @@ struct ReceiptRecord: Identifiable, Codable, Hashable {
         self.createdDate = draft.createdDate
         self.showApartmentNumber = draft.showApartmentNumber
         self.createdAt = Date()
+        self.invoiceAttachmentPath = draft.invoiceAttachmentPath
     }
 
     func toDraft() -> ReceiptDraft {
@@ -1885,7 +2107,8 @@ struct ReceiptRecord: Identifiable, Codable, Hashable {
             createdDate: createdDate,
             showApartmentNumber: showApartmentNumber,
             kind: kind,
-            currency: currency
+            currency: currency,
+            invoiceAttachmentPath: invoiceAttachmentPath
         )
     }
 }
@@ -2925,6 +3148,19 @@ struct ReceiptArchiveSheet: View {
                 }
                 .buttonStyle(.borderless)
                 .help(l10n.shareWhatsApp)
+
+                // View Attached Invoice Button (If Available)
+                if let path = record.invoiceAttachmentPath, !path.isEmpty {
+                    Button {
+                        InvoiceAttachmentManager.shared.openAttachment(at: path)
+                    } label: {
+                        Image(systemName: "paperclip.circle.fill")
+                            .font(.system(size: 14))
+                            .foregroundColor(Color(red: 0.22, green: 0.42, blue: 0.88))
+                    }
+                    .buttonStyle(.borderless)
+                    .help(l10n.viewAttachedInvoice)
+                }
 
                 // Delete Button
                 Button {
