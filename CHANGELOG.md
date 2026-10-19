@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 - **Late fee grand total**: Receipts with a late fee applied computed the grand total as `(base + fee × 100) / 100` due to an operator-precedence error (e.g. 2000 + 300 late fee was saved as 320.00 instead of 2300.00). Late fee and total calculations now go through a single `LateFeeCalculator`.
 
 ### Changed
+- Split the 4,900-line `ViewController.swift` into per-feature files (`L10n.swift`, `ReceiptSettingsStore.swift`, `MainScreen.swift`, `MainScreenViewModel.swift`, `ReceiptModels.swift`, `LateFee.swift`, and one file per sheet/view). No behavior changes.
 - Replaced the late fee unit test that re-implemented the formula inside the test with tests that exercise `LateFeeCalculator` and `MainScreenViewModel` directly.
 
 ## [3.4.2] - 2026-10-19

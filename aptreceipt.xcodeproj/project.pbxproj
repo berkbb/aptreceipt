@@ -11,7 +11,6 @@
 		9A90651127E728020085AA4B /* PreferencesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A90651027E728020085AA4B /* PreferencesViewController.swift */; };
 		9A90652127E728020085AA4B /* GitHubUpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A90652027E728020085AA4B /* GitHubUpdateChecker.swift */; };
 		9A9CF87927E204920042D276 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A9CF87827E204920042D276 /* AppDelegate.swift */; };
-		9A9CF87B27E204920042D276 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A9CF87A27E204920042D276 /* ViewController.swift */; };
 		9A9CF87D27E204920042D276 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9A9CF87C27E204920042D276 /* Assets.xcassets */; };
 		9A9CF88027E204920042D276 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9A9CF87E27E204920042D276 /* Main.storyboard */; };
 		9A9CF88B27E204930042D276 /* aptreceiptTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A9CF88A27E204930042D276 /* aptreceiptTests.swift */; };
@@ -19,6 +18,23 @@
 		9A9CF89727E204930042D276 /* aptreceiptUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A9CF89627E204930042D276 /* aptreceiptUITestsLaunchTests.swift */; };
 		9A9CF8B427E22E670042D276 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9A9CF8B627E22E670042D276 /* InfoPlist.strings */; };
 		9ADECA1427E5DC3500EB0A7F /* File.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9ADECA1627E5DC3500EB0A7F /* File.strings */; };
+		68C1BA92E973AA28D86BC2AE /* AppSettingsEnums.swift in Sources */ = {isa = PBXBuildFile; fileRef = B21581BD303AD60294E7FF3A /* AppSettingsEnums.swift */; };
+		22844F312E056BAA6CB6E2FB /* LateFee.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59B6755C3B7F0F35334DA898 /* LateFee.swift */; };
+		A8BCCC175018AE09FD33E445 /* ReceiptModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6944E652BA625EBA50157EF /* ReceiptModels.swift */; };
+		0684BEDD29E7310185F44AC4 /* SampleData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E683438A37C695A96EE921A /* SampleData.swift */; };
+		9D1EA840F07A3688E803BB9E /* L10n.swift in Sources */ = {isa = PBXBuildFile; fileRef = F34CB4073190B5E3A633A67F /* L10n.swift */; };
+		1BEE1B1AA26FA572834E0580 /* MainScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE9050EB6E3FBA8B13E2679C /* MainScreen.swift */; };
+		E39B52AF81724E51F422C573 /* LiveReceiptPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81E54B49551CF9BC3C62DF26 /* LiveReceiptPreview.swift */; };
+		2BBF72065869D41D26A10AA0 /* MainScreenViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DB48C99EE1963A0583E0104 /* MainScreenViewModel.swift */; };
+		9395B5905B3F9570533B2F9A /* ReceiptArchiveStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7FC3ACDE65754CE5A5444F /* ReceiptArchiveStore.swift */; };
+		DE4FCED20A93C5417BDD34A4 /* SharingHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C91E6AC2BD31BE032FAB520 /* SharingHelpers.swift */; };
+		F0B1A05023D618C52EBF5ADA /* ReceiptSettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B461E0B1ED4FC4F4CFED59B /* ReceiptSettingsStore.swift */; };
+		D76D776295A2C9954A6F947C /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B18CC4073B67A7AEA909377E /* Extensions.swift */; };
+		B1B4EE1F020BA471871E5238 /* LicenseViewerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E94616E39EDF2D41A48DD52B /* LicenseViewerSheet.swift */; };
+		C00FB3A9ABBDC56E5C518CD4 /* ReceiptArchiveSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8054081BAE88B7A286A7D5E /* ReceiptArchiveSheet.swift */; };
+		F519961A217C0540E3B6FB56 /* ApartmentFinancialReportSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 335FDA259574D491BC369FC2 /* ApartmentFinancialReportSheet.swift */; };
+		EBD3F5D514DFF5EF577DE795 /* BatchDuesGeneratorSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CF7B09A5D22F5DDFEEE6BE2 /* BatchDuesGeneratorSheet.swift */; };
+		3D40934AC58F13968AA5D9B7 /* ApartmentBulletinBoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE3D706FEAFD8AE1933CEE20 /* ApartmentBulletinBoardView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,7 +60,6 @@
 		9A90652027E728020085AA4B /* GitHubUpdateChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubUpdateChecker.swift; sourceTree = "<group>"; };
 		9A9CF87527E204920042D276 /* aptreceipt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = aptreceipt.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A9CF87827E204920042D276 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		9A9CF87A27E204920042D276 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		9A9CF87C27E204920042D276 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9A9CF87F27E204920042D276 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		9A9CF88127E204920042D276 /* aptreceipt.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = aptreceipt.entitlements; sourceTree = "<group>"; };
@@ -62,6 +77,23 @@
 		9ADECA1527E5DC3500EB0A7F /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/File.strings; sourceTree = "<group>"; };
 		9ADECA1827E5DD2D00EB0A7F /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/File.strings; sourceTree = "<group>"; };
 		9ADECA1A27E5DD2D00EB0A7F /* ro */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ro; path = ro.lproj/File.strings; sourceTree = "<group>"; };
+		B21581BD303AD60294E7FF3A /* AppSettingsEnums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingsEnums.swift; sourceTree = "<group>"; };
+		59B6755C3B7F0F35334DA898 /* LateFee.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LateFee.swift; sourceTree = "<group>"; };
+		D6944E652BA625EBA50157EF /* ReceiptModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptModels.swift; sourceTree = "<group>"; };
+		0E683438A37C695A96EE921A /* SampleData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleData.swift; sourceTree = "<group>"; };
+		F34CB4073190B5E3A633A67F /* L10n.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = L10n.swift; sourceTree = "<group>"; };
+		AE9050EB6E3FBA8B13E2679C /* MainScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainScreen.swift; sourceTree = "<group>"; };
+		81E54B49551CF9BC3C62DF26 /* LiveReceiptPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveReceiptPreview.swift; sourceTree = "<group>"; };
+		8DB48C99EE1963A0583E0104 /* MainScreenViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainScreenViewModel.swift; sourceTree = "<group>"; };
+		8B7FC3ACDE65754CE5A5444F /* ReceiptArchiveStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptArchiveStore.swift; sourceTree = "<group>"; };
+		8C91E6AC2BD31BE032FAB520 /* SharingHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharingHelpers.swift; sourceTree = "<group>"; };
+		3B461E0B1ED4FC4F4CFED59B /* ReceiptSettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptSettingsStore.swift; sourceTree = "<group>"; };
+		B18CC4073B67A7AEA909377E /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		E94616E39EDF2D41A48DD52B /* LicenseViewerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LicenseViewerSheet.swift; sourceTree = "<group>"; };
+		E8054081BAE88B7A286A7D5E /* ReceiptArchiveSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptArchiveSheet.swift; sourceTree = "<group>"; };
+		335FDA259574D491BC369FC2 /* ApartmentFinancialReportSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApartmentFinancialReportSheet.swift; sourceTree = "<group>"; };
+		9CF7B09A5D22F5DDFEEE6BE2 /* BatchDuesGeneratorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatchDuesGeneratorSheet.swift; sourceTree = "<group>"; };
+		BE3D706FEAFD8AE1933CEE20 /* ApartmentBulletinBoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApartmentBulletinBoardView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,7 +145,23 @@
 			isa = PBXGroup;
 			children = (
 				9A9CF87827E204920042D276 /* AppDelegate.swift */,
-				9A9CF87A27E204920042D276 /* ViewController.swift */,
+				B21581BD303AD60294E7FF3A /* AppSettingsEnums.swift */,
+				59B6755C3B7F0F35334DA898 /* LateFee.swift */,
+				D6944E652BA625EBA50157EF /* ReceiptModels.swift */,
+				0E683438A37C695A96EE921A /* SampleData.swift */,
+				F34CB4073190B5E3A633A67F /* L10n.swift */,
+				AE9050EB6E3FBA8B13E2679C /* MainScreen.swift */,
+				81E54B49551CF9BC3C62DF26 /* LiveReceiptPreview.swift */,
+				8DB48C99EE1963A0583E0104 /* MainScreenViewModel.swift */,
+				8B7FC3ACDE65754CE5A5444F /* ReceiptArchiveStore.swift */,
+				8C91E6AC2BD31BE032FAB520 /* SharingHelpers.swift */,
+				3B461E0B1ED4FC4F4CFED59B /* ReceiptSettingsStore.swift */,
+				B18CC4073B67A7AEA909377E /* Extensions.swift */,
+				E94616E39EDF2D41A48DD52B /* LicenseViewerSheet.swift */,
+				E8054081BAE88B7A286A7D5E /* ReceiptArchiveSheet.swift */,
+				335FDA259574D491BC369FC2 /* ApartmentFinancialReportSheet.swift */,
+				9CF7B09A5D22F5DDFEEE6BE2 /* BatchDuesGeneratorSheet.swift */,
+				BE3D706FEAFD8AE1933CEE20 /* ApartmentBulletinBoardView.swift */,
 				9A9CF87C27E204920042D276 /* Assets.xcassets */,
 				9A9CF87E27E204920042D276 /* Main.storyboard */,
 				9A9CF88127E204920042D276 /* aptreceipt.entitlements */,
@@ -278,8 +326,24 @@
 			buildActionMask = 2147483647;
 			files = (
 				9A1F6CAA27E485B5006C171B /* ReceiptViewController.swift in Sources */,
-				9A9CF87B27E204920042D276 /* ViewController.swift in Sources */,
 				9A9CF87927E204920042D276 /* AppDelegate.swift in Sources */,
+				68C1BA92E973AA28D86BC2AE /* AppSettingsEnums.swift in Sources */,
+				22844F312E056BAA6CB6E2FB /* LateFee.swift in Sources */,
+				A8BCCC175018AE09FD33E445 /* ReceiptModels.swift in Sources */,
+				0684BEDD29E7310185F44AC4 /* SampleData.swift in Sources */,
+				9D1EA840F07A3688E803BB9E /* L10n.swift in Sources */,
+				1BEE1B1AA26FA572834E0580 /* MainScreen.swift in Sources */,
+				E39B52AF81724E51F422C573 /* LiveReceiptPreview.swift in Sources */,
+				2BBF72065869D41D26A10AA0 /* MainScreenViewModel.swift in Sources */,
+				9395B5905B3F9570533B2F9A /* ReceiptArchiveStore.swift in Sources */,
+				DE4FCED20A93C5417BDD34A4 /* SharingHelpers.swift in Sources */,
+				F0B1A05023D618C52EBF5ADA /* ReceiptSettingsStore.swift in Sources */,
+				D76D776295A2C9954A6F947C /* Extensions.swift in Sources */,
+				B1B4EE1F020BA471871E5238 /* LicenseViewerSheet.swift in Sources */,
+				C00FB3A9ABBDC56E5C518CD4 /* ReceiptArchiveSheet.swift in Sources */,
+				F519961A217C0540E3B6FB56 /* ApartmentFinancialReportSheet.swift in Sources */,
+				EBD3F5D514DFF5EF577DE795 /* BatchDuesGeneratorSheet.swift in Sources */,
+				3D40934AC58F13968AA5D9B7 /* ApartmentBulletinBoardView.swift in Sources */,
 				9A90651127E728020085AA4B /* PreferencesViewController.swift in Sources */,
 				9A90652127E728020085AA4B /* GitHubUpdateChecker.swift in Sources */,
 			);
