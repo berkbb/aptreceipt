@@ -496,6 +496,35 @@ struct L10n {
     var generateBatchReceipts: String { tr("Generate Receipts & Add to Archive", "Makbuzları Kes ve Arşive Ekle", "Generează Chitanțele și Salvează") }
     var batchSuccessMessage: String { tr("receipts generated and added to archive successfully.", "adet makbuz başarıyla kesilip arşive eklendi.", "chitanțe au fost generate și adăugate în arhivă cu succes.") }
 
+    // MARK: - Kat Mülkiyeti Kanunu (KMK Md. 20) Gecikme Tazminatı Strings
+    var lateFeeTitle: String { tr("Late Payment Compensation (KMK Art. 20)", "Kat Mülkiyeti Kanunu (KMK Md. 20) Gecikme Tazminatı", "Penalități de Întârziere (Art. 20 Lege)") }
+    var lateFeeSubtitle: String { tr("Configure statutory or custom monthly late compensation rate on overdue dues", "Gününde ödenmeyen aidatlara kanuni veya manuel gecikme tazminatı işletin", "Configurați rata legală sau personalizată a penalităților lunare pentru restanțe") }
+    var lateFeeEnabledToggle: String { tr("Enable Late Compensation Calculation", "Gecikme Tazminatı Hesaplama", "Activare Calcul Penalități Întârziere") }
+    var lateFeeMonthlyRateTitle: String { tr("Monthly Late Fee Rate (%):", "Aylık Gecikme Oranı (%):", "Rată Lunară Penalizare (%):") }
+    var lateFeeDueDayTitle: String { tr("Payment Due Day of Month:", "Son Ödeme Günü (Vade):", "Zi Limită de Plată:") }
+    var lateFeeLegalNotice: String { tr("Under Article 20/c of Property Law No. 634, a 5% monthly compensation is legally applied to overdue dues. You can customize the rate manually above.", "634 sayılı Kat Mülkiyeti Kanunu Madde 20/c gereği vaktinde ödenmeyen aidata aylık %5 kanuni gecikme tazminatı uygulanır. Dilediğiniz takdirde oranı ve vadeyi buradan manuel değiştirebilirsiniz.", "Conform art. 20/c din Legea Asociațiilor, se aplică 5% penalizare lunară. Puteți modifica manual procentul de mai sus.") }
+    var lateFeeApplyCheckbox: String { tr("Apply Late Compensation (KMK Art. 20)", "Gecikme Tazminatı Ekle (KMK Md. 20)", "Aplică Penalități de Întârziere") }
+    var overdueMonthsCount: String { tr("Overdue Duration:", "Gecikme Süresi:", "Durată Întârziere:") }
+    var monthUnit: String { tr("Month", "Ay", "Lună") }
+    var monthsUnit: String { tr("Months", "Ay", "Luni") }
+    var autoDetectOverdue: String { tr("Auto-Detect Delay", "Gecikmeyi Otomatik Hesapla", "Detectare Automată") }
+    var baseDuesAmount: String { tr("Base Dues:", "Aidat Ana Para:", "Cotă de Bază:") }
+    var lateFeeCalculated: String { tr("Late Fee:", "Gecikme Tazminatı:", "Penalitate:") }
+    var totalWithLateFee: String { tr("Total Collected:", "Toplam Tahsilat:", "Total Încasat:") }
+    var statutoryRateChip: String { tr("%5.0 (Statutory)", "%5.0 (Kanuni)", "%5.0 (Legal)") }
+    var dueDayDayPrefix: String { tr("Day", "Ayın", "Ziua") }
+    var dueDayDaySuffix: String { tr("of each month", ". gününe kadar", "a fiecărei luni") }
+    func lateFeeItemName(rate: Double, months: Int) -> String {
+        tr("KMK Art. 20 Late Fee (%\(String(format: "%.1f", rate)) × \(months) \(months > 1 ? "Months" : "Month"))",
+           "KMK Md. 20 Gecikme Tazminatı (%\(String(format: "%.1f", rate)) × \(months) Ay)",
+           "Penalități Întârziere (%\(String(format: "%.1f", rate)) × \(months) \(months > 1 ? "Luni" : "Lună"))")
+    }
+    var lateFeeStatutoryFootnote: String {
+        tr("* Calculated pursuant to Article 20/c of Property Law No. 634.",
+           "* 634 Sayılı Kat Mülkiyeti Kanunu Madde 20/c uyarınca hesaplanmıştır.",
+           "* Calculat conform art. 20/c din legislația asociațiilor de proprietari.")
+    }
+
     // Settings Form Fields
     var buildingDetails: String { tr("Building Information", "Apartman Bilgileri", "Informații Imobil / Asociație") }
     var buildingName: String { tr("Building Name:", "Apartman Adı:", "Nume Imobil / Asociație:") }
@@ -771,13 +800,18 @@ struct MainScreen: View {
                             period: viewModel.receiptDate.monthYearString(locale: settings.currentLocale),
                             issuer: viewModel.issuerName.isEmpty ? "—" : viewModel.issuerName,
                             receiver: viewModel.ownerName.isEmpty ? "—" : viewModel.ownerName,
-                            amountString: viewModel.totalAmount,
+                            amountString: String(format: "%.2f", viewModel.grandTotalAmount(settings: settings)),
                             sequenceNumber: viewModel.sequenceNumber,
                             notes: viewModel.notes,
                             signatureImage: settings.signatureImage,
                             currency: settings.currency,
                             l10n: l10n,
-                            logoImage: settings.logoImage
+                            logoImage: settings.logoImage,
+                            isLateFeeApplied: viewModel.isLateFeeApplied && viewModel.receiptKind == .income,
+                            baseAmount: viewModel.baseDuesAmount(),
+                            lateFeeAmount: viewModel.calculatedLateFee(settings: settings),
+                            lateFeeRate: viewModel.effectiveLateRate(settings: settings),
+                            lateMonths: viewModel.lateMonths
                         )
                         .padding(20)
                     }
@@ -1604,10 +1638,143 @@ struct MainScreen: View {
                         .stroke(Color.secondary.opacity(0.15), lineWidth: 1)
                 )
             }
+
+            // Optional KMK Md. 20 Late Fee Section (Income Only)
+            if viewModel.receiptKind == .income {
+                lateFeeHeroCard
+            }
         }
         .padding(12)
         .background(Color(NSColor.controlBackgroundColor))
         .clipShape(RoundedRectangle(cornerRadius: 10))
+    }
+
+    private var lateFeeHeroCard: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 8) {
+                Toggle(isOn: $viewModel.isLateFeeApplied) {
+                    HStack(spacing: 5) {
+                        Image(systemName: "scalemass.fill")
+                            .font(.system(size: 11))
+                            .foregroundColor(.orange)
+                        Text(l10n.lateFeeApplyCheckbox)
+                            .font(.system(size: 11.5, weight: .bold))
+                            .foregroundColor(.primary)
+                    }
+                }
+                .toggleStyle(.checkbox)
+
+                Spacer()
+
+                if viewModel.isLateFeeApplied {
+                    Button {
+                        viewModel.autoDetectOverdueMonths(settings: settings)
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "wand.and.stars")
+                            Text(l10n.autoDetectOverdue)
+                        }
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundColor(.accentColor)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+
+            if viewModel.isLateFeeApplied {
+                VStack(spacing: 8) {
+                    HStack(spacing: 12) {
+                        // Months
+                        HStack(spacing: 6) {
+                            Text(l10n.overdueMonthsCount)
+                                .font(.system(size: 11))
+                                .foregroundColor(.secondary)
+
+                            Picker("", selection: $viewModel.lateMonths) {
+                                ForEach(1...24, id: \.self) { m in
+                                    Text("\(m) \(m > 1 ? l10n.monthsUnit : l10n.monthUnit)").tag(m)
+                                }
+                            }
+                            .frame(width: 85)
+                        }
+
+                        // Rate field (manuel oran düzenlenebilir)
+                        HStack(spacing: 4) {
+                            Text(l10n.lateFeeMonthlyRateTitle)
+                                .font(.system(size: 11))
+                                .foregroundColor(.secondary)
+                            Text("%")
+                                .font(.system(size: 11, weight: .bold))
+                                .foregroundColor(.secondary)
+                            TextField("5.0", text: $viewModel.customLateFeeRate)
+                                .textFieldStyle(.plain)
+                                .font(.system(size: 11, weight: .semibold, design: .monospaced))
+                                .frame(width: 45)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 3)
+                                .background(Color(NSColor.textBackgroundColor))
+                                .clipShape(RoundedRectangle(cornerRadius: 5))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 5)
+                                        .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
+                                )
+                        }
+
+                        Spacer()
+                    }
+
+                    // Calculation Breakdown
+                    HStack(spacing: 12) {
+                        VStack(alignment: .leading, spacing: 1) {
+                            Text(l10n.baseDuesAmount)
+                                .font(.system(size: 9.5))
+                                .foregroundColor(.secondary)
+                            Text(String(format: "%.2f %@", viewModel.baseDuesAmount(), settings.currency.symbol))
+                                .font(.system(size: 11, weight: .semibold, design: .monospaced))
+                        }
+
+                        Text("+")
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundColor(.orange)
+
+                        VStack(alignment: .leading, spacing: 1) {
+                            Text("\(l10n.lateFeeCalculated) (%\(String(format: "%.1f", viewModel.effectiveLateRate(settings: settings))) × \(viewModel.lateMonths))")
+                                .font(.system(size: 9.5))
+                                .foregroundColor(.orange)
+                            Text(String(format: "+%.2f %@", viewModel.calculatedLateFee(settings: settings), settings.currency.symbol))
+                                .font(.system(size: 11, weight: .bold, design: .monospaced))
+                                .foregroundColor(.orange)
+                        }
+
+                        Spacer()
+
+                        VStack(alignment: .trailing, spacing: 1) {
+                            Text(l10n.totalWithLateFee)
+                                .font(.system(size: 9.5))
+                                .foregroundColor(.secondary)
+                            Text(String(format: "%.2f %@", viewModel.grandTotalAmount(settings: settings), settings.currency.symbol))
+                                .font(.system(size: 13, weight: .bold, design: .rounded))
+                                .foregroundColor(.green)
+                        }
+                    }
+                    .padding(8)
+                    .background(Color.orange.opacity(0.06))
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 6)
+                            .stroke(Color.orange.opacity(0.2), lineWidth: 1)
+                    )
+                }
+                .padding(.top, 4)
+            }
+        }
+        .padding(10)
+        .background(Color(NSColor.textBackgroundColor).opacity(0.4))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(Color.secondary.opacity(0.12), lineWidth: 1)
+        )
     }
 
     // 4. Action Buttons
@@ -1687,6 +1854,11 @@ struct LiveReceiptPreview: View {
     let currency: AppCurrency
     let l10n: L10n
     var logoImage: NSImage? = nil
+    var isLateFeeApplied: Bool = false
+    var baseAmount: Double = 0.0
+    var lateFeeAmount: Double = 0.0
+    var lateFeeRate: Double = 0.0
+    var lateMonths: Int = 0
 
     private var formattedAmount: String {
         let normalized = amountString.trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: ",", with: ".")
@@ -1770,6 +1942,40 @@ struct LiveReceiptPreview: View {
                     previewRow(label: l10n.issuerLabel, value: issuer)
                 }
                 previewRow(label: l10n.dateLabel, value: Date().dayMonthYearString(locale: l10n.locale))
+            }
+
+            // Late Fee Breakdown Preview
+            if isLateFeeApplied && lateFeeAmount > 0 {
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(l10n.baseDuesAmount)
+                            .font(.system(size: 9.5, weight: .semibold))
+                            .foregroundColor(.secondary)
+                        Text(String(format: "%.2f %@", baseAmount, currency.symbol))
+                            .font(.system(size: 11, weight: .medium, design: .monospaced))
+                    }
+
+                    Spacer()
+
+                    Text("+")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundColor(.orange)
+
+                    Spacer()
+
+                    VStack(alignment: .trailing, spacing: 2) {
+                        Text("\(l10n.lateFeeCalculated) (%\(String(format: "%.1f", lateFeeRate)) × \(lateMonths))")
+                            .font(.system(size: 9.5, weight: .semibold))
+                            .foregroundColor(.orange)
+                        Text(String(format: "+%.2f %@", lateFeeAmount, currency.symbol))
+                            .font(.system(size: 11, weight: .bold, design: .monospaced))
+                            .foregroundColor(.orange)
+                    }
+                }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(Color.orange.opacity(0.08))
+                .clipShape(RoundedRectangle(cornerRadius: 6))
             }
 
             // Amount Highlight Box
@@ -1892,6 +2098,10 @@ final class MainScreenViewModel: ObservableObject {
     @Published var isScanningInvoice: Bool = false
     @Published var invoiceScanBanner: String? = nil
 
+    @Published var isLateFeeApplied: Bool = false
+    @Published var lateMonths: Int = 1
+    @Published var customLateFeeRate: String = ""
+
     func syncWithSettings(_ settings: ReceiptSettingsStore) {
         selectedApartment = settings.apartmentNumbers.first ?? 1
         receiptDate = Date()
@@ -1904,6 +2114,50 @@ final class MainScreenViewModel: ObservableObject {
         receiptKind = .income
         attachedInvoicePath = nil
         invoiceScanBanner = nil
+        isLateFeeApplied = false
+        lateMonths = 1
+        customLateFeeRate = String(format: "%.1f", settings.lateFeeMonthlyRate)
+    }
+
+    func effectiveLateRate(settings: ReceiptSettingsStore) -> Double {
+        let cleaned = customLateFeeRate.trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: ",", with: ".")
+        if let val = Double(cleaned), val >= 0 {
+            return val
+        }
+        return settings.lateFeeMonthlyRate
+    }
+
+    func baseDuesAmount() -> Double {
+        parseAmount(totalAmount) ?? 0.0
+    }
+
+    func calculatedLateFee(settings: ReceiptSettingsStore) -> Double {
+        guard isLateFeeApplied && receiptKind == .income else { return 0.0 }
+        let base = baseDuesAmount()
+        let rate = effectiveLateRate(settings: settings)
+        let raw = base * (rate / 100.0) * Double(lateMonths)
+        return (raw * 100.0).rounded() / 100.0
+    }
+
+    func grandTotalAmount(settings: ReceiptSettingsStore) -> Double {
+        let base = baseDuesAmount()
+        if isLateFeeApplied && receiptKind == .income {
+            return (base + calculatedLateFee(settings: settings) * 100.0).rounded() / 100.0
+        }
+        return base
+    }
+
+    func autoDetectOverdueMonths(settings: ReceiptSettingsStore) {
+        let calendar = Calendar.current
+        let now = Date()
+        let comp = calendar.dateComponents([.month], from: receiptDate, to: now)
+        let months = comp.month ?? 0
+        if months > 0 {
+            self.lateMonths = max(1, months)
+        } else {
+            self.lateMonths = 1
+        }
+        self.isLateFeeApplied = true
     }
 
     func importInvoice(from url: URL, settings: ReceiptSettingsStore) {
@@ -2025,7 +2279,7 @@ final class MainScreenViewModel: ObservableObject {
             validationError = ValidationError(message: l10n.errSequenceInvalid)
             return
         }
-        guard let amount = parseAmount(totalAmount), amount >= 0 else {
+        guard let baseAmt = parseAmount(totalAmount), baseAmt >= 0 else {
             validationError = ValidationError(message: l10n.errAmountInvalid)
             return
         }
@@ -2033,19 +2287,28 @@ final class MainScreenViewModel: ObservableObject {
         let effectiveApartment = receiptKind == .managementExpense ? 0 : selectedApartment
         let effectiveShowApartment = receiptKind == .managementExpense ? false : printApartmentNumber
 
+        let effectiveLateFee = isLateFeeApplied && receiptKind == .income ? calculatedLateFee(settings: settings) : 0.0
+        let effectiveGrandTotal = (baseAmt + effectiveLateFee * 100.0).rounded() / 100.0
+        let effectiveRate = effectiveLateRate(settings: settings)
+
         let draft = ReceiptDraft(
             receiver: trimmedOwner.localizedCapitalized,
             issuer: trimmedIssuer.localizedCapitalized,
             notes: notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "-" : notes,
             monthYear: receiptDate.monthYearString(locale: settings.currentLocale),
             apartmentNumber: effectiveApartment,
-            amount: amount,
+            amount: effectiveGrandTotal,
             sequenceNumber: sequence,
             createdDate: Date().dayMonthYearString(locale: settings.currentLocale),
             showApartmentNumber: effectiveShowApartment,
             kind: receiptKind,
             currency: settings.currency,
-            invoiceAttachmentPath: attachedInvoicePath
+            invoiceAttachmentPath: attachedInvoicePath,
+            isLateFeeApplied: isLateFeeApplied && receiptKind == .income && effectiveLateFee > 0,
+            lateFeeRate: effectiveRate,
+            lateMonths: lateMonths,
+            lateFeeAmount: effectiveLateFee,
+            baseAmount: baseAmt
         )
 
         previewDraft = draft
@@ -2125,6 +2388,80 @@ struct ReceiptDraft: Identifiable, Codable {
     let kind: ReceiptKind
     var currency: AppCurrency = .turkishLira
     var invoiceAttachmentPath: String? = nil
+    var isLateFeeApplied: Bool = false
+    var lateFeeRate: Double = 0.0
+    var lateMonths: Int = 0
+    var lateFeeAmount: Double = 0.0
+    var baseAmount: Double = 0.0
+
+    enum CodingKeys: String, CodingKey {
+        case id, receiver, issuer, notes, monthYear, apartmentNumber, amount
+        case sequenceNumber, createdDate, showApartmentNumber, kind, currency
+        case invoiceAttachmentPath, isLateFeeApplied, lateFeeRate, lateMonths, lateFeeAmount, baseAmount
+    }
+
+    init(
+        id: UUID = UUID(),
+        receiver: String,
+        issuer: String,
+        notes: String,
+        monthYear: String,
+        apartmentNumber: Int,
+        amount: Double,
+        sequenceNumber: Int,
+        createdDate: String,
+        showApartmentNumber: Bool,
+        kind: ReceiptKind,
+        currency: AppCurrency = .turkishLira,
+        invoiceAttachmentPath: String? = nil,
+        isLateFeeApplied: Bool = false,
+        lateFeeRate: Double = 0.0,
+        lateMonths: Int = 0,
+        lateFeeAmount: Double = 0.0,
+        baseAmount: Double = 0.0
+    ) {
+        self.id = id
+        self.receiver = receiver
+        self.issuer = issuer
+        self.notes = notes
+        self.monthYear = monthYear
+        self.apartmentNumber = apartmentNumber
+        self.amount = amount
+        self.sequenceNumber = sequenceNumber
+        self.createdDate = createdDate
+        self.showApartmentNumber = showApartmentNumber
+        self.kind = kind
+        self.currency = currency
+        self.invoiceAttachmentPath = invoiceAttachmentPath
+        self.isLateFeeApplied = isLateFeeApplied
+        self.lateFeeRate = lateFeeRate
+        self.lateMonths = lateMonths
+        self.lateFeeAmount = lateFeeAmount
+        self.baseAmount = baseAmount > 0 ? baseAmount : (isLateFeeApplied ? max(0, amount - lateFeeAmount) : amount)
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
+        receiver = try container.decode(String.self, forKey: .receiver)
+        issuer = try container.decode(String.self, forKey: .issuer)
+        notes = try container.decode(String.self, forKey: .notes)
+        monthYear = try container.decode(String.self, forKey: .monthYear)
+        apartmentNumber = try container.decode(Int.self, forKey: .apartmentNumber)
+        amount = try container.decode(Double.self, forKey: .amount)
+        sequenceNumber = try container.decode(Int.self, forKey: .sequenceNumber)
+        createdDate = try container.decode(String.self, forKey: .createdDate)
+        showApartmentNumber = try container.decode(Bool.self, forKey: .showApartmentNumber)
+        kind = try container.decode(ReceiptKind.self, forKey: .kind)
+        currency = try container.decodeIfPresent(AppCurrency.self, forKey: .currency) ?? .turkishLira
+        invoiceAttachmentPath = try container.decodeIfPresent(String.self, forKey: .invoiceAttachmentPath)
+        isLateFeeApplied = try container.decodeIfPresent(Bool.self, forKey: .isLateFeeApplied) ?? false
+        lateFeeRate = try container.decodeIfPresent(Double.self, forKey: .lateFeeRate) ?? 0.0
+        lateMonths = try container.decodeIfPresent(Int.self, forKey: .lateMonths) ?? 0
+        let decodedLateFee = try container.decodeIfPresent(Double.self, forKey: .lateFeeAmount) ?? 0.0
+        lateFeeAmount = decodedLateFee
+        baseAmount = try container.decodeIfPresent(Double.self, forKey: .baseAmount) ?? (amount - decodedLateFee)
+    }
 }
 
 // MARK: - Receipt Archive Record & Persistent Store
@@ -2144,6 +2481,11 @@ struct ReceiptRecord: Identifiable, Codable, Hashable {
     var showApartmentNumber: Bool
     var createdAt: Date = Date()
     var invoiceAttachmentPath: String? = nil
+    var isLateFeeApplied: Bool = false
+    var lateFeeRate: Double = 0.0
+    var lateMonths: Int = 0
+    var lateFeeAmount: Double = 0.0
+    var baseAmount: Double = 0.0
 
     var kind: ReceiptKind {
         ReceiptKind(rawValue: kindRaw) ?? .income
@@ -2151,6 +2493,13 @@ struct ReceiptRecord: Identifiable, Codable, Hashable {
 
     var currency: AppCurrency {
         AppCurrency(rawValue: currencyRaw) ?? .turkishLira
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case id, sequenceNumber, kindRaw, receiver, issuer, notes, monthYear
+        case apartmentNumber, amount, currencyRaw, createdDate, showApartmentNumber
+        case createdAt, invoiceAttachmentPath
+        case isLateFeeApplied, lateFeeRate, lateMonths, lateFeeAmount, baseAmount
     }
 
     init(draft: ReceiptDraft) {
@@ -2168,6 +2517,35 @@ struct ReceiptRecord: Identifiable, Codable, Hashable {
         self.showApartmentNumber = draft.showApartmentNumber
         self.createdAt = Date()
         self.invoiceAttachmentPath = draft.invoiceAttachmentPath
+        self.isLateFeeApplied = draft.isLateFeeApplied
+        self.lateFeeRate = draft.lateFeeRate
+        self.lateMonths = draft.lateMonths
+        self.lateFeeAmount = draft.lateFeeAmount
+        self.baseAmount = draft.baseAmount
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
+        sequenceNumber = try container.decode(Int.self, forKey: .sequenceNumber)
+        kindRaw = try container.decode(String.self, forKey: .kindRaw)
+        receiver = try container.decode(String.self, forKey: .receiver)
+        issuer = try container.decode(String.self, forKey: .issuer)
+        notes = try container.decode(String.self, forKey: .notes)
+        monthYear = try container.decode(String.self, forKey: .monthYear)
+        apartmentNumber = try container.decode(Int.self, forKey: .apartmentNumber)
+        amount = try container.decode(Double.self, forKey: .amount)
+        currencyRaw = try container.decode(String.self, forKey: .currencyRaw)
+        createdDate = try container.decode(String.self, forKey: .createdDate)
+        showApartmentNumber = try container.decode(Bool.self, forKey: .showApartmentNumber)
+        createdAt = try container.decodeIfPresent(Date.self, forKey: .createdAt) ?? Date()
+        invoiceAttachmentPath = try container.decodeIfPresent(String.self, forKey: .invoiceAttachmentPath)
+        isLateFeeApplied = try container.decodeIfPresent(Bool.self, forKey: .isLateFeeApplied) ?? false
+        lateFeeRate = try container.decodeIfPresent(Double.self, forKey: .lateFeeRate) ?? 0.0
+        lateMonths = try container.decodeIfPresent(Int.self, forKey: .lateMonths) ?? 0
+        let decodedLateFee = try container.decodeIfPresent(Double.self, forKey: .lateFeeAmount) ?? 0.0
+        lateFeeAmount = decodedLateFee
+        baseAmount = try container.decodeIfPresent(Double.self, forKey: .baseAmount) ?? (amount - decodedLateFee)
     }
 
     func toDraft() -> ReceiptDraft {
@@ -2184,7 +2562,12 @@ struct ReceiptRecord: Identifiable, Codable, Hashable {
             showApartmentNumber: showApartmentNumber,
             kind: kind,
             currency: currency,
-            invoiceAttachmentPath: invoiceAttachmentPath
+            invoiceAttachmentPath: invoiceAttachmentPath,
+            isLateFeeApplied: isLateFeeApplied,
+            lateFeeRate: lateFeeRate,
+            lateMonths: lateMonths,
+            lateFeeAmount: lateFeeAmount,
+            baseAmount: baseAmount
         )
     }
 }
@@ -2360,6 +2743,9 @@ struct SystemBackupPackage: Codable {
     var vendors: [VendorRecord]
     var expenseServices: [ExpenseServicePreset]
     var archivedReceipts: [ReceiptRecord]
+    var isLateFeeEnabled: Bool? = false
+    var lateFeeMonthlyRate: Double? = 5.0
+    var lateFeeDueDay: Int? = 15
 }
 
 // MARK: - Store
@@ -2404,6 +2790,15 @@ final class ReceiptSettingsStore: ObservableObject {
     }
     @Published var currency: AppCurrency {
         didSet { defaults.set(currency.rawValue, forKey: Keys.currency) }
+    }
+    @Published var isLateFeeEnabled: Bool {
+        didSet { defaults.set(isLateFeeEnabled, forKey: Keys.isLateFeeEnabled) }
+    }
+    @Published var lateFeeMonthlyRate: Double {
+        didSet { defaults.set(lateFeeMonthlyRate, forKey: Keys.lateFeeMonthlyRate) }
+    }
+    @Published var lateFeeDueDay: Int {
+        didSet { defaults.set(lateFeeDueDay, forKey: Keys.lateFeeDueDay) }
     }
     @Published var signatureData: Data? {
         didSet {
@@ -2500,10 +2895,17 @@ final class ReceiptSettingsStore: ObservableObject {
         let savedTheme = defaults.string(forKey: Keys.theme) ?? AppTheme.system.rawValue
         let resolvedTheme = AppTheme(rawValue: savedTheme) ?? .system
         theme = resolvedTheme
-        applyTheme(resolvedTheme)
+
+        isLateFeeEnabled = defaults.bool(forKey: Keys.isLateFeeEnabled)
+        let savedFeeRate = defaults.double(forKey: Keys.lateFeeMonthlyRate)
+        lateFeeMonthlyRate = savedFeeRate > 0 ? savedFeeRate : 5.0
+        let savedDueDay = defaults.integer(forKey: Keys.lateFeeDueDay)
+        lateFeeDueDay = savedDueDay > 0 ? savedDueDay : 15
 
         signatureData = defaults.data(forKey: Keys.signature)
         logoData = defaults.data(forKey: Keys.logo)
+
+        applyTheme(resolvedTheme)
     }
 
     func loadSampleDefaults(for targetLang: AppLanguage? = nil) {
@@ -2651,7 +3053,10 @@ final class ReceiptSettingsStore: ObservableObject {
             residentPhones: phoneMap,
             vendors: vendors,
             expenseServices: expenseServices,
-            archivedReceipts: ReceiptArchiveStore.shared.records
+            archivedReceipts: ReceiptArchiveStore.shared.records,
+            isLateFeeEnabled: isLateFeeEnabled,
+            lateFeeMonthlyRate: lateFeeMonthlyRate,
+            lateFeeDueDay: lateFeeDueDay
         )
         return try? JSONEncoder().encode(pkg)
     }
@@ -2669,6 +3074,15 @@ final class ReceiptSettingsStore: ObservableObject {
         }
         if let cur = AppCurrency(rawValue: pkg.currency) {
             currency = cur
+        }
+        if let feeEnabled = pkg.isLateFeeEnabled {
+            isLateFeeEnabled = feeEnabled
+        }
+        if let feeRate = pkg.lateFeeMonthlyRate, feeRate >= 0 {
+            lateFeeMonthlyRate = feeRate
+        }
+        if let feeDay = pkg.lateFeeDueDay, feeDay >= 1 && feeDay <= 31 {
+            lateFeeDueDay = feeDay
         }
         for (flat, name) in pkg.residents {
             saveOwner(name, apartmentNumber: flat)
@@ -2706,6 +3120,9 @@ final class ReceiptSettingsStore: ObservableObject {
         static let currency = "app_currency"
         static let vendors = "vendors_list"
         static let expenseServices = "expense_services_list"
+        static let isLateFeeEnabled = "is_late_fee_enabled"
+        static let lateFeeMonthlyRate = "late_fee_monthly_rate"
+        static let lateFeeDueDay = "late_fee_due_day"
 
         static func owner(_ number: Int) -> String {
             "homeowner_\(number)"
@@ -3618,6 +4035,18 @@ struct ApartmentFinancialReportSheet: View {
                             .background(Color.orange.opacity(0.12))
                             .clipShape(Capsule())
 
+                            if settings.isLateFeeEnabled {
+                                let defaultAmt = Double(settings.defaultPayment.replacingOccurrences(of: ",", with: ".")) ?? 1750.0
+                                let fee = (defaultAmt * (settings.lateFeeMonthlyRate / 100.0) * 100.0).rounded() / 100.0
+                                Text("+\(String(format: "%.2f", fee)) \(settings.currency.symbol) KMK")
+                                    .font(.system(size: 10, weight: .bold, design: .monospaced))
+                                    .foregroundColor(.orange)
+                                    .padding(.horizontal, 7)
+                                    .padding(.vertical, 3)
+                                    .background(Color.orange.opacity(0.08))
+                                    .clipShape(Capsule())
+                            }
+
                             Button {
                                 sendWhatsAppReminder(flat: item.flat, owner: item.owner, phone: item.phone)
                             } label: {
@@ -3705,18 +4134,35 @@ struct ApartmentFinancialReportSheet: View {
     private func sendWhatsAppReminder(flat: Int, owner: String, phone: String) {
         let periodName = selectedPeriod == "all" ? (availablePeriods.first ?? "") : selectedPeriod
         let duesAmt = settings.defaultPayment.isEmpty ? "1750" : settings.defaultPayment
+        let duesAmtValue = Double(duesAmt.replacingOccurrences(of: ",", with: ".")) ?? 1750.0
         let currencySym = settings.currency.symbol
         let apt = settings.apartmentName.isEmpty ? l10n.defaultBuildingName : settings.apartmentName
         let manager = settings.issuer.isEmpty ? l10n.managerSignatureTitle : settings.issuer
 
         let message: String
-        switch l10n.resolvedLanguage {
-        case .turkish:
-            message = "Sayın Komşumuz (Daire \(flat)), \(apt) \(periodName) dönemi \(duesAmt) \(currencySym) aidat ödemeniz henüz kaydımıza geçmemiştir. Bilginize sunar, iyi günler dileriz. - \(manager)"
-        case .romanian:
-            message = "Stimate Vecin (Ap. \(flat)), plata întreținerii pentru perioada \(periodName) la \(apt) în valoare de \(duesAmt) \(currencySym) este în așteptare. Vă mulțumim! - \(manager)"
-        default:
-            message = "Dear Resident (Flat \(flat)), dues payment for \(periodName) at \(apt) in the amount of \(duesAmt) \(currencySym) is currently pending. Thank you! - \(manager)"
+        if settings.isLateFeeEnabled {
+            let lateFeeVal = (duesAmtValue * (settings.lateFeeMonthlyRate / 100.0) * 100.0).rounded() / 100.0
+            let totalVal = duesAmtValue + lateFeeVal
+            let rateStr = String(format: "%.1f", settings.lateFeeMonthlyRate)
+            let feeStr = String(format: "%.2f", lateFeeVal)
+            let totalStr = String(format: "%.2f", totalVal)
+            switch l10n.resolvedLanguage {
+            case .turkish:
+                message = "Sayın Komşumuz (Daire \(flat)), \(apt) \(periodName) dönemi \(duesAmt) \(currencySym) aidat ve KMK Md. 20 uyarınca aylık %\(rateStr) gecikme tazminatı (\(feeStr) \(currencySym)) ile birlikte toplam \(totalStr) \(currencySym) ödemeniz henüz kaydımıza geçmemiştir. Bilginize sunar, iyi günler dileriz. - \(manager)"
+            case .romanian:
+                message = "Stimate Vecin (Ap. \(flat)), plata întreținerii pentru \(periodName) la \(apt) (\(duesAmt) \(currencySym)) plus penalități conform art. 20 (%\(rateStr): \(feeStr) \(currencySym)), total \(totalStr) \(currencySym) este în așteptare. Vă mulțumim! - \(manager)"
+            default:
+                message = "Dear Resident (Flat \(flat)), dues for \(periodName) at \(apt) (\(duesAmt) \(currencySym)) plus Art. 20 late compensation (%\(rateStr): \(feeStr) \(currencySym)), total \(totalStr) \(currencySym) is currently pending. Thank you! - \(manager)"
+            }
+        } else {
+            switch l10n.resolvedLanguage {
+            case .turkish:
+                message = "Sayın Komşumuz (Daire \(flat)), \(apt) \(periodName) dönemi \(duesAmt) \(currencySym) aidat ödemeniz henüz kaydımıza geçmemiştir. Bilginize sunar, iyi günler dileriz. - \(manager)"
+            case .romanian:
+                message = "Stimate Vecin (Ap. \(flat)), plata întreținerii pentru perioada \(periodName) la \(apt) în valoare de \(duesAmt) \(currencySym) este în așteptare. Vă mulțumim! - \(manager)"
+            default:
+                message = "Dear Resident (Flat \(flat)), dues payment for \(periodName) at \(apt) in the amount of \(duesAmt) \(currencySym) is currently pending. Thank you! - \(manager)"
+            }
         }
 
         let cleanPhone = phone.trimmingCharacters(in: .whitespacesAndNewlines)

@@ -287,6 +287,9 @@ struct SettingsView: View {
             .background(Color(NSColor.controlBackgroundColor))
             .clipShape(RoundedRectangle(cornerRadius: 10))
 
+            // Group: Kat Mülkiyeti Kanunu (KMK Md. 20) Gecikme Tazminatı
+            lateFeeSettingsCard
+
             // Group 3: Hızlı Başlangıç Senaryo Kartları
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
@@ -340,6 +343,126 @@ struct SettingsView: View {
             .background(Color(NSColor.controlBackgroundColor))
             .clipShape(RoundedRectangle(cornerRadius: 10))
         }
+    }
+
+    // MARK: - Kat Mülkiyeti Kanunu (KMK Md. 20) Gecikme Tazminatı Card
+
+    private var lateFeeSettingsCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 10) {
+                Image(systemName: "scalemass.fill")
+                    .font(.system(size: 15))
+                    .foregroundColor(.orange)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(l10n.lateFeeTitle)
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundColor(.primary)
+                    Text(l10n.lateFeeSubtitle)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+
+                Spacer()
+
+                Toggle("", isOn: $viewModel.isLateFeeEnabled)
+                    .toggleStyle(.switch)
+            }
+
+            if viewModel.isLateFeeEnabled {
+                Divider()
+
+                VStack(alignment: .leading, spacing: 10) {
+                    // Manual Rate Entry & Presets
+                    HStack(alignment: .center, spacing: 12) {
+                        Text(l10n.lateFeeMonthlyRateTitle)
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(.secondary)
+                            .frame(width: 170, alignment: .leading)
+
+                        HStack(spacing: 4) {
+                            Text("%")
+                                .font(.system(size: 12, weight: .bold))
+                                .foregroundColor(.secondary)
+                            TextField("5.0", text: $viewModel.lateFeeMonthlyRate)
+                                .textFieldStyle(.plain)
+                                .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                                .frame(width: 55)
+                        }
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 5)
+                        .background(Color(NSColor.textBackgroundColor))
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 6)
+                                .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
+                        )
+
+                        // Quick Chips: [%3.0], [%5.0 Kanuni], [%7.5], [%10.0]
+                        HStack(spacing: 5) {
+                            ForEach([3.0, 5.0, 7.5, 10.0], id: \.self) { rate in
+                                let isSelected = (Double(viewModel.lateFeeMonthlyRate.replacingOccurrences(of: ",", with: ".")) ?? -1) == rate
+                                Button {
+                                    viewModel.lateFeeMonthlyRate = String(format: "%.1f", rate)
+                                } label: {
+                                    Text(rate == 5.0 ? l10n.statutoryRateChip : "%\(String(format: "%.1f", rate))")
+                                        .font(.system(size: 10.5, weight: isSelected ? .bold : .medium))
+                                        .padding(.horizontal, 8)
+                                        .padding(.vertical, 4)
+                                        .background(isSelected ? Color.orange : Color.secondary.opacity(0.12))
+                                        .foregroundColor(isSelected ? .white : .primary)
+                                        .clipShape(Capsule())
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                    }
+
+                    // Monthly Due Day (Grace Threshold)
+                    HStack(spacing: 12) {
+                        Text(l10n.lateFeeDueDayTitle)
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(.secondary)
+                            .frame(width: 170, alignment: .leading)
+
+                        HStack(spacing: 8) {
+                            Text(l10n.dueDayDayPrefix)
+                                .font(.system(size: 12))
+                                .foregroundColor(.secondary)
+
+                            Picker("", selection: $viewModel.lateFeeDueDay) {
+                                ForEach(1...31, id: \.self) { day in
+                                    Text("\(day)").tag(day)
+                                }
+                            }
+                            .frame(width: 65)
+
+                            Text(l10n.dueDayDaySuffix)
+                                .font(.system(size: 12))
+                                .foregroundColor(.secondary)
+                        }
+                    }
+
+                    // Legal Footnote
+                    HStack(alignment: .top, spacing: 6) {
+                        Image(systemName: "info.circle.fill")
+                            .font(.system(size: 11))
+                            .foregroundColor(.orange)
+                            .padding(.top, 2)
+                        Text(l10n.lateFeeLegalNotice)
+                            .font(.system(size: 10))
+                            .foregroundColor(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .padding(8)
+                    .background(Color.orange.opacity(0.08))
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                }
+            }
+        }
+        .padding(14)
+        .background(Color(NSColor.controlBackgroundColor))
+        .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 
     // MARK: - Building Hero Showcase Card
@@ -1606,6 +1729,9 @@ final class SettingsViewModel: ObservableObject {
     @Published var language: AppLanguage = .system
     @Published var theme: AppTheme = .system
     @Published var currency: AppCurrency = .turkishLira
+    @Published var isLateFeeEnabled: Bool = false
+    @Published var lateFeeMonthlyRate: String = "5.0"
+    @Published var lateFeeDueDay: Int = 15
     @Published var showRestartAlert: Bool = false
     @Published var showSampleDefaultsFeedback: Bool = false
 
@@ -1769,6 +1895,9 @@ final class SettingsViewModel: ObservableObject {
         language = settings.language
         theme = settings.theme
         currency = settings.currency
+        isLateFeeEnabled = settings.isLateFeeEnabled
+        lateFeeMonthlyRate = String(format: "%.1f", settings.lateFeeMonthlyRate)
+        lateFeeDueDay = settings.lateFeeDueDay
         vendors = settings.vendors
         expenseServices = settings.expenseServices
         selectedApartment = settings.apartmentNumbers.first ?? 1
@@ -1851,6 +1980,12 @@ final class SettingsViewModel: ObservableObject {
         settings.language = language
         settings.theme = theme
         settings.currency = currency
+        settings.isLateFeeEnabled = isLateFeeEnabled
+        let normalizedFeeRate = lateFeeMonthlyRate.trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: ",", with: ".")
+        if let feeRate = Double(normalizedFeeRate), feeRate >= 0 {
+            settings.lateFeeMonthlyRate = feeRate
+        }
+        settings.lateFeeDueDay = max(1, min(31, lateFeeDueDay))
         settings.vendors = vendors
         settings.expenseServices = expenseServices
 

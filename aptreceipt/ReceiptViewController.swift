@@ -613,6 +613,25 @@ struct ReceiptDocumentView: View {
         return formatter.string(from: NSNumber(value: draft.amount)) ?? "\(draft.currency.symbol) \(draft.amount)"
     }
 
+    private var baseAmountFormatted: String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.locale = l10n.locale
+        formatter.currencySymbol = draft.currency.symbol
+        formatter.currencyCode = draft.currency.code
+        let amt = draft.baseAmount > 0 ? draft.baseAmount : (draft.isLateFeeApplied ? max(0, draft.amount - draft.lateFeeAmount) : draft.amount)
+        return formatter.string(from: NSNumber(value: amt)) ?? "\(draft.currency.symbol) \(amt)"
+    }
+
+    private var lateFeeAmountFormatted: String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.locale = l10n.locale
+        formatter.currencySymbol = draft.currency.symbol
+        formatter.currencyCode = draft.currency.code
+        return formatter.string(from: NSNumber(value: draft.lateFeeAmount)) ?? "\(draft.currency.symbol) \(draft.lateFeeAmount)"
+    }
+
     private var mainTitle: String {
         apartmentName.isEmpty ? l10n.defaultBuildingName : apartmentName.uppercased()
     }
@@ -871,43 +890,121 @@ struct ReceiptDocumentView: View {
                 .background(tableHeaderBg)
                 .clipShape(RoundedRectangle(cornerRadius: 4))
 
-                // Table Row
-                HStack(spacing: 0) {
-                    Text("01")
-                        .font(.system(size: 10, weight: .medium, design: .monospaced))
-                        .foregroundColor(textDark)
-                        .frame(width: 36, alignment: .center)
+                // Table Rows
+                if draft.lateFeeAmount > 0 {
+                    // Row 01: Base Dues
+                    HStack(spacing: 0) {
+                        Text("01")
+                            .font(.system(size: 10, weight: .medium, design: .monospaced))
+                            .foregroundColor(textDark)
+                            .frame(width: 36, alignment: .center)
 
-                    Text(itemDescriptionText)
-                        .font(.system(size: 10, weight: .medium))
-                        .foregroundColor(textDark)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.leading, 8)
+                        Text(itemDescriptionText)
+                            .font(.system(size: 10, weight: .medium))
+                            .foregroundColor(textDark)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.leading, 8)
 
-                    Text(draft.monthYear)
-                        .font(.system(size: 9.5))
-                        .foregroundColor(textSecondary)
-                        .frame(width: 80, alignment: .center)
+                        Text(draft.monthYear)
+                            .font(.system(size: 9.5))
+                            .foregroundColor(textSecondary)
+                            .frame(width: 80, alignment: .center)
 
-                    Text(l10n.unitMonth)
-                        .font(.system(size: 9.5))
-                        .foregroundColor(textSecondary)
-                        .frame(width: 60, alignment: .center)
+                        Text(l10n.unitMonth)
+                            .font(.system(size: 9.5))
+                            .foregroundColor(textSecondary)
+                            .frame(width: 60, alignment: .center)
 
-                    Text(formattedAmount)
-                        .font(.system(size: 11, weight: .bold, design: .monospaced))
-                        .foregroundColor(textDark)
-                        .frame(width: 95, alignment: .trailing)
-                        .padding(.trailing, 8)
+                        Text(baseAmountFormatted)
+                            .font(.system(size: 11, weight: .bold, design: .monospaced))
+                            .foregroundColor(textDark)
+                            .frame(width: 95, alignment: .trailing)
+                            .padding(.trailing, 8)
+                    }
+                    .padding(.vertical, 8)
+                    .background(Color.white)
+                    .overlay(
+                        Rectangle()
+                            .fill(borderSubtle)
+                            .frame(height: 1),
+                        alignment: .bottom
+                    )
+
+                    // Row 02: KMK Md. 20 Late Fee
+                    HStack(spacing: 0) {
+                        Text("02")
+                            .font(.system(size: 10, weight: .medium, design: .monospaced))
+                            .foregroundColor(textDark)
+                            .frame(width: 36, alignment: .center)
+
+                        Text(l10n.lateFeeItemName(rate: draft.lateFeeRate, months: draft.lateMonths))
+                            .font(.system(size: 10, weight: .semibold))
+                            .foregroundColor(Color(red: 0.82, green: 0.42, blue: 0.12))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.leading, 8)
+
+                        Text(draft.monthYear)
+                            .font(.system(size: 9.5))
+                            .foregroundColor(textSecondary)
+                            .frame(width: 80, alignment: .center)
+
+                        Text("\(draft.lateMonths) \(draft.lateMonths > 1 ? l10n.monthsUnit : l10n.monthUnit)")
+                            .font(.system(size: 9.5))
+                            .foregroundColor(textSecondary)
+                            .frame(width: 60, alignment: .center)
+
+                        Text("+" + lateFeeAmountFormatted)
+                            .font(.system(size: 11, weight: .bold, design: .monospaced))
+                            .foregroundColor(Color(red: 0.82, green: 0.42, blue: 0.12))
+                            .frame(width: 95, alignment: .trailing)
+                            .padding(.trailing, 8)
+                    }
+                    .padding(.vertical, 8)
+                    .background(Color(red: 0.99, green: 0.97, blue: 0.94))
+                    .overlay(
+                        Rectangle()
+                            .fill(borderSubtle)
+                            .frame(height: 1),
+                        alignment: .bottom
+                    )
+                } else {
+                    HStack(spacing: 0) {
+                        Text("01")
+                            .font(.system(size: 10, weight: .medium, design: .monospaced))
+                            .foregroundColor(textDark)
+                            .frame(width: 36, alignment: .center)
+
+                        Text(itemDescriptionText)
+                            .font(.system(size: 10, weight: .medium))
+                            .foregroundColor(textDark)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.leading, 8)
+
+                        Text(draft.monthYear)
+                            .font(.system(size: 9.5))
+                            .foregroundColor(textSecondary)
+                            .frame(width: 80, alignment: .center)
+
+                        Text(l10n.unitMonth)
+                            .font(.system(size: 9.5))
+                            .foregroundColor(textSecondary)
+                            .frame(width: 60, alignment: .center)
+
+                        Text(formattedAmount)
+                            .font(.system(size: 11, weight: .bold, design: .monospaced))
+                            .foregroundColor(textDark)
+                            .frame(width: 95, alignment: .trailing)
+                            .padding(.trailing, 8)
+                    }
+                    .padding(.vertical, 10)
+                    .background(Color.white)
+                    .overlay(
+                        Rectangle()
+                            .fill(borderSubtle)
+                            .frame(height: 1),
+                        alignment: .bottom
+                    )
                 }
-                .padding(.vertical, 10)
-                .background(Color.white)
-                .overlay(
-                    Rectangle()
-                        .fill(borderSubtle)
-                        .frame(height: 1),
-                    alignment: .bottom
-                )
             }
             .padding(.bottom, 16)
 
@@ -943,19 +1040,47 @@ struct ReceiptDocumentView: View {
                     Text(l10n.legalStatutoryNotice)
                         .font(.system(size: 8.5))
                         .foregroundColor(textMuted)
+
+                    if draft.lateFeeAmount > 0 {
+                        Text(l10n.lateFeeStatutoryFootnote)
+                            .font(.system(size: 8.5, weight: .semibold))
+                            .foregroundColor(Color(red: 0.82, green: 0.42, blue: 0.12))
+                    }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
 
                 // Right: Financial Totals Box
                 VStack(spacing: 5) {
-                    HStack {
-                        Text(l10n.subtotal)
-                            .font(.system(size: 10, weight: .medium))
-                            .foregroundColor(textSecondary)
-                        Spacer()
-                        Text(formattedAmount)
-                            .font(.system(size: 11, weight: .semibold, design: .monospaced))
-                            .foregroundColor(textDark)
+                    if draft.lateFeeAmount > 0 {
+                        HStack {
+                            Text(l10n.baseDuesAmount)
+                                .font(.system(size: 9.5, weight: .medium))
+                                .foregroundColor(textSecondary)
+                            Spacer()
+                            Text(baseAmountFormatted)
+                                .font(.system(size: 10.5, weight: .semibold, design: .monospaced))
+                                .foregroundColor(textDark)
+                        }
+
+                        HStack {
+                            Text(l10n.lateFeeCalculated)
+                                .font(.system(size: 9.5, weight: .medium))
+                                .foregroundColor(Color(red: 0.82, green: 0.42, blue: 0.12))
+                            Spacer()
+                            Text("+" + lateFeeAmountFormatted)
+                                .font(.system(size: 10.5, weight: .bold, design: .monospaced))
+                                .foregroundColor(Color(red: 0.82, green: 0.42, blue: 0.12))
+                        }
+                    } else {
+                        HStack {
+                            Text(l10n.subtotal)
+                                .font(.system(size: 10, weight: .medium))
+                                .foregroundColor(textSecondary)
+                            Spacer()
+                            Text(formattedAmount)
+                                .font(.system(size: 11, weight: .semibold, design: .monospaced))
+                                .foregroundColor(textDark)
+                        }
                     }
 
                     HStack {
