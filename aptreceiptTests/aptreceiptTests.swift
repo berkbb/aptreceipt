@@ -3,34 +3,216 @@
 //  aptreceiptTests
 //
 //  Created by berkbb on 16.03.2022.
+//  Copyright © 2023-2026 Babadogan Tech and Edu. All rights reserved.
 //
 
 import XCTest
 @testable import aptreceipt
 
-class aptreceiptTests: XCTestCase {
+final class aptreceiptTests: XCTestCase {
 
-    override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+    // MARK: - 1. ReceiptDraft & Late Fee Tests
+
+    func testReceiptDraftInitialization() {
+        let draft = ReceiptDraft(
+            receiver: "Ali Veli",
+            issuer: "Ahmet Yılmaz",
+            notes: "Ekim 2026 Aidatı",
+            monthYear: "Ekim 2026",
+            apartmentNumber: 5,
+            amount: 2300.0,
+            sequenceNumber: 105,
+            createdDate: "19.10.2026",
+            showApartmentNumber: true,
+            kind: .income,
+            currency: .turkishLira,
+            isLateFeeApplied: true,
+            lateFeeRate: 5.0,
+            lateMonths: 3,
+            lateFeeAmount: 300.0,
+            baseAmount: 2000.0
+        )
+
+        XCTAssertEqual(draft.receiver, "Ali Veli")
+        XCTAssertEqual(draft.issuer, "Ahmet Yılmaz")
+        XCTAssertEqual(draft.amount, 2300.0)
+        XCTAssertEqual(draft.baseAmount, 2000.0)
+        XCTAssertEqual(draft.lateFeeAmount, 300.0)
+        XCTAssertEqual(draft.lateFeeRate, 5.0)
+        XCTAssertEqual(draft.lateMonths, 3)
+        XCTAssertTrue(draft.isLateFeeApplied)
+        XCTAssertEqual(draft.kind, .income)
+        XCTAssertEqual(draft.currency, .turkishLira)
     }
 
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
+    func testKMKLateFeeMathematicalCalculation() {
+        // KMK Art. 20/c calculation: Base * (Rate / 100) * Months
+        let baseDues: Double = 2000.0
+        let monthlyRate: Double = 5.0 // Statutory 5%
+        let overdueMonths: Int = 3
+
+        let calculatedLateFee = baseDues * (monthlyRate / 100.0) * Double(overdueMonths)
+        let total = baseDues + calculatedLateFee
+
+        XCTAssertEqual(calculatedLateFee, 300.0, accuracy: 0.001)
+        XCTAssertEqual(total, 2300.0, accuracy: 0.001)
+
+        // Custom rate test: %7.5 over 2 months
+        let customRate: Double = 7.5
+        let customLateFee = baseDues * (customRate / 100.0) * 2.0
+        XCTAssertEqual(customLateFee, 300.0, accuracy: 0.001)
     }
 
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-        // Any test you write for XCTest can be annotated as throws and async.
-        // Mark your test throws to produce an unexpected failure when your test encounters an uncaught error.
-        // Mark your test async to allow awaiting for asynchronous code to complete. Check the results with assertions afterwards.
+    func testReceiptDraftCodableRoundTrip() throws {
+        let originalDraft = ReceiptDraft(
+            receiver: "Mehmet Demir",
+            issuer: "Yönetici",
+            notes: "Aidat",
+            monthYear: "Ekim 2026",
+            apartmentNumber: 3,
+            amount: 1850.0,
+            sequenceNumber: 42,
+            createdDate: "19.10.2026",
+            showApartmentNumber: true,
+            kind: .income,
+            currency: .euro,
+            isLateFeeApplied: true,
+            lateFeeRate: 5.0,
+            lateMonths: 1,
+            lateFeeAmount: 88.0,
+            baseAmount: 1762.0
+        )
+
+        let encoder = JSONEncoder()
+        let data = try encoder.encode(originalDraft)
+
+        let decoder = JSONDecoder()
+        let decodedDraft = try decoder.decode(ReceiptDraft.self, from: data)
+
+        XCTAssertEqual(originalDraft.id, decodedDraft.id)
+        XCTAssertEqual(originalDraft.receiver, decodedDraft.receiver)
+        XCTAssertEqual(originalDraft.amount, decodedDraft.amount)
+        XCTAssertEqual(originalDraft.baseAmount, decodedDraft.baseAmount)
+        XCTAssertEqual(originalDraft.lateFeeAmount, decodedDraft.lateFeeAmount)
+        XCTAssertEqual(originalDraft.lateFeeRate, decodedDraft.lateFeeRate)
+        XCTAssertEqual(originalDraft.lateMonths, decodedDraft.lateMonths)
+        XCTAssertEqual(originalDraft.isLateFeeApplied, decodedDraft.isLateFeeApplied)
+        XCTAssertEqual(originalDraft.currency, decodedDraft.currency)
     }
 
-    func testPerformanceExample() throws {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
+    func testReceiptDraftBackwardCompatibilityWithLegacyJSON() throws {
+        // Legacy JSON without late fee keys
+        let legacyJSON = """
+        {
+            "id": "12345678-1234-1234-1234-123456789abc",
+            "receiver": "Ahmet Kaya",
+            "issuer": "Yönetim",
+            "notes": "Aidat Ödemesi",
+            "monthYear": "Ocak 2025",
+            "apartmentNumber": 4,
+            "amount": 1500.0,
+            "sequenceNumber": 12,
+            "createdDate": "15.01.2025",
+            "showApartmentNumber": true,
+            "kind": "income",
+            "currency": "TRY"
         }
+        """.data(using: .utf8)!
+
+        let decoder = JSONDecoder()
+        let draft = try decoder.decode(ReceiptDraft.self, from: legacyJSON)
+
+        XCTAssertEqual(draft.receiver, "Ahmet Kaya")
+        XCTAssertEqual(draft.amount, 1500.0)
+        XCTAssertFalse(draft.isLateFeeApplied)
+        XCTAssertEqual(draft.lateFeeRate, 0.0)
+        XCTAssertEqual(draft.lateMonths, 0)
+        XCTAssertEqual(draft.lateFeeAmount, 0.0)
+        XCTAssertEqual(draft.baseAmount, 1500.0)
     }
 
+    // MARK: - 2. Currency & Language Tests
+
+    func testCurrencySymbolsAndIdentifiers() {
+        XCTAssertEqual(AppCurrency.turkishLira.symbol, "₺")
+        XCTAssertEqual(AppCurrency.turkishLira.code, "TRY")
+
+        XCTAssertEqual(AppCurrency.euro.symbol, "€")
+        XCTAssertEqual(AppCurrency.euro.code, "EUR")
+
+        XCTAssertEqual(AppCurrency.usDollar.symbol, "$")
+        XCTAssertEqual(AppCurrency.usDollar.code, "USD")
+
+        XCTAssertEqual(AppCurrency.romanianLeu.symbol, "Lei")
+        XCTAssertEqual(AppCurrency.romanianLeu.code, "RON")
+    }
+
+    func testAppLanguageLocalesAndL10n() {
+        XCTAssertEqual(AppLanguage.turkish.rawValue, "tr")
+        XCTAssertEqual(AppLanguage.english.rawValue, "en")
+        XCTAssertEqual(AppLanguage.romanian.rawValue, "ro")
+
+        // Verify L10n localization keys
+        let trL10n = L10n(.turkish)
+        XCTAssertEqual(trL10n.incomeDocumentType, "Tahsilat Makbuzu")
+        XCTAssertEqual(trL10n.expenseDocumentType, "Sakin İade / Tediye Makbuzu")
+        XCTAssertEqual(trL10n.statutoryRateChip, "%5.0 (Kanuni)")
+
+        let enL10n = L10n(.english)
+        XCTAssertEqual(enL10n.incomeDocumentType, "Collection Receipt")
+        XCTAssertEqual(enL10n.expenseDocumentType, "Resident Refund Voucher")
+
+        let roL10n = L10n(.romanian)
+        XCTAssertEqual(roL10n.incomeDocumentType, "Chitanță Încasare")
+        XCTAssertEqual(roL10n.expenseDocumentType, "Dispoziție de Plată Locatar")
+    }
+
+    // MARK: - 3. Backup Package & Settings Store Tests
+
+    func testSystemBackupPackageCodable() throws {
+        let package = SystemBackupPackage(
+            apartmentName: "Güleryüz Apartmanı",
+            issuer: "Ahmet Yılmaz",
+            defaultPayment: "2000",
+            flatCount: 16,
+            seqNumber: 150,
+            language: "tr",
+            currency: "TRY",
+            residents: [1: "Ali", 2: "Ayşe"],
+            residentPhones: [1: "05551234567"],
+            vendors: [VendorRecord(name: "Otis Asansör", category: "Asansör")],
+            expenseServices: [],
+            archivedReceipts: [],
+            isLateFeeEnabled: true,
+            lateFeeMonthlyRate: 5.0,
+            lateFeeDueDay: 15
+        )
+
+        let encoder = JSONEncoder()
+        let data = try encoder.encode(package)
+
+        let decoder = JSONDecoder()
+        let restored = try decoder.decode(SystemBackupPackage.self, from: data)
+
+        XCTAssertEqual(restored.apartmentName, "Güleryüz Apartmanı")
+        XCTAssertEqual(restored.defaultPayment, "2000")
+        XCTAssertEqual(restored.seqNumber, 150)
+        XCTAssertEqual(restored.flatCount, 16)
+        XCTAssertEqual(restored.isLateFeeEnabled, true)
+        XCTAssertEqual(restored.lateFeeMonthlyRate, 5.0)
+        XCTAssertEqual(restored.lateFeeDueDay, 15)
+        XCTAssertEqual(restored.residents[1], "Ali")
+        XCTAssertEqual(restored.vendors.count, 1)
+        XCTAssertEqual(restored.vendors.first?.name, "Otis Asansör")
+    }
+
+    @MainActor
+    func testReceiptSettingsStoreDefaults() {
+        let store = ReceiptSettingsStore.shared
+        XCTAssertFalse(store.apartmentName.isEmpty)
+        XCTAssertGreaterThan(store.flatCount, 0)
+        XCTAssertGreaterThan(store.lateFeeMonthlyRate, 0.0)
+        XCTAssertGreaterThanOrEqual(store.lateFeeDueDay, 1)
+        XCTAssertLessThanOrEqual(store.lateFeeDueDay, 31)
+    }
 }
