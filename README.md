@@ -1,6 +1,6 @@
 <img src="aptreceipt/Assets.xcassets/Logo.imageset/aparment_macos-2@256.png" width="160" alt="Apartment Receipt Logo" />
 
-# Apartment Receipt Generator for macOS
+# AptReceipt
 
 A modern, native macOS application to effortlessly generate, manage, and export official apartment income and expense receipts.
 
