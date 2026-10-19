@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		9A1F6CAA27E485B5006C171B /* ReceiptViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A1F6CA927E485B5006C171B /* ReceiptViewController.swift */; };
 		9A90651127E728020085AA4B /* PreferencesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A90651027E728020085AA4B /* PreferencesViewController.swift */; };
+		9A90652127E728020085AA4B /* GitHubUpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A90652027E728020085AA4B /* GitHubUpdateChecker.swift */; };
 		9A9CF87927E204920042D276 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A9CF87827E204920042D276 /* AppDelegate.swift */; };
 		9A9CF87B27E204920042D276 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A9CF87A27E204920042D276 /* ViewController.swift */; };
 		9A9CF87D27E204920042D276 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9A9CF87C27E204920042D276 /* Assets.xcassets */; };
@@ -40,6 +41,7 @@
 /* Begin PBXFileReference section */
 		9A1F6CA927E485B5006C171B /* ReceiptViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptViewController.swift; sourceTree = "<group>"; };
 		9A90651027E728020085AA4B /* PreferencesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesViewController.swift; sourceTree = "<group>"; };
+		9A90652027E728020085AA4B /* GitHubUpdateChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubUpdateChecker.swift; sourceTree = "<group>"; };
 		9A9CF87527E204920042D276 /* aptreceipt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = aptreceipt.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A9CF87827E204920042D276 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		9A9CF87A27E204920042D276 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -118,6 +120,7 @@
 				9A9CF8B627E22E670042D276 /* InfoPlist.strings */,
 				9A1F6CA927E485B5006C171B /* ReceiptViewController.swift */,
 				9A90651027E728020085AA4B /* PreferencesViewController.swift */,
+				9A90652027E728020085AA4B /* GitHubUpdateChecker.swift */,
 				9ADECA1627E5DC3500EB0A7F /* File.strings */,
 			);
 			path = aptreceipt;
@@ -278,6 +281,7 @@
 				9A9CF87B27E204920042D276 /* ViewController.swift in Sources */,
 				9A9CF87927E204920042D276 /* AppDelegate.swift in Sources */,
 				9A90651127E728020085AA4B /* PreferencesViewController.swift in Sources */,
+				9A90652127E728020085AA4B /* GitHubUpdateChecker.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -477,7 +481,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 7;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = K2MKP4X26N;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -492,7 +496,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 3.3.0;
+				MARKETING_VERSION = 3.4.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.babadogantech.aptreceipt;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -510,7 +514,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = K2MKP4X26N;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -525,7 +529,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 3.3.0;
+				MARKETING_VERSION = 3.4.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.babadogantech.aptreceipt;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;

@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.4.0] - 2026-10-19
+
+### Added
+- **GitHub Release Update Checker**: Built-in update detector querying GitHub Releases API (`berkbb/aptreceipt`), featuring semver comparator (`SemverCompare`), native macOS update alert with release details and one-click download, integrated into the macOS App Menu bar (`Check for Updates...`), Settings -> About tab, and the dedicated About window.
+- **Multi-Country Late Payment Compensation Engine**: Replaced hardcoded Turkish KMK naming with a toggleable, multi-country late fee framework supporting Turkey (🇹🇷 KMK Md. 20/c), Romania (🇷🇴 Legea 196/2018 Art. 77), International (🌐 HOA Bylaws), and Custom (⚙️). Includes country-specific rates, payment due thresholds, grace periods, and receipt legal citations.
+- **Customizable Receipt Footnotes & Neutral Templates**: Added editable per-country and custom legal footnotes rendered on official A4 receipts and stored with receipts and backups. Removed hardcoded KMK references in WhatsApp reminders and batch dues badges.
+- **Extended Unit Test Suite**: Added comprehensive test cases for `SemverCompare`, `GitHubRelease` JSON decoding, and `LateFeeCountryProfile` legal citations and presets (12/12 unit tests passing).
+
+### Changed
+- Bumped marketing version to `3.4.0` (build `7`).
+
 ## [3.3.0] - 2026-10-19
 
 ### Added
