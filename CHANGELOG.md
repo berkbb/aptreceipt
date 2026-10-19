@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 ## [3.3.0] - 2026-10-19
 
 ### Added
+- **KMK Art. 20 Late Fee Calculator (Gecikme Tazminatı)**: Integrated Turkish Property Law (KMK No. 634 Art. 20/c) late payment compensation calculator. Includes manual rate configuration in Settings with statutory presets (%3.0, %5.0 Kanuni, %7.5, %10.0), monthly due day picker, on-the-fly override on receipt creation, 1-click magic overdue detection, and dual-itemized official A4 receipt rendering with legal footnote.
+- **Corporate Branding & Package Identity**: Updated bundle identifier to `com.babadogantech.aptreceipt` and official publisher branding to **Babadogan Tech and Edu** across all views, About sheet, license viewer, and system properties.
+- **Comprehensive Unit Test Suite & Test Runner**: Added unit test suite in `aptreceiptTests` covering KMK late fee math, Codable serialization backward compatibility with legacy archives, currency models, and language localization, along with the `./run_all_tests_mac.command` executable runner.
+- **Dark Mode & English Screenshot Suite**: Completely refreshed the 14-piece UI screenshot gallery in `docs/screenshots/` in native macOS Dark Mode and English localization.
+
+### Changed
+- Bumped marketing version to `3.3.0` (build `6`).
+
+## [3.2.0] - 2026-10-19
+
+### Added
 - **Receipt Archive & History**: Persistent local receipt store with real-time search, category filtering (Income, Refund, Management Expense), instant past receipt viewer, and CSV tabular export.
 - **Verifiable Dynamic QR Code**: CoreImage-powered anti-tamper QR code embedded directly into the official A4 receipt PDF and live preview, encoding verifiable summary payload.
 - **WhatsApp & Email Quick Share**: One-click dispatch of personalized, trilingual receipt notifications and payment summaries via WhatsApp Web/Desktop and macOS Mail.

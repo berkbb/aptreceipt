@@ -634,7 +634,7 @@ struct L10n {
     var noSignatureYet: String { tr("No signature uploaded yet", "Henüz imza yüklenmedi", "Nicio semnătură încărcată încă") }
 
     // About Tab & License
-    var appVersionText: String { tr("Version 3.2.0 (Build 5)", "Sürüm 3.2.0 (Yapı 5)", "Versiunea 3.2.0 (Build 5)") }
+    var appVersionText: String { tr("Version 3.3.0 (Build 6)", "Sürüm 3.3.0 (Yapı 6)", "Versiunea 3.3.0 (Build 6)") }
     var publisher: String { tr("Publisher: Babadogan Tech and Edu", "Yayıncı: Babadogan Tech and Edu", "Editor: Babadogan Tech and Edu") }
     var license: String { tr("License: GNU General Public License v3.0 (GPL-3.0)", "Lisans: GNU Genel Kamu Lisansı v3.0 (GPL-3.0)", "Licență: GNU General Public License v3.0 (GPL-3.0)") }
     var copyright: String { tr("Copyright © 2023-2026 Babadogan Tech and Edu. All rights reserved.", "Copyright © 2023-2026 Babadogan Tech and Edu. Tüm hakları saklıdır.", "Copyright © 2023-2026 Babadogan Tech and Edu. Toate drepturile rezervate.") }
