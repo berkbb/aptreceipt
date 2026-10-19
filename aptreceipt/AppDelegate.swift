@@ -20,6 +20,9 @@ struct AptReceiptApp: App {
                 Button(settings.l10n.menuAboutApp) {
                     AboutWindowManager.shared.show(settings: ReceiptSettingsStore.shared)
                 }
+                Button(settings.l10n.checkForUpdates) {
+                    GitHubUpdateChecker.shared.checkForUpdates(userInitiated: true)
+                }
             }
             CommandGroup(replacing: .appSettings) {
                 Button(settings.l10n.menuSettings) {
@@ -70,6 +73,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @MainActor
     @objc func showAboutWindow(_ sender: Any?) {
         AboutWindowManager.shared.show(settings: ReceiptSettingsStore.shared)
+    }
+
+    @MainActor
+    @objc func checkForUpdatesAction(_ sender: Any?) {
+        GitHubUpdateChecker.shared.checkForUpdates(userInitiated: true)
     }
 
     @MainActor
@@ -420,6 +428,29 @@ struct AboutWindowView: View {
                         .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
                 )
 
+                // Check for Updates
+                HStack(spacing: 8) {
+                    if GitHubUpdateChecker.shared.isChecking {
+                        ProgressView()
+                            .controlSize(.small)
+                        Text(l10n.checkingForUpdates)
+                            .font(.system(size: 11))
+                            .foregroundColor(Color(NSColor.secondaryLabelColor))
+                    } else {
+                        Button {
+                            GitHubUpdateChecker.shared.checkForUpdates(userInitiated: true)
+                        } label: {
+                            HStack(spacing: 5) {
+                                Image(systemName: "arrow.clockwise")
+                                Text(l10n.checkForUpdatesButton)
+                            }
+                            .font(.system(size: 11, weight: .medium))
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+                    }
+                }
+
                 // Copyright
                 Text(l10n.copyright)
                     .font(.system(size: 10))
@@ -427,7 +458,7 @@ struct AboutWindowView: View {
             }
             .padding(20)
         }
-        .frame(width: 420, height: 460)
+        .frame(width: 420, height: 500)
         .background(Color(NSColor.windowBackgroundColor))
         .sheet(isPresented: $settings.showLicenseViewer) {
             LicenseViewerSheet(l10n: l10n)
@@ -456,7 +487,7 @@ final class AboutWindowManager: NSObject, NSWindowDelegate {
         }
 
         let newWindow = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 420, height: 460),
+            contentRect: NSRect(x: 0, y: 0, width: 420, height: 500),
             styleMask: [.titled, .closable],
             backing: .buffered,
             defer: false
@@ -684,9 +715,11 @@ final class MenuBarManager: NSObject {
 
     private func localizeAppSubmenu(_ submenu: NSMenu, with l10n: L10n) {
         var seenSettings = false
+        var seenUpdate = false
+        var aboutIndex = 0
         var itemsToRemove: [NSMenuItem] = []
 
-        for item in submenu.items {
+        for (idx, item) in submenu.items.enumerated() {
             let actionStr = item.action?.description ?? ""
             let titleLower = item.title.lowercased()
 
@@ -694,6 +727,12 @@ final class MenuBarManager: NSObject {
                 item.title = l10n.menuAboutApp
                 item.target = NSApp.delegate
                 item.action = #selector(AppDelegate.orderFrontStandardAboutPanel(_:))
+                aboutIndex = idx
+            } else if actionStr.contains("checkForUpdatesAction") || titleLower.contains("update") || titleLower.contains("güncelle") || titleLower.contains("actualiz") {
+                seenUpdate = true
+                item.title = l10n.checkForUpdates
+                item.target = NSApp.delegate
+                item.action = #selector(AppDelegate.checkForUpdatesAction(_:))
             } else if actionStr.contains("showPreferencesWindow") || actionStr.contains("showSettingsWindow") || actionStr.contains("openSettings") || titleLower.contains("preferences") || titleLower.contains("settings") || titleLower.contains("tercihler") || titleLower.contains("ayarlar") || titleLower.contains("preferințe") || titleLower.contains("configurări") {
                 if seenSettings {
                     itemsToRemove.append(item)
@@ -723,6 +762,13 @@ final class MenuBarManager: NSObject {
 
         for item in itemsToRemove {
             submenu.removeItem(item)
+        }
+
+        if !seenUpdate {
+            let updateItem = NSMenuItem(title: l10n.checkForUpdates, action: #selector(AppDelegate.checkForUpdatesAction(_:)), keyEquivalent: "")
+            updateItem.target = NSApp.delegate
+            let targetIdx = min(aboutIndex + 1, submenu.items.count)
+            submenu.insertItem(updateItem, at: targetIdx)
         }
     }
 

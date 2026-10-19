@@ -372,8 +372,36 @@ struct SettingsView: View {
             if viewModel.isLateFeeEnabled {
                 Divider()
 
-                VStack(alignment: .leading, spacing: 10) {
-                    // Manual Rate Entry & Presets
+                VStack(alignment: .leading, spacing: 12) {
+                    // Jurisdiction & Country Profile Selector
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(l10n.lateFeeCountryProfileTitle)
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(.secondary)
+
+                        HStack(spacing: 6) {
+                            ForEach(LateFeeCountryProfile.allCases) { profile in
+                                let isSelected = viewModel.lateFeeCountryProfile == profile
+                                Button {
+                                    viewModel.selectCountryProfile(profile)
+                                } label: {
+                                    HStack(spacing: 4) {
+                                        Text(profile.flagEmoji)
+                                        Text(profile.title(l10n: l10n))
+                                            .font(.system(size: 10.5, weight: isSelected ? .bold : .medium))
+                                    }
+                                    .padding(.horizontal, 9)
+                                    .padding(.vertical, 5)
+                                    .background(isSelected ? Color.orange : Color.secondary.opacity(0.12))
+                                    .foregroundColor(isSelected ? .white : .primary)
+                                    .clipShape(Capsule())
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                    }
+
+                    // Rate Entry & Country Presets
                     HStack(alignment: .center, spacing: 12) {
                         Text(l10n.lateFeeMonthlyRateTitle)
                             .font(.system(size: 12, weight: .medium))
@@ -398,14 +426,14 @@ struct SettingsView: View {
                                 .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
                         )
 
-                        // Quick Chips: [%3.0], [%5.0 Kanuni], [%7.5], [%10.0]
+                        // Quick Chips: from country quick presets
                         HStack(spacing: 5) {
-                            ForEach([3.0, 5.0, 7.5, 10.0], id: \.self) { rate in
+                            ForEach(viewModel.lateFeeCountryProfile.quickPresets, id: \.self) { rate in
                                 let isSelected = (Double(viewModel.lateFeeMonthlyRate.replacingOccurrences(of: ",", with: ".")) ?? -1) == rate
                                 Button {
                                     viewModel.lateFeeMonthlyRate = String(format: "%.1f", rate)
                                 } label: {
-                                    Text(rate == 5.0 ? l10n.statutoryRateChip : "%\(String(format: "%.1f", rate))")
+                                    Text(rate == viewModel.lateFeeCountryProfile.defaultRate ? "%\(String(format: "%.1f", rate)) (\(l10n.statutoryRateChip))" : "%\(String(format: "%.1f", rate))")
                                         .font(.system(size: 10.5, weight: isSelected ? .bold : .medium))
                                         .padding(.horizontal, 8)
                                         .padding(.vertical, 4)
@@ -418,39 +446,75 @@ struct SettingsView: View {
                         }
                     }
 
-                    // Monthly Due Day (Grace Threshold)
-                    HStack(spacing: 12) {
-                        Text(l10n.lateFeeDueDayTitle)
-                            .font(.system(size: 12, weight: .medium))
-                            .foregroundColor(.secondary)
-                            .frame(width: 170, alignment: .leading)
-
+                    // Monthly Due Day and Grace Period
+                    HStack(spacing: 24) {
                         HStack(spacing: 8) {
-                            Text(l10n.dueDayDayPrefix)
-                                .font(.system(size: 12))
+                            Text(l10n.lateFeeDueDayTitle)
+                                .font(.system(size: 12, weight: .medium))
                                 .foregroundColor(.secondary)
 
-                            Picker("", selection: $viewModel.lateFeeDueDay) {
-                                ForEach(1...31, id: \.self) { day in
-                                    Text("\(day)").tag(day)
+                            HStack(spacing: 4) {
+                                Text(l10n.dueDayDayPrefix)
+                                    .font(.system(size: 12))
+                                    .foregroundColor(.secondary)
+
+                                Picker("", selection: $viewModel.lateFeeDueDay) {
+                                    ForEach(1...31, id: \.self) { day in
+                                        Text("\(day)").tag(day)
+                                    }
+                                }
+                                .frame(width: 60)
+
+                                Text(l10n.dueDayDaySuffix)
+                                    .font(.system(size: 12))
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+
+                        HStack(spacing: 8) {
+                            Text(l10n.lateFeeGracePeriodTitle)
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundColor(.secondary)
+
+                            Picker("", selection: $viewModel.lateFeeGracePeriodDays) {
+                                ForEach([0, 5, 10, 15, 20, 30, 45, 60], id: \.self) { days in
+                                    Text("\(days)").tag(days)
                                 }
                             }
                             .frame(width: 65)
-
-                            Text(l10n.dueDayDaySuffix)
-                                .font(.system(size: 12))
-                                .foregroundColor(.secondary)
                         }
                     }
 
-                    // Legal Footnote
+                    // Receipt Footnote & Customization
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack {
+                            Text(l10n.lateFeeCustomFootnoteTitle)
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundColor(.secondary)
+                            Spacer()
+                            Button {
+                                viewModel.lateFeeCustomFootnote = ""
+                            } label: {
+                                Text(l10n.lateFeeResetFootnoteButton)
+                                    .font(.system(size: 10.5))
+                                    .foregroundColor(.accentColor)
+                            }
+                            .buttonStyle(.plain)
+                        }
+
+                        TextField(viewModel.lateFeeCountryProfile.defaultFootnote(for: settings.language), text: $viewModel.lateFeeCustomFootnote)
+                            .textFieldStyle(.roundedBorder)
+                            .font(.system(size: 11))
+                    }
+
+                    // Legal Footnote Summary Notice
                     HStack(alignment: .top, spacing: 6) {
                         Image(systemName: "info.circle.fill")
                             .font(.system(size: 11))
                             .foregroundColor(.orange)
                             .padding(.top, 2)
-                        Text(l10n.lateFeeLegalNotice)
-                            .font(.system(size: 10))
+                        Text(viewModel.lateFeeCountryProfile.defaultLegalNotice(for: settings.language))
+                            .font(.system(size: 10.5))
                             .foregroundColor(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
                     }
@@ -1692,6 +1756,65 @@ struct SettingsView: View {
                         .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
                 )
 
+                // Software Updates Card
+                VStack(spacing: 10) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "arrow.triangle.2.circlepath.circle.fill")
+                            .font(.system(size: 15))
+                            .foregroundColor(.accentColor)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(l10n.softwareUpdateSection)
+                                .font(.system(size: 12, weight: .bold))
+                            Text(l10n.softwareUpdateDesc)
+                                .font(.system(size: 10))
+                                .foregroundColor(.secondary)
+                        }
+                        Spacer()
+                    }
+
+                    HStack {
+                        if GitHubUpdateChecker.shared.isChecking {
+                            ProgressView()
+                                .controlSize(.small)
+                            Text(l10n.checkingForUpdates)
+                                .font(.system(size: 10.5))
+                                .foregroundColor(.secondary)
+                        } else {
+                            if let last = GitHubUpdateChecker.shared.lastCheckedDate {
+                                Text("\(l10n.lastChecked) \(last.formatted(date: .numeric, time: .shortened))")
+                                    .font(.system(size: 10))
+                                    .foregroundColor(.secondary)
+                            } else {
+                                Text("\(l10n.lastChecked) \(l10n.neverChecked)")
+                                    .font(.system(size: 10))
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+
+                        Spacer()
+
+                        Button {
+                            GitHubUpdateChecker.shared.checkForUpdates(userInitiated: true)
+                        } label: {
+                            HStack(spacing: 4) {
+                                Image(systemName: "arrow.clockwise")
+                                Text(l10n.checkForUpdatesButton)
+                            }
+                            .font(.system(size: 11, weight: .medium))
+                        }
+                        .buttonStyle(.bordered)
+                        .disabled(GitHubUpdateChecker.shared.isChecking)
+                    }
+                }
+                .padding(12)
+                .frame(maxWidth: 380)
+                .background(Color(NSColor.controlBackgroundColor))
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
+                )
+
                 Text(l10n.copyright)
                     .font(.caption)
                     .foregroundColor(.secondary)
@@ -1732,6 +1855,9 @@ final class SettingsViewModel: ObservableObject {
     @Published var isLateFeeEnabled: Bool = false
     @Published var lateFeeMonthlyRate: String = "5.0"
     @Published var lateFeeDueDay: Int = 15
+    @Published var lateFeeCountryProfile: LateFeeCountryProfile = .international
+    @Published var lateFeeGracePeriodDays: Int = 0
+    @Published var lateFeeCustomFootnote: String = ""
     @Published var showRestartAlert: Bool = false
     @Published var showSampleDefaultsFeedback: Bool = false
 
@@ -1898,6 +2024,9 @@ final class SettingsViewModel: ObservableObject {
         isLateFeeEnabled = settings.isLateFeeEnabled
         lateFeeMonthlyRate = String(format: "%.1f", settings.lateFeeMonthlyRate)
         lateFeeDueDay = settings.lateFeeDueDay
+        lateFeeCountryProfile = settings.lateFeeCountryProfile
+        lateFeeGracePeriodDays = settings.lateFeeGracePeriodDays
+        lateFeeCustomFootnote = settings.lateFeeCustomFootnote
         vendors = settings.vendors
         expenseServices = settings.expenseServices
         selectedApartment = settings.apartmentNumbers.first ?? 1
@@ -1914,6 +2043,14 @@ final class SettingsViewModel: ObservableObject {
         }
         residents = loaded
         residentPhones = loadedPhones
+    }
+
+    func selectCountryProfile(_ profile: LateFeeCountryProfile) {
+        lateFeeCountryProfile = profile
+        lateFeeMonthlyRate = String(format: "%.1f", profile.defaultRate)
+        lateFeeDueDay = profile.defaultDueDay
+        lateFeeGracePeriodDays = profile.defaultGraceDays
+        lateFeeCustomFootnote = ""
     }
 
     func loadSampleDefaults(for targetLang: AppLanguage) {
@@ -1986,6 +2123,9 @@ final class SettingsViewModel: ObservableObject {
             settings.lateFeeMonthlyRate = feeRate
         }
         settings.lateFeeDueDay = max(1, min(31, lateFeeDueDay))
+        settings.lateFeeCountryProfile = lateFeeCountryProfile
+        settings.lateFeeGracePeriodDays = max(0, min(60, lateFeeGracePeriodDays))
+        settings.lateFeeCustomFootnote = lateFeeCustomFootnote.trimmingCharacters(in: .whitespacesAndNewlines)
         settings.vendors = vendors
         settings.expenseServices = expenseServices
 
