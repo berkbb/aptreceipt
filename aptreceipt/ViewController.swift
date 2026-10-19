@@ -495,6 +495,8 @@ struct L10n {
     var duesAmountPerFlat: String { tr("Dues Amount per Flat:", "Daire Başı Aidat Tutarı:", "Sumă Întreținere per Apartament:") }
     var generateBatchReceipts: String { tr("Generate Receipts & Add to Archive", "Makbuzları Kes ve Arşive Ekle", "Generează Chitanțele și Salvează") }
     var batchSuccessMessage: String { tr("receipts generated and added to archive successfully.", "adet makbuz başarıyla kesilip arşive eklendi.", "chitanțe au fost generate și adăugate în arhivă cu succes.") }
+    var selectAll: String { tr("Select All", "Tümünü Seç", "Selectează Tot") }
+    var deselectAll: String { tr("Deselect All", "Seçimi Kaldır", "Deselectează Tot") }
 
     // MARK: - Kat Mülkiyeti Kanunu (KMK Md. 20) Gecikme Tazminatı Strings
     var lateFeeTitle: String { tr("Late Payment Compensation (KMK Art. 20)", "Kat Mülkiyeti Kanunu (KMK Md. 20) Gecikme Tazminatı", "Penalități de Întârziere (Art. 20 Lege)") }
@@ -4325,7 +4327,7 @@ struct BatchDuesGeneratorSheet: View {
                         Text("\(selectedFlats.count) / \(settings.flatCount) \(l10n.duesPaidCount)")
                             .font(.system(size: 12, weight: .bold))
                         Spacer()
-                        Button(selectedFlats.count == settings.flatCount ? "Seçimi Kaldır" : "Tümünü Seç") {
+                        Button(selectedFlats.count == settings.flatCount ? l10n.deselectAll : l10n.selectAll) {
                             if selectedFlats.count == settings.flatCount {
                                 selectedFlats.removeAll()
                             } else {

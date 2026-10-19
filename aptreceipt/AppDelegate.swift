@@ -136,166 +136,149 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         let settings = ReceiptSettingsStore()
-        settings.apartmentName = "Güleryüz Apartmanı"
-        settings.issuer = "Ahmet Yılmaz"
-        settings.defaultPayment = "1750"
+        settings.loadSampleDefaults(for: .english)
+        settings.language = .english
+        settings.currency = .usDollar
+        settings.theme = .dark
         settings.seqNumber = 104
-        settings.flatCount = 12
-        settings.language = .turkish
-        settings.currency = .turkishLira
-        settings.theme = .system
-        settings.saveOwner("Mehmet Kaya", apartmentNumber: 1)
-        settings.saveOwner("Ayşe Demir", apartmentNumber: 2)
+        settings.isLateFeeEnabled = true
+        settings.lateFeeMonthlyRate = 5.0
+        settings.lateFeeDueDay = 15
 
-        // 1. Main Dashboard (TR)
+        // 1. Main Dashboard (Dark English)
         let mainView = MainScreen(settings: settings)
             .frame(width: 1080, height: 740)
-        render(view: mainView, size: CGSize(width: 1080, height: 740), to: outDir.appendingPathComponent("01_main_dashboard.png"))
+        render(view: mainView, size: CGSize(width: 1080, height: 740), to: outDir.appendingPathComponent("01_main_dashboard.png"), isDark: true)
 
-        // 2. Receipt Certificate View (TR)
+        // 2. Receipt Certificate View (English)
         let sampleDraft = ReceiptDraft(
-            receiver: "Mehmet Kaya",
-            issuer: "Ahmet Yılmaz",
-            notes: "2026 Ekim ayı aidatı ve asansör periyodik bakım gider payı",
-            monthYear: "Ekim 2026",
+            receiver: "Jane Smith",
+            issuer: "John Doe",
+            notes: "October 2026 monthly dues and elevator maintenance share",
+            monthYear: "October 2026",
             apartmentNumber: 4,
             amount: 1750.0,
             sequenceNumber: 104,
-            createdDate: "18 Ekim 2026",
+            createdDate: "19 October 2026",
             showApartmentNumber: true,
             kind: .income,
-            currency: .turkishLira
+            currency: .usDollar,
+            isLateFeeApplied: true,
+            lateFeeRate: 5.0,
+            lateMonths: 2,
+            lateFeeAmount: 175.0,
+            baseAmount: 1575.0
         )
         let docView = ReceiptDocumentView(
             draft: sampleDraft,
-            apartmentName: "Güleryüz Apartmanı",
+            apartmentName: "Sunshine Residence",
             signatureImage: nil,
             l10n: settings.l10n
         )
         .frame(width: 595, height: 842)
-        render(view: docView, size: CGSize(width: 595, height: 842), to: outDir.appendingPathComponent("02_receipt_document.png"))
+        render(view: docView, size: CGSize(width: 595, height: 842), to: outDir.appendingPathComponent("02_receipt_document.png"), isDark: true)
         renderPDF(view: docView.environment(\.colorScheme, .light), size: CGSize(width: 595, height: 842), to: outDir.appendingPathComponent("02_receipt_document.pdf"))
 
-        // 3. Settings View (Hero Building & Settings)
+        // 3. Settings View (Hero Building & KMK Late Fee Settings - Dark English)
         let settingsView = SettingsView(settings: settings, initialTab: .general)
             .frame(width: 840, height: 640)
-        render(view: settingsView, size: CGSize(width: 840, height: 640), to: outDir.appendingPathComponent("03_settings_view.png"))
+        render(view: settingsView, size: CGSize(width: 840, height: 640), to: outDir.appendingPathComponent("03_settings_view.png"), isDark: true)
 
-        // 4. Management Expense Receipt Document
+        // 4. Management Expense Receipt Document (English)
         let sampleOutcomeDraft = ReceiptDraft(
-            receiver: "Asansör Bakım Servisi",
-            issuer: "Ahmet Yılmaz",
-            notes: "2026 Ekim ayı bina asansörü periyodik bakım ve kontrol bedeli",
-            monthYear: "Ekim 2026",
+            receiver: "Apex Elevator Services Inc.",
+            issuer: "John Doe",
+            notes: "October 2026 periodic elevator maintenance and safety inspection",
+            monthYear: "October 2026",
             apartmentNumber: 0,
             amount: 3450.0,
             sequenceNumber: 105,
-            createdDate: "18 Ekim 2026",
+            createdDate: "19 October 2026",
             showApartmentNumber: false,
             kind: .managementExpense,
-            currency: .turkishLira
+            currency: .usDollar
         )
         let docOutcomeView = ReceiptDocumentView(
             draft: sampleOutcomeDraft,
-            apartmentName: "Güleryüz Apartmanı",
+            apartmentName: "Sunshine Residence",
             signatureImage: nil,
             l10n: settings.l10n
         )
         .frame(width: 595, height: 842)
-        render(view: docOutcomeView, size: CGSize(width: 595, height: 842), to: outDir.appendingPathComponent("04_receipt_outcome.png"))
+        render(view: docOutcomeView, size: CGSize(width: 595, height: 842), to: outDir.appendingPathComponent("04_receipt_outcome.png"), isDark: true)
 
-        // 5. English Main Dashboard
-        let settingsEN = ReceiptSettingsStore()
-        settingsEN.apartmentName = "Sunshine Residence"
-        settingsEN.issuer = "John Doe"
-        settingsEN.defaultPayment = "1750"
-        settingsEN.seqNumber = 104
-        settingsEN.flatCount = 12
-        settingsEN.language = .english
-        settingsEN.currency = .usDollar
-        settingsEN.saveOwner("Jane Smith", apartmentNumber: 1)
-
-        let mainViewEN = MainScreen(settings: settingsEN)
+        // 5. English Main Dashboard (Dark English)
+        let mainViewEN = MainScreen(settings: settings)
             .frame(width: 1080, height: 740)
-        render(view: mainViewEN, size: CGSize(width: 1080, height: 740), to: outDir.appendingPathComponent("05_main_dashboard_en.png"))
+        render(view: mainViewEN, size: CGSize(width: 1080, height: 740), to: outDir.appendingPathComponent("05_main_dashboard_en.png"), isDark: true)
 
-        // 6. Romanian Main Dashboard
+        // 6. Romanian Main Dashboard (Dark Romanian)
         let settingsRO = ReceiptSettingsStore()
-        settingsRO.apartmentName = "Asociația Parcul Tineretului"
-        settingsRO.issuer = "Andrei Popescu"
-        settingsRO.defaultPayment = "1750"
-        settingsRO.seqNumber = 104
-        settingsRO.flatCount = 12
+        settingsRO.loadSampleDefaults(for: .romanian)
         settingsRO.language = .romanian
         settingsRO.currency = .romanianLeu
-        settingsRO.saveOwner("Elena Radu", apartmentNumber: 1)
+        settingsRO.theme = .dark
 
         let mainViewRO = MainScreen(settings: settingsRO)
             .frame(width: 1080, height: 740)
-        render(view: mainViewRO, size: CGSize(width: 1080, height: 740), to: outDir.appendingPathComponent("06_main_dashboard_ro.png"))
+        render(view: mainViewRO, size: CGSize(width: 1080, height: 740), to: outDir.appendingPathComponent("06_main_dashboard_ro.png"), isDark: true)
 
-        // 7. About Window
+        // Reload English defaults for all subsequent screenshots
+        settings.loadSampleDefaults(for: .english)
+
+        // 7. About Window (Dark English)
         let aboutView = AboutWindowView(settings: settings)
             .frame(width: 420, height: 460)
-        render(view: aboutView, size: CGSize(width: 420, height: 460), to: outDir.appendingPathComponent("07_about_window.png"))
+        render(view: aboutView, size: CGSize(width: 420, height: 460), to: outDir.appendingPathComponent("07_about_window.png"), isDark: true)
 
-        // 8. Management Expense Dashboard
-        let settingsMgt = ReceiptSettingsStore()
-        settingsMgt.apartmentName = "Güleryüz Apartmanı"
-        settingsMgt.issuer = "Ahmet Yılmaz"
-        settingsMgt.defaultPayment = "3450"
-        settingsMgt.seqNumber = 105
-        settingsMgt.flatCount = 10
-        settingsMgt.language = .turkish
-        settingsMgt.currency = .turkishLira
-
+        // 8. Management Expense Dashboard (Dark English)
         let mgtDashboardView = MainScreen(
-            settings: settingsMgt,
+            settings: settings,
             initialKind: .managementExpense,
-            initialVendor: "Kaya Asansör Ltd. Şti.",
-            initialNotes: "2026 Ekim ayı bina asansörü periyodik bakım ve kontrol bedeli"
+            initialVendor: "Apex Elevator Services Inc.",
+            initialNotes: "October 2026 periodic elevator maintenance and safety inspection"
         )
         .frame(width: 1080, height: 740)
-        render(view: mgtDashboardView, size: CGSize(width: 1080, height: 740), to: outDir.appendingPathComponent("08_management_expense_dashboard.png"))
+        render(view: mgtDashboardView, size: CGSize(width: 1080, height: 740), to: outDir.appendingPathComponent("08_management_expense_dashboard.png"), isDark: true)
 
-        // 9. Settings Vendors & Services Tab
+        // 9. Settings Vendors & Services Tab (Dark English)
         let vendorsSettingsView = SettingsView(settings: settings, initialTab: .vendors)
             .frame(width: 840, height: 640)
-        render(view: vendorsSettingsView, size: CGSize(width: 840, height: 640), to: outDir.appendingPathComponent("09_settings_vendors.png"))
+        render(view: vendorsSettingsView, size: CGSize(width: 840, height: 640), to: outDir.appendingPathComponent("09_settings_vendors.png"), isDark: true)
 
-        // 10. Settings Appearance & Language Hero Deck
+        // 10. Settings Appearance & Language Hero Deck (Dark English)
         let appearanceSettingsView = SettingsView(settings: settings, initialTab: .appearance)
             .frame(width: 840, height: 640)
-        render(view: appearanceSettingsView, size: CGSize(width: 840, height: 640), to: outDir.appendingPathComponent("10_settings_appearance.png"))
+        render(view: appearanceSettingsView, size: CGSize(width: 840, height: 640), to: outDir.appendingPathComponent("10_settings_appearance.png"), isDark: true)
 
-        // 11. Receipt Archive Sheet
+        // 11. Receipt Archive Sheet (Dark English)
         let sampleArchiveStore = ReceiptArchiveStore.shared
-        if sampleArchiveStore.records.isEmpty {
-            sampleArchiveStore.add(draft: sampleDraft)
-            sampleArchiveStore.add(draft: sampleOutcomeDraft)
-        }
+        sampleArchiveStore.records.removeAll()
+        sampleArchiveStore.add(draft: sampleDraft)
+        sampleArchiveStore.add(draft: sampleOutcomeDraft)
+
         let archiveView = ReceiptArchiveSheet(settings: settings, onSelectDraft: { _ in })
             .frame(width: 860, height: 640)
-        render(view: archiveView, size: CGSize(width: 860, height: 640), to: outDir.appendingPathComponent("11_receipt_archive.png"))
+        render(view: archiveView, size: CGSize(width: 860, height: 640), to: outDir.appendingPathComponent("11_receipt_archive.png"), isDark: true)
 
-        // 12. Financial Report Sheet (KPI cards, dues tracking, transactions)
+        // 12. Financial Report Sheet (KPI cards, dues tracking, transactions - Dark English)
         let financialReportView = ApartmentFinancialReportSheet(settings: settings)
             .frame(width: 880, height: 660)
-        render(view: financialReportView, size: CGSize(width: 880, height: 660), to: outDir.appendingPathComponent("12_financial_report.png"))
+        render(view: financialReportView, size: CGSize(width: 880, height: 660), to: outDir.appendingPathComponent("12_financial_report.png"), isDark: true)
 
-        // 13. Batch Dues Generator Sheet
+        // 13. Batch Dues Generator Sheet (Dark English)
         let batchDuesView = BatchDuesGeneratorSheet(settings: settings, onComplete: {})
             .frame(width: 720, height: 600)
-        render(view: batchDuesView, size: CGSize(width: 720, height: 600), to: outDir.appendingPathComponent("13_batch_dues.png"))
+        render(view: batchDuesView, size: CGSize(width: 720, height: 600), to: outDir.appendingPathComponent("13_batch_dues.png"), isDark: true)
 
-        // 14. Printable A4 Apartment Bulletin Board Notice
+        // 14. Printable A4 Apartment Bulletin Board Notice (English)
         let bulletinBoardView = ApartmentBulletinBoardView(
             settings: settings,
-            periodTitle: "Ekim 2026",
+            periodTitle: "October 2026",
             totalIncome: 17500.0,
             totalExpenses: 3450.0,
             netBalance: 14050.0,
-            expenseCategories: [("Asansör Periyodik Bakım", 3450.0, 100.0)],
+            expenseCategories: [("Elevator Maintenance", 3450.0, 100.0)],
             paidFlatsCount: 10,
             totalFlatsCount: 12,
             records: sampleArchiveStore.records,
@@ -303,15 +286,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         )
         .frame(width: 595, height: 842)
         .environment(\.colorScheme, .light)
-        render(view: bulletinBoardView, size: CGSize(width: 595, height: 842), to: outDir.appendingPathComponent("14_bulletin_board_notice.png"))
+        render(view: bulletinBoardView, size: CGSize(width: 595, height: 842), to: outDir.appendingPathComponent("14_bulletin_board_notice.png"), isDark: false)
 
         print("Screenshots successfully generated in \(outDir.path)")
     }
 
     @MainActor
-    private func render<V: View>(view: V, size: CGSize, to fileURL: URL) {
-        let hosting = NSHostingView(rootView: view)
-        hosting.appearance = NSAppearance(named: .aqua)
+    private func render<V: View>(view: V, size: CGSize, to fileURL: URL, isDark: Bool = true) {
+        let hosting = NSHostingView(rootView: view.preferredColorScheme(isDark ? .dark : .light))
+        hosting.appearance = NSAppearance(named: isDark ? .darkAqua : .aqua)
         hosting.frame = CGRect(origin: .zero, size: size)
         hosting.layoutSubtreeIfNeeded()
         guard let rep = hosting.bitmapImageRepForCachingDisplay(in: hosting.bounds) else { return }
