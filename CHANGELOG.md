@@ -6,23 +6,14 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 - **GitHub Release Update Checker**: Built-in update detector querying GitHub Releases API (`berkbb/aptreceipt`), featuring semver comparator (`SemverCompare`), native macOS update alert with release details and one-click download, integrated into the macOS App Menu bar (`Check for Updates...`), Settings -> About tab, and the dedicated About window.
-- **Multi-Country Late Payment Compensation Engine**: Replaced hardcoded Turkish KMK naming with a toggleable, multi-country late fee framework supporting Turkey (🇹🇷 KMK Md. 20/c), Romania (🇷🇴 Legea 196/2018 Art. 77), International (🌐 HOA Bylaws), and Custom (⚙️). Includes country-specific rates, payment due thresholds, grace periods, and receipt legal citations.
+- **Multi-Country Late Payment Compensation Engine**: Generalized late fee calculation with a master toggle switch and dedicated country/jurisdiction profiles supporting Turkey (🇹🇷 KMK Md. 20/c statutory 5%), Romania (🇷🇴 Legea 196/2018 Art. 77 up to 0.2%/day with 30-day grace period), International (🌐 HOA Bylaws), and Custom (⚙️). Includes country-specific rates, payment due thresholds, grace periods, and receipt legal citations.
 - **Customizable Receipt Footnotes & Neutral Templates**: Added editable per-country and custom legal footnotes rendered on official A4 receipts and stored with receipts and backups. Removed hardcoded KMK references in WhatsApp reminders and batch dues badges.
-- **Extended Unit Test Suite**: Added comprehensive test cases for `SemverCompare`, `GitHubRelease` JSON decoding, and `LateFeeCountryProfile` legal citations and presets (12/12 unit tests passing).
-
-### Changed
-- Bumped marketing version to `3.4.0` (build `7`).
-
-## [3.3.0] - 2026-10-19
-
-### Added
-- **KMK Art. 20 Late Fee Calculator (Gecikme Tazminatı)**: Integrated Turkish Property Law (KMK No. 634 Art. 20/c) late payment compensation calculator. Includes manual rate configuration in Settings with statutory presets (%3.0, %5.0 Kanuni, %7.5, %10.0), monthly due day picker, on-the-fly override on receipt creation, 1-click magic overdue detection, and dual-itemized official A4 receipt rendering with legal footnote.
 - **Corporate Branding & Package Identity**: Updated bundle identifier to `com.babadogantech.aptreceipt` and official publisher branding to **Babadogan Tech and Edu** across all views, About sheet, license viewer, and system properties.
-- **Comprehensive Unit Test Suite & Test Runner**: Added unit test suite in `aptreceiptTests` covering KMK late fee math, Codable serialization backward compatibility with legacy archives, currency models, and language localization, along with the `./run_all_tests_mac.command` executable runner.
+- **Comprehensive Unit Test Suite & Test Runner**: Added unit test suite in `aptreceiptTests` covering semver comparisons, GitHub release JSON decoding, multi-country late fee presets, Codable serialization backward compatibility with legacy archives, currency models, and language localization, along with the `./run_all_tests_mac.command` executable runner (12/12 unit tests passing).
 - **Dark Mode & English Screenshot Suite**: Completely refreshed the 14-piece UI screenshot gallery in `docs/screenshots/` in native macOS Dark Mode and English localization.
 
 ### Changed
-- Bumped marketing version to `3.3.0` (build `6`).
+- Bumped marketing version to `3.4.0` (build `7`).
 
 ## [3.2.0] - 2026-10-19
 
