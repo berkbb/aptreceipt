@@ -1470,11 +1470,15 @@ struct LiveReceiptPreview: View {
                 Spacer()
                 Text(formattedAmount)
                     .font(.system(size: 18, weight: .bold, design: .rounded))
-                    .foregroundColor(.accentColor)
+                    .foregroundColor(badgeColor)
             }
             .padding(12)
-            .background(Color.accentColor.opacity(0.08))
+            .background(badgeColor.opacity(0.10))
             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .stroke(badgeColor.opacity(0.25), lineWidth: 1)
+            )
 
             // Notes
             if !notes.isEmpty {
