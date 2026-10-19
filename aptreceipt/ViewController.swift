@@ -806,6 +806,14 @@ struct L10n {
     var neverChecked: String { tr("Never", "Henüz yapılmadı", "Niciodată") }
     var softwareUpdateSection: String { tr("Software Updates", "Yazılım Güncellemeleri", "Actualizări Software") }
     var softwareUpdateDesc: String { tr("Check GitHub for official AptReceipt releases, new features, and bug fixes.", "En son AptReceipt sürümleri, yeni özellikler ve hata düzeltmeleri için GitHub'ı denetleyin.", "Verificați GitHub pentru cele mai recente versiuni AptReceipt.") }
+    var downloadingUpdateTitle: String { tr("Downloading Update", "Güncelleme İndiriliyor", "Se Descarcă Actualizarea") }
+    var cancelDownloadButton: String { tr("Cancel", "İptal", "Anulează") }
+    var updateDownloadedTitle: String { tr("Update Downloaded", "Güncelleme İndirildi", "Actualizare Descărcată") }
+    var updateDownloadedMessage: String { tr("%@ was saved to your Downloads folder and opened.\n\nQuit AptReceipt, drag the new version onto Applications and choose Replace, then open it again.\n\nIf macOS blocks the first launch, allow it in System Settings → Privacy & Security → Open Anyway.", "%@ İndirilenler klasörüne kaydedildi ve açıldı.\n\nAptReceipt'ten çıkın, yeni sürümü Applications (Uygulamalar) klasörüne sürükleyip Değiştir'i seçin, ardından yeniden açın.\n\nmacOS ilk açılışı engellerse Sistem Ayarları → Gizlilik ve Güvenlik → Yine de Aç ile izin verin.", "%@ a fost salvat în dosarul Descărcări și deschis.\n\nÎnchideți AptReceipt, trageți noua versiune în Applications (Aplicații) și alegeți Înlocuire, apoi deschideți-o din nou.\n\nDacă macOS blochează prima lansare, permiteți-o din Configurări sistem → Confidențialitate și securitate → Deschide oricum.") }
+    var quitAndInstallButton: String { tr("Quit AptReceipt", "AptReceipt'ten Çık", "Închide AptReceipt") }
+    var showInFinderButton: String { tr("Show in Finder", "Finder'da Göster", "Arată în Finder") }
+    var updateDownloadFailedTitle: String { tr("Update Download Failed", "Güncelleme İndirilemedi", "Descărcarea Actualizării a Eșuat") }
+    var updateDownloadFailedMessage: String { tr("The update could not be downloaded or verified. You can download it manually from GitHub.", "Güncelleme indirilemedi veya doğrulanamadı. GitHub üzerinden elle indirebilirsiniz.", "Actualizarea nu a putut fi descărcată sau verificată. O puteți descărca manual de pe GitHub.") }
 
     // Validation Messages
     var validationErrorTitle: String { tr("Validation Error", "Doğrulama Hatası", "Eroare de Validare") }

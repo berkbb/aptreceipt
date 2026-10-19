@@ -113,15 +113,15 @@ This is only needed once per downloaded version. Because every update is a new d
 
 ### Verifying Downloads
 
-Each release includes a `SHA256SUMS.txt` file. Download it next to the DMG/ZIP and run:
+Each release includes a `SHA256SUMS.txt` file. Download it next to the DMG and run:
 
 ```bash
-shasum -a 256 -c SHA256SUMS.txt --ignore-missing
+shasum -a 256 -c SHA256SUMS.txt
 ```
 
 ### Updating
 
-AptReceipt checks GitHub Releases for new versions (**Check for Updates…** in the app menu, Settings → About, or the About window). When an update is available, download the new DMG from the release page and replace the app in **Applications**.
+AptReceipt checks GitHub Releases for new versions (**Check for Updates…** in the app menu, Settings → About, or the About window). When an update is available, **Download Update** saves the release DMG to your **Downloads** folder, verifies it against the release's `SHA256SUMS.txt`, and opens it. Quit AptReceipt, drag the new version onto **Applications** and choose **Replace**, then open it again (the Gatekeeper note above applies to each new version). If a release has no DMG attached, the release page opens in your browser instead.
 
 ---
 

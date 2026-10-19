@@ -69,7 +69,7 @@ xattr -dr com.apple.quarantine /Applications/aptreceipt.app
 
 See [Gatekeeper & Quarantine](https://github.com/berkbb/aptreceipt#gatekeeper--quarantine) for details.
 
-Verify downloads with `shasum -a 256 -c SHA256SUMS.txt --ignore-missing`.
+Verify downloads with `shasum -a 256 -c SHA256SUMS.txt`.
 EOF
 
 echo "Publishing $TAG to $REPO..."
@@ -79,7 +79,6 @@ gh release create "$TAG" \
   --title "$APP_NAME $VERSION" \
   --notes-file "$NOTES_FILE" \
   "$DIST_ROOT/$APP_NAME-$VERSION.dmg" \
-  "$DIST_ROOT/$APP_NAME-$VERSION.zip" \
   "$DIST_ROOT/SHA256SUMS.txt"
 
 echo "Done: $(gh release view "$TAG" --repo "$REPO" --json url --jq .url)"

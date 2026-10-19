@@ -255,6 +255,61 @@ final class aptreceiptTests: XCTestCase {
         XCTAssertEqual(release.name, "AptReceipt v3.4.0 - macOS Native Update")
         XCTAssertEqual(release.htmlUrl, "https://github.com/berkbb/aptreceipt/releases/tag/v3.4.0")
         XCTAssertEqual(release.id, "v3.4.0")
+        XCTAssertTrue(release.assets.isEmpty)
+        XCTAssertNil(release.dmgAsset)
+        XCTAssertNil(release.checksumAsset)
+    }
+
+    func testGitHubReleaseAssetSelection() throws {
+        let json = """
+        {
+            "tag_name": "v3.5.0",
+            "name": "aptreceipt 3.5.0",
+            "body": null,
+            "html_url": "https://github.com/berkbb/aptreceipt/releases/tag/v3.5.0",
+            "assets": [
+                { "name": "SHA256SUMS.txt", "browser_download_url": "https://example.com/SHA256SUMS.txt", "size": 87 },
+                { "name": "aptreceipt-3.5.0.dmg", "browser_download_url": "https://example.com/aptreceipt-3.5.0.dmg", "size": 4838919 }
+            ]
+        }
+        """.data(using: .utf8)!
+
+        let release = try JSONDecoder().decode(GitHubRelease.self, from: json)
+
+        XCTAssertEqual(release.assets.count, 2)
+        XCTAssertEqual(release.dmgAsset?.name, "aptreceipt-3.5.0.dmg")
+        XCTAssertEqual(release.dmgAsset?.browserDownloadUrl, "https://example.com/aptreceipt-3.5.0.dmg")
+        XCTAssertEqual(release.dmgAsset?.size, 4838919)
+        XCTAssertEqual(release.checksumAsset?.name, "SHA256SUMS.txt")
+    }
+
+    func testUpdateChecksumsParsing() {
+        let dmgDigest = String(repeating: "a", count: 64)
+        let otherDigest = String(repeating: "B", count: 64)
+        let text = """
+        \(dmgDigest)  aptreceipt-3.5.0.dmg
+        \(otherDigest) *notes file.txt
+
+        not-a-digest  ignored.dmg
+        """
+
+        let checksums = UpdateChecksums.parse(text)
+
+        XCTAssertEqual(checksums["aptreceipt-3.5.0.dmg"], dmgDigest)
+        XCTAssertEqual(checksums["notes file.txt"], otherDigest.lowercased())
+        XCTAssertNil(checksums["ignored.dmg"])
+        XCTAssertEqual(checksums.count, 2)
+    }
+
+    func testUpdateChecksumsSHA256OfFile() throws {
+        let fileURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try Data("abc".utf8).write(to: fileURL)
+        defer { try? FileManager.default.removeItem(at: fileURL) }
+
+        XCTAssertEqual(
+            try UpdateChecksums.sha256(of: fileURL),
+            "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+        )
     }
 
     // MARK: - 5. Multi-Country Late Fee Profiles Tests

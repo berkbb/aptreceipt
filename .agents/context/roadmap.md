@@ -47,8 +47,9 @@
     - Automatic and manual update check querying GitHub Releases API (`berkbb/aptreceipt`).
     - Semver evaluation engine (`SemverCompare`) handling `v` prefixes, prereleases, and patch versions.
     - Menubar (`Check for Updates...`), Settings -> About tab, and About window integration with 1-click downloads.
+    - In-app DMG download to `~/Downloads` with progress/cancel, SHA-256 verification against `SHA256SUMS.txt`, and auto-open for drag-to-Applications install (no third-party updater framework).
 11. **Comprehensive Test Suite & CLI Runner**:
-    - 12 passing unit tests in `aptreceiptTests` verifying mathematical calculations, semver comparisons, JSON backwards compatibility, and localized citations.
+    - 15 passing unit tests in `aptreceiptTests` verifying mathematical calculations, semver comparisons, JSON backwards compatibility, and localized citations.
     - Executable `./run_all_tests_mac.command` for continuous verification.
 
 ---

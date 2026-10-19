@@ -47,11 +47,7 @@ codesign --force --deep --sign - --timestamp=none \
 codesign --verify --deep --strict "$FINAL_APP_PATH"
 
 VERSION="$(defaults read "$PWD/$FINAL_APP_PATH/Contents/Info" CFBundleShortVersionString)"
-ZIP_NAME="$APP_NAME-$VERSION.zip"
 DMG_NAME="$APP_NAME-$VERSION.dmg"
-
-echo "Creating $ZIP_NAME..."
-ditto -c -k --keepParent "$FINAL_APP_PATH" "$DIST_ROOT/$ZIP_NAME"
 
 echo "Creating $DMG_NAME..."
 DMG_STAGING="$(mktemp -d)"
@@ -69,10 +65,9 @@ hdiutil create \
 codesign --force --sign - "$DIST_ROOT/$DMG_NAME"
 
 echo "Writing SHA-256 checksums..."
-(cd "$DIST_ROOT" && shasum -a 256 "$DMG_NAME" "$ZIP_NAME" > SHA256SUMS.txt)
+(cd "$DIST_ROOT" && shasum -a 256 "$DMG_NAME" > SHA256SUMS.txt)
 
 echo "Done:"
 echo "  $FINAL_APP_PATH"
 echo "  $DIST_ROOT/$DMG_NAME"
-echo "  $DIST_ROOT/$ZIP_NAME"
 echo "  $DIST_ROOT/SHA256SUMS.txt"
