@@ -414,16 +414,16 @@ struct L10n {
     // Settings Tabs
     var tabBuilding: String { tr("Building", "Apartman", "Imobil") }
     var tabResidents: String { tr("Residents", "Sakinler", "Locatari") }
-    var tabAppearance: String { tr("Appearance & Language", "Görünüm & Dil", "Aspect & Limbă") }
+    var tabAppearance: String { tr("Appearance", "Görünüm", "Aspect") }
     var tabSignature: String { tr("Signature", "İmza", "Semnătură") }
-    var tabBackup: String { tr("Backup & Restore", "Yedekleme & Geri Yükleme", "Copie & Restaurare") }
+    var tabBackup: String { tr("Backup", "Yedekleme", "Copie") }
     var tabAbout: String { tr("About", "Hakkında", "Despre") }
 
     // Archive & History Strings
     var archiveTitle: String { tr("Receipt Archive & History", "Makbuz Arşivi ve Geçmişi", "Arhivă și Istoric Chitanțe") }
     var archiveSubtitle: String { tr("Search, review, re-print, and share previously generated receipts", "Daha önce kesilen makbuzları görüntüleyin, filtreleyin, yazdırın ve paylaşın", "Vizualizați, filtrați, tipăriți și partajați chitanțele emise") }
     var archiveSearchPlaceholder: String { tr("Search flat, person, company, or notes…", "Daire no, kişi, firma veya notlarda ara…", "Caută apartament, persoană, furnizor sau notă…") }
-    var filterAll: String { tr("All Receipts", "Tüm Makbuzlar", "Toate Chitanțele") }
+    var filterAll: String { tr("All", "Tümü", "Toate") }
     var filterIncome: String { tr("Income", "Gelir", "Încasări") }
     var filterOutcome: String { tr("Refund", "İade", "Restituiri") }
     var filterManagement: String { tr("Management", "İşletme", "Administrație") }
@@ -618,7 +618,7 @@ struct L10n {
     var applyScenarioButton: String { tr("Apply Preset", "Şablonu Uygula", "Aplică Șablonul") }
 
     // Vendors & Services Tab Strings
-    var tabVendors: String { tr("Vendors & Services", "Tedarikçi & Hizmet", "Furnizori & Servicii") }
+    var tabVendors: String { tr("Vendors", "Firmalar", "Furnizori") }
     var vendorsTitle: String { tr("Vendor Directory & Services", "Tedarikçi & Hizmet Yönetimi", "Gestiune Furnizori & Servicii") }
     var vendorsSubtitle: String { tr("Manage regular vendors, contractors, and preset operating expense services", "Düzenli çalıştığınız firma, usta ve hazır işletme gider kalemlerini yönetin", "Gestionați furnizorii uzuali și serviciile de întreținere") }
     var registeredVendorsBadge: String { tr("Registered Vendors", "Kayıtlı Firma", "Furnizori Înregistrați") }
@@ -763,10 +763,11 @@ struct MainScreen: View {
             ReceiptArchiveSheet(settings: settings) { selectedDraft in
                 viewModel.previewDraft = selectedDraft
             }
+            .frame(width: 860, height: 640)
         }
         .sheet(isPresented: $viewModel.isPresentingSettings) {
             SettingsView(settings: settings)
-                .frame(width: 680, height: 580)
+                .frame(width: 840, height: 640)
         }
         .sheet(isPresented: $settings.showLicenseViewer) {
             LicenseViewerSheet(l10n: l10n)
@@ -1792,6 +1793,17 @@ enum ReceiptKind: String, CaseIterable, Identifiable, Codable {
         }
     }
 
+    func badgeTitle(l10n: L10n) -> String {
+        switch self {
+        case .income:
+            return l10n.filterIncome
+        case .outcome:
+            return l10n.filterOutcome
+        case .managementExpense:
+            return l10n.filterManagement
+        }
+    }
+
     var iconName: String {
         switch self {
         case .income:
@@ -2751,7 +2763,7 @@ struct ReceiptArchiveSheet: View {
                         Text(l10n.filterManagement).tag("management")
                     }
                     .pickerStyle(.segmented)
-                    .frame(width: 340)
+                    .frame(width: 380)
                 }
 
                 // Stats Bar
@@ -2820,7 +2832,7 @@ struct ReceiptArchiveSheet: View {
             .padding(.vertical, 12)
             .background(Color(NSColor.windowBackgroundColor))
         }
-        .frame(minWidth: 700, minHeight: 520)
+        .frame(minWidth: 800, idealWidth: 860, minHeight: 560, idealHeight: 640)
     }
 
     private func archiveRecordRow(_ record: ReceiptRecord) -> some View {
@@ -2838,12 +2850,12 @@ struct ReceiptArchiveSheet: View {
                 Text("#\(record.sequenceNumber)")
                     .font(.system(size: 13, weight: .bold, design: .monospaced))
                     .foregroundColor(badgeColor)
-                Text(record.kind.title(l10n: l10n))
-                    .font(.system(size: 9, weight: .semibold))
+                Text(record.kind.badgeTitle(l10n: l10n))
+                    .font(.system(size: 10, weight: .semibold))
                     .foregroundColor(badgeColor)
                     .lineLimit(1)
             }
-            .frame(width: 80)
+            .frame(width: 86)
             .padding(.vertical, 6)
             .background(badgeColor.opacity(0.12))
             .clipShape(RoundedRectangle(cornerRadius: 6))
@@ -2853,6 +2865,7 @@ struct ReceiptArchiveSheet: View {
                 HStack(spacing: 6) {
                     Text(record.receiver)
                         .font(.system(size: 13, weight: .bold))
+                        .lineLimit(1)
                     if record.showApartmentNumber && record.apartmentNumber > 0 {
                         Text("\(l10n.flatPrefix) \(record.apartmentNumber)")
                             .font(.system(size: 10, weight: .semibold))
@@ -2878,6 +2891,7 @@ struct ReceiptArchiveSheet: View {
                     }
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
 
             Spacer()
 
@@ -2885,7 +2899,7 @@ struct ReceiptArchiveSheet: View {
             Text(String(format: "%.2f %@", record.amount, record.currency.symbol))
                 .font(.system(size: 15, weight: .bold, design: .rounded))
                 .foregroundColor(badgeColor)
-                .frame(width: 120, alignment: .trailing)
+                .frame(width: 130, alignment: .trailing)
 
             // Actions
             HStack(spacing: 6) {

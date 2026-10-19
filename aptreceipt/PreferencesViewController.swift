@@ -106,38 +106,41 @@ struct SettingsView: View {
             Divider()
 
             // Tab Bar (Hero Segmented Deck)
-            HStack(spacing: 6) {
-                ForEach(SettingsTab.allCases) { tab in
-                    let isSelected = viewModel.selectedTab == tab
-                    Button {
-                        viewModel.selectedTab = tab
-                    } label: {
-                        HStack(spacing: 6) {
-                            Image(systemName: tab.iconName)
-                                .font(.system(size: 11, weight: isSelected ? .bold : .medium))
-                            Text(tab.title(l10n: l10n))
-                                .font(.system(size: 12, weight: isSelected ? .bold : .medium))
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 6) {
+                    ForEach(SettingsTab.allCases) { tab in
+                        let isSelected = viewModel.selectedTab == tab
+                        Button {
+                            viewModel.selectedTab = tab
+                        } label: {
+                            HStack(spacing: 5) {
+                                Image(systemName: tab.iconName)
+                                    .font(.system(size: 11, weight: isSelected ? .bold : .medium))
+                                Text(tab.title(l10n: l10n))
+                                    .font(.system(size: 12, weight: isSelected ? .bold : .medium))
+                                    .lineLimit(1)
+                                    .fixedSize(horizontal: true, vertical: false)
+                            }
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(
+                                isSelected
+                                ? Color.accentColor.opacity(0.18)
+                                : Color.clear
+                            )
+                            .foregroundColor(isSelected ? .accentColor : .secondary)
+                            .clipShape(Capsule())
+                            .overlay(
+                                Capsule()
+                                    .stroke(isSelected ? Color.accentColor.opacity(0.35) : Color.clear, lineWidth: 1)
+                            )
                         }
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 7)
-                        .background(
-                            isSelected
-                            ? Color.accentColor.opacity(0.18)
-                            : Color.clear
-                        )
-                        .foregroundColor(isSelected ? .accentColor : .secondary)
-                        .clipShape(Capsule())
-                        .overlay(
-                            Capsule()
-                                .stroke(isSelected ? Color.accentColor.opacity(0.35) : Color.clear, lineWidth: 1)
-                        )
+                        .buttonStyle(.plain)
                     }
-                    .buttonStyle(.plain)
                 }
-                Spacer()
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
             .background(Color(NSColor.controlBackgroundColor).opacity(0.6))
 
             Divider()
@@ -192,6 +195,7 @@ struct SettingsView: View {
             .padding(.vertical, 12)
             .background(Color(NSColor.windowBackgroundColor))
         }
+        .frame(minWidth: 800, idealWidth: 840, minHeight: 580, idealHeight: 640)
         .onAppear {
             viewModel.load(from: settings)
         }

@@ -178,8 +178,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         // 3. Settings View (Hero Building & Settings)
         let settingsView = SettingsView(settings: settings, initialTab: .general)
-            .frame(width: 740, height: 600)
-        render(view: settingsView, size: CGSize(width: 740, height: 600), to: outDir.appendingPathComponent("03_settings_view.png"))
+            .frame(width: 840, height: 640)
+        render(view: settingsView, size: CGSize(width: 840, height: 640), to: outDir.appendingPathComponent("03_settings_view.png"))
 
         // 4. Management Expense Receipt Document
         let sampleOutcomeDraft = ReceiptDraft(
@@ -260,13 +260,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         // 9. Settings Vendors & Services Tab
         let vendorsSettingsView = SettingsView(settings: settings, initialTab: .vendors)
-            .frame(width: 740, height: 600)
-        render(view: vendorsSettingsView, size: CGSize(width: 740, height: 600), to: outDir.appendingPathComponent("09_settings_vendors.png"))
+            .frame(width: 840, height: 640)
+        render(view: vendorsSettingsView, size: CGSize(width: 840, height: 640), to: outDir.appendingPathComponent("09_settings_vendors.png"))
 
         // 10. Settings Appearance & Language Hero Deck
         let appearanceSettingsView = SettingsView(settings: settings, initialTab: .appearance)
-            .frame(width: 740, height: 600)
-        render(view: appearanceSettingsView, size: CGSize(width: 740, height: 600), to: outDir.appendingPathComponent("10_settings_appearance.png"))
+            .frame(width: 840, height: 640)
+        render(view: appearanceSettingsView, size: CGSize(width: 840, height: 640), to: outDir.appendingPathComponent("10_settings_appearance.png"))
+
+        // 11. Receipt Archive Sheet
+        let sampleArchiveStore = ReceiptArchiveStore.shared
+        if sampleArchiveStore.records.isEmpty {
+            sampleArchiveStore.add(draft: sampleDraft)
+            sampleArchiveStore.add(draft: sampleOutcomeDraft)
+        }
+        let archiveView = ReceiptArchiveSheet(settings: settings, onSelectDraft: { _ in })
+            .frame(width: 860, height: 640)
+        render(view: archiveView, size: CGSize(width: 860, height: 640), to: outDir.appendingPathComponent("11_receipt_archive.png"))
 
         print("Screenshots successfully generated in \(outDir.path)")
     }
@@ -484,13 +494,13 @@ final class SettingsWindowManager: NSObject, NSWindowDelegate {
         }
 
         let newWindow = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 750, height: 600),
+            contentRect: NSRect(x: 0, y: 0, width: 840, height: 640),
             styleMask: [.titled, .closable, .miniaturizable, .resizable],
             backing: .buffered,
             defer: false
         )
-        newWindow.minSize = NSSize(width: 680, height: 520)
-        newWindow.maxSize = NSSize(width: 960, height: 800)
+        newWindow.minSize = NSSize(width: 800, height: 580)
+        newWindow.maxSize = NSSize(width: 1040, height: 850)
         newWindow.title = actualSettings.l10n.settingsTitle
         newWindow.isReleasedWhenClosed = false
         newWindow.delegate = self
