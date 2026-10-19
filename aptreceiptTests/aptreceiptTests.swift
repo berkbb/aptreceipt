@@ -46,22 +46,44 @@ final class aptreceiptTests: XCTestCase {
         XCTAssertEqual(draft.currency, .turkishLira)
     }
 
-    func testKMKLateFeeMathematicalCalculation() {
-        // KMK Art. 20/c calculation: Base * (Rate / 100) * Months
-        let baseDues: Double = 2000.0
-        let monthlyRate: Double = 5.0 // Statutory 5%
-        let overdueMonths: Int = 3
+    func testLateFeeCalculatorFee() {
+        // KMK Art. 20/c: Base * (Rate / 100) * Months
+        XCTAssertEqual(LateFeeCalculator.fee(base: 2000.0, monthlyRate: 5.0, months: 3), 300.0, accuracy: 0.001)
+        XCTAssertEqual(LateFeeCalculator.fee(base: 2000.0, monthlyRate: 7.5, months: 2), 300.0, accuracy: 0.001)
+        XCTAssertEqual(LateFeeCalculator.fee(base: 1750.0, monthlyRate: 5.0, months: 1), 87.5, accuracy: 0.001)
+        XCTAssertEqual(LateFeeCalculator.fee(base: 2000.0, monthlyRate: 0.0, months: 4), 0.0, accuracy: 0.001)
 
-        let calculatedLateFee = baseDues * (monthlyRate / 100.0) * Double(overdueMonths)
-        let total = baseDues + calculatedLateFee
+        // Rounded to cents: 333.33 * 5% = 16.6665
+        XCTAssertEqual(LateFeeCalculator.fee(base: 333.33, monthlyRate: 5.0, months: 1), 16.67, accuracy: 0.0001)
+    }
 
-        XCTAssertEqual(calculatedLateFee, 300.0, accuracy: 0.001)
-        XCTAssertEqual(total, 2300.0, accuracy: 0.001)
+    func testLateFeeCalculatorGrandTotal() {
+        XCTAssertEqual(LateFeeCalculator.grandTotal(base: 2000.0, lateFee: 300.0), 2300.0, accuracy: 0.001)
+        XCTAssertEqual(LateFeeCalculator.grandTotal(base: 1750.0, lateFee: 0.0), 1750.0, accuracy: 0.001)
+        XCTAssertEqual(LateFeeCalculator.grandTotal(base: 0.1, lateFee: 0.2), 0.3, accuracy: 0.0001)
+    }
 
-        // Custom rate test: %7.5 over 2 months
-        let customRate: Double = 7.5
-        let customLateFee = baseDues * (customRate / 100.0) * 2.0
-        XCTAssertEqual(customLateFee, 300.0, accuracy: 0.001)
+    @MainActor
+    func testMainScreenViewModelLateFeeTotals() {
+        let settings = ReceiptSettingsStore.shared
+        let viewModel = MainScreenViewModel()
+        viewModel.receiptKind = .income
+        viewModel.totalAmount = "2000"
+        viewModel.customLateFeeRate = "5"
+        viewModel.lateMonths = 3
+
+        viewModel.isLateFeeApplied = false
+        XCTAssertEqual(viewModel.calculatedLateFee(settings: settings), 0.0, accuracy: 0.001)
+        XCTAssertEqual(viewModel.grandTotalAmount(settings: settings), 2000.0, accuracy: 0.001)
+
+        viewModel.isLateFeeApplied = true
+        XCTAssertEqual(viewModel.calculatedLateFee(settings: settings), 300.0, accuracy: 0.001)
+        XCTAssertEqual(viewModel.grandTotalAmount(settings: settings), 2300.0, accuracy: 0.001)
+
+        // Late fees only apply to income receipts.
+        viewModel.receiptKind = .managementExpense
+        XCTAssertEqual(viewModel.calculatedLateFee(settings: settings), 0.0, accuracy: 0.001)
+        XCTAssertEqual(viewModel.grandTotalAmount(settings: settings), 2000.0, accuracy: 0.001)
     }
 
     func testReceiptDraftCodableRoundTrip() throws {

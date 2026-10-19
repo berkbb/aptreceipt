@@ -239,6 +239,24 @@ enum LateFeeCountryProfile: String, CaseIterable, Identifiable, Codable {
     }
 }
 
+// MARK: - Late Payment Compensation Calculator
+
+enum LateFeeCalculator {
+    /// Late fee for `base` at `monthlyRate` percent per month over `months`, rounded to cents.
+    static func fee(base: Double, monthlyRate: Double, months: Int) -> Double {
+        roundedToCents(base * (monthlyRate / 100.0) * Double(months))
+    }
+
+    /// Dues plus late fee, rounded to cents.
+    static func grandTotal(base: Double, lateFee: Double) -> Double {
+        roundedToCents(base + lateFee)
+    }
+
+    static func roundedToCents(_ value: Double) -> Double {
+        (value * 100.0).rounded() / 100.0
+    }
+}
+
 // MARK: - Vendor & Service Models
 
 struct VendorRecord: Identifiable, Codable, Hashable {
@@ -2308,14 +2326,13 @@ final class MainScreenViewModel: ObservableObject {
         guard isLateFeeApplied && receiptKind == .income else { return 0.0 }
         let base = baseDuesAmount()
         let rate = effectiveLateRate(settings: settings)
-        let raw = base * (rate / 100.0) * Double(lateMonths)
-        return (raw * 100.0).rounded() / 100.0
+        return LateFeeCalculator.fee(base: base, monthlyRate: rate, months: lateMonths)
     }
 
     func grandTotalAmount(settings: ReceiptSettingsStore) -> Double {
         let base = baseDuesAmount()
         if isLateFeeApplied && receiptKind == .income {
-            return (base + calculatedLateFee(settings: settings) * 100.0).rounded() / 100.0
+            return LateFeeCalculator.grandTotal(base: base, lateFee: calculatedLateFee(settings: settings))
         }
         return base
     }
@@ -2461,7 +2478,7 @@ final class MainScreenViewModel: ObservableObject {
         let effectiveShowApartment = receiptKind == .managementExpense ? false : printApartmentNumber
 
         let effectiveLateFee = isLateFeeApplied && receiptKind == .income ? calculatedLateFee(settings: settings) : 0.0
-        let effectiveGrandTotal = (baseAmt + effectiveLateFee * 100.0).rounded() / 100.0
+        let effectiveGrandTotal = LateFeeCalculator.grandTotal(base: baseAmt, lateFee: effectiveLateFee)
         let effectiveRate = effectiveLateRate(settings: settings)
 
         let draft = ReceiptDraft(
@@ -4284,7 +4301,7 @@ struct ApartmentFinancialReportSheet: View {
 
                             if settings.isLateFeeEnabled {
                                 let defaultAmt = Double(settings.defaultPayment.replacingOccurrences(of: ",", with: ".")) ?? 1750.0
-                                let fee = (defaultAmt * (settings.lateFeeMonthlyRate / 100.0) * 100.0).rounded() / 100.0
+                                let fee = LateFeeCalculator.fee(base: defaultAmt, monthlyRate: settings.lateFeeMonthlyRate, months: 1)
                                 Text("+\(String(format: "%.2f", fee)) \(settings.currency.symbol) \(l10n.lateFeeShortBadge)")
                                     .font(.system(size: 10, weight: .bold, design: .monospaced))
                                     .foregroundColor(.orange)
@@ -4388,7 +4405,7 @@ struct ApartmentFinancialReportSheet: View {
 
         let message: String
         if settings.isLateFeeEnabled {
-            let lateFeeVal = (duesAmtValue * (settings.lateFeeMonthlyRate / 100.0) * 100.0).rounded() / 100.0
+            let lateFeeVal = LateFeeCalculator.fee(base: duesAmtValue, monthlyRate: settings.lateFeeMonthlyRate, months: 1)
             let totalVal = duesAmtValue + lateFeeVal
             let rateStr = String(format: "%.1f", settings.lateFeeMonthlyRate)
             let feeStr = String(format: "%.2f", lateFeeVal)
