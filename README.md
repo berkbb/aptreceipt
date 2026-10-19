@@ -89,6 +89,42 @@ A modern, native macOS application to effortlessly generate, manage, and export 
 
 ---
 
+## Installation
+
+1. Download `aptreceipt-<version>.dmg` from the [latest release](https://github.com/berkbb/aptreceipt/releases/latest).
+2. Open the DMG and drag **aptreceipt** into **Applications**.
+3. Launch the app (see the Gatekeeper note below on first launch).
+
+### Gatekeeper & Quarantine
+
+AptReceipt is **ad-hoc signed** and **not notarized** by Apple. When a file is downloaded from the internet, macOS adds a `com.apple.quarantine` attribute to it, and Gatekeeper blocks quarantined apps that are not notarized. On first launch you will see a warning such as *"aptreceipt" cannot be opened because Apple cannot check it for malicious software*.
+
+Allow the app in one of these ways:
+
+- **macOS 15 (Sequoia) or later:** Try to open the app once, then go to **System Settings → Privacy & Security**, scroll down and click **Open Anyway** next to the aptreceipt message, and confirm.
+- **macOS 13–14:** Right-click (or Control-click) the app in **Applications**, choose **Open**, then click **Open** in the dialog.
+- **Terminal (any version):** Remove the quarantine attribute:
+
+  ```bash
+  xattr -dr com.apple.quarantine /Applications/aptreceipt.app
+  ```
+
+This is only needed once per downloaded version. Because every update is a new download, you may need to repeat it after installing an update.
+
+### Verifying Downloads
+
+Each release includes a `SHA256SUMS.txt` file. Download it next to the DMG/ZIP and run:
+
+```bash
+shasum -a 256 -c SHA256SUMS.txt --ignore-missing
+```
+
+### Updating
+
+AptReceipt checks GitHub Releases for new versions (**Check for Updates…** in the app menu, Settings → About, or the About window). When an update is available, download the new DMG from the release page and replace the app in **Applications**.
+
+---
+
 ## License
 
 This project is licensed under the **GNU General Public License v3.0 (GPL-3.0)** - see the [LICENSE](LICENSE) file for details.

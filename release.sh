@@ -59,9 +59,17 @@ fi
 cat >> "$NOTES_FILE" <<'EOF'
 
 ### Installation
-Download the `.dmg`, open it and drag **aptreceipt** into **Applications**. The app is ad-hoc signed and not notarized, so on first launch right-click the app and choose **Open** (or run `xattr -dr com.apple.quarantine /Applications/aptreceipt.app`).
+Download the `.dmg`, open it and drag **aptreceipt** into **Applications**.
 
-Verify downloads with `shasum -a 256 -c SHA256SUMS.txt`.
+The app is ad-hoc signed and not notarized, so Gatekeeper blocks the first launch. Either allow it via **System Settings → Privacy & Security → Open Anyway** (macOS 15+) / right-click → **Open** (macOS 13–14), or remove the quarantine attribute:
+
+```bash
+xattr -dr com.apple.quarantine /Applications/aptreceipt.app
+```
+
+See [Gatekeeper & Quarantine](https://github.com/berkbb/aptreceipt#gatekeeper--quarantine) for details.
+
+Verify downloads with `shasum -a 256 -c SHA256SUMS.txt --ignore-missing`.
 EOF
 
 echo "Publishing $TAG to $REPO..."
