@@ -104,6 +104,141 @@ enum AppCurrency: String, CaseIterable, Identifiable, Codable {
     }
 }
 
+// MARK: - Late Payment Compensation Country Profile
+
+enum LateFeeCountryProfile: String, CaseIterable, Identifiable, Codable {
+    case turkey = "turkey"
+    case romania = "romania"
+    case international = "international"
+    case custom = "custom"
+
+    var id: String { rawValue }
+
+    var flagEmoji: String {
+        switch self {
+        case .turkey: return "🇹🇷"
+        case .romania: return "🇷🇴"
+        case .international: return "🌐"
+        case .custom: return "⚙️"
+        }
+    }
+
+    func title(l10n: L10n) -> String {
+        switch self {
+        case .turkey:
+            return l10n.isTurkish ? "Türkiye (KMK Md. 20/c)" : (l10n.isRomanian ? "Turcia (KMK Art. 20)" : "Turkey (KMK Art. 20)")
+        case .romania:
+            return l10n.isTurkish ? "Romanya (Legea 196/2018)" : (l10n.isRomanian ? "România (Legea 196/2018)" : "Romania (Law 196/2018)")
+        case .international:
+            return l10n.isTurkish ? "Uluslararası / Genel (HOA)" : (l10n.isRomanian ? "Internațional / General (HOA)" : "International / General (HOA)")
+        case .custom:
+            return l10n.isTurkish ? "Özel Yapılandırma" : (l10n.isRomanian ? "Personalizat" : "Custom Jurisdiction")
+        }
+    }
+
+    var defaultRate: Double {
+        switch self {
+        case .turkey: return 5.0
+        case .romania: return 6.0
+        case .international: return 5.0
+        case .custom: return 5.0
+        }
+    }
+
+    var defaultDueDay: Int {
+        switch self {
+        case .turkey: return 15
+        case .romania: return 20
+        case .international: return 10
+        case .custom: return 15
+        }
+    }
+
+    var defaultGraceDays: Int {
+        switch self {
+        case .turkey: return 0
+        case .romania: return 30
+        case .international: return 10
+        case .custom: return 0
+        }
+    }
+
+    var quickPresets: [Double] {
+        switch self {
+        case .turkey: return [3.0, 5.0, 7.5, 10.0]
+        case .romania: return [3.0, 5.0, 6.0, 10.0]
+        case .international: return [2.5, 5.0, 7.5, 10.0]
+        case .custom: return [3.0, 5.0, 7.5, 10.0]
+        }
+    }
+
+    func defaultFootnote(for language: AppLanguage) -> String {
+        switch self {
+        case .turkey:
+            switch language {
+            case .turkish: return "* 634 Sayılı Kat Mülkiyeti Kanunu Madde 20/c uyarınca hesaplanmıştır."
+            case .romanian: return "* Calculat conform art. 20/c din legislația asociațiilor de proprietari."
+            default: return "* Calculated pursuant to Article 20/c of Property Law No. 634."
+            }
+        case .romania:
+            switch language {
+            case .turkish: return "* Romanya 196/2018 Sayılı Kanun Madde 77 (azami %0.2/gün) uyarınca hesaplanmıştır."
+            case .romanian: return "* Calculat conform Legii 196/2018 Art. 77 privind asociațiile de proprietari (max. 0.2%/zi)."
+            default: return "* Calculated pursuant to Romanian Law No. 196/2018 Art. 77 on Owners Associations."
+            }
+        case .international:
+            switch language {
+            case .turkish: return "* Bina yönetim planı ve işletme projesi gecikme hükümleri uyarınca hesaplanmıştır."
+            case .romanian: return "* Calculat conform regulamentului de ordine interioară al asociației."
+            default: return "* Calculated in accordance with condominium property association late fee regulations."
+            }
+        case .custom:
+            switch language {
+            case .turkish: return "* İlgili yönetim kurulu kararı ve gecikme tazminatı esasları uyarınca hesaplanmıştır."
+            case .romanian: return "* Calculat conform deciziei comitetului executiv privind penalitățile."
+            default: return "* Calculated in accordance with management board late penalty resolutions."
+            }
+        }
+    }
+
+    func defaultLegalNotice(for language: AppLanguage) -> String {
+        switch self {
+        case .turkey:
+            switch language {
+            case .turkish: return "634 sayılı Kat Mülkiyeti Kanunu Madde 20/c gereği vaktinde ödenmeyen aidata aylık %5 kanuni gecikme tazminatı uygulanır."
+            case .romanian: return "Conform art. 20/c din Legea Asociațiilor, se aplică 5% penalizare lunară pentru restanțe."
+            default: return "Under Article 20/c of Property Law No. 634, a 5% monthly compensation is legally applied to overdue dues."
+            }
+        case .romania:
+            switch language {
+            case .turkish: return "Romanya 196/2018 Sayılı Kanun Md. 77 gereği, 30 günlük son ödeme süresini aşan aidatlara günlük azami %0.2 (aylık yakl. %6) ceza uygulanabilir."
+            case .romanian: return "Conform Legii 196/2018 Art. 77, asociația poate stabili penalizări de până la 0.2%/zi după un termen de grație de 30 de zile."
+            default: return "Under Romanian Law 196/2018 Art. 77, associations may apply late penalties up to 0.2% per day after a 30-day grace period."
+            }
+        case .international:
+            switch language {
+            case .turkish: return "Bina ve site yönetim kuralları uyarınca vaktinde ödenmeyen aidatlara aylık gecikme bedeli işletilir."
+            case .romanian: return "Penalitățile de întârziere se aplică în conformitate cu regulamentul asociației de proprietari."
+            default: return "Late fees and penalties are applied to overdue dues in accordance with condominium HOA regulations."
+            }
+        case .custom:
+            switch language {
+            case .turkish: return "Özel gecikme oranı, son ödeme günü ve makbuz dipnotunu serbestçe belirleyebilirsiniz."
+            case .romanian: return "Puteți defini liber rata penalizării, scadența și nota legală de pe chitanță."
+            default: return "Freely configure your custom penalty rate, payment due threshold, and receipt legal citation."
+            }
+        }
+    }
+
+    static func `default`(for language: AppLanguage) -> LateFeeCountryProfile {
+        switch language {
+        case .turkish: return .turkey
+        case .romanian: return .romania
+        default: return .international
+        }
+    }
+}
+
 // MARK: - Vendor & Service Models
 
 struct VendorRecord: Identifiable, Codable, Hashable {
@@ -498,14 +633,20 @@ struct L10n {
     var selectAll: String { tr("Select All", "Tümünü Seç", "Selectează Tot") }
     var deselectAll: String { tr("Deselect All", "Seçimi Kaldır", "Deselectează Tot") }
 
-    // MARK: - Kat Mülkiyeti Kanunu (KMK Md. 20) Gecikme Tazminatı Strings
-    var lateFeeTitle: String { tr("Late Payment Compensation (KMK Art. 20)", "Kat Mülkiyeti Kanunu (KMK Md. 20) Gecikme Tazminatı", "Penalități de Întârziere (Art. 20 Lege)") }
-    var lateFeeSubtitle: String { tr("Configure statutory or custom monthly late compensation rate on overdue dues", "Gününde ödenmeyen aidatlara kanuni veya manuel gecikme tazminatı işletin", "Configurați rata legală sau personalizată a penalităților lunare pentru restanțe") }
+    // MARK: - Late Payment Compensation & Penalty Strings
+    var lateFeeTitle: String { tr("Late Payment Compensation & Penalty", "Gecikme Tazminatı & Faiz Oranları", "Penalități de Întârziere") }
+    var lateFeeSubtitle: String { tr("Configure statutory or custom late payment rates, grace periods, and receipt citations by country", "Ülke bazlı yasal veya serbest gecikme faizi, ek süre ve makbuz dipnotlarını yapılandırın", "Configurați ratele de penalizare, perioadele de grație și notele legale specifice fiecărei țări") }
     var lateFeeEnabledToggle: String { tr("Enable Late Compensation Calculation", "Gecikme Tazminatı Hesaplama", "Activare Calcul Penalități Întârziere") }
+    var lateFeeCountryProfileTitle: String { tr("Jurisdiction & Country Profile:", "Yargı Alanı ve Ülke Profili:", "Jurisdicție & Profil Țară:") }
     var lateFeeMonthlyRateTitle: String { tr("Monthly Late Fee Rate (%):", "Aylık Gecikme Oranı (%):", "Rată Lunară Penalizare (%):") }
     var lateFeeDueDayTitle: String { tr("Payment Due Day of Month:", "Son Ödeme Günü (Vade):", "Zi Limită de Plată:") }
+    var lateFeeGracePeriodTitle: String { tr("Grace Period (Days):", "Ek Süre / Tolerans (Gün):", "Perioadă de Grație (Zile):") }
+    var lateFeeCustomFootnoteTitle: String { tr("Receipt Legal Footnote:", "Makbuz Hukuki Dipnot Metni:", "Notă Legală pe Chitanță:") }
+    var lateFeeResetFootnoteButton: String { tr("Reset to Country Default", "Ülke Varsayılanına Sıfırla", "Revenire la Textul Implicit") }
+    var lateFeeShortBadge: String { tr("Late Fee", "Gecikme", "Penalizare") }
+    var lateFeeDisabledInSettingsNotice: String { tr("Late payment compensation is disabled in Preferences.", "Gecikme tazminatı hesaplaması Tercihler'den kapatılmıştır.", "Calculul penalităților este dezactivat din Preferințe.") }
     var lateFeeLegalNotice: String { tr("Under Article 20/c of Property Law No. 634, a 5% monthly compensation is legally applied to overdue dues. You can customize the rate manually above.", "634 sayılı Kat Mülkiyeti Kanunu Madde 20/c gereği vaktinde ödenmeyen aidata aylık %5 kanuni gecikme tazminatı uygulanır. Dilediğiniz takdirde oranı ve vadeyi buradan manuel değiştirebilirsiniz.", "Conform art. 20/c din Legea Asociațiilor, se aplică 5% penalizare lunară. Puteți modifica manual procentul de mai sus.") }
-    var lateFeeApplyCheckbox: String { tr("Apply Late Compensation (KMK Art. 20)", "Gecikme Tazminatı Ekle (KMK Md. 20)", "Aplică Penalități de Întârziere") }
+    var lateFeeApplyCheckbox: String { tr("Apply Late Payment Compensation", "Gecikme Tazminatı Ekle", "Aplică Penalități de Întârziere") }
     var overdueMonthsCount: String { tr("Overdue Duration:", "Gecikme Süresi:", "Durată Întârziere:") }
     var monthUnit: String { tr("Month", "Ay", "Lună") }
     var monthsUnit: String { tr("Months", "Ay", "Luni") }
@@ -517,8 +658,8 @@ struct L10n {
     var dueDayDayPrefix: String { tr("Day", "Ayın", "Ziua") }
     var dueDayDaySuffix: String { tr("of each month", ". gününe kadar", "a fiecărei luni") }
     func lateFeeItemName(rate: Double, months: Int) -> String {
-        tr("KMK Art. 20 Late Fee (%\(String(format: "%.1f", rate)) × \(months) \(months > 1 ? "Months" : "Month"))",
-           "KMK Md. 20 Gecikme Tazminatı (%\(String(format: "%.1f", rate)) × \(months) Ay)",
+        tr("Late Fee (%\(String(format: "%.1f", rate)) × \(months) \(months > 1 ? "Months" : "Month"))",
+           "Gecikme Tazminatı (%\(String(format: "%.1f", rate)) × \(months) Ay)",
            "Penalități Întârziere (%\(String(format: "%.1f", rate)) × \(months) \(months > 1 ? "Luni" : "Lună"))")
     }
     var lateFeeStatutoryFootnote: String {
@@ -646,6 +787,25 @@ struct L10n {
     var aboutWindowHeader: String { tr("About AptReceipt", "AptReceipt Hakkında", "Despre AptReceipt") }
     var githubRepository: String { tr("GitHub Repository", "GitHub Deposu", "Depozit GitHub") }
     var appDescription: String { tr("Modern, secure and trilingual apartment dues & expense receipt generator.", "Modern, güvenli ve üç dilli apartman aidat ve gider makbuzu oluşturucu.", "Generator modern, sigur și trilingv de chitanțe de încasare și dispoziții de plată.") }
+
+    // Software Update Strings
+    var checkForUpdates: String { tr("Check for Updates...", "Güncellemeleri Denetle...", "Caută Actualizări...") }
+    var checkForUpdatesButton: String { tr("Check for Updates", "Güncellemeleri Denetle", "Caută Actualizări") }
+    var checkingForUpdates: String { tr("Checking for updates...", "Güncellemeler denetleniyor...", "Se caută actualizări...") }
+    var updateAvailableTitle: String { tr("New Version Available!", "Yeni Bir Sürüm Mevcut!", "O Nouă Versiune este Disponibilă!") }
+    var upToDateTitle: String { tr("You're Up to Date", "AptReceipt Güncel", "Aplicația este la Zi") }
+    var upToDateMessage: String { tr("AptReceipt %@ is currently the newest version.", "AptReceipt %@ şu anda en güncel sürümdür.", "AptReceipt %@ este în prezent cea mai recentă versiune.") }
+    var downloadUpdate: String { tr("Download Update", "Güncellemeyi İndir", "Descarcă Actualizarea") }
+    var laterButton: String { tr("Later", "Daha Sonra", "Mai Târziu") }
+    var updateCheckFailedTitle: String { tr("Update Check Failed", "Güncelleme Denetlenemedi", "Verificarea Actualizării a Eșuat") }
+    var updateCheckFailedMessage: String { tr("Unable to reach GitHub Releases. Please check your internet connection.", "GitHub Releases sunucusuna bağlanılamadı. Lütfen internet bağlantınızı kontrol edin.", "Nu s-a putut contacta serverul GitHub. Verificați conexiunea la internet.") }
+    var openReleasesPage: String { tr("View Releases on GitHub", "GitHub Sürümler Sayfasını Aç", "Deschide Pagina de Lansări") }
+    var isNowAvailableText: String { tr("is now available", "artık indirilebilir", "este acum disponibilă") }
+    var currentVersionPrefix: String { tr("you have", "mevcut sürümünüz", "aveți versiunea") }
+    var lastChecked: String { tr("Last checked:", "Son denetleme:", "Ultima verificare:") }
+    var neverChecked: String { tr("Never", "Henüz yapılmadı", "Niciodată") }
+    var softwareUpdateSection: String { tr("Software Updates", "Yazılım Güncellemeleri", "Actualizări Software") }
+    var softwareUpdateDesc: String { tr("Check GitHub for official AptReceipt releases, new features, and bug fixes.", "En son AptReceipt sürümleri, yeni özellikler ve hata düzeltmeleri için GitHub'ı denetleyin.", "Verificați GitHub pentru cele mai recente versiuni AptReceipt.") }
 
     // Validation Messages
     var validationErrorTitle: String { tr("Validation Error", "Doğrulama Hatası", "Eroare de Validare") }
@@ -1641,8 +1801,8 @@ struct MainScreen: View {
                 )
             }
 
-            // Optional KMK Md. 20 Late Fee Section (Income Only)
-            if viewModel.receiptKind == .income {
+            // Optional Late Fee Section (Income Only, enabled in Settings)
+            if viewModel.receiptKind == .income && settings.isLateFeeEnabled {
                 lateFeeHeroCard
             }
         }
@@ -1662,6 +1822,8 @@ struct MainScreen: View {
                         Text(l10n.lateFeeApplyCheckbox)
                             .font(.system(size: 11.5, weight: .bold))
                             .foregroundColor(.primary)
+                        Text(settings.lateFeeCountryProfile.flagEmoji)
+                            .font(.system(size: 11))
                     }
                 }
                 .toggleStyle(.checkbox)
@@ -2310,7 +2472,8 @@ final class MainScreenViewModel: ObservableObject {
             lateFeeRate: effectiveRate,
             lateMonths: lateMonths,
             lateFeeAmount: effectiveLateFee,
-            baseAmount: baseAmt
+            baseAmount: baseAmt,
+            lateFeeFootnote: settings.effectiveLateFeeFootnote()
         )
 
         previewDraft = draft
@@ -2395,11 +2558,13 @@ struct ReceiptDraft: Identifiable, Codable {
     var lateMonths: Int = 0
     var lateFeeAmount: Double = 0.0
     var baseAmount: Double = 0.0
+    var lateFeeFootnote: String? = nil
 
     enum CodingKeys: String, CodingKey {
         case id, receiver, issuer, notes, monthYear, apartmentNumber, amount
         case sequenceNumber, createdDate, showApartmentNumber, kind, currency
         case invoiceAttachmentPath, isLateFeeApplied, lateFeeRate, lateMonths, lateFeeAmount, baseAmount
+        case lateFeeFootnote
     }
 
     init(
@@ -2420,7 +2585,8 @@ struct ReceiptDraft: Identifiable, Codable {
         lateFeeRate: Double = 0.0,
         lateMonths: Int = 0,
         lateFeeAmount: Double = 0.0,
-        baseAmount: Double = 0.0
+        baseAmount: Double = 0.0,
+        lateFeeFootnote: String? = nil
     ) {
         self.id = id
         self.receiver = receiver
@@ -2440,6 +2606,7 @@ struct ReceiptDraft: Identifiable, Codable {
         self.lateMonths = lateMonths
         self.lateFeeAmount = lateFeeAmount
         self.baseAmount = baseAmount > 0 ? baseAmount : (isLateFeeApplied ? max(0, amount - lateFeeAmount) : amount)
+        self.lateFeeFootnote = lateFeeFootnote
     }
 
     init(from decoder: Decoder) throws {
@@ -2463,6 +2630,7 @@ struct ReceiptDraft: Identifiable, Codable {
         let decodedLateFee = try container.decodeIfPresent(Double.self, forKey: .lateFeeAmount) ?? 0.0
         lateFeeAmount = decodedLateFee
         baseAmount = try container.decodeIfPresent(Double.self, forKey: .baseAmount) ?? (amount - decodedLateFee)
+        lateFeeFootnote = try container.decodeIfPresent(String.self, forKey: .lateFeeFootnote)
     }
 }
 
@@ -2488,6 +2656,7 @@ struct ReceiptRecord: Identifiable, Codable, Hashable {
     var lateMonths: Int = 0
     var lateFeeAmount: Double = 0.0
     var baseAmount: Double = 0.0
+    var lateFeeFootnote: String? = nil
 
     var kind: ReceiptKind {
         ReceiptKind(rawValue: kindRaw) ?? .income
@@ -2502,6 +2671,7 @@ struct ReceiptRecord: Identifiable, Codable, Hashable {
         case apartmentNumber, amount, currencyRaw, createdDate, showApartmentNumber
         case createdAt, invoiceAttachmentPath
         case isLateFeeApplied, lateFeeRate, lateMonths, lateFeeAmount, baseAmount
+        case lateFeeFootnote
     }
 
     init(draft: ReceiptDraft) {
@@ -2524,6 +2694,7 @@ struct ReceiptRecord: Identifiable, Codable, Hashable {
         self.lateMonths = draft.lateMonths
         self.lateFeeAmount = draft.lateFeeAmount
         self.baseAmount = draft.baseAmount
+        self.lateFeeFootnote = draft.lateFeeFootnote
     }
 
     init(from decoder: Decoder) throws {
@@ -2548,6 +2719,7 @@ struct ReceiptRecord: Identifiable, Codable, Hashable {
         let decodedLateFee = try container.decodeIfPresent(Double.self, forKey: .lateFeeAmount) ?? 0.0
         lateFeeAmount = decodedLateFee
         baseAmount = try container.decodeIfPresent(Double.self, forKey: .baseAmount) ?? (amount - decodedLateFee)
+        lateFeeFootnote = try container.decodeIfPresent(String.self, forKey: .lateFeeFootnote)
     }
 
     func toDraft() -> ReceiptDraft {
@@ -2569,7 +2741,8 @@ struct ReceiptRecord: Identifiable, Codable, Hashable {
             lateFeeRate: lateFeeRate,
             lateMonths: lateMonths,
             lateFeeAmount: lateFeeAmount,
-            baseAmount: baseAmount
+            baseAmount: baseAmount,
+            lateFeeFootnote: lateFeeFootnote
         )
     }
 }
@@ -2731,7 +2904,7 @@ enum WhatsAppShareHelper {
 // MARK: - Portable System Backup Model
 
 struct SystemBackupPackage: Codable {
-    var version: String = "2.0"
+    var version: String = "2.1"
     var exportDate: Date = Date()
     var apartmentName: String
     var issuer: String
@@ -2748,6 +2921,9 @@ struct SystemBackupPackage: Codable {
     var isLateFeeEnabled: Bool? = false
     var lateFeeMonthlyRate: Double? = 5.0
     var lateFeeDueDay: Int? = 15
+    var lateFeeCountryProfile: String? = "international"
+    var lateFeeGracePeriodDays: Int? = 0
+    var lateFeeCustomFootnote: String? = nil
 }
 
 // MARK: - Store
@@ -2801,6 +2977,15 @@ final class ReceiptSettingsStore: ObservableObject {
     }
     @Published var lateFeeDueDay: Int {
         didSet { defaults.set(lateFeeDueDay, forKey: Keys.lateFeeDueDay) }
+    }
+    @Published var lateFeeCountryProfile: LateFeeCountryProfile {
+        didSet { defaults.set(lateFeeCountryProfile.rawValue, forKey: Keys.lateFeeCountryProfile) }
+    }
+    @Published var lateFeeGracePeriodDays: Int {
+        didSet { defaults.set(lateFeeGracePeriodDays, forKey: Keys.lateFeeGracePeriodDays) }
+    }
+    @Published var lateFeeCustomFootnote: String {
+        didSet { defaults.set(lateFeeCustomFootnote, forKey: Keys.lateFeeCustomFootnote) }
     }
     @Published var signatureData: Data? {
         didSet {
@@ -2904,10 +3089,42 @@ final class ReceiptSettingsStore: ObservableObject {
         let savedDueDay = defaults.integer(forKey: Keys.lateFeeDueDay)
         lateFeeDueDay = savedDueDay > 0 ? savedDueDay : 15
 
+        let savedProfile = defaults.string(forKey: Keys.lateFeeCountryProfile)
+        let resolvedProfile = savedProfile.flatMap(LateFeeCountryProfile.init(rawValue:)) ?? LateFeeCountryProfile.default(for: resolvedLang)
+        lateFeeCountryProfile = resolvedProfile
+        let savedGrace = defaults.integer(forKey: Keys.lateFeeGracePeriodDays)
+        lateFeeGracePeriodDays = defaults.object(forKey: Keys.lateFeeGracePeriodDays) != nil ? savedGrace : resolvedProfile.defaultGraceDays
+        lateFeeCustomFootnote = defaults.string(forKey: Keys.lateFeeCustomFootnote) ?? ""
+
         signatureData = defaults.data(forKey: Keys.signature)
         logoData = defaults.data(forKey: Keys.logo)
 
         applyTheme(resolvedTheme)
+    }
+
+    func effectiveLateFeeFootnote() -> String {
+        let trimmed = lateFeeCustomFootnote.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !trimmed.isEmpty {
+            return trimmed
+        }
+        return lateFeeCountryProfile.defaultFootnote(for: language)
+    }
+
+    func effectiveLateFeeLegalNotice() -> String {
+        lateFeeCountryProfile.defaultLegalNotice(for: language)
+    }
+
+    func setLateFeeCountryProfile(_ profile: LateFeeCountryProfile, applyDefaults: Bool = true) {
+        defaults.set(lateFeeMonthlyRate, forKey: Keys.lateFeeRate(for: lateFeeCountryProfile))
+        lateFeeCountryProfile = profile
+
+        if applyDefaults {
+            let savedRate = defaults.double(forKey: Keys.lateFeeRate(for: profile))
+            lateFeeMonthlyRate = savedRate > 0 ? savedRate : profile.defaultRate
+            lateFeeDueDay = profile.defaultDueDay
+            lateFeeGracePeriodDays = profile.defaultGraceDays
+            lateFeeCustomFootnote = ""
+        }
     }
 
     func loadSampleDefaults(for targetLang: AppLanguage? = nil) {
@@ -3042,7 +3259,7 @@ final class ReceiptSettingsStore: ObservableObject {
         }
 
         let pkg = SystemBackupPackage(
-            version: "2.0",
+            version: "2.1",
             exportDate: Date(),
             apartmentName: apartmentName,
             issuer: issuer,
@@ -3058,7 +3275,10 @@ final class ReceiptSettingsStore: ObservableObject {
             archivedReceipts: ReceiptArchiveStore.shared.records,
             isLateFeeEnabled: isLateFeeEnabled,
             lateFeeMonthlyRate: lateFeeMonthlyRate,
-            lateFeeDueDay: lateFeeDueDay
+            lateFeeDueDay: lateFeeDueDay,
+            lateFeeCountryProfile: lateFeeCountryProfile.rawValue,
+            lateFeeGracePeriodDays: lateFeeGracePeriodDays,
+            lateFeeCustomFootnote: lateFeeCustomFootnote
         )
         return try? JSONEncoder().encode(pkg)
     }
@@ -3085,6 +3305,15 @@ final class ReceiptSettingsStore: ObservableObject {
         }
         if let feeDay = pkg.lateFeeDueDay, feeDay >= 1 && feeDay <= 31 {
             lateFeeDueDay = feeDay
+        }
+        if let profileStr = pkg.lateFeeCountryProfile, let prof = LateFeeCountryProfile(rawValue: profileStr) {
+            lateFeeCountryProfile = prof
+        }
+        if let grace = pkg.lateFeeGracePeriodDays {
+            lateFeeGracePeriodDays = grace
+        }
+        if let foot = pkg.lateFeeCustomFootnote {
+            lateFeeCustomFootnote = foot
         }
         for (flat, name) in pkg.residents {
             saveOwner(name, apartmentNumber: flat)
@@ -3125,6 +3354,13 @@ final class ReceiptSettingsStore: ObservableObject {
         static let isLateFeeEnabled = "is_late_fee_enabled"
         static let lateFeeMonthlyRate = "late_fee_monthly_rate"
         static let lateFeeDueDay = "late_fee_due_day"
+        static let lateFeeCountryProfile = "late_fee_country_profile"
+        static let lateFeeGracePeriodDays = "late_fee_grace_period_days"
+        static let lateFeeCustomFootnote = "late_fee_custom_footnote"
+
+        static func lateFeeRate(for profile: LateFeeCountryProfile) -> String {
+            "late_fee_rate_\(profile.rawValue)"
+        }
 
         static func owner(_ number: Int) -> String {
             "homeowner_\(number)"
@@ -4040,7 +4276,7 @@ struct ApartmentFinancialReportSheet: View {
                             if settings.isLateFeeEnabled {
                                 let defaultAmt = Double(settings.defaultPayment.replacingOccurrences(of: ",", with: ".")) ?? 1750.0
                                 let fee = (defaultAmt * (settings.lateFeeMonthlyRate / 100.0) * 100.0).rounded() / 100.0
-                                Text("+\(String(format: "%.2f", fee)) \(settings.currency.symbol) KMK")
+                                Text("+\(String(format: "%.2f", fee)) \(settings.currency.symbol) \(l10n.lateFeeShortBadge)")
                                     .font(.system(size: 10, weight: .bold, design: .monospaced))
                                     .foregroundColor(.orange)
                                     .padding(.horizontal, 7)
@@ -4150,11 +4386,11 @@ struct ApartmentFinancialReportSheet: View {
             let totalStr = String(format: "%.2f", totalVal)
             switch l10n.resolvedLanguage {
             case .turkish:
-                message = "Sayın Komşumuz (Daire \(flat)), \(apt) \(periodName) dönemi \(duesAmt) \(currencySym) aidat ve KMK Md. 20 uyarınca aylık %\(rateStr) gecikme tazminatı (\(feeStr) \(currencySym)) ile birlikte toplam \(totalStr) \(currencySym) ödemeniz henüz kaydımıza geçmemiştir. Bilginize sunar, iyi günler dileriz. - \(manager)"
+                message = "Sayın Komşumuz (Daire \(flat)), \(apt) \(periodName) dönemi \(duesAmt) \(currencySym) aidat ve aylık %\(rateStr) gecikme tazminatı (\(feeStr) \(currencySym)) ile birlikte toplam \(totalStr) \(currencySym) ödemeniz henüz kaydımıza geçmemiştir. Bilginize sunar, iyi günler dileriz. - \(manager)"
             case .romanian:
-                message = "Stimate Vecin (Ap. \(flat)), plata întreținerii pentru \(periodName) la \(apt) (\(duesAmt) \(currencySym)) plus penalități conform art. 20 (%\(rateStr): \(feeStr) \(currencySym)), total \(totalStr) \(currencySym) este în așteptare. Vă mulțumim! - \(manager)"
+                message = "Stimate Vecin (Ap. \(flat)), plata întreținerii pentru \(periodName) la \(apt) (\(duesAmt) \(currencySym)) plus penalități de întârziere (%\(rateStr): \(feeStr) \(currencySym)), total \(totalStr) \(currencySym) este în așteptare. Vă mulțumim! - \(manager)"
             default:
-                message = "Dear Resident (Flat \(flat)), dues for \(periodName) at \(apt) (\(duesAmt) \(currencySym)) plus Art. 20 late compensation (%\(rateStr): \(feeStr) \(currencySym)), total \(totalStr) \(currencySym) is currently pending. Thank you! - \(manager)"
+                message = "Dear Resident (Flat \(flat)), dues for \(periodName) at \(apt) (\(duesAmt) \(currencySym)) plus late fee compensation (%\(rateStr): \(feeStr) \(currencySym)), total \(totalStr) \(currencySym) is currently pending. Thank you! - \(manager)"
             }
         } else {
             switch l10n.resolvedLanguage {

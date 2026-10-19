@@ -1042,7 +1042,8 @@ struct ReceiptDocumentView: View {
                         .foregroundColor(textMuted)
 
                     if draft.lateFeeAmount > 0 {
-                        Text(l10n.lateFeeStatutoryFootnote)
+                        let footnote = draft.lateFeeFootnote ?? ReceiptSettingsStore.shared.effectiveLateFeeFootnote()
+                        Text(footnote)
                             .font(.system(size: 8.5, weight: .semibold))
                             .foregroundColor(Color(red: 0.82, green: 0.42, blue: 0.12))
                     }
