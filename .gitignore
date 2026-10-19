@@ -6,7 +6,7 @@
 .LSOverride
 
 # Project build & release outputs
-artifacts/
+dist/
 build/
 .build/
 .deriveddata/

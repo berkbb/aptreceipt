@@ -6,15 +6,17 @@ PROJECT_PATH="${PROJECT_PATH:-aptreceipt.xcodeproj}"
 SCHEME="${SCHEME:-aptreceipt}"
 CONFIGURATION="${CONFIGURATION:-Release}"
 DERIVED_DATA_PATH="${DERIVED_DATA_PATH:-.deriveddata}"
-OUTPUT_ROOT="${OUTPUT_ROOT:-artifacts}"
-BUILD_DIR="$OUTPUT_ROOT/build/$CONFIGURATION"
+ENTITLEMENTS="${ENTITLEMENTS:-aptreceipt/aptreceipt.entitlements}"
 APP_NAME="${APP_NAME:-aptreceipt}"
-APP_PATH="$BUILD_DIR/$APP_NAME.app"
-FINAL_APP_PATH="$OUTPUT_ROOT/$APP_NAME.app"
+BUILD_ROOT="${BUILD_ROOT:-build}"
+DIST_ROOT="${DIST_ROOT:-dist}"
+PRODUCTS_DIR="$DERIVED_DATA_PATH/products/$CONFIGURATION"
+APP_PATH="$PRODUCTS_DIR/$APP_NAME.app"
+FINAL_APP_PATH="$BUILD_ROOT/$APP_NAME.app"
 
 echo "Preparing output directories..."
-rm -rf "$OUTPUT_ROOT/build"
-mkdir -p "$BUILD_DIR"
+rm -rf "$PRODUCTS_DIR" "$BUILD_ROOT" "$DIST_ROOT"
+mkdir -p "$PRODUCTS_DIR" "$BUILD_ROOT" "$DIST_ROOT"
 
 echo "Building $SCHEME ($CONFIGURATION)..."
 xcodebuild \
@@ -25,7 +27,7 @@ xcodebuild \
   -derivedDataPath "$DERIVED_DATA_PATH" \
   -destination "platform=macOS" \
   -quiet \
-  CONFIGURATION_BUILD_DIR="$PWD/$BUILD_DIR" \
+  CONFIGURATION_BUILD_DIR="$PWD/$PRODUCTS_DIR" \
   CODE_SIGNING_ALLOWED=NO \
   CODE_SIGNING_REQUIRED=NO \
   build
@@ -36,7 +38,41 @@ if [[ ! -d "$APP_PATH" ]]; then
 fi
 
 echo "Copying app bundle..."
-rm -rf "$FINAL_APP_PATH"
-cp -R "$APP_PATH" "$FINAL_APP_PATH"
+ditto "$APP_PATH" "$FINAL_APP_PATH"
 
-echo "Done: $FINAL_APP_PATH"
+echo "Ad-hoc signing app bundle..."
+codesign --force --deep --sign - --timestamp=none \
+  --entitlements "$ENTITLEMENTS" \
+  "$FINAL_APP_PATH"
+codesign --verify --deep --strict "$FINAL_APP_PATH"
+
+VERSION="$(defaults read "$PWD/$FINAL_APP_PATH/Contents/Info" CFBundleShortVersionString)"
+ZIP_NAME="$APP_NAME-$VERSION.zip"
+DMG_NAME="$APP_NAME-$VERSION.dmg"
+
+echo "Creating $ZIP_NAME..."
+ditto -c -k --keepParent "$FINAL_APP_PATH" "$DIST_ROOT/$ZIP_NAME"
+
+echo "Creating $DMG_NAME..."
+DMG_STAGING="$(mktemp -d)"
+trap 'rm -rf "$DMG_STAGING"' EXIT
+ditto "$FINAL_APP_PATH" "$DMG_STAGING/$APP_NAME.app"
+ln -s /Applications "$DMG_STAGING/Applications"
+hdiutil create \
+  -volname "$APP_NAME $VERSION" \
+  -srcfolder "$DMG_STAGING" \
+  -fs HFS+ \
+  -format UDZO \
+  -ov \
+  -quiet \
+  "$DIST_ROOT/$DMG_NAME"
+codesign --force --sign - "$DIST_ROOT/$DMG_NAME"
+
+echo "Writing SHA-256 checksums..."
+(cd "$DIST_ROOT" && shasum -a 256 "$DMG_NAME" "$ZIP_NAME" > SHA256SUMS.txt)
+
+echo "Done:"
+echo "  $FINAL_APP_PATH"
+echo "  $DIST_ROOT/$DMG_NAME"
+echo "  $DIST_ROOT/$ZIP_NAME"
+echo "  $DIST_ROOT/SHA256SUMS.txt"

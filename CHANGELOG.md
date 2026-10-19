@@ -14,6 +14,10 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 - Bumped marketing version to `3.4.0` (build `7`).
+- `build_app.sh` now ad-hoc signs the app and produces a DMG, ZIP and `SHA256SUMS.txt` in `dist/`; added `release.sh` to publish GitHub releases.
+
+### Fixed
+- Added the `com.apple.security.network.client` sandbox entitlement so the GitHub update checker can reach the Releases API.
 
 ## [3.2.0] - 2026-10-19
 
