@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.4.2] - 2026-10-19
+
+### Added
+- **Signed Updates (Ed25519)**: Release DMGs are signed with an Ed25519 (EdDSA) key and published with a detached `.sig` file. The app embeds the public key (`AptReceiptUpdatePublicEDKey` in `Info.plist`) and discards any downloaded update whose signature is missing or invalid, in addition to the SHA-256 checksum check.
+- `scripts/update_signing.swift` to generate, import, and use the signing key (stored in the login keychain, with a backup copy in the gitignored `.secrets/` folder); `release.sh` now signs and verifies the DMG and checks that the keychain key matches the app's public key.
+
+### Changed
+- Bumped marketing version to `3.4.2` (build `9`).
+
 ## [3.4.1] - 2026-10-19
 
 ### Added

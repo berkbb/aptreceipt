@@ -79,6 +79,35 @@ public struct GitHubRelease: Codable, Identifiable, Equatable {
     public var checksumAsset: GitHubReleaseAsset? {
         assets.first { $0.name == Self.checksumAssetName }
     }
+
+    /// The detached Ed25519 signature (`<file>.sig`) for `asset`, if any.
+    public func signatureAsset(for asset: GitHubReleaseAsset) -> GitHubReleaseAsset? {
+        assets.first { $0.name == asset.name + ".sig" }
+    }
+}
+
+// MARK: - Ed25519 Update Signatures
+
+public enum UpdateSignature {
+    static let publicKeyInfoKey = "AptReceiptUpdatePublicEDKey"
+
+    /// The base64 Ed25519 public key that release DMGs must be signed with.
+    public static var bundledPublicKey: String? {
+        Bundle.main.object(forInfoDictionaryKey: publicKeyInfoKey) as? String
+    }
+
+    /// Returns true when `signatureBase64` is a valid Ed25519 signature of the file for `publicKeyBase64`.
+    public static func isValid(fileURL: URL, signatureBase64: String, publicKeyBase64: String) throws -> Bool {
+        guard
+            let signature = Data(base64Encoded: signatureBase64.trimmingCharacters(in: .whitespacesAndNewlines)),
+            let publicKeyData = Data(base64Encoded: publicKeyBase64),
+            let publicKey = try? Curve25519.Signing.PublicKey(rawRepresentation: publicKeyData)
+        else {
+            return false
+        }
+        let data = try Data(contentsOf: fileURL, options: .mappedIfSafe)
+        return publicKey.isValidSignature(signature, for: data)
+    }
 }
 
 // MARK: - SHA-256 Checksums
@@ -315,6 +344,7 @@ public final class GitHubUpdateChecker: ObservableObject {
         downloadTask = Task {
             do {
                 let expectedDigest = try await self.fetchExpectedDigest(release: release, fileName: dmgAsset.name)
+                let signature = try await self.fetchSignature(release: release, asset: dmgAsset)
                 let tempURL = try await UpdateFileDownloader.download(from: dmgURL) { fraction in
                     Task { @MainActor in self.downloadProgress = fraction }
                 }
@@ -324,6 +354,12 @@ public final class GitHubUpdateChecker: ObservableObject {
                     let actualDigest = try UpdateChecksums.sha256(of: tempURL)
                     guard actualDigest == expectedDigest else {
                         throw UpdateDownloadError.checksumMismatch
+                    }
+                }
+
+                if let signature {
+                    guard try UpdateSignature.isValid(fileURL: tempURL, signatureBase64: signature.value, publicKeyBase64: signature.publicKey) else {
+                        throw UpdateDownloadError.signatureInvalid
                     }
                 }
 
@@ -363,6 +399,22 @@ public final class GitHubUpdateChecker: ObservableObject {
             throw UpdateDownloadError.checksumUnavailable
         }
         return digest
+    }
+
+    /// Returns the release's signature for `asset` with the bundled public key, or nil when this build
+    /// has no public key. A release without a signature is rejected so it cannot bypass verification.
+    private func fetchSignature(release: GitHubRelease, asset: GitHubReleaseAsset) async throws -> (value: String, publicKey: String)? {
+        guard let publicKey = UpdateSignature.bundledPublicKey else {
+            return nil
+        }
+        guard let signatureAsset = release.signatureAsset(for: asset), let url = URL(string: signatureAsset.browserDownloadUrl) else {
+            throw UpdateDownloadError.signatureMissing
+        }
+        let (data, response) = try await URLSession.shared.data(from: url)
+        guard (response as? HTTPURLResponse)?.statusCode == 200, let text = String(data: data, encoding: .utf8) else {
+            throw UpdateDownloadError.signatureMissing
+        }
+        return (text, publicKey)
     }
 
     /// Moves the downloaded file into ~/Downloads without overwriting existing files.
@@ -464,6 +516,8 @@ public enum UpdateDownloadError: LocalizedError {
     case badResponse(statusCode: Int)
     case checksumUnavailable
     case checksumMismatch
+    case signatureMissing
+    case signatureInvalid
 
     public var errorDescription: String? {
         switch self {
@@ -473,6 +527,10 @@ public enum UpdateDownloadError: LocalizedError {
             return "SHA256SUMS.txt could not be read for this release"
         case .checksumMismatch:
             return "SHA-256 checksum mismatch; the downloaded file was discarded"
+        case .signatureMissing:
+            return "This release has no update signature, so it cannot be verified"
+        case .signatureInvalid:
+            return "Update signature is invalid; the downloaded file was discarded"
         }
     }
 }

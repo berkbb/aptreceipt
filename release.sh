@@ -42,6 +42,21 @@ fi
 echo "Verifying checksums..."
 (cd "$DIST_ROOT" && shasum -a 256 -c SHA256SUMS.txt)
 
+# Ed25519-sign the DMG with the key in the login keychain. The app only accepts
+# updates signed by the key matching its bundled AptReceiptUpdatePublicEDKey.
+DMG_PATH="$DIST_ROOT/$APP_NAME-$VERSION.dmg"
+SIGNING_TOOL=(xcrun swift scripts/update_signing.swift)
+APP_PUBLIC_KEY="$(defaults read "$PWD/$BUILD_ROOT/$APP_NAME.app/Contents/Info" AptReceiptUpdatePublicEDKey)"
+KEYCHAIN_PUBLIC_KEY="$("${SIGNING_TOOL[@]}" public-key)"
+if [[ "$APP_PUBLIC_KEY" != "$KEYCHAIN_PUBLIC_KEY" ]]; then
+  echo "Signing key in keychain does not match AptReceiptUpdatePublicEDKey in the app." >&2
+  exit 1
+fi
+
+echo "Signing $DMG_PATH..."
+"${SIGNING_TOOL[@]}" sign "$DMG_PATH" > "$DMG_PATH.sig"
+"${SIGNING_TOOL[@]}" verify "$DMG_PATH" "$(cat "$DMG_PATH.sig")" "$APP_PUBLIC_KEY"
+
 # Release notes are the CHANGELOG.md section for this version.
 NOTES_FILE="$(mktemp)"
 trap 'rm -f "$NOTES_FILE"' EXIT
@@ -78,7 +93,8 @@ gh release create "$TAG" \
   --target "$(git rev-parse HEAD)" \
   --title "$APP_NAME $VERSION" \
   --notes-file "$NOTES_FILE" \
-  "$DIST_ROOT/$APP_NAME-$VERSION.dmg" \
+  "$DMG_PATH" \
+  "$DMG_PATH.sig" \
   "$DIST_ROOT/SHA256SUMS.txt"
 
 echo "Done: $(gh release view "$TAG" --repo "$REPO" --json url --jq .url)"

@@ -29,3 +29,6 @@ xcuserdata/
 *.tmp
 *.swp
 *~
+
+# Update signing key backup (never commit)
+.secrets/

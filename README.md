@@ -123,7 +123,29 @@ shasum -a 256 -c SHA256SUMS.txt
 
 ### Updating
 
-AptReceipt checks GitHub Releases for new versions (**Check for Updates…** in the app menu, Settings → About, or the About window). When an update is available, **Download Update** saves the release DMG to your **Downloads** folder, verifies it against the release's `SHA256SUMS.txt`, and opens it (if macOS blocks opening it, the app explains how to allow it). Quit AptReceipt, drag the new version onto **Applications** and choose **Replace**, then open it again (the Gatekeeper note above applies to each new version). If a release has no DMG attached, the release page opens in your browser instead.
+AptReceipt checks GitHub Releases for new versions (**Check for Updates…** in the app menu, Settings → About, or the About window). When an update is available, **Download Update** saves the release DMG to your **Downloads** folder, verifies its SHA-256 checksum and Ed25519 signature, and opens it (if macOS blocks opening it, the app explains how to allow it). Quit AptReceipt, drag the new version onto **Applications** and choose **Replace**, then open it again (the Gatekeeper note above applies to each new version). If a release has no DMG attached, the release page opens in your browser instead.
+
+---
+
+## Releasing (Maintainers)
+
+Release DMGs are signed with an Ed25519 key so the in-app updater only installs builds you published. The public key is embedded in `aptreceipt/Info.plist` (`AptReceiptUpdatePublicEDKey`); the private key lives in your login keychain.
+
+- **First-time setup** (already done for this repository; only repeat if you are replacing the key, which also requires updating `AptReceiptUpdatePublicEDKey`):
+
+  ```bash
+  xcrun swift scripts/update_signing.swift generate .secrets/aptreceipt-update-signing-key.txt
+  ```
+
+- **On a new Mac**, restore the key from your backup copy:
+
+  ```bash
+  xcrun swift scripts/update_signing.swift import .secrets/aptreceipt-update-signing-key.txt
+  ```
+
+- **Publishing a release:** bump the version in Xcode, add the version's section to `CHANGELOG.md`, commit and push, then run `./release.sh`. It builds the app, creates the DMG and `SHA256SUMS.txt`, signs the DMG (`.dmg.sig`), and publishes all three to GitHub Releases.
+
+Keep a copy of the private key somewhere safe outside the repository. If it is lost, existing installs cannot verify new updates and users must update manually from the release page.
 
 ---
 

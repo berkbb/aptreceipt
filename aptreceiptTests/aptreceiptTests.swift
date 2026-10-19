@@ -6,6 +6,7 @@
 //  Copyright © 2023-2026 Babadogan Tech and Edu. All rights reserved.
 //
 
+import CryptoKit
 import XCTest
 @testable import aptreceipt
 
@@ -310,6 +311,41 @@ final class aptreceiptTests: XCTestCase {
             try UpdateChecksums.sha256(of: fileURL),
             "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
         )
+    }
+
+    func testGitHubReleaseSignatureAssetLookup() {
+        let dmg = GitHubReleaseAsset(name: "aptreceipt-3.5.0.dmg", browserDownloadUrl: "https://example.com/aptreceipt-3.5.0.dmg")
+        let signature = GitHubReleaseAsset(name: "aptreceipt-3.5.0.dmg.sig", browserDownloadUrl: "https://example.com/aptreceipt-3.5.0.dmg.sig")
+        let release = GitHubRelease(tagName: "v3.5.0", name: nil, body: nil, htmlUrl: "https://example.com", assets: [dmg, signature])
+
+        XCTAssertEqual(release.dmgAsset, dmg)
+        XCTAssertEqual(release.signatureAsset(for: dmg), signature)
+        XCTAssertNil(GitHubRelease(tagName: "v3.5.0", name: nil, body: nil, htmlUrl: "https://example.com", assets: [dmg]).signatureAsset(for: dmg))
+    }
+
+    func testUpdateSignatureVerification() throws {
+        let fileURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try Data("aptreceipt update payload".utf8).write(to: fileURL)
+        defer { try? FileManager.default.removeItem(at: fileURL) }
+
+        let key = Curve25519.Signing.PrivateKey()
+        let publicKey = key.publicKey.rawRepresentation.base64EncodedString()
+        let signature = try key.signature(for: Data(contentsOf: fileURL)).base64EncodedString()
+
+        XCTAssertTrue(try UpdateSignature.isValid(fileURL: fileURL, signatureBase64: signature + "\n", publicKeyBase64: publicKey))
+
+        let otherPublicKey = Curve25519.Signing.PrivateKey().publicKey.rawRepresentation.base64EncodedString()
+        XCTAssertFalse(try UpdateSignature.isValid(fileURL: fileURL, signatureBase64: signature, publicKeyBase64: otherPublicKey))
+        XCTAssertFalse(try UpdateSignature.isValid(fileURL: fileURL, signatureBase64: "not-base64", publicKeyBase64: publicKey))
+
+        try Data("tampered payload".utf8).write(to: fileURL)
+        XCTAssertFalse(try UpdateSignature.isValid(fileURL: fileURL, signatureBase64: signature, publicKeyBase64: publicKey))
+    }
+
+    func testBundledUpdatePublicKeyIsValid() throws {
+        let publicKey = try XCTUnwrap(UpdateSignature.bundledPublicKey)
+        let data = try XCTUnwrap(Data(base64Encoded: publicKey))
+        XCTAssertNoThrow(try Curve25519.Signing.PublicKey(rawRepresentation: data))
     }
 
     // MARK: - 5. Multi-Country Late Fee Profiles Tests
