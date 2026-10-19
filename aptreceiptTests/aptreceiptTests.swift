@@ -190,6 +190,37 @@ final class aptreceiptTests: XCTestCase {
         XCTAssertEqual(roL10n.expenseDocumentType, "Dispoziție de Plată Locatar")
     }
 
+    func testStringCatalogHasEveryKeyInEveryLanguage() throws {
+        func table(_ localization: String) throws -> [String: String] {
+            let url = try XCTUnwrap(Bundle.main.url(forResource: "Localizable", withExtension: "strings", subdirectory: nil, localization: localization))
+            return try XCTUnwrap(NSDictionary(contentsOf: url) as? [String: String])
+        }
+        func formatSpecifiers(_ text: String) -> [String] {
+            let regex = try! NSRegularExpression(pattern: "%(?:\\d+\\$)?[@d]")
+            return regex.matches(in: text, range: NSRange(text.startIndex..., in: text))
+                .map { String(text[Range($0.range, in: text)!]) }
+                .sorted()
+        }
+
+        let english = try table("en")
+        XCTAssertFalse(english.isEmpty)
+        for localization in ["tr", "ro"] {
+            let translated = try table(localization)
+            XCTAssertEqual(Set(translated.keys), Set(english.keys), "\(localization) keys differ from en")
+            for (key, value) in translated {
+                XCTAssertFalse(value.isEmpty, "\(localization).\(key) is empty")
+                XCTAssertEqual(formatSpecifiers(value), formatSpecifiers(english[key] ?? ""), "\(localization).\(key) format specifiers differ from en")
+            }
+        }
+    }
+
+    func testLateFeeItemNameFormatting() {
+        XCTAssertEqual(L10n(.english).lateFeeItemName(rate: 5, months: 3), "Late Fee (%5.0 × 3 Months)")
+        XCTAssertEqual(L10n(.english).lateFeeItemName(rate: 5, months: 1), "Late Fee (%5.0 × 1 Month)")
+        XCTAssertEqual(L10n(.turkish).lateFeeItemName(rate: 2.5, months: 2), "Gecikme Tazminatı (%2.5 × 2 Ay)")
+        XCTAssertEqual(L10n(.romanian).lateFeeItemName(rate: 5, months: 1), "Penalități Întârziere (%5.0 × 1 Lună)")
+    }
+
     // MARK: - 3. Backup Package & Settings Store Tests
 
     func testSystemBackupPackageCodable() throws {

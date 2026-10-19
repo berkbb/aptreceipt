@@ -35,6 +35,7 @@
 		F519961A217C0540E3B6FB56 /* ApartmentFinancialReportSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 335FDA259574D491BC369FC2 /* ApartmentFinancialReportSheet.swift */; };
 		EBD3F5D514DFF5EF577DE795 /* BatchDuesGeneratorSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CF7B09A5D22F5DDFEEE6BE2 /* BatchDuesGeneratorSheet.swift */; };
 		3D40934AC58F13968AA5D9B7 /* ApartmentBulletinBoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE3D706FEAFD8AE1933CEE20 /* ApartmentBulletinBoardView.swift */; };
+		68ED18A18FEE563F50A19534 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = D1560FD55F164F23F586FC62 /* Localizable.xcstrings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -94,6 +95,7 @@
 		335FDA259574D491BC369FC2 /* ApartmentFinancialReportSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApartmentFinancialReportSheet.swift; sourceTree = "<group>"; };
 		9CF7B09A5D22F5DDFEEE6BE2 /* BatchDuesGeneratorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatchDuesGeneratorSheet.swift; sourceTree = "<group>"; };
 		BE3D706FEAFD8AE1933CEE20 /* ApartmentBulletinBoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApartmentBulletinBoardView.swift; sourceTree = "<group>"; };
+		D1560FD55F164F23F586FC62 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -170,6 +172,7 @@
 				9A90651027E728020085AA4B /* PreferencesViewController.swift */,
 				9A90652027E728020085AA4B /* GitHubUpdateChecker.swift */,
 				9ADECA1627E5DC3500EB0A7F /* File.strings */,
+				D1560FD55F164F23F586FC62 /* Localizable.xcstrings */,
 			);
 			path = aptreceipt;
 			sourceTree = "<group>";
@@ -301,6 +304,7 @@
 				9A9CF8B427E22E670042D276 /* InfoPlist.strings in Resources */,
 				9A9CF88027E204920042D276 /* Main.storyboard in Resources */,
 				9ADECA1427E5DC3500EB0A7F /* File.strings in Resources */,
+				68ED18A18FEE563F50A19534 /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

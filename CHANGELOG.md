@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 - Split the 4,900-line `ViewController.swift` into per-feature files (`L10n.swift`, `ReceiptSettingsStore.swift`, `MainScreen.swift`, `MainScreenViewModel.swift`, `ReceiptModels.swift`, `LateFee.swift`, and one file per sheet/view). No behavior changes.
+- Moved all 375 UI strings from inline `tr("EN", "TR", "RO")` calls into an Xcode String Catalog (`aptreceipt/Localizable.xcstrings`). `L10n` looks keys up in the bundle of the in-app language, so the language picker keeps working independently of the system language. Added a test that every key exists in every language with matching format specifiers.
 - Replaced the late fee unit test that re-implemented the formula inside the test with tests that exercise `LateFeeCalculator` and `MainScreenViewModel` directly.
 
 ## [3.4.2] - 2026-10-19
