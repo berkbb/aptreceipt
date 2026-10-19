@@ -34,7 +34,7 @@
 
 ---
 
-### Phase 3: Multi-Jurisdiction Compliance & Software Lifecycle (Completed in v3.4.1)
+### Phase 3: Multi-Jurisdiction Compliance & Software Lifecycle (Completed in v3.4.2)
 9. **Multi-Country Late Payment Compensation Engine**:
    - Master toggle switch to enable/disable late compensation calculation across receipts and UI.
    - Pre-configured jurisdiction profiles:
