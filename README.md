@@ -109,6 +109,8 @@ Allow the app in one of these ways:
   xattr -dr com.apple.quarantine /Applications/aptreceipt.app
   ```
 
+On newer macOS versions Gatekeeper may also refuse to open the downloaded **DMG** itself. Allow it the same way in **Privacy & Security**, or run `xattr -d com.apple.quarantine ~/Downloads/aptreceipt-*.dmg` before opening it.
+
 This is only needed once per downloaded version. Because every update is a new download, you may need to repeat it after installing an update.
 
 ### Verifying Downloads
@@ -121,7 +123,7 @@ shasum -a 256 -c SHA256SUMS.txt
 
 ### Updating
 
-AptReceipt checks GitHub Releases for new versions (**Check for Updates…** in the app menu, Settings → About, or the About window). When an update is available, **Download Update** saves the release DMG to your **Downloads** folder, verifies it against the release's `SHA256SUMS.txt`, and opens it. Quit AptReceipt, drag the new version onto **Applications** and choose **Replace**, then open it again (the Gatekeeper note above applies to each new version). If a release has no DMG attached, the release page opens in your browser instead.
+AptReceipt checks GitHub Releases for new versions (**Check for Updates…** in the app menu, Settings → About, or the About window). When an update is available, **Download Update** saves the release DMG to your **Downloads** folder, verifies it against the release's `SHA256SUMS.txt`, and opens it (if macOS blocks opening it, the app explains how to allow it). Quit AptReceipt, drag the new version onto **Applications** and choose **Replace**, then open it again (the Gatekeeper note above applies to each new version). If a release has no DMG attached, the release page opens in your browser instead.
 
 ---
 

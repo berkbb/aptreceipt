@@ -255,14 +255,42 @@ public final class GitHubUpdateChecker: ObservableObject {
         let l10n = ReceiptSettingsStore.shared.l10n
         let alert = NSAlert()
         alert.messageText = l10n.updateAvailableTitle
-        alert.informativeText = "\(l10n.appTitle) \(release.tagName) \(l10n.isNowAvailableText) (\(l10n.currentVersionPrefix) \(currentAppVersion)).\n\n\(release.name ?? "")\n\(release.body ?? "")"
+        alert.informativeText = "\(l10n.appTitle) \(release.tagName) \(l10n.isNowAvailableText) (\(l10n.currentVersionPrefix) \(currentAppVersion))."
         alert.alertStyle = .informational
+        if let notes = release.body?.trimmingCharacters(in: .whitespacesAndNewlines), !notes.isEmpty {
+            alert.accessoryView = Self.makeReleaseNotesView(notes)
+        }
         alert.addButton(withTitle: l10n.downloadUpdate)
         alert.addButton(withTitle: l10n.laterButton)
 
         if alert.runModal() == .alertFirstButtonReturn {
             downloadUpdate(release: release)
         }
+    }
+
+    /// Release notes can be long, so they go in a fixed-height scroll view instead of the alert text.
+    private static func makeReleaseNotesView(_ notes: String) -> NSView {
+        let scrollView = NSTextView.scrollableTextView()
+        scrollView.frame = NSRect(x: 0, y: 0, width: 420, height: 220)
+        scrollView.borderType = .bezelBorder
+        if let textView = scrollView.documentView as? NSTextView {
+            textView.isEditable = false
+            textView.drawsBackground = false
+            textView.textContainerInset = NSSize(width: 6, height: 6)
+            let options = AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)
+            if let markdown = try? AttributedString(markdown: notes, options: options) {
+                let attributed = NSMutableAttributedString(markdown)
+                attributed.addAttributes([
+                    .foregroundColor: NSColor.labelColor,
+                    .font: NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
+                ], range: NSRange(location: 0, length: attributed.length))
+                textView.textStorage?.setAttributedString(attributed)
+            } else {
+                textView.string = notes
+                textView.font = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
+            }
+        }
+        return scrollView
     }
 
     // MARK: - DMG Download
@@ -301,8 +329,8 @@ public final class GitHubUpdateChecker: ObservableObject {
 
                 let destinationURL = try Self.moveToDownloads(tempURL, fileName: dmgAsset.name)
                 self.finishDownload()
-                NSWorkspace.shared.open(destinationURL)
-                self.presentDownloadCompletedAlert(fileURL: destinationURL)
+                let opened = await Self.open(destinationURL)
+                self.presentDownloadCompletedAlert(fileURL: destinationURL, opened: opened)
             } catch is CancellationError {
                 self.finishDownload()
             } catch {
@@ -360,11 +388,20 @@ public final class GitHubUpdateChecker: ObservableObject {
         }
     }
 
-    private func presentDownloadCompletedAlert(fileURL: URL) {
+    private static func open(_ fileURL: URL) async -> Bool {
+        await withCheckedContinuation { continuation in
+            NSWorkspace.shared.open(fileURL, configuration: NSWorkspace.OpenConfiguration()) { _, error in
+                continuation.resume(returning: error == nil)
+            }
+        }
+    }
+
+    private func presentDownloadCompletedAlert(fileURL: URL, opened: Bool) {
         let l10n = ReceiptSettingsStore.shared.l10n
         let alert = NSAlert()
         alert.messageText = l10n.updateDownloadedTitle
-        alert.informativeText = String(format: l10n.updateDownloadedMessage, fileURL.lastPathComponent)
+        let format = opened ? l10n.updateDownloadedMessage : l10n.updateDownloadedNotOpenedMessage
+        alert.informativeText = String(format: format, fileURL.lastPathComponent)
         alert.alertStyle = .informational
         alert.addButton(withTitle: l10n.quitAndInstallButton)
         alert.addButton(withTitle: l10n.laterButton)

@@ -54,6 +54,8 @@ DMG_STAGING="$(mktemp -d)"
 trap 'rm -rf "$DMG_STAGING"' EXIT
 ditto "$FINAL_APP_PATH" "$DMG_STAGING/$APP_NAME.app"
 ln -s /Applications "$DMG_STAGING/Applications"
+cp LICENSE "$DMG_STAGING/LICENSE.txt"
+cp packaging/dmg/README.txt "$DMG_STAGING/README.txt"
 hdiutil create \
   -volname "$APP_NAME $VERSION" \
   -srcfolder "$DMG_STAGING" \
