@@ -2,7 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
-## [3.2.0] - 2026-10-18
+## [3.3.0] - 2026-10-19
+
+### Added
+- **Receipt Archive & History**: Persistent local receipt store with real-time search, category filtering (Income, Refund, Management Expense), instant past receipt viewer, and CSV tabular export.
+- **Verifiable Dynamic QR Code**: CoreImage-powered anti-tamper QR code embedded directly into the official A4 receipt PDF and live preview, encoding verifiable summary payload.
+- **WhatsApp & Email Quick Share**: One-click dispatch of personalized, trilingual receipt notifications and payment summaries via WhatsApp Web/Desktop and macOS Mail.
+- **Full System Backup & Restore**: One-click JSON backup export and restore covering building configuration, residents directory, vendor list, expense services, and the entire receipt archive.
+- **Resident Contact Directory**: Added phone number field for each flat in the Residents Directory to power instant WhatsApp messaging.
+- **Spec-Driven Development (SDD)**: Bootstrapped agent constitution and living roadmap in `.agents/`.
 
 ### Added
 - Complete English and Romanian language support with 1-to-1 accurate localization across all views, receipt documents, and dialogs.

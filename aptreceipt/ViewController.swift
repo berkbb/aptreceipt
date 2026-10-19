@@ -1,5 +1,6 @@
 import AppKit
 import SwiftUI
+import CoreImage
 
 // MARK: - Language & Theme Enums
 
@@ -415,7 +416,43 @@ struct L10n {
     var tabResidents: String { tr("Residents", "Sakinler", "Locatari") }
     var tabAppearance: String { tr("Appearance & Language", "Görünüm & Dil", "Aspect & Limbă") }
     var tabSignature: String { tr("Signature", "İmza", "Semnătură") }
+    var tabBackup: String { tr("Backup & Restore", "Yedekleme & Geri Yükleme", "Copie & Restaurare") }
     var tabAbout: String { tr("About", "Hakkında", "Despre") }
+
+    // Archive & History Strings
+    var archiveTitle: String { tr("Receipt Archive & History", "Makbuz Arşivi ve Geçmişi", "Arhivă și Istoric Chitanțe") }
+    var archiveSubtitle: String { tr("Search, review, re-print, and share previously generated receipts", "Daha önce kesilen makbuzları görüntüleyin, filtreleyin, yazdırın ve paylaşın", "Vizualizați, filtrați, tipăriți și partajați chitanțele emise") }
+    var archiveSearchPlaceholder: String { tr("Search flat, person, company, or notes…", "Daire no, kişi, firma veya notlarda ara…", "Caută apartament, persoană, furnizor sau notă…") }
+    var filterAll: String { tr("All Receipts", "Tüm Makbuzlar", "Toate Chitanțele") }
+    var filterIncome: String { tr("Income", "Gelir", "Încasări") }
+    var filterOutcome: String { tr("Refund", "İade", "Restituiri") }
+    var filterManagement: String { tr("Management", "İşletme", "Administrație") }
+    var totalArchived: String { tr("Total Archived", "Toplam Arşiv", "Total Arhivate") }
+    var openReceipt: String { tr("Open Receipt", "Makbuzu Aç", "Deschide Chitanța") }
+    var deleteReceipt: String { tr("Delete from Archive", "Arşivden Sil", "Șterge din Arhivă") }
+    var exportCSV: String { tr("Export as CSV", "CSV Olarak Dışa Aktar", "Exportă ca CSV") }
+    var archiveEmpty: String { tr("No archived receipts yet. Generated receipts will automatically appear here.", "Henüz arşivlenmiş makbuz yok. Oluşturulan makbuzlar otomatik olarak burada listelenecektir.", "Nicio chitanță arhivată încă.") }
+    var archiveButton: String { tr("Archive", "Arşiv", "Arhivă") }
+
+    // WhatsApp & Sharing Strings
+    var shareWhatsApp: String { tr("Share via WhatsApp", "WhatsApp ile Paylaş", "Trimite pe WhatsApp") }
+    var shareEmail: String { tr("Send via Email", "E-posta ile Gönder", "Trimite prin Email") }
+    var residentPhone: String { tr("Phone / WhatsApp:", "Telefon / WhatsApp:", "Telefon / WhatsApp:") }
+    var residentPhonePlaceholder: String { tr("e.g. +90 532 123 45 67", "Örn: 0532 123 45 67", "Ex: +40 721 123 456") }
+
+    // QR Code Verification Strings
+    var qrVerificationNotice: String { tr("Scan with phone camera to verify receipt authenticity", "Belge doğruluğunu teyit etmek için telefon kamerasıyla okutunuz", "Scanați cu camera telefonului pentru a verifica autenticitatea chitanței") }
+    var qrCodeActive: String { tr("Verifiable QR Code Active", "Doğrulanabilir QR Kod Aktif", "Cod QR de Verificare Activ") }
+
+    // Backup & Restore Strings
+    var backupTitle: String { tr("Data Backup & Restore", "Veri Yedekleme ve Geri Yükleme", "Salvare & Restaurare Date") }
+    var backupSubtitle: String { tr("Export your entire apartment configuration, residents, vendors, and receipt archive to a single JSON file, or restore from a previous backup", "Tüm apartman ayarları, sakinler, firmalar ve makbuz arşivinizi tek bir JSON dosyasına yedekleyin veya geri yükleyin", "Exportați sau restaurați configurările, locatarii, furnizorii și arhiva într-un singur fișier JSON") }
+    var exportBackupButton: String { tr("Export Full System Backup (.json)…", "Tam Sistem Yedeğini Dışa Aktar (.json)…", "Exportă Copie de Siguranță (.json)…") }
+    var importBackupButton: String { tr("Restore from Backup File (.json)…", "Yedek Dosyasından Geri Yükle (.json)…", "Restaurează din Fișier (.json)…") }
+    var backupExportSuccess: String { tr("Backup exported successfully.", "Yedekleme başarıyla dışa aktarıldı.", "Copie salvată cu succes.") }
+    var backupImportSuccess: String { tr("All data and archive restored successfully.", "Tüm veriler ve arşiv başarıyla geri yüklendi.", "Datele și arhiva au fost restaurate cu succes.") }
+    var backupImportError: String { tr("Failed to read backup file or invalid format.", "Yedek dosyası okunamadı veya dosya biçimi geçersiz.", "Eroare la citirea copiei de siguranță.") }
+    var backupNotice: String { tr("Backups contain all resident records, custom vendors, expense services, and receipt history in a portable format.", "Yedek dosyası tüm sakin kayıtlarını, firma listesini, işletme hizmetlerini ve makbuz geçmişini taşınabilir formatta içerir.", "Fișierul de siguranță conține toți locatarii, furnizorii și istoricul chitanțelor.") }
 
     // Settings Form Fields
     var buildingDetails: String { tr("Building Information", "Apartman Bilgileri", "Informații Imobil / Asociație") }
@@ -722,6 +759,11 @@ struct MainScreen: View {
         .sheet(item: $viewModel.previewDraft) { draft in
             ReceiptPreviewSheet(draft: draft, settings: settings)
         }
+        .sheet(isPresented: $viewModel.isPresentingArchive) {
+            ReceiptArchiveSheet(settings: settings) { selectedDraft in
+                viewModel.previewDraft = selectedDraft
+            }
+        }
         .sheet(isPresented: $viewModel.isPresentingSettings) {
             SettingsView(settings: settings)
                 .frame(width: 680, height: 580)
@@ -778,6 +820,33 @@ struct MainScreen: View {
 
             Spacer()
 
+            // Archive Button
+            Button {
+                viewModel.isPresentingArchive = true
+            } label: {
+                HStack(spacing: 5) {
+                    Image(systemName: "archivebox.fill")
+                        .font(.system(size: 13, weight: .semibold))
+                    Text(l10n.archiveButton)
+                        .font(.system(size: 12, weight: .medium))
+                    if !ReceiptArchiveStore.shared.records.isEmpty {
+                        Text("\(ReceiptArchiveStore.shared.records.count)")
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 1)
+                            .background(Color.accentColor)
+                            .clipShape(Capsule())
+                    }
+                }
+                .padding(.horizontal, 4)
+                .padding(.vertical, 2)
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.regular)
+            .help(l10n.archiveTitle)
+
+            // Settings Button
             Button {
                 openSettingsWindow()
             } label: {
@@ -1480,6 +1549,24 @@ struct LiveReceiptPreview: View {
                     .stroke(badgeColor.opacity(0.25), lineWidth: 1)
             )
 
+            // Verifiable QR Indicator
+            HStack(spacing: 6) {
+                Image(systemName: "qrcode")
+                    .font(.system(size: 11, weight: .bold))
+                Text(l10n.qrCodeActive)
+                    .font(.system(size: 10, weight: .semibold))
+                Spacer()
+                Text(l10n.qrVerificationNotice)
+                    .font(.system(size: 9))
+                    .foregroundColor(.secondary)
+                    .lineLimit(1)
+            }
+            .foregroundColor(badgeColor)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 5)
+            .background(badgeColor.opacity(0.08))
+            .clipShape(RoundedRectangle(cornerRadius: 6))
+
             // Notes
             if !notes.isEmpty {
                 VStack(alignment: .leading, spacing: 4) {
@@ -1555,6 +1642,7 @@ final class MainScreenViewModel: ObservableObject {
 
     @Published var previewDraft: ReceiptDraft?
     @Published var isPresentingSettings: Bool = false
+    @Published var isPresentingArchive: Bool = false
     @Published var validationError: ValidationError?
 
     func syncWithSettings(_ settings: ReceiptSettingsStore) {
@@ -1650,7 +1738,7 @@ final class MainScreenViewModel: ObservableObject {
         let effectiveApartment = receiptKind == .managementExpense ? 0 : selectedApartment
         let effectiveShowApartment = receiptKind == .managementExpense ? false : printApartmentNumber
 
-        previewDraft = ReceiptDraft(
+        let draft = ReceiptDraft(
             receiver: trimmedOwner.localizedCapitalized,
             issuer: trimmedIssuer.localizedCapitalized,
             notes: notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "-" : notes,
@@ -1663,6 +1751,9 @@ final class MainScreenViewModel: ObservableObject {
             kind: receiptKind,
             currency: settings.currency
         )
+
+        previewDraft = draft
+        ReceiptArchiveStore.shared.add(draft: draft)
 
         settings.seqNumber = sequence + 1
         sequenceNumber = String(settings.seqNumber)
@@ -1683,7 +1774,7 @@ struct ValidationError: Identifiable {
     let message: String
 }
 
-enum ReceiptKind: String, CaseIterable, Identifiable {
+enum ReceiptKind: String, CaseIterable, Identifiable, Codable {
     case income
     case outcome
     case managementExpense = "management_expense"
@@ -1713,8 +1804,8 @@ enum ReceiptKind: String, CaseIterable, Identifiable {
     }
 }
 
-struct ReceiptDraft: Identifiable {
-    let id = UUID()
+struct ReceiptDraft: Identifiable, Codable {
+    var id: UUID = UUID()
     let receiver: String
     let issuer: String
     let notes: String
@@ -1726,6 +1817,238 @@ struct ReceiptDraft: Identifiable {
     let showApartmentNumber: Bool
     let kind: ReceiptKind
     var currency: AppCurrency = .turkishLira
+}
+
+// MARK: - Receipt Archive Record & Persistent Store
+
+struct ReceiptRecord: Identifiable, Codable, Hashable {
+    var id: UUID = UUID()
+    var sequenceNumber: Int
+    var kindRaw: String
+    var receiver: String
+    var issuer: String
+    var notes: String
+    var monthYear: String
+    var apartmentNumber: Int
+    var amount: Double
+    var currencyRaw: String
+    var createdDate: String
+    var showApartmentNumber: Bool
+    var createdAt: Date = Date()
+
+    var kind: ReceiptKind {
+        ReceiptKind(rawValue: kindRaw) ?? .income
+    }
+
+    var currency: AppCurrency {
+        AppCurrency(rawValue: currencyRaw) ?? .turkishLira
+    }
+
+    init(draft: ReceiptDraft) {
+        self.id = draft.id
+        self.sequenceNumber = draft.sequenceNumber
+        self.kindRaw = draft.kind.rawValue
+        self.receiver = draft.receiver
+        self.issuer = draft.issuer
+        self.notes = draft.notes
+        self.monthYear = draft.monthYear
+        self.apartmentNumber = draft.apartmentNumber
+        self.amount = draft.amount
+        self.currencyRaw = draft.currency.rawValue
+        self.createdDate = draft.createdDate
+        self.showApartmentNumber = draft.showApartmentNumber
+        self.createdAt = Date()
+    }
+
+    func toDraft() -> ReceiptDraft {
+        ReceiptDraft(
+            id: id,
+            receiver: receiver,
+            issuer: issuer,
+            notes: notes,
+            monthYear: monthYear,
+            apartmentNumber: apartmentNumber,
+            amount: amount,
+            sequenceNumber: sequenceNumber,
+            createdDate: createdDate,
+            showApartmentNumber: showApartmentNumber,
+            kind: kind,
+            currency: currency
+        )
+    }
+}
+
+@MainActor
+final class ReceiptArchiveStore: ObservableObject {
+    static let shared = ReceiptArchiveStore()
+
+    @Published var records: [ReceiptRecord] = []
+
+    private var archiveURL: URL {
+        let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
+            ?? URL(fileURLWithPath: NSTemporaryDirectory())
+        let folder = appSupport.appendingPathComponent("aptreceipt", isDirectory: true)
+        try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        return folder.appendingPathComponent("receipts_archive.json")
+    }
+
+    init() {
+        load()
+    }
+
+    func add(draft: ReceiptDraft) {
+        records.removeAll(where: { $0.id == draft.id })
+        let record = ReceiptRecord(draft: draft)
+        records.insert(record, at: 0)
+        save()
+    }
+
+    func remove(id: UUID) {
+        records.removeAll(where: { $0.id == id })
+        save()
+    }
+
+    func replaceRecords(_ newRecords: [ReceiptRecord]) {
+        records = newRecords
+        save()
+    }
+
+    func clearAll() {
+        records.removeAll()
+        save()
+    }
+
+    func save() {
+        do {
+            let data = try JSONEncoder().encode(records)
+            try data.write(to: archiveURL, options: .atomic)
+        } catch {
+            print("ReceiptArchiveStore: save error \(error)")
+        }
+    }
+
+    func load() {
+        guard FileManager.default.fileExists(atPath: archiveURL.path) else { return }
+        do {
+            let data = try Data(contentsOf: archiveURL)
+            records = try JSONDecoder().decode([ReceiptRecord].self, from: data)
+        } catch {
+            print("ReceiptArchiveStore: load error \(error)")
+        }
+    }
+}
+
+// MARK: - CoreImage QR Code Generator
+
+enum QRCodeGenerator {
+    static func generate(from string: String, size: CGFloat = 64) -> NSImage? {
+        guard let filter = CIFilter(name: "CIQRCodeGenerator") else { return nil }
+        let data = string.data(using: .utf8)
+        filter.setValue(data, forKey: "inputMessage")
+        filter.setValue("M", forKey: "inputCorrectionLevel")
+        guard let output = filter.outputImage else { return nil }
+
+        let extent = output.extent
+        guard extent.width > 0, extent.height > 0 else { return nil }
+        let scale = size / extent.width
+        let transformed = output.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
+
+        let rep = NSCIImageRep(ciImage: transformed)
+        let image = NSImage(size: NSSize(width: size, height: size))
+        image.addRepresentation(rep)
+        return image
+    }
+}
+
+// MARK: - WhatsApp & Sharing Helper
+
+enum WhatsAppShareHelper {
+    static func shareURL(phone: String?, message: String) -> URL? {
+        let digits = (phone ?? "").filter { $0.isNumber }
+        let encoded = message.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        if !digits.isEmpty {
+            return URL(string: "https://wa.me/\(digits)?text=\(encoded)")
+        } else {
+            return URL(string: "https://wa.me/?text=\(encoded)")
+        }
+    }
+
+    static func emailURL(recipientEmail: String = "", subject: String, body: String) -> URL? {
+        let encSubject = subject.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        let encBody = body.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        return URL(string: "mailto:\(recipientEmail)?subject=\(encSubject)&body=\(encBody)")
+    }
+
+    static func receiptSummary(draft: ReceiptDraft, buildingName: String, l10n: L10n) -> String {
+        let currencySymbol = draft.currency.symbol
+        let formattedAmount = String(format: "%.2f", draft.amount)
+        switch l10n.resolvedLanguage {
+        case .turkish:
+            let kindText = draft.kind == .managementExpense ? "işletme harcaması belgesi" : (draft.kind == .outcome ? "iade makbuzu" : "aidat tahsilat makbuzu")
+            let flatText = draft.showApartmentNumber ? "Daire \(draft.apartmentNumber) -" : ""
+            return """
+            Sayın *\(draft.receiver)*,
+            *\(buildingName)* yönetimi tarafından \(draft.monthYear) dönemi için #\(draft.sequenceNumber) numaralı \(kindText) düzenlenmiştir.
+
+            📍 Muhatap: \(flatText) \(draft.receiver)
+            💰 Tutar: \(currencySymbol) \(formattedAmount)
+            📅 Tarih: \(draft.createdDate)
+            📝 Açıklama: \(draft.notes)
+
+            Bilgilerinize sunarız.
+            Yönetici: \(draft.issuer)
+            """
+        case .romanian:
+            let kindText = draft.kind == .managementExpense ? "cheltuială administrație" : (draft.kind == .outcome ? "dispoziție de plată" : "chitanță întreținere")
+            let flatText = draft.showApartmentNumber ? "Ap. \(draft.apartmentNumber) -" : ""
+            return """
+            Stimate/Stimată *\(draft.receiver)*,
+            Asociația *\(buildingName)* a emis \(kindText) cu seria #\(draft.sequenceNumber) pentru perioada \(draft.monthYear).
+
+            📍 Beneficiar: \(flatText) \(draft.receiver)
+            💰 Sumă: \(currencySymbol) \(formattedAmount)
+            📅 Data: \(draft.createdDate)
+            📝 Detalii: \(draft.notes)
+
+            Cu stimă,
+            Administrator: \(draft.issuer)
+            """
+        default:
+            let kindText = draft.kind == .managementExpense ? "operating expense voucher" : (draft.kind == .outcome ? "resident refund receipt" : "dues collection receipt")
+            let flatText = draft.showApartmentNumber ? "Unit \(draft.apartmentNumber) -" : ""
+            return """
+            Dear *\(draft.receiver)*,
+            *\(buildingName)* management has issued receipt #\(draft.sequenceNumber) (\(kindText)) for the period of \(draft.monthYear).
+
+            📍 Payee/Unit: \(flatText) \(draft.receiver)
+            💰 Amount: \(currencySymbol) \(formattedAmount)
+            📅 Date: \(draft.createdDate)
+            📝 Notes: \(draft.notes)
+
+            Best regards,
+            Manager: \(draft.issuer)
+            """
+        }
+    }
+}
+
+// MARK: - Portable System Backup Model
+
+struct SystemBackupPackage: Codable {
+    var version: String = "2.0"
+    var exportDate: Date = Date()
+    var apartmentName: String
+    var issuer: String
+    var defaultPayment: String
+    var flatCount: Int
+    var seqNumber: Int
+    var language: String
+    var currency: String
+    var residents: [Int: String]
+    var residentPhones: [Int: String]
+    var vendors: [VendorRecord]
+    var expenseServices: [ExpenseServicePreset]
+    var archivedReceipts: [ReceiptRecord]
 }
 
 // MARK: - Store
@@ -1984,6 +2307,71 @@ final class ReceiptSettingsStore: ObservableObject {
         expenseServices = samples.defaultServices
     }
 
+    func ownerPhone(for apartmentNumber: Int) -> String {
+        defaults.string(forKey: Keys.ownerPhone(apartmentNumber)) ?? ""
+    }
+
+    func saveOwnerPhone(_ phone: String, apartmentNumber: Int) {
+        defaults.set(phone, forKey: Keys.ownerPhone(apartmentNumber))
+        objectWillChange.send()
+    }
+
+    func exportSystemBackup() -> Data? {
+        var resMap: [Int: String] = [:]
+        var phoneMap: [Int: String] = [:]
+        for flat in 1...max(flatCount, 1) {
+            let name = owner(for: flat)
+            if !name.isEmpty { resMap[flat] = name }
+            let phone = ownerPhone(for: flat)
+            if !phone.isEmpty { phoneMap[flat] = phone }
+        }
+
+        let pkg = SystemBackupPackage(
+            version: "2.0",
+            exportDate: Date(),
+            apartmentName: apartmentName,
+            issuer: issuer,
+            defaultPayment: defaultPayment,
+            flatCount: flatCount,
+            seqNumber: seqNumber,
+            language: language.rawValue,
+            currency: currency.rawValue,
+            residents: resMap,
+            residentPhones: phoneMap,
+            vendors: vendors,
+            expenseServices: expenseServices,
+            archivedReceipts: ReceiptArchiveStore.shared.records
+        )
+        return try? JSONEncoder().encode(pkg)
+    }
+
+    func importSystemBackup(from data: Data) throws {
+        let decoder = JSONDecoder()
+        let pkg = try decoder.decode(SystemBackupPackage.self, from: data)
+        apartmentName = pkg.apartmentName
+        issuer = pkg.issuer
+        defaultPayment = pkg.defaultPayment
+        flatCount = max(1, pkg.flatCount)
+        seqNumber = max(1, pkg.seqNumber)
+        if let lang = AppLanguage(rawValue: pkg.language) {
+            language = lang
+        }
+        if let cur = AppCurrency(rawValue: pkg.currency) {
+            currency = cur
+        }
+        for (flat, name) in pkg.residents {
+            saveOwner(name, apartmentNumber: flat)
+        }
+        for (flat, phone) in pkg.residentPhones {
+            saveOwnerPhone(phone, apartmentNumber: flat)
+        }
+        vendors = pkg.vendors
+        expenseServices = pkg.expenseServices
+        ReceiptArchiveStore.shared.replaceRecords(pkg.archivedReceipts)
+        NotificationCenter.default.post(name: .settingsDidSave, object: nil)
+        objectWillChange.send()
+    }
+
     private static func readInt(_ defaults: UserDefaults, key: String, fallback: Int) -> Int {
         if let value = defaults.object(forKey: key) as? Int {
             return value
@@ -2010,6 +2398,10 @@ final class ReceiptSettingsStore: ObservableObject {
 
         static func owner(_ number: Int) -> String {
             "homeowner_\(number)"
+        }
+
+        static func ownerPhone(_ number: Int) -> String {
+            "homeowner_phone_\(number)"
         }
     }
 }
@@ -2239,6 +2631,340 @@ PROVIDE THE PROGRAM "AS IS" WITHOUT WARRANTY OF ANY KIND.
             .background(Color(NSColor.windowBackgroundColor))
         }
         .frame(width: 640, height: 540)
+    }
+}
+
+// MARK: - Receipt Archive Sheet
+
+struct ReceiptArchiveSheet: View {
+    @ObservedObject var settings: ReceiptSettingsStore
+    @ObservedObject var archiveStore = ReceiptArchiveStore.shared
+    @Environment(\.presentationMode) private var presentationMode
+    var onSelectDraft: (ReceiptDraft) -> Void
+
+    @State private var searchQuery: String = ""
+    @State private var selectedFilter: String = "all"
+
+    private var l10n: L10n { settings.l10n }
+
+    private var filteredRecords: [ReceiptRecord] {
+        archiveStore.records.filter { rec in
+            // Filter by type
+            if selectedFilter == "income" && rec.kind != .income { return false }
+            if selectedFilter == "outcome" && rec.kind != .outcome { return false }
+            if selectedFilter == "management" && rec.kind != .managementExpense { return false }
+
+            // Filter by query
+            if searchQuery.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { return true }
+            let q = searchQuery.lowercased()
+            return rec.receiver.lowercased().contains(q)
+                || rec.notes.lowercased().contains(q)
+                || "\(rec.sequenceNumber)".contains(q)
+                || "\(rec.apartmentNumber)".contains(q)
+                || rec.monthYear.lowercased().contains(q)
+        }
+    }
+
+    private var totalFilteredAmount: Double {
+        filteredRecords.reduce(0) { $0 + $1.amount }
+    }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            // Header
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "archivebox.fill")
+                            .foregroundColor(.accentColor)
+                            .font(.system(size: 16))
+                        Text(l10n.archiveTitle)
+                            .font(.headline)
+                    }
+                    Text(l10n.archiveSubtitle)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+
+                Spacer()
+
+                Button {
+                    exportArchiveCSV()
+                } label: {
+                    Label(l10n.exportCSV, systemImage: "arrow.down.doc.fill")
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.regular)
+                .disabled(filteredRecords.isEmpty)
+
+                Button {
+                    presentationMode.wrappedValue.dismiss()
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.title3)
+                        .foregroundColor(.secondary)
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 14)
+            .background(Color(NSColor.windowBackgroundColor))
+
+            Divider()
+
+            // Filter & Search Deck
+            VStack(spacing: 10) {
+                HStack(spacing: 12) {
+                    // Search field
+                    HStack(spacing: 6) {
+                        Image(systemName: "magnifyingglass")
+                            .foregroundColor(.secondary)
+                            .font(.system(size: 12))
+                        TextField(l10n.archiveSearchPlaceholder, text: $searchQuery)
+                            .textFieldStyle(.plain)
+                            .font(.system(size: 12))
+                        if !searchQuery.isEmpty {
+                            Button {
+                                searchQuery = ""
+                            } label: {
+                                Image(systemName: "xmark.circle.fill")
+                                    .foregroundColor(.secondary)
+                                    .font(.system(size: 12))
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 7)
+                    .background(Color(NSColor.textBackgroundColor))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
+                    )
+
+                    // Type filter picker
+                    Picker("", selection: $selectedFilter) {
+                        Text(l10n.filterAll).tag("all")
+                        Text(l10n.filterIncome).tag("income")
+                        Text(l10n.filterOutcome).tag("outcome")
+                        Text(l10n.filterManagement).tag("management")
+                    }
+                    .pickerStyle(.segmented)
+                    .frame(width: 340)
+                }
+
+                // Stats Bar
+                HStack {
+                    HStack(spacing: 5) {
+                        Image(systemName: "number.circle.fill")
+                            .foregroundColor(.secondary)
+                        Text("\(filteredRecords.count) \(l10n.totalArchived)")
+                            .font(.system(size: 11, weight: .semibold))
+                    }
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color.secondary.opacity(0.1))
+                    .clipShape(Capsule())
+
+                    Spacer()
+
+                    Text(String(format: "%.2f %@", totalFilteredAmount, settings.currency.symbol))
+                        .font(.system(size: 13, weight: .bold, design: .rounded))
+                        .foregroundColor(.primary)
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 10)
+            .background(Color(NSColor.controlBackgroundColor))
+
+            Divider()
+
+            // List of Receipts
+            if filteredRecords.isEmpty {
+                VStack(spacing: 12) {
+                    Image(systemName: "tray.fill")
+                        .font(.system(size: 40))
+                        .foregroundColor(.secondary.opacity(0.5))
+                    Text(l10n.archiveEmpty)
+                        .font(.system(size: 13))
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 40)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .padding(.vertical, 60)
+            } else {
+                ScrollView {
+                    LazyVStack(spacing: 8) {
+                        ForEach(filteredRecords) { record in
+                            archiveRecordRow(record)
+                        }
+                    }
+                    .padding(20)
+                }
+            }
+
+            Divider()
+
+            // Footer
+            HStack {
+                Spacer()
+                Button(l10n.close) {
+                    presentationMode.wrappedValue.dismiss()
+                }
+                .buttonStyle(.borderedProminent)
+                .keyboardShortcut(.cancelAction)
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 12)
+            .background(Color(NSColor.windowBackgroundColor))
+        }
+        .frame(minWidth: 700, minHeight: 520)
+    }
+
+    private func archiveRecordRow(_ record: ReceiptRecord) -> some View {
+        let badgeColor: Color = {
+            switch record.kind {
+            case .income: return .green
+            case .outcome: return .orange
+            case .managementExpense: return Color(red: 0.22, green: 0.42, blue: 0.88)
+            }
+        }()
+
+        return HStack(spacing: 12) {
+            // Sequence & Kind Badge
+            VStack(spacing: 2) {
+                Text("#\(record.sequenceNumber)")
+                    .font(.system(size: 13, weight: .bold, design: .monospaced))
+                    .foregroundColor(badgeColor)
+                Text(record.kind.title(l10n: l10n))
+                    .font(.system(size: 9, weight: .semibold))
+                    .foregroundColor(badgeColor)
+                    .lineLimit(1)
+            }
+            .frame(width: 80)
+            .padding(.vertical, 6)
+            .background(badgeColor.opacity(0.12))
+            .clipShape(RoundedRectangle(cornerRadius: 6))
+
+            // Details
+            VStack(alignment: .leading, spacing: 3) {
+                HStack(spacing: 6) {
+                    Text(record.receiver)
+                        .font(.system(size: 13, weight: .bold))
+                    if record.showApartmentNumber && record.apartmentNumber > 0 {
+                        Text("\(l10n.flatPrefix) \(record.apartmentNumber)")
+                            .font(.system(size: 10, weight: .semibold))
+                            .foregroundColor(.secondary)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 1)
+                            .background(Color.secondary.opacity(0.12))
+                            .clipShape(Capsule())
+                    }
+                }
+
+                HStack(spacing: 8) {
+                    Label(record.createdDate, systemImage: "calendar")
+                        .font(.system(size: 10))
+                        .foregroundColor(.secondary)
+                    if !record.notes.isEmpty && record.notes != "-" {
+                        Text("•")
+                            .foregroundColor(.secondary)
+                        Text(record.notes)
+                            .font(.system(size: 10))
+                            .foregroundColor(.secondary)
+                            .lineLimit(1)
+                    }
+                }
+            }
+
+            Spacer()
+
+            // Amount
+            Text(String(format: "%.2f %@", record.amount, record.currency.symbol))
+                .font(.system(size: 15, weight: .bold, design: .rounded))
+                .foregroundColor(badgeColor)
+                .frame(width: 120, alignment: .trailing)
+
+            // Actions
+            HStack(spacing: 6) {
+                // Open Receipt Button
+                Button {
+                    let draft = record.toDraft()
+                    presentationMode.wrappedValue.dismiss()
+                    onSelectDraft(draft)
+                } label: {
+                    Image(systemName: "arrow.up.right.square.fill")
+                        .font(.system(size: 14))
+                }
+                .buttonStyle(.borderless)
+                .help(l10n.openReceipt)
+
+                // WhatsApp Share Button
+                Button {
+                    shareViaWhatsApp(record)
+                } label: {
+                    Image(systemName: "message.fill")
+                        .font(.system(size: 14))
+                        .foregroundColor(.green)
+                }
+                .buttonStyle(.borderless)
+                .help(l10n.shareWhatsApp)
+
+                // Delete Button
+                Button {
+                    archiveStore.remove(id: record.id)
+                } label: {
+                    Image(systemName: "trash")
+                        .font(.system(size: 13))
+                        .foregroundColor(.red.opacity(0.8))
+                }
+                .buttonStyle(.borderless)
+                .help(l10n.deleteReceipt)
+            }
+        }
+        .padding(10)
+        .background(Color(NSColor.textBackgroundColor))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(Color.secondary.opacity(0.15), lineWidth: 1)
+        )
+    }
+
+    private func shareViaWhatsApp(_ record: ReceiptRecord) {
+        let phone = record.apartmentNumber > 0 ? settings.ownerPhone(for: record.apartmentNumber) : nil
+        let msg = WhatsAppShareHelper.receiptSummary(draft: record.toDraft(), buildingName: settings.apartmentName, l10n: l10n)
+        if let url = WhatsAppShareHelper.shareURL(phone: phone, message: msg) {
+            NSWorkspace.shared.open(url)
+        }
+    }
+
+    private func exportArchiveCSV() {
+        var csv = "Sequence,Kind,Receiver,Apartment,Period,Date,Amount,Currency,Notes,Issuer\n"
+        for r in filteredRecords {
+            let row = [
+                "\(r.sequenceNumber)",
+                "\"\(r.kind.rawValue)\"",
+                "\"\(r.receiver)\"",
+                "\(r.apartmentNumber)",
+                "\"\(r.monthYear)\"",
+                "\"\(r.createdDate)\"",
+                String(format: "%.2f", r.amount),
+                "\"\(r.currency.rawValue)\"",
+                "\"\(r.notes.replacingOccurrences(of: "\"", with: "\"\""))\"",
+                "\"\(r.issuer)\""
+            ].joined(separator: ",")
+            csv.append(row + "\n")
+        }
+
+        let panel = NSSavePanel()
+        panel.allowedContentTypes = [.commaSeparatedText]
+        panel.nameFieldStringValue = "AptReceipt_Archive_\(Date().dayMonthYearString(locale: settings.currentLocale)).csv"
+        if panel.runModal() == .OK, let url = panel.url {
+            try? csv.write(to: url, atomically: true, encoding: .utf8)
+        }
     }
 }
 

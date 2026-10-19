@@ -402,6 +402,23 @@ struct ReceiptPreviewSheet: View {
 
                 Spacer()
 
+                // WhatsApp Share Button
+                Button {
+                    shareWhatsApp()
+                } label: {
+                    Label(l10n.shareWhatsApp, systemImage: "message.fill")
+                        .foregroundColor(.green)
+                }
+                .buttonStyle(.bordered)
+
+                // Email Share Button
+                Button {
+                    shareEmail()
+                } label: {
+                    Label(l10n.shareEmail, systemImage: "envelope.fill")
+                }
+                .buttonStyle(.bordered)
+
                 Button(l10n.close) {
                     presentationMode.wrappedValue.dismiss()
                 }
@@ -431,7 +448,23 @@ struct ReceiptPreviewSheet: View {
             .padding(.vertical, 14)
             .background(Color(NSColor.windowBackgroundColor))
         }
-        .frame(width: 720, height: 800)
+        .frame(width: 760, height: 800)
+    }
+
+    private func shareWhatsApp() {
+        let phone = draft.apartmentNumber > 0 ? settings.ownerPhone(for: draft.apartmentNumber) : nil
+        let msg = WhatsAppShareHelper.receiptSummary(draft: draft, buildingName: settings.apartmentName, l10n: l10n)
+        if let url = WhatsAppShareHelper.shareURL(phone: phone, message: msg) {
+            NSWorkspace.shared.open(url)
+        }
+    }
+
+    private func shareEmail() {
+        let subject = "\(settings.apartmentName) - #\(draft.sequenceNumber) \(l10n.invoiceTypeLabel)"
+        let body = WhatsAppShareHelper.receiptSummary(draft: draft, buildingName: settings.apartmentName, l10n: l10n)
+        if let url = WhatsAppShareHelper.emailURL(subject: subject, body: body) {
+            NSWorkspace.shared.open(url)
+        }
     }
 
     // MARK: - PDF Vector Export
@@ -611,6 +644,10 @@ struct ReceiptDocumentView: View {
         case .outcome: return Color(red: 0.99, green: 0.94, blue: 0.92)
         case .managementExpense: return Color(red: 0.92, green: 0.94, blue: 0.99)
         }
+    }
+
+    private var qrVerificationPayload: String {
+        "AptReceipt | \(mainTitle) | \(documentSerialFormatted) | \(draft.createdDate) | \(draft.receiver) | \(formattedAmount) | \(draft.issuer)"
     }
 
     private var documentType: String {
@@ -929,25 +966,40 @@ struct ReceiptDocumentView: View {
             Spacer(minLength: 20)
 
             // MARK: 5. Footer & Authorized Signature
-            HStack(alignment: .bottom) {
+            HStack(alignment: .bottom, spacing: 14) {
+                // QR Verification Code
+                if let qrImage = QRCodeGenerator.generate(from: qrVerificationPayload, size: 52) {
+                    Image(nsImage: qrImage)
+                        .interpolation(.none)
+                        .resizable()
+                        .frame(width: 52, height: 52)
+                        .clipShape(RoundedRectangle(cornerRadius: 4))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 4)
+                                .stroke(borderSubtle, lineWidth: 1)
+                        )
+                }
+
                 // Electronic verification and tracking footer
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(l10n.electronicDisclaimer)
-                        .font(.system(size: 8.5))
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(l10n.qrVerificationNotice)
+                        .font(.system(size: 8))
                         .foregroundColor(textMuted)
+                        .fixedSize(horizontal: false, vertical: true)
 
                     HStack(spacing: 6) {
-                        Text("|||||||||||||||||||||||||||||||||||||||||||||")
-                            .font(.system(size: 9, weight: .ultraLight, design: .monospaced))
-                            .foregroundColor(textDark.opacity(0.4))
-
                         Text(documentSerialFormatted)
                             .font(.system(size: 8.5, weight: .bold, design: .monospaced))
+                            .foregroundColor(textDark)
+                        Text("•")
+                            .foregroundColor(textMuted)
+                        Text(draft.createdDate)
+                            .font(.system(size: 8.5))
                             .foregroundColor(textMuted)
                     }
 
                     Text("\(l10n.appTitle) v3.2.0 • \(l10n.publisher)")
-                        .font(.system(size: 8.5))
+                        .font(.system(size: 8))
                         .foregroundColor(textMuted.opacity(0.8))
                 }
 

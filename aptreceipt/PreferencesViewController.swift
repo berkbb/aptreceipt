@@ -10,6 +10,7 @@ enum SettingsTab: String, CaseIterable, Identifiable {
     case vendors = "vendors"
     case appearance = "appearance"
     case signature = "signature"
+    case backup = "backup"
     case about = "about"
 
     var id: String { rawValue }
@@ -26,6 +27,8 @@ enum SettingsTab: String, CaseIterable, Identifiable {
             return l10n.tabAppearance
         case .signature:
             return l10n.tabSignature
+        case .backup:
+            return l10n.tabBackup
         case .about:
             return l10n.tabAbout
         }
@@ -43,6 +46,8 @@ enum SettingsTab: String, CaseIterable, Identifiable {
             return "paintbrush.fill"
         case .signature:
             return "signature"
+        case .backup:
+            return "arrow.triangle.2.circlepath.circle.fill"
         case .about:
             return "info.circle.fill"
         }
@@ -151,6 +156,8 @@ struct SettingsView: View {
                         appearanceTab
                     case .signature:
                         signatureTab
+                    case .backup:
+                        backupTab
                     case .about:
                         aboutTab
                     }
@@ -721,6 +728,7 @@ struct SettingsView: View {
 
     private func residentCard(flat: Int) -> some View {
         let nameBinding = viewModel.bindingForResident(at: flat)
+        let phoneBinding = viewModel.bindingForResidentPhone(at: flat)
         let isAssigned = !nameBinding.wrappedValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
 
         return HStack(spacing: 12) {
@@ -749,27 +757,42 @@ struct SettingsView: View {
             )
             .clipShape(RoundedRectangle(cornerRadius: 8))
 
-            // Resident Name Field & Indicator
+            // Resident Name & Phone Fields
             VStack(alignment: .leading, spacing: 3) {
                 TextField(l10n.residentNamePlaceholder, text: nameBinding)
                     .textFieldStyle(.plain)
                     .font(.system(size: 13, weight: .medium))
 
-                HStack(spacing: 4) {
-                    if isAssigned {
-                        Image(systemName: "checkmark.circle.fill")
+                HStack(spacing: 8) {
+                    HStack(spacing: 3) {
+                        Image(systemName: "phone.fill")
                             .font(.system(size: 9))
-                            .foregroundColor(.green)
-                        Text(l10n.flatAssigned)
+                            .foregroundColor(.secondary)
+                        TextField(l10n.residentPhonePlaceholder, text: phoneBinding)
+                            .textFieldStyle(.plain)
                             .font(.system(size: 10))
                             .foregroundColor(.secondary)
+                            .frame(maxWidth: 160)
+                    }
+
+                    if isAssigned {
+                        HStack(spacing: 3) {
+                            Image(systemName: "checkmark.circle.fill")
+                                .font(.system(size: 9))
+                                .foregroundColor(.green)
+                            Text(l10n.flatAssigned)
+                                .font(.system(size: 10))
+                                .foregroundColor(.secondary)
+                        }
                     } else {
-                        Image(systemName: "circle.dashed")
-                            .font(.system(size: 9))
-                            .foregroundColor(.secondary.opacity(0.6))
-                        Text(l10n.flatUnassigned)
-                            .font(.system(size: 10))
-                            .foregroundColor(.secondary.opacity(0.7))
+                        HStack(spacing: 3) {
+                            Image(systemName: "circle.dashed")
+                                .font(.system(size: 9))
+                                .foregroundColor(.secondary.opacity(0.6))
+                            Text(l10n.flatUnassigned)
+                                .font(.system(size: 10))
+                                .foregroundColor(.secondary.opacity(0.7))
+                        }
                     }
                 }
             }
@@ -1328,6 +1351,162 @@ struct SettingsView: View {
         }
     }
 
+    // MARK: - Tab: Backup & Restore
+
+    private var backupTab: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            // Hero Header
+            HStack(spacing: 14) {
+                Image(systemName: "arrow.triangle.2.circlepath.circle.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 44, height: 44)
+                    .foregroundColor(.accentColor)
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(l10n.backupTitle)
+                        .font(.system(size: 16, weight: .bold))
+                    Text(l10n.backupSubtitle)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
+            .padding(14)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color(NSColor.controlBackgroundColor))
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+
+            // Notice Box
+            HStack(spacing: 10) {
+                Image(systemName: "info.circle.fill")
+                    .foregroundColor(.accentColor)
+                    .font(.title3)
+                Text(l10n.backupNotice)
+                    .font(.system(size: 11))
+                    .foregroundColor(.secondary)
+            }
+            .padding(12)
+            .background(Color.accentColor.opacity(0.08))
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+
+            // Feedback Message
+            if let msg = viewModel.backupSuccessMessage {
+                Label(msg, systemImage: "checkmark.circle.fill")
+                    .foregroundColor(.green)
+                    .font(.callout.bold())
+                    .padding(8)
+            } else if let err = viewModel.backupErrorMessage {
+                Label(err, systemImage: "exclamationmark.triangle.fill")
+                    .foregroundColor(.red)
+                    .font(.callout.bold())
+                    .padding(8)
+            }
+
+            // Action Cards
+            VStack(spacing: 12) {
+                // Export Card
+                HStack {
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text(l10n.exportBackupButton)
+                            .font(.system(size: 13, weight: .bold))
+                        Text("\(viewModel.availableApartments.count) \(l10n.totalFlatsBadge) • \(ReceiptArchiveStore.shared.records.count) \(l10n.totalArchived)")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+
+                    Spacer()
+
+                    Button {
+                        exportFullBackup()
+                    } label: {
+                        Label(l10n.exportBackupButton, systemImage: "square.and.arrow.up.fill")
+                            .font(.system(size: 12, weight: .medium))
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.regular)
+                }
+                .padding(14)
+                .background(Color(NSColor.textBackgroundColor))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(Color.secondary.opacity(0.18), lineWidth: 1)
+                )
+
+                // Import Card
+                HStack {
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text(l10n.importBackupButton)
+                            .font(.system(size: 13, weight: .bold))
+                        Text(l10n.backupSubtitle)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .lineLimit(1)
+                    }
+
+                    Spacer()
+
+                    Button {
+                        importFullBackup()
+                    } label: {
+                        Label(l10n.importBackupButton, systemImage: "square.and.arrow.down.fill")
+                            .font(.system(size: 12, weight: .medium))
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.regular)
+                }
+                .padding(14)
+                .background(Color(NSColor.textBackgroundColor))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(Color.secondary.opacity(0.18), lineWidth: 1)
+                )
+            }
+        }
+    }
+
+    private func exportFullBackup() {
+        guard let data = settings.exportSystemBackup() else { return }
+        let panel = NSSavePanel()
+        panel.allowedContentTypes = [.json]
+        let df = DateFormatter()
+        df.dateFormat = "yyyyMMdd_HHmmss"
+        panel.nameFieldStringValue = "AptReceipt_Backup_\(df.string(from: Date())).json"
+
+        if panel.runModal() == .OK, let url = panel.url {
+            do {
+                try data.write(to: url, options: .atomic)
+                viewModel.backupSuccessMessage = l10n.backupExportSuccess
+                viewModel.backupErrorMessage = nil
+            } catch {
+                viewModel.backupErrorMessage = error.localizedDescription
+                viewModel.backupSuccessMessage = nil
+            }
+        }
+    }
+
+    private func importFullBackup() {
+        let panel = NSOpenPanel()
+        panel.allowedContentTypes = [.json]
+        panel.canChooseFiles = true
+        panel.canChooseDirectories = false
+        panel.allowsMultipleSelection = false
+
+        if panel.runModal() == .OK, let url = panel.url {
+            do {
+                let data = try Data(contentsOf: url)
+                try settings.importSystemBackup(from: data)
+                viewModel.load(from: settings)
+                viewModel.backupSuccessMessage = l10n.backupImportSuccess
+                viewModel.backupErrorMessage = nil
+            } catch {
+                viewModel.backupErrorMessage = l10n.backupImportError
+                viewModel.backupSuccessMessage = nil
+            }
+        }
+    }
+
     // MARK: - Tab 5: About (Gözden geçirilmiş)
 
     private var aboutTab: some View {
@@ -1427,7 +1606,10 @@ final class SettingsViewModel: ObservableObject {
     @Published var showSampleDefaultsFeedback: Bool = false
 
     @Published var residents: [Int: String] = [:]
+    @Published var residentPhones: [Int: String] = [:]
     @Published var residentSearchQuery: String = ""
+    @Published var backupSuccessMessage: String? = nil
+    @Published var backupErrorMessage: String? = nil
 
     @Published var vendors: [VendorRecord] = []
     @Published var vendorSearchQuery: String = ""
@@ -1545,8 +1727,16 @@ final class SettingsViewModel: ObservableObject {
         )
     }
 
+    func bindingForResidentPhone(at flat: Int) -> Binding<String> {
+        Binding<String>(
+            get: { self.residentPhones[flat] ?? "" },
+            set: { self.residentPhones[flat] = $0 }
+        )
+    }
+
     func clearResident(for flat: Int) {
         residents[flat] = ""
+        residentPhones[flat] = ""
     }
 
     func fillSampleResidents(for targetLang: AppLanguage) {
@@ -1562,6 +1752,7 @@ final class SettingsViewModel: ObservableObject {
     func clearAllResidents() {
         for apt in availableApartments {
             residents[apt] = ""
+            residentPhones[apt] = ""
         }
     }
 
@@ -1579,12 +1770,17 @@ final class SettingsViewModel: ObservableObject {
         selectedApartment = settings.apartmentNumbers.first ?? 1
         selectedOwner = settings.owner(for: selectedApartment)
         showOwnerSavedFeedback = false
+        backupSuccessMessage = nil
+        backupErrorMessage = nil
 
         var loaded: [Int: String] = [:]
+        var loadedPhones: [Int: String] = [:]
         for apt in 1...settings.flatCount {
             loaded[apt] = settings.owner(for: apt)
+            loadedPhones[apt] = settings.ownerPhone(for: apt)
         }
         residents = loaded
+        residentPhones = loadedPhones
     }
 
     func loadSampleDefaults(for targetLang: AppLanguage) {
@@ -1657,6 +1853,8 @@ final class SettingsViewModel: ObservableObject {
         for apt in 1...flats {
             let name = (residents[apt] ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
             settings.saveOwner(name.localizedCapitalized, apartmentNumber: apt)
+            let phone = (residentPhones[apt] ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+            settings.saveOwnerPhone(phone, apartmentNumber: apt)
         }
 
         settings.objectWillChange.send()
