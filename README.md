@@ -10,7 +10,7 @@ A modern, native macOS application to effortlessly generate, manage, and export 
 - **Vector PDF & JPEG Export:** Export crystal-clear vector PDF documents with selectable text or high-resolution JPEG images.
 - **Locale-Aware Smart Filenames:** Automatically generates descriptive filenames containing apartment name, document type, flat number, resident, and billing period formatted in the user's selected language.
 - **Trilingual Support (English, Turkish, Romanian):** 1-to-1 localization for English (default), Turkish, and Romanian, automatically resolving to system locale or user choice.
-- **Interactive License Viewer:** Direct read-only inspection of the GNU General Public License v3.0 from Preferences and About windows, highlighting publisher **berkbb**.
+- **Interactive License Viewer:** Direct read-only inspection of the GNU General Public License v3.0 from Preferences and About windows, highlighting publisher **Babadogan Tech and Edu**.
 - **Real-Time Live Receipt Preview:** Live interactive preview card dynamically updates as you type.
 - **Automatic Theme Support:** Light, Dark, and Automatic System appearance modes.
 - **Dedicated Settings Window:** Accessible from the macOS Menu Bar (`Cmd+,` / `Preferences`) or the compact gear icon on the main screen, with tabbed sections for Building Details, Residents Directory, Appearance & Language, Signature, and About.
@@ -81,4 +81,4 @@ A modern, native macOS application to effortlessly generate, manage, and export 
 
 This project is licensed under the **GNU General Public License v3.0 (GPL-3.0)** - see the [LICENSE](LICENSE) file for details.
 
-Publisher: **berkbb**
+Publisher: **Babadogan Tech and Edu**

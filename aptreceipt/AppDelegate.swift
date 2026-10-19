@@ -128,7 +128,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             }
         }
         defer {
-            let bundleID = Bundle.main.bundleIdentifier ?? "com.berkbb.aptreceipt"
+            let bundleID = Bundle.main.bundleIdentifier ?? "com.babadogantech.aptreceipt"
             defaults.removePersistentDomain(forName: bundleID)
             for (key, val) in backupDict {
                 defaults.set(val, forKey: key)

@@ -633,12 +633,12 @@ struct L10n {
 
     // About Tab & License
     var appVersionText: String { tr("Version 3.2.0 (Build 5)", "Sürüm 3.2.0 (Yapı 5)", "Versiunea 3.2.0 (Build 5)") }
-    var publisher: String { tr("Publisher: berkbb", "Yayıncı: berkbb", "Editor: berkbb") }
+    var publisher: String { tr("Publisher: Babadogan Tech and Edu", "Yayıncı: Babadogan Tech and Edu", "Editor: Babadogan Tech and Edu") }
     var license: String { tr("License: GNU General Public License v3.0 (GPL-3.0)", "Lisans: GNU Genel Kamu Lisansı v3.0 (GPL-3.0)", "Licență: GNU General Public License v3.0 (GPL-3.0)") }
-    var copyright: String { tr("Copyright © 2023-2026 berkbb. All rights reserved.", "Copyright © 2023-2026 berkbb. Tüm hakları saklıdır.", "Copyright © 2023-2026 berkbb. Toate drepturile rezervate.") }
+    var copyright: String { tr("Copyright © 2023-2026 Babadogan Tech and Edu. All rights reserved.", "Copyright © 2023-2026 Babadogan Tech and Edu. Tüm hakları saklıdır.", "Copyright © 2023-2026 Babadogan Tech and Edu. Toate drepturile rezervate.") }
     var viewLicenseButton: String { tr("View License (GNU GPL v3)", "Lisansı Görüntüle (GNU GPL v3)", "Vizualizează Licența (GNU GPL v3)") }
     var licenseViewerTitle: String { tr("GNU General Public License v3.0", "GNU Genel Kamu Lisansı v3.0", "Licența Publică Generală GNU v3.0") }
-    var licenseViewerSubtitle: String { tr("Free and open-source software license. Publisher: berkbb", "Özgür ve açık kaynak kodlu yazılım lisansı. Yayıncı: berkbb", "Licență software liberă și cu sursă deschisă. Editor: berkbb") }
+    var licenseViewerSubtitle: String { tr("Free and open-source software license. Publisher: Babadogan Tech and Edu", "Özgür ve açık kaynak kodlu yazılım lisansı. Yayıncı: Babadogan Tech and Edu", "Licență software liberă și cu sursă deschisă. Editor: Babadogan Tech and Edu") }
     var copyLicenseText: String { tr("Copy License Text", "Lisans Metnini Kopyala", "Copiază Textul Licenței") }
     var licenseCopied: String { tr("Copied!", "Kopyalandı!", "Copiat!") }
     var aboutWindowHeader: String { tr("About AptReceipt", "AptReceipt Hakkında", "Despre AptReceipt") }
@@ -3209,7 +3209,7 @@ giving you legal permission to copy, distribute and/or modify it.
   "This License" refers to version 3 of the GNU General Public License.
   "Copyright" also means copyright-like laws that apply to other kinds of works.
   "The Program" refers to any copyrightable work licensed under this License.
-  "Publisher" refers to berkbb.
+  "Publisher" refers to Babadogan Tech and Edu.
 
   1. Source Code.
   The "source code" for a work means the preferred form of the work
@@ -3288,7 +3288,7 @@ PROVIDE THE PROGRAM "AS IS" WITHOUT WARRANTY OF ANY KIND.
                     Text("\(l10n.publisherLabel):")
                         .font(.caption.bold())
                         .foregroundColor(.secondary)
-                    Text("berkbb")
+                    Text("Babadogan Tech and Edu")
                         .font(.caption.bold())
                         .padding(.horizontal, 8)
                         .padding(.vertical, 2)

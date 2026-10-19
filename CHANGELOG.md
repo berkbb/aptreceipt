@@ -14,7 +14,7 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 - Complete English and Romanian language support with 1-to-1 accurate localization across all views, receipt documents, and dialogs.
-- Dedicated native About window accessible from the macOS menu bar with app icon, version, publisher badge (**berkbb**), GitHub link, and interactive GNU GPL v3 license viewer.
+- Dedicated native About window accessible from the macOS menu bar with app icon, version, publisher badge (**Babadogan Tech and Edu**), GitHub link, and interactive GNU GPL v3 license viewer.
 - Vector PDF and high-resolution JPEG export with official A4 itemized invoice format.
 - Locale-aware smart filenames formatted with apartment name, document kind, flat number, and resident name.
 - Modern macOS application icon set and asset catalog.
@@ -31,7 +31,7 @@ All notable changes to this project will be documented in this file.
 ## [3.1.0] - 2026-10-18
 
 ### Added
-- GNU General Public License v3.0 (GPL-3.0) with publisher berkbb.
+- GNU General Public License v3.0 (GPL-3.0) with publisher Babadogan Tech and Edu.
 - Real-time live receipt preview card on the main dashboard.
 - Modern macOS interface with two-column layout, SF Symbols, and card components.
 - Modernized Settings window with TabView.
