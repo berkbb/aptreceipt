@@ -215,4 +215,112 @@ final class aptreceiptTests: XCTestCase {
         XCTAssertGreaterThanOrEqual(store.lateFeeDueDay, 1)
         XCTAssertLessThanOrEqual(store.lateFeeDueDay, 31)
     }
+
+    // MARK: - 4. Semver & GitHub Release Update Checker Tests
+
+    func testSemverComparison() {
+        // Higher minor/patch should detect update
+        XCTAssertTrue(SemverCompare.isRemoteNewer(remote: "v3.4.0", local: "3.3.0"))
+        XCTAssertTrue(SemverCompare.isRemoteNewer(remote: "3.3.1", local: "3.3.0"))
+        XCTAssertTrue(SemverCompare.isRemoteNewer(remote: "v4.0.0", local: "3.99.99"))
+        XCTAssertTrue(SemverCompare.isRemoteNewer(remote: "3.3.0.1", local: "3.3.0"))
+
+        // Equal version should NOT detect update
+        XCTAssertFalse(SemverCompare.isRemoteNewer(remote: "v3.3.0", local: "3.3.0"))
+        XCTAssertFalse(SemverCompare.isRemoteNewer(remote: "3.3.0", local: "3.3.0"))
+
+        // Older version should NOT detect update
+        XCTAssertFalse(SemverCompare.isRemoteNewer(remote: "v3.2.0", local: "3.3.0"))
+        XCTAssertFalse(SemverCompare.isRemoteNewer(remote: "2.9.9", local: "3.0.0"))
+
+        // Prerelease stripped comparison
+        XCTAssertFalse(SemverCompare.isRemoteNewer(remote: "v3.3.0-beta.1", local: "3.3.0"))
+    }
+
+    func testGitHubReleaseModelDecodable() throws {
+        let json = """
+        {
+            "tag_name": "v3.4.0",
+            "name": "AptReceipt v3.4.0 - macOS Native Update",
+            "body": "### Features\\n- GitHub release update check\\n- International late fee profiles",
+            "html_url": "https://github.com/berkbb/aptreceipt/releases/tag/v3.4.0",
+            "published_at": "2026-10-19T10:00:00Z"
+        }
+        """.data(using: .utf8)!
+
+        let decoder = JSONDecoder()
+        let release = try decoder.decode(GitHubRelease.self, from: json)
+
+        XCTAssertEqual(release.tagName, "v3.4.0")
+        XCTAssertEqual(release.name, "AptReceipt v3.4.0 - macOS Native Update")
+        XCTAssertEqual(release.htmlUrl, "https://github.com/berkbb/aptreceipt/releases/tag/v3.4.0")
+        XCTAssertEqual(release.id, "v3.4.0")
+    }
+
+    // MARK: - 5. Multi-Country Late Fee Profiles Tests
+
+    func testLateFeeCountryProfiles() {
+        // Turkey
+        let turkey = LateFeeCountryProfile.turkey
+        XCTAssertEqual(turkey.flagEmoji, "🇹🇷")
+        XCTAssertEqual(turkey.defaultRate, 5.0)
+        XCTAssertEqual(turkey.defaultDueDay, 15)
+        XCTAssertEqual(turkey.defaultGraceDays, 0)
+        XCTAssertTrue(turkey.quickPresets.contains(5.0))
+        XCTAssertTrue(turkey.defaultFootnote(for: .turkish).contains("Kat Mülkiyeti Kanunu"))
+        XCTAssertTrue(turkey.defaultLegalNotice(for: .turkish).contains("Madde 20/c"))
+
+        // Romania
+        let romania = LateFeeCountryProfile.romania
+        XCTAssertEqual(romania.flagEmoji, "🇷🇴")
+        XCTAssertEqual(romania.defaultRate, 6.0)
+        XCTAssertEqual(romania.defaultDueDay, 20)
+        XCTAssertEqual(romania.defaultGraceDays, 30)
+        XCTAssertTrue(romania.defaultFootnote(for: .romanian).contains("196/2018"))
+        XCTAssertTrue(romania.defaultLegalNotice(for: .english).contains("Law 196/2018"))
+
+        // International
+        let intl = LateFeeCountryProfile.international
+        XCTAssertEqual(intl.flagEmoji, "🌐")
+        XCTAssertEqual(intl.defaultRate, 5.0)
+        XCTAssertEqual(intl.defaultDueDay, 10)
+        XCTAssertEqual(intl.defaultGraceDays, 10)
+        XCTAssertTrue(intl.defaultFootnote(for: .english).contains("condominium"))
+
+        // Custom
+        let custom = LateFeeCountryProfile.custom
+        XCTAssertEqual(custom.flagEmoji, "⚙️")
+        XCTAssertEqual(custom.defaultRate, 5.0)
+    }
+
+    func testSystemBackupPackageWithCountryProfile() throws {
+        let package = SystemBackupPackage(
+            apartmentName: "Palas Residence",
+            issuer: "Admin",
+            defaultPayment: "500",
+            flatCount: 20,
+            seqNumber: 1,
+            language: "ro",
+            currency: "RON",
+            residents: [:],
+            residentPhones: [:],
+            vendors: [],
+            expenseServices: [],
+            archivedReceipts: [],
+            isLateFeeEnabled: true,
+            lateFeeMonthlyRate: 6.0,
+            lateFeeDueDay: 20,
+            lateFeeCountryProfile: LateFeeCountryProfile.romania.rawValue,
+            lateFeeGracePeriodDays: 30,
+            lateFeeCustomFootnote: "Penalități cf. Legea 196/2018"
+        )
+
+        let encoded = try JSONEncoder().encode(package)
+        let decoded = try JSONDecoder().decode(SystemBackupPackage.self, from: encoded)
+
+        XCTAssertEqual(decoded.lateFeeCountryProfile, LateFeeCountryProfile.romania.rawValue)
+        XCTAssertEqual(decoded.lateFeeGracePeriodDays, 30)
+        XCTAssertEqual(decoded.lateFeeCustomFootnote, "Penalități cf. Legea 196/2018")
+    }
 }
+
