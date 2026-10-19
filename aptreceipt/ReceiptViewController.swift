@@ -315,7 +315,7 @@ func buildExportFileName(draft: ReceiptDraft, apartmentName: String, language: A
     return "\(baseName).\(ext.lowercased())"
 }
 
-private func sanitizeForFileName(_ input: String) -> String {
+func sanitizeForFileName(_ input: String) -> String {
     var text = input.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
 
     let diacriticMap: [Character: Character] = [
@@ -522,6 +522,28 @@ struct ReceiptPreviewSheet: View {
         }
         pdfContext.endPDFPage()
         pdfContext.closePDF()
+
+        // If an invoice is attached, append it as Page 2+ for audit transparency
+        if let invoicePath = draft.invoiceAttachmentPath,
+           !invoicePath.isEmpty,
+           FileManager.default.fileExists(atPath: invoicePath),
+           let finalPDF = PDFDocument(url: url) {
+            let invoiceURL = URL(fileURLWithPath: invoicePath)
+            if invoiceURL.pathExtension.lowercased() == "pdf",
+               let attachedDoc = PDFDocument(url: invoiceURL) {
+                for i in 0..<attachedDoc.pageCount {
+                    if let page = attachedDoc.page(at: i) {
+                        finalPDF.insert(page, at: finalPDF.pageCount)
+                    }
+                }
+                finalPDF.write(to: url)
+            } else if let img = NSImage(contentsOf: invoiceURL) {
+                if let validPage = PDFPage(image: img) {
+                    finalPDF.insert(validPage, at: finalPDF.pageCount)
+                    finalPDF.write(to: url)
+                }
+            }
+        }
 
         successMessage = l10n.saveSuccessPDF
     }

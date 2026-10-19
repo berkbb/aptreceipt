@@ -278,6 +278,33 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             .frame(width: 860, height: 640)
         render(view: archiveView, size: CGSize(width: 860, height: 640), to: outDir.appendingPathComponent("11_receipt_archive.png"))
 
+        // 12. Financial Report Sheet (KPI cards, dues tracking, transactions)
+        let financialReportView = ApartmentFinancialReportSheet(settings: settings)
+            .frame(width: 880, height: 660)
+        render(view: financialReportView, size: CGSize(width: 880, height: 660), to: outDir.appendingPathComponent("12_financial_report.png"))
+
+        // 13. Batch Dues Generator Sheet
+        let batchDuesView = BatchDuesGeneratorSheet(settings: settings, onComplete: {})
+            .frame(width: 720, height: 600)
+        render(view: batchDuesView, size: CGSize(width: 720, height: 600), to: outDir.appendingPathComponent("13_batch_dues.png"))
+
+        // 14. Printable A4 Apartment Bulletin Board Notice
+        let bulletinBoardView = ApartmentBulletinBoardView(
+            settings: settings,
+            periodTitle: "Ekim 2026",
+            totalIncome: 17500.0,
+            totalExpenses: 3450.0,
+            netBalance: 14050.0,
+            expenseCategories: [("Asansör Periyodik Bakım", 3450.0, 100.0)],
+            paidFlatsCount: 10,
+            totalFlatsCount: 12,
+            records: sampleArchiveStore.records,
+            l10n: settings.l10n
+        )
+        .frame(width: 595, height: 842)
+        .environment(\.colorScheme, .light)
+        render(view: bulletinBoardView, size: CGSize(width: 595, height: 842), to: outDir.appendingPathComponent("14_bulletin_board_notice.png"))
+
         print("Screenshots successfully generated in \(outDir.path)")
     }
 

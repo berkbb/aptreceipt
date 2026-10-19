@@ -17,6 +17,11 @@ A modern, native macOS application to effortlessly generate, manage, and export 
 - **Residents Directory:** Save flat numbers and resident names for one-click auto-fill.
 - **Digital Signature:** Import authorized signature images (PNG/JPEG) to print directly onto exported receipts.
 - **Auto-Incrementing Sequence Numbers:** Receipt numbers increment automatically after generation.
+- **Financial Report & Cash Register Balance (Kasa Özeti):** Monthly income-expense balance sheet, net cash balance KPIs, expense breakdown by category with proportional progress meters, and transaction ledger.
+- **Dues Tracking Checklist & WhatsApp Reminders:** Interactive resident payment ledger showing who paid and who is pending for any period, with 1-click WhatsApp payment reminders.
+- **A4 Printable Apartment Bulletin Board Notice (Pano İlanı):** Generates and exports official A4 PDF notice sheets ready to hang on building bulletin boards or share on resident groups.
+- **Batch Dues Generator (Toplu Aidat Makbuzu):** 1-click generation of sequential receipts for all or selected apartment flats in a single operation.
+- **Apple Vision & PDFKit Invoice OCR Import:** Smart OCR text and amount recognition from scanned vendor invoices or PDFs, with automated page-2 attachment merging into exported receipt PDFs.
 
 ---
 
@@ -32,12 +37,20 @@ A modern, native macOS application to effortlessly generate, manage, and export 
   <td><img src="docs/screenshots/05_main_dashboard_en.png" width="480" alt="Main Dashboard English" /></td>
 </tr>
 <tr>
-  <td align="center"><b>Main Dashboard (Romanian)</b></td>
-  <td align="center"><b>Dedicated About Window (Menu Bar)</b></td>
+  <td align="center"><b>Apartment Financial Report & Cash Balance</b></td>
+  <td align="center"><b>Batch Dues Receipt Generator</b></td>
 </tr>
 <tr>
-  <td><img src="docs/screenshots/06_main_dashboard_ro.png" width="480" alt="Main Dashboard Romanian" /></td>
-  <td align="center"><img src="docs/screenshots/07_about_window.png" width="340" alt="Dedicated About Window" /></td>
+  <td><img src="docs/screenshots/12_financial_report.png" width="480" alt="Financial Report & Cash Balance" /></td>
+  <td><img src="docs/screenshots/13_batch_dues.png" width="480" alt="Batch Dues Receipt Generator" /></td>
+</tr>
+<tr>
+  <td align="center"><b>Printable A4 Bulletin Board Notice (Pano İlanı)</b></td>
+  <td align="center"><b>Receipt Archive & History</b></td>
+</tr>
+<tr>
+  <td><img src="docs/screenshots/14_bulletin_board_notice.png" width="480" alt="Bulletin Board Notice" /></td>
+  <td><img src="docs/screenshots/11_receipt_archive.png" width="480" alt="Receipt Archive" /></td>
 </tr>
 <tr>
   <td align="center"><b>Preferences Window (Settings & License)</b></td>

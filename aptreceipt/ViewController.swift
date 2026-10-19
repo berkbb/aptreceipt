@@ -468,6 +468,34 @@ struct L10n {
     var backupImportError: String { tr("Failed to read backup file or invalid format.", "Yedek dosyası okunamadı veya dosya biçimi geçersiz.", "Eroare la citirea copiei de siguranță.") }
     var backupNotice: String { tr("Backups contain all resident records, custom vendors, expense services, and receipt history in a portable format.", "Yedek dosyası tüm sakin kayıtlarını, firma listesini, işletme hizmetlerini ve makbuz geçmişini taşınabilir formatta içerir.", "Fișierul de siguranță conține toți locatarii, furnizorii și istoricul chitanțelor.") }
 
+    // Financial Report & Bulletin Board Strings
+    var financialReportTitle: String { tr("Financial Report & Cash Balance", "Mali Rapor & Kasa Özeti", "Raport Financiar & Sold Casierie") }
+    var financialReportSubtitle: String { tr("Monthly cash flow statement, income vs expense balance, dues status, and bulletin board notice", "Aylık gelir-gider bilançosu, kasa mevcudu, aidat takip çetelesi ve apartman pano ilanı", "Situație financiară lunară, venituri vs cheltuieli, evidență întreținere și afiș avizier") }
+    var exportBulletinBoardPDF: String { tr("Export Notice Board PDF (A4)", "Pano İlanı PDF İndir (A4)", "Exportă Afiș Avizier PDF (A4)") }
+    var totalIncome: String { tr("Total Income", "Toplam Gelir", "Total Încasări") }
+    var totalExpenses: String { tr("Total Expenses", "Toplam Harcama", "Total Cheltuieli") }
+    var netCashBalance: String { tr("Net Cash Balance", "Net Kasa Bakiyesi", "Sold Net Casierie") }
+    var allMonths: String { tr("All Months (Total)", "Tüm Aylar (Genel)", "Toate Lunile (Total)") }
+    var duesTrackingTab: String { tr("Dues Status Check", "Aidat Çetelesi", "Evidență Întreținere") }
+    var financialSummaryTab: String { tr("Cash Summary", "Kasa Özeti", "Sumar Casierie") }
+    var allTransactionsTab: String { tr("Transactions", "Tüm İşlemler", "Toate Operațiunile") }
+    var paidStatus: String { tr("Paid", "Ödendi", "Achitat") }
+    var unpaidStatus: String { tr("Pending / Unpaid", "Ödenmedi / Bekliyor", "Neachitat / În Așteptare") }
+    var remindWhatsApp: String { tr("Remind via WhatsApp", "WhatsApp ile Hatırlat", "Amintește pe WhatsApp") }
+    var duesPaidCount: String { tr("Paid Flats", "Ödeyen Daireler", "Apartamente Achitate") }
+    var duesPendingCount: String { tr("Pending Flats", "Bekleyen Daireler", "Apartamente În Așteptare") }
+    var bulletinBoardNoticeTitle: String { tr("APARTMENT FINANCIAL BULLETIN BOARD NOTICE", "APARTMAN YÖNETİMİ MALİ BİLANÇO VE KASA RAPORU", "RAPORT FINANCIAR ȘI SITUAȚIE CASIERIE") }
+    var bulletinBoardNoticeFooter: String { tr("Presented for the information of all residents.", "Tüm apartman sakinlerimizin bilgisine saygıyla sunulur.", "Prezentat spre informarea tuturor locatarilor.") }
+    var managerSignatureTitle: String { tr("Building Manager", "Bina / Site Yöneticisi", "Administrator Imobil") }
+
+    // Batch Dues Generation Strings
+    var batchDuesTitle: String { tr("Batch Dues Generator", "Toplu Aidat Makbuzu Kes", "Generare Colectivă Chitanțe") }
+    var batchDuesSubtitle: String { tr("Generate dues receipts for all registered flats for the selected month in one click", "Seçilen ay için tüm kayıtlı dairelere tek tıkla ardışık aidat makbuzu oluşturun", "Generați chitanțe de întreținere pentru toate apartamentele într-un singur clic") }
+    var startSequenceNumber: String { tr("Starting Receipt #:", "Başlangıç Makbuz No:", "Număr Inițial Chitanță:") }
+    var duesAmountPerFlat: String { tr("Dues Amount per Flat:", "Daire Başı Aidat Tutarı:", "Sumă Întreținere per Apartament:") }
+    var generateBatchReceipts: String { tr("Generate Receipts & Add to Archive", "Makbuzları Kes ve Arşive Ekle", "Generează Chitanțele și Salvează") }
+    var batchSuccessMessage: String { tr("receipts generated and added to archive successfully.", "adet makbuz başarıyla kesilip arşive eklendi.", "chitanțe au fost generate și adăugate în arhivă cu succes.") }
+
     // Settings Form Fields
     var buildingDetails: String { tr("Building Information", "Apartman Bilgileri", "Informații Imobil / Asociație") }
     var buildingName: String { tr("Building Name:", "Apartman Adı:", "Nume Imobil / Asociație:") }
@@ -780,6 +808,16 @@ struct MainScreen: View {
             }
             .frame(width: 860, height: 640)
         }
+        .sheet(isPresented: $viewModel.isPresentingFinancialReport) {
+            ApartmentFinancialReportSheet(settings: settings)
+                .frame(width: 880, height: 660)
+        }
+        .sheet(isPresented: $viewModel.isPresentingBatchDues) {
+            BatchDuesGeneratorSheet(settings: settings) {
+                viewModel.updateLiveFromSettings(settings)
+            }
+            .frame(width: 720, height: 580)
+        }
         .sheet(isPresented: $viewModel.isPresentingSettings) {
             SettingsView(settings: settings)
                 .frame(width: 840, height: 640)
@@ -835,6 +873,42 @@ struct MainScreen: View {
             }
 
             Spacer()
+
+            // Financial Report & Cash Balance Button
+            Button {
+                viewModel.isPresentingFinancialReport = true
+            } label: {
+                HStack(spacing: 5) {
+                    Image(systemName: "chart.pie.fill")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundColor(Color(red: 0.22, green: 0.42, blue: 0.88))
+                    Text(l10n.financialSummaryTab)
+                        .font(.system(size: 12, weight: .medium))
+                }
+                .padding(.horizontal, 4)
+                .padding(.vertical, 2)
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.regular)
+            .help(l10n.financialReportTitle)
+
+            // Batch Dues Button
+            Button {
+                viewModel.isPresentingBatchDues = true
+            } label: {
+                HStack(spacing: 5) {
+                    Image(systemName: "bolt.fill")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundColor(.orange)
+                    Text(l10n.batchDuesTitle)
+                        .font(.system(size: 12, weight: .medium))
+                }
+                .padding(.horizontal, 4)
+                .padding(.vertical, 2)
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.regular)
+            .help(l10n.batchDuesSubtitle)
 
             // Archive Button
             Button {
@@ -1810,6 +1884,8 @@ final class MainScreenViewModel: ObservableObject {
     @Published var previewDraft: ReceiptDraft?
     @Published var isPresentingSettings: Bool = false
     @Published var isPresentingArchive: Bool = false
+    @Published var isPresentingFinancialReport: Bool = false
+    @Published var isPresentingBatchDues: Bool = false
     @Published var validationError: ValidationError?
 
     @Published var attachedInvoicePath: String? = nil
@@ -3215,6 +3291,903 @@ struct ReceiptArchiveSheet: View {
         if panel.runModal() == .OK, let url = panel.url {
             try? csv.write(to: url, atomically: true, encoding: .utf8)
         }
+    }
+}
+
+// MARK: - Apartment Financial Report & Cash Balance Sheet
+
+struct ApartmentFinancialReportSheet: View {
+    @ObservedObject var settings: ReceiptSettingsStore
+    @ObservedObject private var archiveStore = ReceiptArchiveStore.shared
+    @Environment(\.presentationMode) private var presentationMode
+
+    @State private var selectedPeriod: String = "all"
+    @State private var selectedTab: Int = 0
+    @State private var successNotice: String?
+
+    private var l10n: L10n { settings.l10n }
+
+    private var availablePeriods: [String] {
+        let set = Set(archiveStore.records.map { $0.monthYear })
+        return Array(set).sorted().reversed()
+    }
+
+    private var filteredRecords: [ReceiptRecord] {
+        if selectedPeriod == "all" {
+            return archiveStore.records
+        }
+        return archiveStore.records.filter { $0.monthYear == selectedPeriod }
+    }
+
+    private var totalIncome: Double {
+        filteredRecords.filter { $0.kind == .income }.reduce(0) { $0 + $1.amount }
+    }
+
+    private var totalRefunds: Double {
+        filteredRecords.filter { $0.kind == .outcome }.reduce(0) { $0 + $1.amount }
+    }
+
+    private var totalExpenses: Double {
+        filteredRecords.filter { $0.kind == .managementExpense }.reduce(0) { $0 + $1.amount }
+    }
+
+    private var netCashBalance: Double {
+        totalIncome - totalRefunds - totalExpenses
+    }
+
+    private var expenseCategories: [(category: String, amount: Double, percent: Double)] {
+        let expenses = filteredRecords.filter { $0.kind == .managementExpense }
+        guard !expenses.isEmpty else { return [] }
+        var map: [String: Double] = [:]
+        for exp in expenses {
+            let cat = exp.notes.components(separatedBy: "•").first?.trimmingCharacters(in: .whitespaces) ?? exp.receiver
+            let key = (cat.isEmpty || cat == "-") ? exp.receiver : cat
+            map[key, default: 0.0] += exp.amount
+        }
+        let total = totalExpenses > 0 ? totalExpenses : 1.0
+        return map.map { (category: $0.key, amount: $0.value, percent: ($0.value / total) * 100.0) }
+            .sorted { $0.amount > $1.amount }
+    }
+
+    private var flatDuesStatusList: [(flat: Int, owner: String, phone: String, isPaid: Bool, record: ReceiptRecord?)] {
+        let periodToMatch = selectedPeriod == "all" ? (availablePeriods.first ?? "") : selectedPeriod
+        return settings.apartmentNumbers.map { flat in
+            let owner = settings.owner(for: flat)
+            let phone = settings.ownerPhone(for: flat)
+            let matchingRecord = archiveStore.records.first {
+                $0.kind == .income && $0.apartmentNumber == flat && (periodToMatch.isEmpty || $0.monthYear == periodToMatch)
+            }
+            return (flat: flat, owner: owner, phone: phone, isPaid: matchingRecord != nil, record: matchingRecord)
+        }
+    }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            // Header
+            HStack(spacing: 12) {
+                Image(systemName: "chart.pie.fill")
+                    .font(.system(size: 24))
+                    .foregroundColor(Color(red: 0.22, green: 0.42, blue: 0.88))
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(l10n.financialReportTitle)
+                        .font(.system(size: 16, weight: .bold))
+                    Text(l10n.financialReportSubtitle)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+
+                Spacer()
+
+                Button {
+                    presentationMode.wrappedValue.dismiss()
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.title3)
+                        .foregroundColor(.secondary)
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 14)
+            .background(Color(NSColor.windowBackgroundColor))
+
+            Divider()
+
+            // Control Bar (Period Filter & View Selector)
+            HStack(spacing: 16) {
+                // Period Dropdown
+                HStack(spacing: 6) {
+                    Image(systemName: "calendar")
+                        .foregroundColor(.secondary)
+                        .font(.system(size: 11))
+                    Picker("", selection: $selectedPeriod) {
+                        Text(l10n.allMonths).tag("all")
+                        ForEach(availablePeriods, id: \.self) { period in
+                            Text(period).tag(period)
+                        }
+                    }
+                    .frame(width: 170)
+                }
+
+                Spacer()
+
+                // Tab Switcher
+                Picker("", selection: $selectedTab) {
+                    Text(l10n.financialSummaryTab).tag(0)
+                    Text(l10n.duesTrackingTab).tag(1)
+                    Text(l10n.allTransactionsTab).tag(2)
+                }
+                .pickerStyle(.segmented)
+                .frame(width: 380)
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 10)
+            .background(Color(NSColor.controlBackgroundColor).opacity(0.6))
+
+            Divider()
+
+            // Active Tab Content
+            ScrollView {
+                VStack(spacing: 16) {
+                    if selectedTab == 0 {
+                        summaryTabContent
+                    } else if selectedTab == 1 {
+                        duesTrackingTabContent
+                    } else {
+                        transactionsTabContent
+                    }
+                }
+                .padding(20)
+            }
+            .frame(maxHeight: .infinity)
+
+            Divider()
+
+            // Footer
+            HStack {
+                if let notice = successNotice {
+                    Label(notice, systemImage: "checkmark.circle.fill")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundColor(.green)
+                }
+
+                Spacer()
+
+                Button {
+                    exportBulletinBoardPDF()
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "doc.richtext.fill")
+                        Text(l10n.exportBulletinBoardPDF)
+                    }
+                }
+                .buttonStyle(.borderedProminent)
+
+                Button(l10n.close) {
+                    presentationMode.wrappedValue.dismiss()
+                }
+                .buttonStyle(.bordered)
+                .keyboardShortcut(.cancelAction)
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 12)
+            .background(Color(NSColor.windowBackgroundColor))
+        }
+        .frame(minWidth: 840, idealWidth: 880, minHeight: 600, idealHeight: 660)
+        .onAppear {
+            if let latest = availablePeriods.first {
+                selectedPeriod = latest
+            }
+        }
+    }
+
+    // MARK: - Tab 0: Summary Content
+    private var summaryTabContent: some View {
+        VStack(spacing: 16) {
+            // KPI Balance Cards
+            HStack(spacing: 12) {
+                kpiCard(title: l10n.totalIncome, amount: totalIncome, color: .green, icon: "arrow.down.left.circle.fill", subtitle: "\(filteredRecords.filter { $0.kind == .income }.count) \(l10n.archiveTitle)")
+                kpiCard(title: l10n.totalExpenses, amount: totalExpenses, color: .red, icon: "arrow.up.right.circle.fill", subtitle: "\(filteredRecords.filter { $0.kind == .managementExpense }.count) \(l10n.managementExpenseTitle)")
+                kpiCard(title: l10n.netCashBalance, amount: netCashBalance, color: netCashBalance >= 0 ? Color(red: 0.22, green: 0.42, blue: 0.88) : .red, icon: "banknote.fill", subtitle: l10n.commonAreaOperatingBadge)
+            }
+
+            // Dues Collection Rate Card
+            let paidCount = flatDuesStatusList.filter { $0.isPaid }.count
+            let totalFlats = max(1, settings.flatCount)
+            let rate = (Double(paidCount) / Double(totalFlats)) * 100.0
+
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Label(l10n.duesTrackingTab, systemImage: "checkmark.seal.fill")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundColor(.green)
+                    Spacer()
+                    Text(String(format: "%%%0.1f \(l10n.paidStatus) (%d / %d)", rate, paidCount, totalFlats))
+                        .font(.system(size: 12, weight: .bold, design: .rounded))
+                        .foregroundColor(.green)
+                }
+
+                GeometryReader { geo in
+                    ZStack(alignment: .leading) {
+                        RoundedRectangle(cornerRadius: 5)
+                            .fill(Color.secondary.opacity(0.15))
+                            .frame(height: 10)
+                        RoundedRectangle(cornerRadius: 5)
+                            .fill(Color.green)
+                            .frame(width: geo.size.width * CGFloat(rate / 100.0), height: 10)
+                    }
+                }
+                .frame(height: 10)
+            }
+            .padding(14)
+            .background(Color(NSColor.controlBackgroundColor))
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+
+            // Expense Breakdown
+            if !expenseCategories.isEmpty {
+                VStack(alignment: .leading, spacing: 10) {
+                    Label(l10n.managementExpenseTitle, systemImage: "briefcase.fill")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundColor(Color(red: 0.22, green: 0.42, blue: 0.88))
+
+                    VStack(spacing: 8) {
+                        ForEach(expenseCategories, id: \.category) { item in
+                            HStack {
+                                Text(item.category)
+                                    .font(.system(size: 12, weight: .medium))
+                                    .lineLimit(1)
+                                Spacer()
+                                Text(String(format: "%.2f %@", item.amount, settings.currency.symbol))
+                                    .font(.system(size: 12, weight: .bold, design: .rounded))
+                                Text(String(format: "(%%%0.1f)", item.percent))
+                                    .font(.system(size: 11))
+                                    .foregroundColor(.secondary)
+                                    .frame(width: 50, alignment: .trailing)
+                            }
+                            GeometryReader { geo in
+                                ZStack(alignment: .leading) {
+                                    RoundedRectangle(cornerRadius: 3)
+                                        .fill(Color.secondary.opacity(0.1))
+                                        .frame(height: 5)
+                                    RoundedRectangle(cornerRadius: 3)
+                                        .fill(Color(red: 0.22, green: 0.42, blue: 0.88))
+                                        .frame(width: geo.size.width * CGFloat(item.percent / 100.0), height: 5)
+                                }
+                            }
+                            .frame(height: 5)
+                        }
+                    }
+                }
+                .padding(14)
+                .background(Color(NSColor.controlBackgroundColor))
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+            }
+        }
+    }
+
+    // MARK: - Tab 1: Dues Tracking Content
+    private var duesTrackingTabContent: some View {
+        VStack(spacing: 8) {
+            ForEach(flatDuesStatusList, id: \.flat) { item in
+                HStack(spacing: 12) {
+                    Text("\(l10n.flatPrefix) \(item.flat)")
+                        .font(.system(size: 13, weight: .bold))
+                        .frame(width: 70, alignment: .leading)
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(item.owner.isEmpty ? "—" : item.owner)
+                            .font(.system(size: 12, weight: .semibold))
+                        if !item.phone.isEmpty {
+                            Text(item.phone)
+                                .font(.system(size: 10))
+                                .foregroundColor(.secondary)
+                        }
+                    }
+
+                    Spacer()
+
+                    if item.isPaid {
+                        HStack(spacing: 6) {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundColor(.green)
+                            Text(l10n.paidStatus)
+                                .font(.system(size: 11, weight: .bold))
+                                .foregroundColor(.green)
+                            if let rec = item.record {
+                                Text("#\(rec.sequenceNumber)")
+                                    .font(.system(size: 10, weight: .bold, design: .monospaced))
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(Color.green.opacity(0.12))
+                        .clipShape(Capsule())
+                    } else {
+                        HStack(spacing: 8) {
+                            HStack(spacing: 4) {
+                                Image(systemName: "clock.badge.exclamationmark.fill")
+                                    .foregroundColor(.orange)
+                                Text(l10n.unpaidStatus)
+                                    .font(.system(size: 11, weight: .bold))
+                                    .foregroundColor(.orange)
+                            }
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 5)
+                            .background(Color.orange.opacity(0.12))
+                            .clipShape(Capsule())
+
+                            Button {
+                                sendWhatsAppReminder(flat: item.flat, owner: item.owner, phone: item.phone)
+                            } label: {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "message.fill")
+                                    Text(l10n.remindWhatsApp)
+                                }
+                                .font(.system(size: 11, weight: .semibold))
+                                .foregroundColor(.green)
+                            }
+                            .buttonStyle(.bordered)
+                            .controlSize(.small)
+                        }
+                    }
+                }
+                .padding(.horizontal, 14)
+                .padding(.vertical, 9)
+                .background(Color(NSColor.controlBackgroundColor))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+            }
+        }
+    }
+
+    // MARK: - Tab 2: All Transactions Content
+    private var transactionsTabContent: some View {
+        VStack(spacing: 8) {
+            ForEach(filteredRecords) { r in
+                HStack(spacing: 12) {
+                    Text("#\(r.sequenceNumber)")
+                        .font(.system(size: 12, weight: .bold, design: .monospaced))
+                        .frame(width: 50, alignment: .leading)
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(r.receiver)
+                            .font(.system(size: 12, weight: .bold))
+                        Text(r.createdDate + " • " + r.notes)
+                            .font(.system(size: 10))
+                            .foregroundColor(.secondary)
+                            .lineLimit(1)
+                    }
+
+                    Spacer()
+
+                    let color: Color = r.kind == .income ? .green : (r.kind == .outcome ? .orange : Color(red: 0.22, green: 0.42, blue: 0.88))
+                    Text(String(format: "%.2f %@", r.amount, r.currency.symbol))
+                        .font(.system(size: 13, weight: .bold, design: .rounded))
+                        .foregroundColor(color)
+                }
+                .padding(.horizontal, 14)
+                .padding(.vertical, 8)
+                .background(Color(NSColor.controlBackgroundColor))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+            }
+        }
+    }
+
+    private func kpiCard(title: String, amount: Double, color: Color, icon: String, subtitle: String) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Image(systemName: icon)
+                    .foregroundColor(color)
+                    .font(.system(size: 14))
+                Text(title)
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundColor(.secondary)
+            }
+            Text(String(format: "%.2f %@", amount, settings.currency.symbol))
+                .font(.system(size: 17, weight: .heavy, design: .rounded))
+                .foregroundColor(color)
+            Text(subtitle)
+                .font(.system(size: 9.5))
+                .foregroundColor(.secondary)
+                .lineLimit(1)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(12)
+        .background(color.opacity(0.08))
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(color.opacity(0.2), lineWidth: 1)
+        )
+    }
+
+    private func sendWhatsAppReminder(flat: Int, owner: String, phone: String) {
+        let periodName = selectedPeriod == "all" ? (availablePeriods.first ?? "") : selectedPeriod
+        let duesAmt = settings.defaultPayment.isEmpty ? "1750" : settings.defaultPayment
+        let currencySym = settings.currency.symbol
+        let apt = settings.apartmentName.isEmpty ? l10n.defaultBuildingName : settings.apartmentName
+        let manager = settings.issuer.isEmpty ? l10n.managerSignatureTitle : settings.issuer
+
+        let message: String
+        switch l10n.resolvedLanguage {
+        case .turkish:
+            message = "Sayın Komşumuz (Daire \(flat)), \(apt) \(periodName) dönemi \(duesAmt) \(currencySym) aidat ödemeniz henüz kaydımıza geçmemiştir. Bilginize sunar, iyi günler dileriz. - \(manager)"
+        case .romanian:
+            message = "Stimate Vecin (Ap. \(flat)), plata întreținerii pentru perioada \(periodName) la \(apt) în valoare de \(duesAmt) \(currencySym) este în așteptare. Vă mulțumim! - \(manager)"
+        default:
+            message = "Dear Resident (Flat \(flat)), dues payment for \(periodName) at \(apt) in the amount of \(duesAmt) \(currencySym) is currently pending. Thank you! - \(manager)"
+        }
+
+        let cleanPhone = phone.trimmingCharacters(in: .whitespacesAndNewlines)
+        if let url = WhatsAppShareHelper.shareURL(phone: cleanPhone.isEmpty ? nil : cleanPhone, message: message) {
+            NSWorkspace.shared.open(url)
+        }
+    }
+
+    private func exportBulletinBoardPDF() {
+        let panel = NSSavePanel()
+        panel.canCreateDirectories = true
+        panel.showsTagField = false
+        panel.allowedContentTypes = [.pdf]
+        let periodStr = selectedPeriod == "all" ? "Genel" : selectedPeriod.replacingOccurrences(of: " ", with: "_")
+        let aptStr = sanitizeForFileName(settings.apartmentName.isEmpty ? "Apartman" : settings.apartmentName)
+        panel.nameFieldStringValue = "\(aptStr)_Mali_Pano_Raporu_\(periodStr).pdf"
+
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+
+        let noticeView = ApartmentBulletinBoardView(
+            settings: settings,
+            periodTitle: selectedPeriod == "all" ? l10n.allMonths : selectedPeriod,
+            totalIncome: totalIncome,
+            totalExpenses: totalExpenses,
+            netBalance: netCashBalance,
+            expenseCategories: expenseCategories,
+            paidFlatsCount: flatDuesStatusList.filter { $0.isPaid }.count,
+            totalFlatsCount: settings.flatCount,
+            records: filteredRecords,
+            l10n: l10n
+        )
+        .frame(width: 595, height: 842)
+        .environment(\.colorScheme, .light)
+
+        let renderer = ImageRenderer(content: noticeView)
+        renderer.proposedSize = ProposedViewSize(width: 595, height: 842)
+
+        var box = CGRect(origin: .zero, size: CGSize(width: 595, height: 842))
+        guard let consumer = CGDataConsumer(url: url as CFURL),
+              let pdfContext = CGContext(consumer: consumer, mediaBox: &box, nil) else {
+            return
+        }
+
+        pdfContext.beginPDFPage(nil)
+        renderer.render { size, context in
+            context(pdfContext)
+        }
+        pdfContext.endPDFPage()
+        pdfContext.closePDF()
+
+        successNotice = l10n.saveSuccessPDF
+    }
+}
+
+// MARK: - Batch Dues Generator Sheet
+
+struct BatchDuesGeneratorSheet: View {
+    @ObservedObject var settings: ReceiptSettingsStore
+    var onComplete: () -> Void
+    @Environment(\.presentationMode) private var presentationMode
+
+    @State private var selectedPeriodDate: Date = Date()
+    @State private var startSeq: String = ""
+    @State private var duesAmount: String = ""
+    @State private var selectedFlats: Set<Int> = []
+    @State private var isDone: Bool = false
+    @State private var generatedCount: Int = 0
+
+    private var l10n: L10n { settings.l10n }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            // Header
+            HStack(spacing: 12) {
+                Image(systemName: "bolt.circle.fill")
+                    .font(.system(size: 26))
+                    .foregroundColor(.orange)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(l10n.batchDuesTitle)
+                        .font(.system(size: 16, weight: .bold))
+                    Text(l10n.batchDuesSubtitle)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+
+                Spacer()
+
+                Button {
+                    presentationMode.wrappedValue.dismiss()
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.title3)
+                        .foregroundColor(.secondary)
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 14)
+            .background(Color(NSColor.windowBackgroundColor))
+
+            Divider()
+
+            if isDone {
+                VStack(spacing: 16) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 50))
+                        .foregroundColor(.green)
+                    Text("\(generatedCount) \(l10n.batchSuccessMessage)")
+                        .font(.system(size: 15, weight: .bold))
+                    Button(l10n.close) {
+                        presentationMode.wrappedValue.dismiss()
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .padding(40)
+            } else {
+                // Form Configuration
+                VStack(spacing: 12) {
+                    HStack(spacing: 16) {
+                        // Period
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(l10n.period)
+                                .font(.system(size: 11, weight: .semibold))
+                                .foregroundColor(.secondary)
+                            DatePicker("", selection: $selectedPeriodDate, displayedComponents: .date)
+                                .labelsHidden()
+                        }
+
+                        // Starting Sequence #
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(l10n.startSequenceNumber)
+                                .font(.system(size: 11, weight: .semibold))
+                                .foregroundColor(.secondary)
+                            TextField("106", text: $startSeq)
+                                .textFieldStyle(.roundedBorder)
+                                .frame(width: 100)
+                        }
+
+                        // Dues Amount
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(l10n.duesAmountPerFlat)
+                                .font(.system(size: 11, weight: .semibold))
+                                .foregroundColor(.secondary)
+                            TextField("1750", text: $duesAmount)
+                                .textFieldStyle(.roundedBorder)
+                                .frame(width: 110)
+                        }
+
+                        Spacer()
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.top, 14)
+
+                    Divider()
+
+                    // Flat Selection Checklist Header
+                    HStack {
+                        Text("\(selectedFlats.count) / \(settings.flatCount) \(l10n.duesPaidCount)")
+                            .font(.system(size: 12, weight: .bold))
+                        Spacer()
+                        Button(selectedFlats.count == settings.flatCount ? "Seçimi Kaldır" : "Tümünü Seç") {
+                            if selectedFlats.count == settings.flatCount {
+                                selectedFlats.removeAll()
+                            } else {
+                                selectedFlats = Set(settings.apartmentNumbers)
+                            }
+                        }
+                        .font(.system(size: 11))
+                        .buttonStyle(.link)
+                    }
+                    .padding(.horizontal, 20)
+
+                    ScrollView {
+                        LazyVStack(spacing: 6) {
+                            ForEach(settings.apartmentNumbers, id: \.self) { flat in
+                                let isSelected = selectedFlats.contains(flat)
+                                let owner = settings.owner(for: flat)
+                                HStack {
+                                    Button {
+                                        if isSelected {
+                                            selectedFlats.remove(flat)
+                                        } else {
+                                            selectedFlats.insert(flat)
+                                        }
+                                    } label: {
+                                        Image(systemName: isSelected ? "checkmark.square.fill" : "square")
+                                            .foregroundColor(isSelected ? .accentColor : .secondary)
+                                            .font(.system(size: 14))
+                                    }
+                                    .buttonStyle(.plain)
+
+                                    Text("\(l10n.flatPrefix) \(flat)")
+                                        .font(.system(size: 12, weight: .bold))
+                                        .frame(width: 70, alignment: .leading)
+
+                                    Text(owner.isEmpty ? "—" : owner)
+                                        .font(.system(size: 12))
+                                        .foregroundColor(owner.isEmpty ? .secondary : .primary)
+
+                                    Spacer()
+
+                                    Text("\(duesAmount) \(settings.currency.symbol)")
+                                        .font(.system(size: 12, weight: .semibold, design: .rounded))
+                                        .foregroundColor(.secondary)
+                                }
+                                .padding(.horizontal, 14)
+                                .padding(.vertical, 8)
+                                .background(Color(NSColor.controlBackgroundColor).opacity(0.5))
+                                .clipShape(RoundedRectangle(cornerRadius: 6))
+                            }
+                        }
+                        .padding(.horizontal, 20)
+                    }
+                }
+
+                Divider()
+
+                // Footer
+                HStack {
+                    Button(l10n.cancel) {
+                        presentationMode.wrappedValue.dismiss()
+                    }
+                    .keyboardShortcut(.cancelAction)
+
+                    Spacer()
+
+                    Button {
+                        executeBatchGeneration()
+                    } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: "bolt.fill")
+                            Text("\(selectedFlats.count) \(l10n.generateBatchReceipts)")
+                        }
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(selectedFlats.isEmpty)
+                }
+                .padding(.horizontal, 20)
+                .padding(.vertical, 12)
+                .background(Color(NSColor.windowBackgroundColor))
+            }
+        }
+        .frame(minWidth: 640, idealWidth: 700, minHeight: 520, idealHeight: 580)
+        .onAppear {
+            startSeq = String(settings.seqNumber)
+            duesAmount = settings.defaultPayment
+            selectedFlats = Set(settings.apartmentNumbers)
+        }
+    }
+
+    private func executeBatchGeneration() {
+        guard let initialSeq = Int(startSeq), let amount = Double(duesAmount.replacingOccurrences(of: ",", with: ".")), amount >= 0 else {
+            return
+        }
+
+        var currentSeq = initialSeq
+        let sortedFlats = Array(selectedFlats).sorted()
+        let periodStr = selectedPeriodDate.monthYearString(locale: settings.currentLocale)
+        let dateStr = Date().dayMonthYearString(locale: settings.currentLocale)
+
+        for flat in sortedFlats {
+            let owner = settings.owner(for: flat)
+            let receiverName = owner.isEmpty ? "\(settings.apartmentName) Sakini (Daire \(flat))" : owner
+
+            let draft = ReceiptDraft(
+                receiver: receiverName,
+                issuer: settings.issuer,
+                notes: "\(periodStr) dönemi bina ortak gider ve aidat payı",
+                monthYear: periodStr,
+                apartmentNumber: flat,
+                amount: amount,
+                sequenceNumber: currentSeq,
+                createdDate: dateStr,
+                showApartmentNumber: true,
+                kind: .income,
+                currency: settings.currency
+            )
+
+            ReceiptArchiveStore.shared.add(draft: draft)
+            currentSeq += 1
+        }
+
+        settings.seqNumber = currentSeq
+        generatedCount = sortedFlats.count
+        isDone = true
+        onComplete()
+    }
+}
+
+// MARK: - Printable Apartment Bulletin Board Notice View (A4)
+
+struct ApartmentBulletinBoardView: View {
+    let settings: ReceiptSettingsStore
+    let periodTitle: String
+    let totalIncome: Double
+    let totalExpenses: Double
+    let netBalance: Double
+    let expenseCategories: [(category: String, amount: Double, percent: Double)]
+    let paidFlatsCount: Int
+    let totalFlatsCount: Int
+    let records: [ReceiptRecord]
+    let l10n: L10n
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            // Header
+            HStack(alignment: .top) {
+                if let logo = settings.logoImage {
+                    Image(nsImage: logo)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 48, height: 48)
+                } else {
+                    Default2DBuildingLogo(size: 48)
+                }
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(settings.apartmentName.isEmpty ? l10n.defaultBuildingName : settings.apartmentName.uppercased())
+                        .font(.system(size: 16, weight: .bold))
+                    Text(l10n.bulletinBoardNoticeTitle)
+                        .font(.system(size: 12, weight: .heavy))
+                        .foregroundColor(Color(red: 0.22, green: 0.42, blue: 0.88))
+                    Text(periodTitle)
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundColor(.secondary)
+                }
+
+                Spacer()
+
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text(Date().dayMonthYearString(locale: settings.currentLocale))
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundColor(.secondary)
+                }
+            }
+            .padding(.bottom, 6)
+
+            Divider()
+
+            // Financial Balance Cards (3 Columns)
+            HStack(spacing: 12) {
+                balanceBox(title: l10n.totalIncome, amount: totalIncome, color: .green, icon: "arrow.down.left.circle.fill")
+                balanceBox(title: l10n.totalExpenses, amount: totalExpenses, color: .red, icon: "arrow.up.right.circle.fill")
+                balanceBox(title: l10n.netCashBalance, amount: netBalance, color: netBalance >= 0 ? Color(red: 0.22, green: 0.42, blue: 0.88) : .red, icon: "banknote.fill")
+            }
+
+            // Dues Collection Status Bar
+            VStack(alignment: .leading, spacing: 6) {
+                HStack {
+                    Text(l10n.duesTrackingTab)
+                        .font(.system(size: 11, weight: .bold))
+                    Spacer()
+                    Text("\(paidFlatsCount) / \(totalFlatsCount) \(l10n.duesPaidCount)")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundColor(.green)
+                }
+
+                GeometryReader { geo in
+                    let ratio = totalFlatsCount > 0 ? CGFloat(paidFlatsCount) / CGFloat(totalFlatsCount) : 0
+                    ZStack(alignment: .leading) {
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(Color.secondary.opacity(0.15))
+                            .frame(height: 8)
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(Color.green)
+                            .frame(width: geo.size.width * ratio, height: 8)
+                    }
+                }
+                .frame(height: 8)
+            }
+            .padding(10)
+            .background(Color.secondary.opacity(0.06))
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+
+            // Expense Categories Breakdown
+            if !expenseCategories.isEmpty {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(l10n.presetUtilities)
+                        .font(.system(size: 11, weight: .bold))
+
+                    VStack(spacing: 6) {
+                        ForEach(expenseCategories.prefix(6), id: \.category) { item in
+                            HStack {
+                                Text(item.category)
+                                    .font(.system(size: 10.5, weight: .medium))
+                                    .lineLimit(1)
+                                Spacer()
+                                Text(String(format: "%.2f %@", item.amount, settings.currency.symbol))
+                                    .font(.system(size: 10.5, weight: .bold, design: .rounded))
+                                Text(String(format: "(%%%0.1f)", item.percent))
+                                    .font(.system(size: 9.5))
+                                    .foregroundColor(.secondary)
+                                    .frame(width: 44, alignment: .trailing)
+                            }
+                            .padding(.vertical, 2)
+                            Divider()
+                        }
+                    }
+                }
+                .padding(12)
+                .background(Color.secondary.opacity(0.04))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+            }
+
+            Spacer()
+
+            // Footer & Manager Signature
+            Divider()
+
+            HStack(alignment: .bottom) {
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(l10n.bulletinBoardNoticeFooter)
+                        .font(.system(size: 9.5))
+                        .foregroundColor(.secondary)
+                    Text("AptReceipt • Doğrulanabilir Dijital Apartman Yönetim Sistemi")
+                        .font(.system(size: 8))
+                        .foregroundColor(.secondary.opacity(0.7))
+                }
+
+                Spacer()
+
+                VStack(alignment: .center, spacing: 4) {
+                    Text(l10n.managerSignatureTitle)
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundColor(.secondary)
+
+                    if let sig = settings.signatureImage {
+                        Image(nsImage: sig)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 90, height: 35)
+                    } else {
+                        Rectangle()
+                            .fill(Color.clear)
+                            .frame(width: 90, height: 35)
+                    }
+
+                    Text(settings.issuer.isEmpty ? l10n.managerSignatureTitle : settings.issuer)
+                        .font(.system(size: 10.5, weight: .bold))
+                }
+            }
+        }
+        .padding(36)
+        .frame(width: 595, height: 842)
+        .background(Color.white)
+    }
+
+    private func balanceBox(title: String, amount: Double, color: Color, icon: String) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Image(systemName: icon)
+                    .foregroundColor(color)
+                    .font(.system(size: 12))
+                Text(title)
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundColor(.secondary)
+            }
+            Text(String(format: "%.2f %@", amount, settings.currency.symbol))
+                .font(.system(size: 14, weight: .bold, design: .rounded))
+                .foregroundColor(color)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(10)
+        .background(color.opacity(0.08))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(color.opacity(0.2), lineWidth: 1)
+        )
     }
 }
 
