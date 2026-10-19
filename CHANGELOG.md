@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [3.4.0] - 2026-10-19
+## [3.4.1] - 2026-10-19
 
 ### Added
 - **GitHub Release Update Checker**: Built-in update detector querying GitHub Releases API (`berkbb/aptreceipt`), featuring semver comparator (`SemverCompare`), native macOS update alert with release details and one-click download, integrated into the macOS App Menu bar (`Check for Updates...`), Settings -> About tab, and the dedicated About window.
@@ -14,7 +14,7 @@ All notable changes to this project will be documented in this file.
 - **Dark Mode & English Screenshot Suite**: Completely refreshed the 14-piece UI screenshot gallery in `docs/screenshots/` in native macOS Dark Mode and English localization.
 
 ### Changed
-- Bumped marketing version to `3.4.0` (build `7`).
+- Bumped marketing version to `3.4.1` (build `8`).
 - `build_app.sh` now ad-hoc signs the app and produces a DMG (bundling `LICENSE.txt` and an install/Gatekeeper `README.txt`) and `SHA256SUMS.txt` in `dist/`; added `release.sh` to publish GitHub releases.
 
 ### Fixed
