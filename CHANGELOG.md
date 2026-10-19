@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [3.4.3] - 2026-10-19
 
 ### Fixed
 - **Late fee grand total**: Receipts with a late fee applied computed the grand total as `(base + fee × 100) / 100` due to an operator-precedence error (e.g. 2000 + 300 late fee was saved as 320.00 instead of 2300.00). Late fee and total calculations now go through a single `LateFeeCalculator`.
@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 - Split the 4,900-line `ViewController.swift` into per-feature files (`L10n.swift`, `ReceiptSettingsStore.swift`, `MainScreen.swift`, `MainScreenViewModel.swift`, `ReceiptModels.swift`, `LateFee.swift`, and one file per sheet/view). No behavior changes.
 - Moved all 375 UI strings from inline `tr("EN", "TR", "RO")` calls into an Xcode String Catalog (`aptreceipt/Localizable.xcstrings`). `L10n` looks keys up in the bundle of the in-app language, so the language picker keeps working independently of the system language. Added a test that every key exists in every language with matching format specifiers.
 - Replaced the late fee unit test that re-implemented the formula inside the test with tests that exercise `LateFeeCalculator` and `MainScreenViewModel` directly.
+- Bumped marketing version to `3.4.3` (build `10`).
 
 ## [3.4.2] - 2026-10-19
 
