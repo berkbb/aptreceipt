@@ -18,9 +18,9 @@ struct NumberToWords {
     private static let englishTens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"]
 
     static func convert(_ amount: Double, language: AppLanguage, currency: AppCurrency = .turkishLira) -> String {
-        let rounded = (amount * 100.0).rounded() / 100.0
-        let integerPart = Int(floor(rounded))
-        let fractionalPart = Int(((rounded - Double(integerPart)) * 100.0).rounded())
+        let cents = max(0, Money.cents(amount))
+        let integerPart = cents / 100
+        let fractionalPart = cents % 100
 
         switch language {
         case .turkish:

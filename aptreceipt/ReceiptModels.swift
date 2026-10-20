@@ -131,7 +131,7 @@ struct ReceiptDraft: Identifiable, Codable {
         self.lateFeeRate = lateFeeRate
         self.lateMonths = lateMonths
         self.lateFeeAmount = lateFeeAmount
-        self.baseAmount = baseAmount > 0 ? baseAmount : (isLateFeeApplied ? max(0, amount - lateFeeAmount) : amount)
+        self.baseAmount = baseAmount > 0 ? baseAmount : (isLateFeeApplied ? Money.difference(amount, lateFeeAmount) : amount)
         self.lateFeeFootnote = lateFeeFootnote
     }
 

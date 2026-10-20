@@ -49,30 +49,31 @@ struct ApartmentFinancialReportSheet: View {
     }
 
     private var totalIncome: Double {
-        filteredRecords.filter { $0.kind == .income }.reduce(0) { $0 + $1.amount }
+        Money.sum(filteredRecords.filter { $0.kind == .income }.map(\.amount))
     }
 
     private var totalRefunds: Double {
-        filteredRecords.filter { $0.kind == .outcome }.reduce(0) { $0 + $1.amount }
+        Money.sum(filteredRecords.filter { $0.kind == .outcome }.map(\.amount))
     }
 
     private var totalExpenses: Double {
-        filteredRecords.filter { $0.kind == .managementExpense }.reduce(0) { $0 + $1.amount }
+        Money.sum(filteredRecords.filter { $0.kind == .managementExpense }.map(\.amount))
     }
 
     private var netCashBalance: Double {
-        totalIncome - totalRefunds - totalExpenses
+        Money.double(Money.rounded(Money.decimal(totalIncome) - Money.decimal(totalRefunds) - Money.decimal(totalExpenses)))
     }
 
     private var expenseCategories: [(category: String, amount: Double, percent: Double)] {
         let expenses = filteredRecords.filter { $0.kind == .managementExpense }
         guard !expenses.isEmpty else { return [] }
-        var map: [String: Double] = [:]
+        var amounts: [String: [Double]] = [:]
         for exp in expenses {
             let cat = exp.notes.components(separatedBy: "•").first?.trimmingCharacters(in: .whitespaces) ?? exp.receiver
             let key = (cat.isEmpty || cat == "-") ? exp.receiver : cat
-            map[key, default: 0.0] += exp.amount
+            amounts[key, default: []].append(exp.amount)
         }
+        let map = amounts.mapValues(Money.sum)
         let total = totalExpenses > 0 ? totalExpenses : 1.0
         return map.map { (category: $0.key, amount: $0.value, percent: ($0.value / total) * 100.0) }
             .sorted { $0.amount > $1.amount }

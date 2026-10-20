@@ -5,7 +5,7 @@
 
 The global probabilistic and simulation invariants (3-6-9 paradigm, mixture models, confidence intervals, survival analysis, queueing theory, PRNG seeding) apply to forecasting and simulation systems. AptReceipt has none, so they do **not** apply here. The app's financial invariants are:
 
-1. **Money has two decimals.** Fees and totals are rounded to cents through `LateFeeCalculator.roundedToCents` (schoolbook rounding, half away from zero). Known limitation: it rounds a `Double`, so a value exactly on half a cent can round the wrong way; moving to `Decimal` is on `context/roadmap.md`.
+1. **Money has two decimals and is calculated in `Decimal`.** Every fee, total, sum and difference goes through `Money` (`LateFee.swift`): each stored amount is read at its decimal value (`Money.decimal`, e.g. 1.005 rather than 1.00499…), calculated in `Decimal`, and rounded half-up (half away from zero) to cents with `NSDecimalRound(..., .plain)`. Amounts stay stored as JSON numbers (`Double`) for compatibility. Never add or multiply money as `Double`; tests in section 21 pin the half-cent cases.
 2. **Late fee** = `base × (monthlyRate / 100) × months`, rounded to cents; **grand total** = `base + lateFee`, rounded to cents. All screens and documents use these functions; never re-implement the formula (tests exercise the real code).
 3. **Rates** are monthly percentages ≥ 0; due day is clamped to `1…31`, grace period to `0…60` days (`SettingsViewModel.save`).
 4. **Country profiles** supply defaults (rate, due day, grace days, footnote); re-selecting a profile re-applies them. Profiles stay jurisdiction-neutral (`user_rejected_spec.md`).

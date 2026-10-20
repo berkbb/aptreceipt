@@ -135,20 +135,65 @@ enum LateFeeCountryProfile: String, CaseIterable, Identifiable, Codable {
     }
 }
 
-// MARK: - Late Payment Compensation Calculator
+// MARK: - Money
 
-enum LateFeeCalculator {
-    /// Late fee for `base` at `monthlyRate` percent per month over `months`, rounded to cents.
-    static func fee(base: Double, monthlyRate: Double, months: Int) -> Double {
-        roundedToCents(base * (monthlyRate / 100.0) * Double(months))
+/// Money arithmetic in `Decimal`, rounded half-up to cents, so half a cent never rounds the wrong way because
+/// of binary floating point (1.005 → 1.01, not 1.00). Amounts are still stored as JSON numbers (`Double`)
+/// so archives and backups stay compatible; each is read at its decimal value before calculating.
+enum Money {
+    /// The decimal value a stored amount stands for: its shortest form, e.g. 1.005 rather than 1.00499….
+    static func decimal(_ value: Double) -> Decimal {
+        guard value.isFinite else { return 0 }
+        return Decimal(string: "\(value)") ?? Decimal(value)
     }
 
-    /// Dues plus late fee, rounded to cents.
-    static func grandTotal(base: Double, lateFee: Double) -> Double {
-        roundedToCents(base + lateFee)
+    /// Rounds half-up (away from zero) to cents.
+    static func rounded(_ value: Decimal) -> Decimal {
+        var input = value
+        var result = Decimal()
+        NSDecimalRound(&result, &input, 2, .plain)
+        return result
+    }
+
+    /// The nearest `Double` to a decimal amount, for storage and formatting.
+    static func double(_ value: Decimal) -> Double {
+        Double("\(value)") ?? NSDecimalNumber(decimal: value).doubleValue
     }
 
     static func roundedToCents(_ value: Double) -> Double {
-        (value * 100.0).rounded() / 100.0
+        double(rounded(decimal(value)))
+    }
+
+    /// Whole cents, rounded half-up.
+    static func cents(_ value: Double) -> Int {
+        NSDecimalNumber(decimal: rounded(decimal(value)) * 100).intValue
+    }
+
+    /// Sum of amounts in cents precision.
+    static func sum<S: Sequence>(_ values: S) -> Double where S.Element == Double {
+        double(rounded(values.reduce(Decimal(0)) { $0 + decimal($1) }))
+    }
+
+    /// `amount - deduction`, never below zero, rounded to cents.
+    static func difference(_ amount: Double, _ deduction: Double) -> Double {
+        double(rounded(max(0, decimal(amount) - decimal(deduction))))
+    }
+}
+
+// MARK: - Late Payment Compensation Calculator
+
+enum LateFeeCalculator {
+    /// Late fee for `base` at `monthlyRate` percent per month over `months`, rounded half-up to cents.
+    static func fee(base: Double, monthlyRate: Double, months: Int) -> Double {
+        Money.double(Money.rounded(Money.decimal(base) * Money.decimal(monthlyRate) / 100 * Decimal(months)))
+    }
+
+    /// Dues plus late fee, rounded half-up to cents.
+    static func grandTotal(base: Double, lateFee: Double) -> Double {
+        Money.double(Money.rounded(Money.decimal(base) + Money.decimal(lateFee)))
+    }
+
+    static func roundedToCents(_ value: Double) -> Double {
+        Money.roundedToCents(value)
     }
 }

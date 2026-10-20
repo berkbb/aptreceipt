@@ -114,7 +114,7 @@ enum WhatsAppShareHelper {
         let building = buildingName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? l10n.defaultBuildingName : buildingName
         let total = formatAmount(draft.amount, currency: draft.currency, l10n: l10n)
         let hasLateFee = draft.isLateFeeApplied && draft.lateFeeAmount > 0
-        let base = draft.baseAmount > 0 ? draft.baseAmount : max(0, draft.amount - draft.lateFeeAmount)
+        let base = draft.baseAmount > 0 ? draft.baseAmount : Money.difference(draft.amount, draft.lateFeeAmount)
         let notes = draft.notes.trimmingCharacters(in: .whitespacesAndNewlines)
         let issuer = draft.issuer.trimmingCharacters(in: .whitespacesAndNewlines)
         let showFlat = draft.showApartmentNumber && draft.apartmentNumber > 0

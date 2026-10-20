@@ -1788,4 +1788,38 @@ final class aptreceiptTests: XCTestCase {
             "Yönetici: Mehmet Şahin",
         ])
     }
+
+    // MARK: - 21. Decimal Money (half a cent always rounds up)
+
+    func testMoneyRoundsHalfUpToCentsAtDecimalValues() {
+        // Each of these is just below the half in binary floating point; the old Double rounding went down.
+        XCTAssertEqual(Money.roundedToCents(1.005), 1.01)
+        XCTAssertEqual(Money.roundedToCents(2.675), 2.68)
+        XCTAssertEqual(Money.roundedToCents(1.115), 1.12)
+        XCTAssertEqual(Money.roundedToCents(0.125), 0.13)
+        XCTAssertEqual(Money.roundedToCents(1.004), 1.0)
+        XCTAssertEqual(Money.roundedToCents(1750), 1750)
+        XCTAssertEqual(Money.cents(1.005), 101)
+        XCTAssertEqual(Money.cents(12750.5), 1_275_050)
+        XCTAssertEqual(Money.difference(12750.5, 750.5), 12000)
+        XCTAssertEqual(Money.difference(100, 175.005), 0)
+    }
+
+    func testLateFeeIsCalculatedInDecimal() {
+        XCTAssertEqual(LateFeeCalculator.fee(base: 2.01, monthlyRate: 50, months: 1), 1.01, "2.01 × 50 % = 1.005 rounds up")
+        XCTAssertEqual(LateFeeCalculator.fee(base: 1750, monthlyRate: 5, months: 3), 262.5)
+        XCTAssertEqual(LateFeeCalculator.fee(base: 1234.56, monthlyRate: 6, months: 7), 518.52)
+        XCTAssertEqual(LateFeeCalculator.fee(base: 0.1, monthlyRate: 5, months: 1), 0.01, "0.005 rounds up")
+        XCTAssertEqual(LateFeeCalculator.grandTotal(base: 0.1, lateFee: 0.2), 0.3)
+        XCTAssertEqual(LateFeeCalculator.grandTotal(base: 1750, lateFee: 262.5), 2012.5)
+    }
+
+    func testMoneySumsHaveNoFloatingPointDrift() {
+        XCTAssertEqual(Money.sum([0.1, 0.2]), 0.3)
+        XCTAssertEqual(Money.sum(Array(repeating: 0.1, count: 10)), 1.0)
+        XCTAssertEqual(Money.sum(Array(repeating: 0.01, count: 1000)), 10.0)
+        XCTAssertEqual(Money.sum([1750.25, 3450.10, 120.65]), 5321.0)
+        XCTAssertEqual(Money.sum([Double]()), 0)
+        XCTAssertEqual(NumberToWords.convert(2.675, language: .english, currency: .usDollar), NumberToWords.convert(2.68, language: .english, currency: .usDollar))
+    }
 }

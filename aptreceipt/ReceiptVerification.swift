@@ -376,7 +376,7 @@ struct ReceiptPrintedText {
     var totalAmount: String { currency(draft.amount) }
 
     var baseAmount: String {
-        currency(draft.baseAmount > 0 ? draft.baseAmount : (draft.isLateFeeApplied ? max(0, draft.amount - draft.lateFeeAmount) : draft.amount))
+        currency(draft.baseAmount > 0 ? draft.baseAmount : (draft.isLateFeeApplied ? Money.difference(draft.amount, draft.lateFeeAmount) : draft.amount))
     }
 
     var lateFeeAmount: String { currency(draft.lateFeeAmount) }
@@ -481,13 +481,13 @@ struct ReceiptQRBlock: Equatable {
     var draft: ReceiptDraft {
         ReceiptDraft(
             receiver: receiver, issuer: issuer, notes: "", monthYear: period,
-            apartmentNumber: apartmentNumber, amount: Double(amountCents) / 100, sequenceNumber: sequenceNumber,
+            apartmentNumber: apartmentNumber, amount: Self.amount(cents: amountCents), sequenceNumber: sequenceNumber,
             createdDate: createdDate, showApartmentNumber: showApartmentNumber, kind: kind, currency: currency,
             isLateFeeApplied: lateFee != nil,
-            lateFeeRate: Double(lateFee?.rateHundredths ?? 0) / 100,
+            lateFeeRate: Self.amount(cents: lateFee?.rateHundredths ?? 0),
             lateMonths: lateFee?.months ?? 0,
-            lateFeeAmount: Double(lateFee?.feeCents ?? 0) / 100,
-            baseAmount: Double(lateFee?.baseCents ?? 0) / 100
+            lateFeeAmount: Self.amount(cents: lateFee?.feeCents ?? 0),
+            baseAmount: Self.amount(cents: lateFee?.baseCents ?? 0)
         )
     }
 
@@ -531,7 +531,11 @@ struct ReceiptQRBlock: Equatable {
     }
 
     private static func cents(_ value: Double) -> Int {
-        max(0, Int((value * 100).rounded()))
+        max(0, Money.cents(value))
+    }
+
+    private static func amount(cents: Int) -> Double {
+        Money.double(Decimal(cents) / 100)
     }
 
     // MARK: Binary format v1

@@ -33,7 +33,7 @@ struct ReceiptArchiveSheet: View {
     }
 
     private var totalFilteredAmount: Double {
-        filteredRecords.reduce(0) { $0 + $1.amount }
+        Money.sum(filteredRecords.map(\.amount))
     }
 
     var body: some View {
