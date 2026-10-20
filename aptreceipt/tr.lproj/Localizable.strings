@@ -470,3 +470,16 @@
 "exportFileOutcome" = "gider_makbuzu";
 "exportFileManagement" = "yonetim_harcama_makbuzu";
 "exportFileFlat" = "daire";
+
+/* Verification key recovery code */
+"verificationKeyTitle" = "Doğrulama Anahtarı";
+"verificationKeyFooter" = "Makbuz QR kodları bu Mac'teki anahtarla şifrelenir. Mac değişir ya da silinirse eski makbuzları doğrulayabilmek için kurtarma kodunu güvenli bir yere yazın; sistem yedeği de anahtarı içerir.";
+"recoveryCodeShow" = "Kurtarma Kodunu Göster";
+"recoveryCodeHide" = "Kurtarma Kodunu Gizle";
+"recoveryCodeCopy" = "Kopyala";
+"recoveryCodeCopied" = "Kurtarma kodu panoya kopyalandı.";
+"recoveryCodeWarning" = "Bu kodu kimseyle paylaşmayın: kodu bilen herkes bu kurulum adına geçerli makbuz kodu üretebilir.";
+"recoveryCodeRestoreTitle" = "Kurtarma kodu";
+"recoveryCodeRestoreButton" = "Geri Yükle";
+"recoveryCodeRestored" = "Anahtar geri yüklendi; bu anahtarla kesilen makbuzlar artık doğrulanabilir.";
+"recoveryCodeInvalid" = "Kod geçersiz: bir karakter eksik ya da yanlış yazılmış olabilir.";

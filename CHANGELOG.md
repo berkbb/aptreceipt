@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+- **Recovery code for the verification key** (Settings → Backup → Verification Key): shows this Mac's key as a 56-character code to write down, with Copy and a warning not to share it, and restores a key from such a code on another Mac. A checksum rejects any mistyped character; restoring keeps the existing keys, so older receipts still verify.
+
 ### Changed
 - **Money is calculated in decimal**: late fees, totals, the cash summary, the archive total and expense categories are calculated in `Decimal` and rounded half-up to cents, so half a cent never rounds the wrong way (2.01 × 50 % = 1.01, not 1.00) and long sums no longer drift. Stored amounts are unchanged.
 - **Due day and grace period now count**: the late fee is due on the due day of the period's month and free through the grace period; after that every started month counts (due 15 October, paid 16 November = 2 months). The late-fee card shows the due date, the grace end and whether the dues are late today; "Auto-detect" uses this and turns the fee off within the grace period. The cash summary badge and the WhatsApp reminder charge the real late months instead of always one.

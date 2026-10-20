@@ -342,6 +342,19 @@ struct L10n {
         String(format: tr("lateFeeStatusLate"), "\(months) \(months > 1 ? monthsUnit : monthUnit)")
     }
 
+    // Verification key recovery code
+    var verificationKeyTitle: String { tr("verificationKeyTitle") }
+    var verificationKeyFooter: String { tr("verificationKeyFooter") }
+    var recoveryCodeShow: String { tr("recoveryCodeShow") }
+    var recoveryCodeHide: String { tr("recoveryCodeHide") }
+    var recoveryCodeCopy: String { tr("recoveryCodeCopy") }
+    var recoveryCodeCopied: String { tr("recoveryCodeCopied") }
+    var recoveryCodeWarning: String { tr("recoveryCodeWarning") }
+    var recoveryCodeRestoreTitle: String { tr("recoveryCodeRestoreTitle") }
+    var recoveryCodeRestoreButton: String { tr("recoveryCodeRestoreButton") }
+    var recoveryCodeRestored: String { tr("recoveryCodeRestored") }
+    var recoveryCodeInvalid: String { tr("recoveryCodeInvalid") }
+
     // Late-fee country profiles and export file names
     var lateFeeProfileTurkey: String { tr("lateFeeProfileTurkey") }
     var lateFeeProfileRomania: String { tr("lateFeeProfileRomania") }

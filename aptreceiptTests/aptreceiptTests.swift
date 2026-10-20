@@ -1986,4 +1986,49 @@ final class aptreceiptTests: XCTestCase {
         XCTAssertEqual(WhatsAppShareHelper.formatRate(5, l10n: L10n(.english)), "5 percent")
         XCTAssertEqual(WhatsAppShareHelper.formatRate(0.2, l10n: L10n(.romanian)), "0,2 la sută")
     }
+
+    // MARK: - 24. Recovery Code for the Verification Keys
+
+    func testRecoveryCodeFormatIsPinned() {
+        // A written-down code must restore forever: value computed independently (Python hashlib).
+        let key = Data(repeating: 7, count: 32)
+        let code = ReceiptRecoveryCode.encode(key)
+        XCTAssertEqual(code, "0W3G-E1R7-0W3G-E1R7-0W3G-E1R7-0W3G-E1R7-0W3G-E1R7-0W3G-E1R7-0W3M-QC3F")
+        XCTAssertEqual(ReceiptRecoveryCode.decode(code), key)
+        // Typed loosely: lower case, spaces instead of dashes, O for 0.
+        let typed = code.lowercased().replacingOccurrences(of: "-", with: " ").replacingOccurrences(of: "0", with: "o")
+        XCTAssertEqual(ReceiptRecoveryCode.decode(typed), key)
+    }
+
+    func testRecoveryCodeRejectsEveryMistypedCharacterAndWrongLength() {
+        let code = ReceiptRecoveryCode.encode(Data((0..<32).map { UInt8($0 * 7 % 256) }))
+        let characters = Array(code)
+        let alphabet = Array("0123456789ABCDEFGHJKMNPQRSTVWXYZ")
+        for index in characters.indices where characters[index] != "-" {
+            for replacement in alphabet where replacement != characters[index] {
+                var mistyped = characters
+                mistyped[index] = replacement
+                XCTAssertNil(ReceiptRecoveryCode.decode(String(mistyped)), "position \(index) → \(replacement)")
+            }
+        }
+        XCTAssertNil(ReceiptRecoveryCode.decode(String(code.dropLast())))
+        XCTAssertNil(ReceiptRecoveryCode.decode(code + "0"))
+        XCTAssertNil(ReceiptRecoveryCode.decode(""))
+        XCTAssertNil(ReceiptRecoveryCode.decode("U" + code.dropFirst()), "U is not in the alphabet")
+    }
+
+    @MainActor
+    func testRecoveryCodeRestoresTheKeyAndKeepsTheExistingOnes() throws {
+        let oldMac = ReceiptVerificationKeyStore(fileURL: nil)
+        let receipt = verifyReceiptView(keys: oldMac).qrContent
+        let code = oldMac.recoveryCode()
+
+        let newMac = ReceiptVerificationKeyStore(fileURL: nil)
+        let newMacKey = try XCTUnwrap(newMac.exportedKeys().first)
+        XCTAssertFalse(newMac.restore(recoveryCode: "1234-5678"))
+        XCTAssertEqual(newMac.exportedKeys(), [newMacKey], "a rejected code changes nothing")
+        XCTAssertTrue(newMac.restore(recoveryCode: code))
+        XCTAssertEqual(newMac.exportedKeys(), oldMac.exportedKeys() + [newMacKey])
+        XCTAssertEqual(ScannedReceiptVerification(scannedText: receipt, keys: newMac.allKeys)?.status, .genuine(keyIndex: 0))
+    }
 }

@@ -147,6 +147,20 @@ final class ReceiptVerificationKeyStore {
         return keyData
     }
 
+    /// The current key as a recovery code to write down (`ReceiptRecoveryCode`).
+    func recoveryCode() -> String {
+        ReceiptRecoveryCode.encode(exportedKeys()[0])
+    }
+
+    /// Adds the key of a recovery code in front of the existing keys, like restoring a backup;
+    /// `false` when the code is mistyped or incomplete.
+    @discardableResult
+    func restore(recoveryCode: String) -> Bool {
+        guard let key = ReceiptRecoveryCode.decode(recoveryCode) else { return false }
+        restore([key])
+        return true
+    }
+
     /// Restores keys from a backup: they come first, so the restored Mac keeps issuing codes with the
     /// backup's current key, and this Mac's keys stay after them so its receipts still verify.
     func restore(_ keys: [Data]) {
@@ -183,6 +197,35 @@ final class ReceiptVerificationKeyStore {
         } catch {
             print("ReceiptVerificationKeyStore: save error \(error)")
         }
+    }
+}
+
+// MARK: - Recovery Code
+
+/// A verification key written so a person can copy it down: the 32 key bytes and a 3-byte checksum in
+/// Crockford Base32, 56 characters in 14 groups of 4. The checksum catches a mistyped or missing character.
+enum ReceiptRecoveryCode {
+    private static let keyByteCount = 32
+    private static let checksumByteCount = 3
+    private static let characterCount = 56
+
+    static func encode(_ key: Data) -> String {
+        let bytes = Array(key) + Array(SHA256.hash(data: key).prefix(checksumByteCount))
+        let characters = ReceiptVerificationCode.base32(bytes)
+        return stride(from: 0, to: characters.count, by: 4)
+            .map { String(characters[$0..<min($0 + 4, characters.count)]) }
+            .joined(separator: "-")
+    }
+
+    /// The key of a recovery code typed with or without dashes or spaces, in any case, with O for 0 or I/L for 1.
+    static func decode(_ text: String) -> Data? {
+        let compact = text.filter { $0 != "-" && !$0.isWhitespace }
+        guard compact.count == characterCount,
+              let bytes = ReceiptVerificationCode.base32Decode(compact),
+              bytes.count == keyByteCount + checksumByteCount else { return nil }
+        let key = Data(bytes.prefix(keyByteCount))
+        guard Array(bytes.suffix(checksumByteCount)) == Array(SHA256.hash(data: key).prefix(checksumByteCount)) else { return nil }
+        return key
     }
 }
 

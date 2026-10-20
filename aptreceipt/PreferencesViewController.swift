@@ -71,6 +71,9 @@ struct SettingsView: View {
     @Environment(\.presentationMode) private var presentationMode
     @ObservedObject private var updateChecker = GitHubUpdateChecker.shared
     @State private var confirmsPreferenceReset = false
+    @State private var showsRecoveryCode = false
+    @State private var recoveryCodeInput = ""
+    @State private var recoveryCodeMessage: (text: String, isError: Bool)?
     /// The tab this page shows. In the settings window each toolbar tab hosts its own page and all
     /// pages share one draft, so Save & Close commits the edits made on every tab.
     private let tab: SettingsTab
@@ -1108,8 +1111,71 @@ struct SettingsView: View {
                 }
                 .fixedSize(horizontal: false, vertical: true)
             }
+
+            verificationKeySection
         }
         .formStyle(.grouped)
+    }
+
+    /// The verification key's recovery code, to write down, and restoring a key from one. Applies at once,
+    /// like importing a backup, because it does not touch the settings draft.
+    private var verificationKeySection: some View {
+        Section {
+            Button {
+                showsRecoveryCode.toggle()
+            } label: {
+                Label(showsRecoveryCode ? l10n.recoveryCodeHide : l10n.recoveryCodeShow, systemImage: showsRecoveryCode ? "eye.slash" : "key.fill")
+            }
+            .buttonStyle(.bordered)
+
+            if showsRecoveryCode {
+                let code = ReceiptVerificationKeyStore.shared.recoveryCode()
+                Text(code)
+                    .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                    .textSelection(.enabled)
+                    .fixedSize(horizontal: false, vertical: true)
+                HStack {
+                    Label(l10n.recoveryCodeWarning, systemImage: "exclamationmark.shield.fill")
+                        .font(.caption)
+                        .foregroundColor(.orange)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Spacer()
+                    Button {
+                        NSPasteboard.general.clearContents()
+                        NSPasteboard.general.setString(code, forType: .string)
+                        recoveryCodeMessage = (l10n.recoveryCodeCopied, false)
+                    } label: {
+                        Label(l10n.recoveryCodeCopy, systemImage: "doc.on.doc")
+                    }
+                }
+            }
+
+            HStack {
+                TextField(l10n.recoveryCodeRestoreTitle, text: $recoveryCodeInput)
+                    .font(.system(size: 12, design: .monospaced))
+                Button(l10n.recoveryCodeRestoreButton) {
+                    if ReceiptVerificationKeyStore.shared.restore(recoveryCode: recoveryCodeInput) {
+                        recoveryCodeInput = ""
+                        recoveryCodeMessage = (l10n.recoveryCodeRestored, false)
+                    } else {
+                        recoveryCodeMessage = (l10n.recoveryCodeInvalid, true)
+                    }
+                }
+                .disabled(recoveryCodeInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            }
+
+            if let message = recoveryCodeMessage {
+                Label(message.text, systemImage: message.isError ? "exclamationmark.triangle.fill" : "checkmark.circle.fill")
+                    .foregroundColor(message.isError ? .red : .green)
+                    .font(.callout.bold())
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        } header: {
+            Text(l10n.verificationKeyTitle)
+        } footer: {
+            Text(l10n.verificationKeyFooter)
+                .fixedSize(horizontal: false, vertical: true)
+        }
     }
 
     private func exportFullBackup() {

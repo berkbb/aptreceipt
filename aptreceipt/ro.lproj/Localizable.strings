@@ -470,3 +470,16 @@
 "exportFileOutcome" = "dispozitie_plata";
 "exportFileManagement" = "dispozitie_plata_administratie";
 "exportFileFlat" = "ap";
+
+/* Verification key recovery code */
+"verificationKeyTitle" = "Cheie de Verificare";
+"verificationKeyFooter" = "Codurile QR ale chitanțelor sunt sigilate cu cheia acestui Mac. Notați codul de recuperare într-un loc sigur, ca să puteți verifica chitanțele mai vechi dacă Mac-ul este înlocuit sau șters; copia de rezervă a sistemului conține și ea cheia.";
+"recoveryCodeShow" = "Afișați Codul de Recuperare";
+"recoveryCodeHide" = "Ascundeți Codul de Recuperare";
+"recoveryCodeCopy" = "Copiați";
+"recoveryCodeCopied" = "Codul de recuperare a fost copiat în clipboard.";
+"recoveryCodeWarning" = "Nu împărtășiți acest cod: oricine îl are poate crea coduri de chitanță valabile în numele acestei instalări.";
+"recoveryCodeRestoreTitle" = "Cod de recuperare";
+"recoveryCodeRestoreButton" = "Restaurați";
+"recoveryCodeRestored" = "Cheia a fost restaurată; chitanțele sigilate cu ea pot fi acum verificate.";
+"recoveryCodeInvalid" = "Cod nevalid: poate lipsi un caracter sau a fost scris greșit.";

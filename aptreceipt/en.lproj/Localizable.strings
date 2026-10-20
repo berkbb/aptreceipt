@@ -470,3 +470,16 @@
 "exportFileOutcome" = "expense_receipt";
 "exportFileManagement" = "management_expense_receipt";
 "exportFileFlat" = "flat";
+
+/* Verification key recovery code */
+"verificationKeyTitle" = "Verification Key";
+"verificationKeyFooter" = "Receipt QR codes are sealed with this Mac's key. Write the recovery code down somewhere safe so older receipts can still be verified if this Mac is replaced or erased; the system backup also contains the key.";
+"recoveryCodeShow" = "Show Recovery Code";
+"recoveryCodeHide" = "Hide Recovery Code";
+"recoveryCodeCopy" = "Copy";
+"recoveryCodeCopied" = "Recovery code copied to the clipboard.";
+"recoveryCodeWarning" = "Do not share this code: anyone who has it can create receipt codes that verify as issued by this installation.";
+"recoveryCodeRestoreTitle" = "Recovery code";
+"recoveryCodeRestoreButton" = "Restore";
+"recoveryCodeRestored" = "Key restored; receipts sealed with it can now be verified.";
+"recoveryCodeInvalid" = "Invalid code: a character may be missing or mistyped.";

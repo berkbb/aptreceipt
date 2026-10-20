@@ -83,5 +83,6 @@
 
 - The receipt QR code holds `ReceiptDocumentView.qrContent`: only the code `AR1.…`, the receipt sealed with this installation's key (`ReceiptQRBlock`, ChaCha20-Poly1305). Phone cameras show it and offer to copy it; nothing personal is readable. 3.6.0 printed labeled lines with `Verification code: XXXX-XXXX-XXXX-XXXX` (HMAC); those still verify.
 - Keys: `ReceiptVerificationKeyStore`, file `Application Support/aptreceipt/receipt-verification-keys`, current key first; carried by the system backup (2.2). Nothing is ever sent to a server or web page (`user_rejected_spec.md`).
+- Recovery code: Settings → Backup → Verification Key shows the current key as 56 characters (14 groups of 4, checksum included) and restores a key from one; restoring keeps the existing keys.
 - Verify Receipt window: QR from a photo, PDF or pasted text (Vision, on device) → `ScannedReceiptVerification` (genuine / not verified / older receipt without code) → `ReceiptArchiveComparison` (matches / differs / missing) → POS-style `ReceiptSlipView`.
 - Receipts printed before 3.6 carry `AptReceipt | … | …` without a code; they are shown but cannot be verified.
