@@ -16,6 +16,7 @@ All AI agents contributing to this codebase must adhere strictly to:
    - All management data (residents, vendors, receipts, financial summaries) are stored locally on the user's machine (Application Support / UserDefaults).
    - Zero telemetry, zero unconsented network transmission.
    - Robust JSON export and import for user-controlled backups.
-5. **Git Commit Standards**:
+5. **One-to-One Localization (mandatory)**: Every user-facing text must exist in every supported language with the same meaning, whatever the language: screens, alerts, menus, generated documents, WhatsApp/email messages, generated data, file names, and number/currency/percent formats. This applies to `en`, `tr`, `ro` and to any language added later; a partial translation or an English fallback is a bug. Follow `.agents/rules/localization_parity.md`; its parity tests must pass before every commit.
+6. **Git Commit Standards**:
    - Format: `modify type @ scope: 'sentence description' - [tag]`
    - Keep atomic commits reflecting distinct units of work.
