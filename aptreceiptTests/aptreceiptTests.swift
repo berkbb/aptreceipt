@@ -1058,6 +1058,37 @@ final class aptreceiptTests: XCTestCase {
         XCTAssertTrue(en.contains("5.0%"), en)
         XCTAssertFalse(en.contains("%5"), en)
     }
+
+    // MARK: - 12. Receipt Periods (cash summary month picker)
+
+    func testReceiptPeriodsInAnyAppLanguageAreTheSameMonth() throws {
+        let october = ReceiptPeriod(year: 2026, month: 10)
+        for text in ["Ekim 2026", "October 2026", "octombrie 2026", "Octombrie 2026", " EKİM 2026 ", "ekim 2026"] {
+            XCTAssertEqual(ReceiptPeriod(monthYear: text), october, text)
+        }
+        XCTAssertEqual(ReceiptPeriod(monthYear: "Şubat 2027"), ReceiptPeriod(year: 2027, month: 2))
+        XCTAssertEqual(ReceiptPeriod(monthYear: "August 2026"), ReceiptPeriod(year: 2026, month: 8))
+        XCTAssertEqual(ReceiptPeriod(monthYear: "Ağustos 2026"), ReceiptPeriod(year: 2026, month: 8))
+        XCTAssertNil(ReceiptPeriod(monthYear: "Q4 2026"))
+        XCTAssertNil(ReceiptPeriod(monthYear: ""))
+        XCTAssertEqual(october.id, "2026-10")
+    }
+
+    func testReceiptPeriodTitlesFollowTheAppLanguageAndSortByDate() throws {
+        let october = ReceiptPeriod(year: 2026, month: 10)
+        XCTAssertEqual(october.title(locale: L10n(.turkish).locale), "Ekim 2026")
+        XCTAssertEqual(october.title(locale: L10n(.english).locale), "October 2026")
+        XCTAssertEqual(october.title(locale: L10n(.romanian).locale).lowercased(), "octombrie 2026")
+        // A new receipt's own period text maps back to the same month.
+        for language in [AppLanguage.turkish, .english, .romanian] {
+            let locale = L10n(language).locale
+            XCTAssertEqual(ReceiptPeriod(monthYear: october.title(locale: locale)), october, "\(language)")
+        }
+        // Chronological, not alphabetical ("Eylül" < "Ekim" by date even though "Ekim" < "Eylül" by letters).
+        let september = try XCTUnwrap(ReceiptPeriod(monthYear: "Eylül 2026"))
+        let january = try XCTUnwrap(ReceiptPeriod(monthYear: "Ocak 2027"))
+        XCTAssertEqual([october, january, september].sorted(by: >), [january, october, september])
+    }
 }
 
 

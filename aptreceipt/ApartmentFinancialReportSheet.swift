@@ -14,16 +14,38 @@ struct ApartmentFinancialReportSheet: View {
 
     private var l10n: L10n { settings.l10n }
 
+    /// Period key of a receipt: "2026-10" when the month is recognized, otherwise the raw text.
+    private func periodKey(_ monthYear: String) -> String {
+        ReceiptPeriod(monthYear: monthYear)?.id ?? "raw:\(monthYear)"
+    }
+
+    /// Picker title in the current language; unrecognized period texts are shown as stored.
+    private func periodTitle(_ key: String) -> String {
+        if key.hasPrefix("raw:") { return String(key.dropFirst(4)) }
+        let parts = key.split(separator: "-").compactMap { Int($0) }
+        guard parts.count == 2 else { return key }
+        return ReceiptPeriod(year: parts[0], month: parts[1]).title(locale: l10n.locale)
+    }
+
+    /// One entry per month, newest first, regardless of the language a receipt was created in.
     private var availablePeriods: [String] {
-        let set = Set(archiveStore.records.map { $0.monthYear })
-        return Array(set).sorted().reversed()
+        var recognized = Set<ReceiptPeriod>()
+        var raw = Set<String>()
+        for record in archiveStore.records {
+            if let period = ReceiptPeriod(monthYear: record.monthYear) {
+                recognized.insert(period)
+            } else {
+                raw.insert("raw:\(record.monthYear)")
+            }
+        }
+        return recognized.sorted(by: >).map(\.id) + raw.sorted()
     }
 
     private var filteredRecords: [ReceiptRecord] {
         if selectedPeriod == "all" {
             return archiveStore.records
         }
-        return archiveStore.records.filter { $0.monthYear == selectedPeriod }
+        return archiveStore.records.filter { periodKey($0.monthYear) == selectedPeriod }
     }
 
     private var totalIncome: Double {
@@ -62,7 +84,7 @@ struct ApartmentFinancialReportSheet: View {
             let owner = settings.owner(for: flat)
             let phone = settings.ownerPhone(for: flat)
             let matchingRecord = archiveStore.records.first {
-                $0.kind == .income && $0.apartmentNumber == flat && (periodToMatch.isEmpty || $0.monthYear == periodToMatch)
+                $0.kind == .income && $0.apartmentNumber == flat && (periodToMatch.isEmpty || periodKey($0.monthYear) == periodToMatch)
             }
             return (flat: flat, owner: owner, phone: phone, isPaid: matchingRecord != nil, record: matchingRecord)
         }
@@ -111,7 +133,7 @@ struct ApartmentFinancialReportSheet: View {
                     Picker("", selection: $selectedPeriod) {
                         Text(l10n.allMonths).tag("all")
                         ForEach(availablePeriods, id: \.self) { period in
-                            Text(period).tag(period)
+                            Text(periodTitle(period)).tag(period)
                         }
                     }
                     .frame(width: 170)
@@ -422,7 +444,7 @@ struct ApartmentFinancialReportSheet: View {
     }
 
     private func sendWhatsAppReminder(flat: Int, owner: String, phone: String) {
-        let periodName = selectedPeriod == "all" ? (availablePeriods.first ?? "") : selectedPeriod
+        let periodName = periodTitle(selectedPeriod == "all" ? (availablePeriods.first ?? "") : selectedPeriod)
         let dues = Double(settings.defaultPayment.trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: ",", with: "."))
         let message = WhatsAppShareHelper.paymentReminder(
             flat: flat,
@@ -447,7 +469,7 @@ struct ApartmentFinancialReportSheet: View {
         panel.canCreateDirectories = true
         panel.showsTagField = false
         panel.allowedContentTypes = [.pdf]
-        let periodStr = selectedPeriod == "all" ? "Genel" : selectedPeriod.replacingOccurrences(of: " ", with: "_")
+        let periodStr = (selectedPeriod == "all" ? l10n.allMonths : periodTitle(selectedPeriod)).replacingOccurrences(of: " ", with: "_")
         let aptStr = sanitizeForFileName(settings.apartmentName.isEmpty ? "Apartman" : settings.apartmentName)
         panel.nameFieldStringValue = "\(aptStr)_Mali_Pano_Raporu_\(periodStr).pdf"
 
@@ -455,7 +477,7 @@ struct ApartmentFinancialReportSheet: View {
 
         let noticeView = ApartmentBulletinBoardView(
             settings: settings,
-            periodTitle: selectedPeriod == "all" ? l10n.allMonths : selectedPeriod,
+            periodTitle: selectedPeriod == "all" ? l10n.allMonths : periodTitle(selectedPeriod),
             totalIncome: totalIncome,
             totalExpenses: totalExpenses,
             netBalance: netCashBalance,
