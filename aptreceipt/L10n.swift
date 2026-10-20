@@ -342,6 +342,34 @@ struct L10n {
         String(format: tr("lateFeeStatusLate"), "\(months) \(months > 1 ? monthsUnit : monthUnit)")
     }
 
+    // Late-fee country profiles and export file names
+    var lateFeeProfileTurkey: String { tr("lateFeeProfileTurkey") }
+    var lateFeeProfileRomania: String { tr("lateFeeProfileRomania") }
+    var lateFeeProfileInternational: String { tr("lateFeeProfileInternational") }
+    var lateFeeProfileCustom: String { tr("lateFeeProfileCustom") }
+    var lateFeeFootnoteTurkey: String { tr("lateFeeFootnoteTurkey") }
+    var lateFeeFootnoteRomania: String { tr("lateFeeFootnoteRomania") }
+    var lateFeeFootnoteInternational: String { tr("lateFeeFootnoteInternational") }
+    var lateFeeFootnoteCustom: String { tr("lateFeeFootnoteCustom") }
+    var lateFeeNoticeTurkey: String { tr("lateFeeNoticeTurkey") }
+    var lateFeeNoticeRomania: String { tr("lateFeeNoticeRomania") }
+    var lateFeeNoticeInternational: String { tr("lateFeeNoticeInternational") }
+    var lateFeeNoticeCustom: String { tr("lateFeeNoticeCustom") }
+    var waKindIncome: String { tr("waKindIncome") }
+    var waKindOutcome: String { tr("waKindOutcome") }
+    var waKindManagement: String { tr("waKindManagement") }
+    var waClosing: String { tr("waClosing") }
+    var exportFileBuilding: String { tr("exportFileBuilding") }
+    var exportFileIncome: String { tr("exportFileIncome") }
+    var exportFileOutcome: String { tr("exportFileOutcome") }
+    var exportFileManagement: String { tr("exportFileManagement") }
+    var exportFileFlat: String { tr("exportFileFlat") }
+
+    /// WhatsApp and email message lines; each takes its values in the order of its placeholders.
+    func message(_ key: String, _ values: String...) -> String {
+        String(format: tr(key), arguments: values)
+    }
+
     func lateFeeItemName(rate: Double, months: Int) -> String {
         let format = tr(months > 1 ? "lateFeeItemName.other" : "lateFeeItemName.one")
         return String(format: format, AppFormat.percent(rate, l10n: self, maximumFractionDigits: 2), months)

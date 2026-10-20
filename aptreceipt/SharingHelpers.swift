@@ -106,8 +106,15 @@ enum WhatsAppShareHelper {
         AppFormat.currency(value, currency, l10n: l10n)
     }
 
+    /// The rate in words ("yüzde 5", "5 percent", "5 la sută"). WhatsApp links must not carry a "%" sign: wa.me
+    /// decodes the text more than once, which turned "%5,0" into broken characters.
     static func formatRate(_ rate: Double, l10n: L10n) -> String {
-        AppFormat.percent(rate, l10n: l10n, maximumFractionDigits: 2)
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.locale = l10n.locale
+        formatter.minimumFractionDigits = 0
+        formatter.maximumFractionDigits = 2
+        return l10n.message("waRatePercent", formatter.string(from: NSNumber(value: rate)) ?? "\(rate)")
     }
 
     static func receiptSummary(draft: ReceiptDraft, buildingName: String, l10n: L10n) -> String {
@@ -118,58 +125,29 @@ enum WhatsAppShareHelper {
         let notes = draft.notes.trimmingCharacters(in: .whitespacesAndNewlines)
         let issuer = draft.issuer.trimmingCharacters(in: .whitespacesAndNewlines)
         let showFlat = draft.showApartmentNumber && draft.apartmentNumber > 0
-
-        var lines: [String] = []
-        switch l10n.resolvedLanguage {
-        case .turkish:
-            let kindText = draft.kind == .managementExpense ? "işletme harcaması belgesi" : (draft.kind == .outcome ? "iade makbuzu" : "aidat tahsilat makbuzu")
-            lines.append("Sayın *\(draft.receiver)*,")
-            lines.append("*\(building)* yönetimi tarafından \(draft.monthYear) dönemi için #\(draft.sequenceNumber) numaralı \(kindText) düzenlenmiştir.")
-            lines.append("")
-            lines.append("📍 Muhatap: \(showFlat ? "Daire \(draft.apartmentNumber) - " : "")\(draft.receiver)")
-            lines.append("💰 Tutar: \(total)")
-            if hasLateFee {
-                lines.append("    Aidat: \(formatAmount(base, currency: draft.currency, l10n: l10n))")
-                lines.append("    Gecikme tazminatı: \(formatAmount(draft.lateFeeAmount, currency: draft.currency, l10n: l10n))")
-            }
-            lines.append("📅 Tarih: \(draft.createdDate)")
-            if !notes.isEmpty { lines.append("📝 Açıklama: \(notes)") }
-            lines.append("")
-            lines.append("Bilgilerinize sunarız.")
-            if !issuer.isEmpty { lines.append("Yönetici: \(issuer)") }
-        case .romanian:
-            let kindText = draft.kind == .managementExpense ? "cheltuială administrație" : (draft.kind == .outcome ? "dispoziție de plată" : "chitanță întreținere")
-            lines.append("Stimate/Stimată *\(draft.receiver)*,")
-            lines.append("Asociația *\(building)* a emis \(kindText) cu seria #\(draft.sequenceNumber) pentru perioada \(draft.monthYear).")
-            lines.append("")
-            lines.append("📍 Beneficiar: \(showFlat ? "Ap. \(draft.apartmentNumber) - " : "")\(draft.receiver)")
-            lines.append("💰 Sumă: \(total)")
-            if hasLateFee {
-                lines.append("    Întreținere: \(formatAmount(base, currency: draft.currency, l10n: l10n))")
-                lines.append("    Penalități de întârziere: \(formatAmount(draft.lateFeeAmount, currency: draft.currency, l10n: l10n))")
-            }
-            lines.append("📅 Data: \(draft.createdDate)")
-            if !notes.isEmpty { lines.append("📝 Detalii: \(notes)") }
-            lines.append("")
-            lines.append("Cu stimă,")
-            if !issuer.isEmpty { lines.append("Administrator: \(issuer)") }
-        default:
-            let kindText = draft.kind == .managementExpense ? "operating expense voucher" : (draft.kind == .outcome ? "resident refund receipt" : "dues collection receipt")
-            lines.append("Dear *\(draft.receiver)*,")
-            lines.append("*\(building)* management has issued receipt #\(draft.sequenceNumber) (\(kindText)) for the period of \(draft.monthYear).")
-            lines.append("")
-            lines.append("📍 Payee/Unit: \(showFlat ? "Unit \(draft.apartmentNumber) - " : "")\(draft.receiver)")
-            lines.append("💰 Amount: \(total)")
-            if hasLateFee {
-                lines.append("    Dues: \(formatAmount(base, currency: draft.currency, l10n: l10n))")
-                lines.append("    Late fee: \(formatAmount(draft.lateFeeAmount, currency: draft.currency, l10n: l10n))")
-            }
-            lines.append("📅 Date: \(draft.createdDate)")
-            if !notes.isEmpty { lines.append("📝 Notes: \(notes)") }
-            lines.append("")
-            lines.append("Best regards,")
-            if !issuer.isEmpty { lines.append("Manager: \(issuer)") }
+        let kindKey: String
+        switch draft.kind {
+        case .income: kindKey = "waKindIncome"
+        case .outcome: kindKey = "waKindOutcome"
+        case .managementExpense: kindKey = "waKindManagement"
         }
+
+        var lines = [
+            l10n.message("waSummaryGreeting", draft.receiver),
+            l10n.message("waSummaryIssued", building, draft.monthYear, "\(draft.sequenceNumber)", l10n.message(kindKey)),
+            "",
+            l10n.message("waPayee", showFlat ? l10n.message("waPayeeFlat", "\(draft.apartmentNumber)", draft.receiver) : draft.receiver),
+            l10n.message("waAmount", total),
+        ]
+        if hasLateFee {
+            lines.append(l10n.message("waDues", formatAmount(base, currency: draft.currency, l10n: l10n)))
+            lines.append(l10n.message("waLateFee", formatAmount(draft.lateFeeAmount, currency: draft.currency, l10n: l10n)))
+        }
+        lines.append(l10n.message("waDate", draft.createdDate))
+        if !notes.isEmpty { lines.append(l10n.message("waNotes", notes)) }
+        lines.append("")
+        lines.append(l10n.message("waClosing"))
+        if !issuer.isEmpty { lines.append(l10n.message("waManager", issuer)) }
         return lines.joined(separator: "\n")
     }
 
@@ -192,34 +170,16 @@ enum WhatsAppShareHelper {
         let feeText = fee.map { formatAmount($0, currency: currency, l10n: l10n) }
         let totalText = (dues != nil && fee != nil) ? formatAmount(LateFeeCalculator.grandTotal(base: dues!, lateFee: fee!), currency: currency, l10n: l10n) : nil
         let rateText = lateFeeRate.map { formatRate($0, l10n: l10n) }
+        let greeting = ownerName.isEmpty
+            ? l10n.message("waReminderGreeting", "\(flat)")
+            : l10n.message("waReminderGreetingNamed", ownerName, "\(flat)")
 
-        switch l10n.resolvedLanguage {
-        case .turkish:
-            let greeting = ownerName.isEmpty ? "Sayın Komşumuz (Daire \(flat))" : "Sayın *\(ownerName)* (Daire \(flat))"
-            var body = "\(greeting), \(buildingName) \(period) dönemi"
-            if let duesText { body += " \(duesText)" }
-            if let feeText, let totalText, let rateText {
-                body += " aidat ve aylık \(rateText) gecikme tazminatı (\(feeText)) ile birlikte toplam \(totalText) ödemeniz"
-            } else {
-                body += " aidat ödemeniz"
-            }
-            return body + " henüz kaydımıza geçmemiştir. Bilginize sunar, iyi günler dileriz. - \(manager)"
-        case .romanian:
-            let greeting = ownerName.isEmpty ? "Stimate Vecin (Ap. \(flat))" : "Stimate/Stimată *\(ownerName)* (Ap. \(flat))"
-            var body = "\(greeting), plata întreținerii pentru perioada \(period) la \(buildingName)"
-            if let duesText { body += " în valoare de \(duesText)" }
-            if let feeText, let totalText, let rateText {
-                body += ", plus penalități de întârziere (\(rateText): \(feeText)), total \(totalText),"
-            }
-            return body + " este în așteptare. Vă mulțumim! - \(manager)"
-        default:
-            let greeting = ownerName.isEmpty ? "Dear Resident (Flat \(flat))" : "Dear *\(ownerName)* (Flat \(flat))"
-            var body = "\(greeting), dues payment for \(period) at \(buildingName)"
-            if let duesText { body += " in the amount of \(duesText)" }
-            if let feeText, let totalText, let rateText {
-                body += ", plus a late fee (\(rateText): \(feeText)), total \(totalText),"
-            }
-            return body + " is currently pending. Thank you! - \(manager)"
+        if let duesText, let feeText, let totalText, let rateText {
+            return l10n.message("waReminderWithFee", greeting, buildingName, period, duesText, rateText, feeText, totalText, manager)
         }
+        if let duesText {
+            return l10n.message("waReminderDues", greeting, buildingName, period, duesText, manager)
+        }
+        return l10n.message("waReminderNoDues", greeting, buildingName, period, manager)
     }
 }

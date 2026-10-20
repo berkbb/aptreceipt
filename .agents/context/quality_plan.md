@@ -1,6 +1,6 @@
 # Quality Plan — Money, Late Fee, Keys, Code Layout, Buildings
 
-- **Status:** Approved 2026-10-20. Phase 1 done (`Money` in `LateFee.swift`, tests section 21). Phase 2 done (`LatePaymentSchedule`, main screen due line, cash summary badge and WhatsApp reminder use it; tests section 22). Phases 3–7 pending.
+- **Status:** Approved 2026-10-20. Phase 1 done (`Money` in `LateFee.swift`, tests section 21). Phase 2 done (`LatePaymentSchedule`, main screen due line, cash summary badge and WhatsApp reminder use it; tests section 22). Phase 3 done (late-fee profile texts, WhatsApp/email messages and export file names in the language files; rates in WhatsApp written without `%`, which fixed broken characters in wa.me links; `NumberToWords.swift` split out; tests section 23). Phases 4–7 pending.
 - **Source:** the user's review of AptReceipt's weak points. Ad-hoc signed distribution is the user's choice and is not in scope (`user_rejected_spec.md`).
 - **Decisions (user, 2026-10-20):** late months count every started month after the due day plus grace; several buildings on the Mac; a recovery code for the verification keys.
 

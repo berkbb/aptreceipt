@@ -1045,7 +1045,7 @@ final class aptreceiptTests: XCTestCase {
             lateFeeRate: 5, buildingName: "Test Apt", manager: "Test Manager", l10n: L10n(.turkish)
         )
         XCTAssertTrue(tr.hasPrefix("Sayın *Test Owner* (Daire 3),"), tr)
-        XCTAssertTrue(tr.contains("2.000,00") && tr.contains("2.100,00") && tr.contains("%5,0"), tr)
+        XCTAssertTrue(tr.contains("2.000,00") && tr.contains("2.100,00") && tr.contains("yüzde 5"), tr)
         XCTAssertTrue(tr.hasSuffix("- Test Manager"), tr)
 
         let anonymous = WhatsAppShareHelper.paymentReminder(
@@ -1059,8 +1059,8 @@ final class aptreceiptTests: XCTestCase {
             flat: 3, owner: "", period: "October 2026", dues: 2000, currency: .usDollar,
             lateFeeRate: 5, buildingName: "Test Apt", manager: "Test Manager", l10n: L10n(.english)
         )
-        XCTAssertTrue(en.contains("5.0%"), en)
-        XCTAssertFalse(en.contains("%5"), en)
+        XCTAssertTrue(en.contains("(5 percent: $100.00)"), en)
+        XCTAssertFalse(en.contains("%"), en)
     }
 
     // MARK: - 12. Receipt Periods (cash summary month picker)
@@ -1910,5 +1910,75 @@ final class aptreceiptTests: XCTestCase {
             XCTAssertTrue(l10n.lateFeeStatusLate(months: 2).contains("2"), "\(language)")
             XCTAssertFalse(l10n.lateFeeStatusOnTime.isEmpty, "\(language)")
         }
+    }
+
+    // MARK: - 23. No Inline Per-Language Texts (every language in its own file)
+
+    func testNoInlinePerLanguageTextsInCode() throws {
+        // Language data that is not interface text: number-word grammar, sample data, language self-names
+        // and the receipt number prefixes printed on receipts.
+        let exempt: Set<String> = ["NumberToWords.swift", "SampleData.swift", "AppSettingsEnums.swift", "ReceiptVerification.swift"]
+        let literal = try NSRegularExpression(pattern: #""((?:[^"\\\n]|\\.)*)""#)
+        let languageCase = try NSRegularExpression(pattern: #"case \.(turkish|romanian)\b"#)
+        let word = try NSRegularExpression(pattern: #"\p{L}{3,}"#)
+        func hasWords(_ text: String) -> Bool {
+            literal.matches(in: text, range: NSRange(text.startIndex..., in: text)).contains { match in
+                guard let range = Range(match.range(at: 1), in: text) else { return false }
+                let content = String(text[range])
+                return word.firstMatch(in: content, range: NSRange(content.startIndex..., in: content)) != nil
+            }
+        }
+        var offenders: [String] = []
+        let files = try FileManager.default.contentsOfDirectory(at: sourceDirectory, includingPropertiesForKeys: nil)
+            .filter { $0.pathExtension == "swift" && !exempt.contains($0.lastPathComponent) }
+        for file in files {
+            let lines = try String(contentsOf: file, encoding: .utf8).components(separatedBy: "\n")
+            for (index, line) in lines.enumerated() {
+                if line.contains("isTurkish ?") || line.contains("isRomanian ?") {
+                    offenders.append("\(file.lastPathComponent):\(index + 1)")
+                }
+                guard languageCase.firstMatch(in: line, range: NSRange(line.startIndex..., in: line)) != nil else { continue }
+                // The case line and its body, up to the next case, default or closing brace.
+                var body = [line]
+                for next in lines.dropFirst(index + 1).prefix(6) {
+                    let trimmed = next.trimmingCharacters(in: .whitespaces)
+                    if trimmed.hasPrefix("case ") || trimmed.hasPrefix("default") || trimmed.hasPrefix("}") { break }
+                    body.append(next)
+                }
+                if body.contains(where: hasWords) {
+                    offenders.append("\(file.lastPathComponent):\(index + 1)")
+                }
+            }
+        }
+        XCTAssertTrue(offenders.isEmpty, "Texts written per language in code instead of the language files: \(offenders)")
+    }
+
+    func testEveryMessageKeyExistsInAllThreeLanguages() throws {
+        let source = try String(contentsOf: sourceDirectory.appendingPathComponent("SharingHelpers.swift"), encoding: .utf8)
+        let regex = try NSRegularExpression(pattern: #"message\("([A-Za-z]+)""#)
+        let keys = Set(regex.matches(in: source, range: NSRange(source.startIndex..., in: source)).compactMap {
+            Range($0.range(at: 1), in: source).map { String(source[$0]) }
+        })
+        XCTAssertGreaterThan(keys.count, 15)
+        for localization in ["en", "tr", "ro"] {
+            let table = try catalogTable(localization)
+            for key in keys {
+                XCTAssertNotNil(table[key], "\(localization) lacks \(key)")
+            }
+        }
+    }
+
+    func testWhatsAppMessagesCarryNoPercentSignAndSurviveTheLink() throws {
+        for language in Self.parityLanguages {
+            let l10n = L10n(language)
+            let reminder = WhatsAppShareHelper.paymentReminder(flat: 3, owner: "Test Owner", period: "Ekim 2026", dues: 2000, currency: .turkishLira, lateFeeRate: 5, lateMonths: 1, buildingName: "Test Apt", manager: "Test Manager", l10n: l10n)
+            XCTAssertFalse(reminder.contains("%"), "\(language): \(reminder)")
+            let url = try XCTUnwrap(WhatsAppShareHelper.shareURL(phone: "05320000000", message: reminder, callingCode: "90"))
+            let decoded = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems?.first?.value
+            XCTAssertEqual(decoded, reminder, "\(language)")
+        }
+        XCTAssertEqual(WhatsAppShareHelper.formatRate(2.5, l10n: L10n(.turkish)), "yüzde 2,5")
+        XCTAssertEqual(WhatsAppShareHelper.formatRate(5, l10n: L10n(.english)), "5 percent")
+        XCTAssertEqual(WhatsAppShareHelper.formatRate(0.2, l10n: L10n(.romanian)), "0,2 la sută")
     }
 }

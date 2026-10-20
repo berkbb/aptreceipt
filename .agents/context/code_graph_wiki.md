@@ -23,7 +23,8 @@
 | `MainScreen.swift` | `MainScreen` | Main window: receipt form, live preview, header buttons, sheets |
 | `MainScreenViewModel.swift` | `MainScreenViewModel` | Form state, late-fee math, invoice import, `createReceipt` |
 | `LiveReceiptPreview.swift` | `LiveReceiptPreview`, `Default2DBuildingLogo` | On-screen preview next to the form |
-| `ReceiptViewController.swift` | `NumberToWords`, `buildExportFileName`, `sanitizeForFileName`, `ReceiptPreviewSheet`, `ReceiptDocumentView`, `NSImage.writeJPEG`, `InvoiceOCRParser`, `ParsedInvoiceResult`, `InvoiceAttachmentManager` | A4 document, PDF/JPEG export, sharing, OCR, attachments |
+| `NumberToWords.swift` | `NumberToWords` | Amount in words per language (number-word grammar; the one place language data branches in code) |
+| `ReceiptViewController.swift` | `buildExportFileName`, `sanitizeForFileName`, `ReceiptPreviewSheet`, `ReceiptDocumentView`, `NSImage.writeJPEG`, `InvoiceOCRParser`, `ParsedInvoiceResult`, `InvoiceAttachmentManager` | A4 document, PDF/JPEG export, sharing, OCR, attachments |
 | `ReceiptArchiveSheet.swift` | `ReceiptArchiveSheet` | Archive browsing, filters, CSV export |
 | `ApartmentFinancialReportSheet.swift` | `ApartmentFinancialReportSheet` | Cash summary, dues status, reminders, transactions, bulletin export |
 | `ApartmentBulletinBoardView.swift` | `ApartmentBulletinBoardView` | A4 bulletin board notice |

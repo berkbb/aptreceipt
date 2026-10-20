@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Changed
+- **Money is calculated in decimal**: late fees, totals, the cash summary, the archive total and expense categories are calculated in `Decimal` and rounded half-up to cents, so half a cent never rounds the wrong way (2.01 × 50 % = 1.01, not 1.00) and long sums no longer drift. Stored amounts are unchanged.
+- **Due day and grace period now count**: the late fee is due on the due day of the period's month and free through the grace period; after that every started month counts (due 15 October, paid 16 November = 2 months). The late-fee card shows the due date, the grace end and whether the dues are late today; "Auto-detect" uses this and turns the fee off within the grace period. The cash summary badge and the WhatsApp reminder charge the real late months instead of always one.
+
+### Fixed
+- **Broken characters in WhatsApp reminders**: the Turkish rate "%5,0" arrived in WhatsApp as a strange character, because wa.me decodes the message more than once. Rates in WhatsApp messages are now written in words ("yüzde 5", "5 percent", "5 la sută").
+- **Late-fee profile texts, WhatsApp and email messages and export file names** were written per language in code; they now come from each language's own file, and a test keeps it that way. With the "System" language the late-fee footnote and legal notice now follow the system language instead of always English.
+
 ## [3.6.1] - 2026-10-20
 
 ### Changed
