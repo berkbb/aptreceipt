@@ -104,9 +104,11 @@ final class ReceiptSettingsStore: ObservableObject {
         l10n.locale
     }
 
-    private let defaults = UserDefaults.standard
+    /// Backing store. The app uses `.standard`; tests pass an isolated suite so they never touch real user data.
+    private let defaults: UserDefaults
 
-    init() {
+    init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
         let savedLang = defaults.string(forKey: Keys.language) ?? AppLanguage.english.rawValue
         let resolvedLang = AppLanguage(rawValue: savedLang) ?? .english
         language = resolvedLang
