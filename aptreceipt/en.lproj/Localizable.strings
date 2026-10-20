@@ -450,13 +450,13 @@
 "waKindIncome" = "dues collection receipt";
 "waKindOutcome" = "resident refund receipt";
 "waKindManagement" = "operating expense voucher";
-"waPayee" = "📍 Payee/Unit: %@";
+"waPayee" = "• Payee/Unit: %@";
 "waPayeeFlat" = "Unit %1$@ - %2$@";
-"waAmount" = "💰 Amount: %@";
+"waAmount" = "• Amount: %@";
 "waDues" = "    Dues: %@";
 "waLateFee" = "    Late fee: %@";
-"waDate" = "📅 Date: %@";
-"waNotes" = "📝 Notes: %@";
+"waDate" = "• Date: %@";
+"waNotes" = "• Notes: %@";
 "waClosing" = "Best regards,";
 "waManager" = "Manager: %@";
 "waReminderGreeting" = "Dear Resident (Flat %@)";

@@ -1025,13 +1025,13 @@ final class aptreceiptTests: XCTestCase {
         XCTAssertFalse(full.contains("2300.00"), full)
         XCTAssertTrue(full.contains("Aidat: ") && full.contains("2.000,00"), full)
         XCTAssertTrue(full.contains("Gecikme tazminatı: ") && full.contains("300,00"), full)
-        XCTAssertTrue(full.contains("📍 Muhatap: Daire 5 - Test Resident"), full)
-        XCTAssertTrue(full.contains("📝 Açıklama: Ekim aidatı"), full)
+        XCTAssertTrue(full.contains("• Muhatap: Daire 5 - Test Resident"), full)
+        XCTAssertTrue(full.contains("• Açıklama: Ekim aidatı"), full)
 
         let plain = WhatsAppShareHelper.receiptSummary(draft: sampleDraft(notes: "  ", lateFee: false, showFlat: false), buildingName: "", l10n: tr)
-        XCTAssertFalse(plain.contains("📝"), plain)
+        XCTAssertFalse(plain.contains("Açıklama"), plain)
         XCTAssertFalse(plain.contains("Gecikme"), plain)
-        XCTAssertTrue(plain.contains("📍 Muhatap: Test Resident"), plain)
+        XCTAssertTrue(plain.contains("• Muhatap: Test Resident"), plain)
         XCTAssertTrue(plain.contains("*\(tr.defaultBuildingName)*"), plain)
 
         let en = WhatsAppShareHelper.receiptSummary(draft: sampleDraft(), buildingName: "Test Apt", l10n: L10n(.english))
@@ -1968,11 +1968,16 @@ final class aptreceiptTests: XCTestCase {
         }
     }
 
-    func testWhatsAppMessagesCarryNoPercentSignAndSurviveTheLink() throws {
+    func testWhatsAppMessagesCarryNoPercentSignOrEmojiAndSurviveTheLink() throws {
         for language in Self.parityLanguages {
             let l10n = L10n(language)
             let reminder = WhatsAppShareHelper.paymentReminder(flat: 3, owner: "Test Owner", period: "Ekim 2026", dues: 2000, currency: .turkishLira, lateFeeRate: 5, lateMonths: 1, buildingName: "Test Apt", manager: "Test Manager", l10n: l10n)
             XCTAssertFalse(reminder.contains("%"), "\(language): \(reminder)")
+            // wa.me shows characters outside the Basic Multilingual Plane (emoji) as "�".
+            let summary = WhatsAppShareHelper.receiptSummary(draft: ReceiptDraft(receiver: "Test Resident", issuer: "Test Manager", notes: "Note", monthYear: "Ekim 2026", apartmentNumber: 1, amount: 1750, sequenceNumber: 9, createdDate: "20 Ekim 2026", showApartmentNumber: true, kind: .income), buildingName: "Test Apt", l10n: l10n)
+            for message in [reminder, summary] {
+                XCTAssertFalse(message.unicodeScalars.contains { $0.value > 0xFFFF }, "\(language): \(message)")
+            }
             let url = try XCTUnwrap(WhatsAppShareHelper.shareURL(phone: "05320000000", message: reminder, callingCode: "90"))
             let decoded = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems?.first?.value
             XCTAssertEqual(decoded, reminder, "\(language)")

@@ -450,13 +450,13 @@
 "waKindIncome" = "aidat tahsilat makbuzu";
 "waKindOutcome" = "iade makbuzu";
 "waKindManagement" = "işletme harcaması belgesi";
-"waPayee" = "📍 Muhatap: %@";
+"waPayee" = "• Muhatap: %@";
 "waPayeeFlat" = "Daire %1$@ - %2$@";
-"waAmount" = "💰 Tutar: %@";
+"waAmount" = "• Tutar: %@";
 "waDues" = "    Aidat: %@";
 "waLateFee" = "    Gecikme tazminatı: %@";
-"waDate" = "📅 Tarih: %@";
-"waNotes" = "📝 Açıklama: %@";
+"waDate" = "• Tarih: %@";
+"waNotes" = "• Açıklama: %@";
 "waClosing" = "Bilgilerinize sunarız.";
 "waManager" = "Yönetici: %@";
 "waReminderGreeting" = "Sayın Komşumuz (Daire %@)";

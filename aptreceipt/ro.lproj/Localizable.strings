@@ -450,13 +450,13 @@
 "waKindIncome" = "chitanță întreținere";
 "waKindOutcome" = "dispoziție de plată";
 "waKindManagement" = "cheltuială administrație";
-"waPayee" = "📍 Beneficiar: %@";
+"waPayee" = "• Beneficiar: %@";
 "waPayeeFlat" = "Ap. %1$@ - %2$@";
-"waAmount" = "💰 Sumă: %@";
+"waAmount" = "• Sumă: %@";
 "waDues" = "    Întreținere: %@";
 "waLateFee" = "    Penalități de întârziere: %@";
-"waDate" = "📅 Data: %@";
-"waNotes" = "📝 Detalii: %@";
+"waDate" = "• Data: %@";
+"waNotes" = "• Detalii: %@";
 "waClosing" = "Cu stimă,";
 "waManager" = "Administrator: %@";
 "waReminderGreeting" = "Stimate Vecin (Ap. %@)";
