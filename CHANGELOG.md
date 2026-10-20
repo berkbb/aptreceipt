@@ -6,6 +6,8 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 - **Update check errors**: A failed update check now explains what went wrong instead of always saying "check your internet connection": no internet connection, timeout, GitHub unreachable, no public release yet (HTTP 404), rate limit reached, GitHub server error, or an unreadable response. Messages are translated into English, Turkish and Romanian.
+- **About window**: Redesigned to match Arhivar: large icon, name, version and build read from the app bundle (previously hardcoded as 3.3.0), tagline, publisher and license credit, glass link buttons (babadogan.net, GitHub, Check for Updates, License) and a copyright line with the current year. The window now sizes itself to its content and hides its title bar. The Settings > About tab uses the same layout and keeps its software update card.
+- **License viewer**: Shows the full, unmodified GPL-3.0 text from the repository `LICENSE` instead of a shortened, edited excerpt. It stays read-only, and a test keeps it in sync with `LICENSE`.
 
 ## [3.4.3] - 2026-10-19
 

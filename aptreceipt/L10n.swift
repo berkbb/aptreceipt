@@ -413,6 +413,14 @@ struct L10n {
     var githubRepository: String { tr("githubRepository") }
     var appDescription: String { tr("appDescription") }
 
+    func aboutVersion(_ version: String, _ build: String) -> String {
+        String(format: tr("aboutVersionFormat"), version, build)
+    }
+
+    func aboutCopyright(_ year: String) -> String {
+        String(format: tr("aboutCopyrightFormat"), year)
+    }
+
     // Software Update Strings
     var checkForUpdates: String { tr("checkForUpdates") }
     var checkForUpdatesButton: String { tr("checkForUpdatesButton") }

@@ -1702,60 +1702,9 @@ struct SettingsView: View {
 
     private var aboutTab: some View {
         VStack(spacing: 16) {
-            if let icon = NSApplication.shared.applicationIconImage {
-                Image(nsImage: icon)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 76, height: 76)
-                    .shadow(color: Color.black.opacity(0.18), radius: 6, x: 0, y: 3)
-            }
+            AboutContentView(settings: settings, showsUpdateButton: false)
 
-            VStack(spacing: 4) {
-                Text(l10n.appTitle)
-                    .font(.title2.bold())
-                Text(l10n.appVersionText)
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-            }
-
-            // Publisher Card
             VStack(spacing: 12) {
-                HStack(spacing: 8) {
-                    Image(systemName: "person.badge.shield.checkmark.fill")
-                        .foregroundColor(.accentColor)
-                        .font(.title3)
-                    Text(l10n.publisher)
-                        .font(.headline)
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                .background(Color.accentColor.opacity(0.12))
-                .clipShape(Capsule())
-
-                // License Card & Clickable Viewer
-                VStack(spacing: 10) {
-                    Text(l10n.license)
-                        .font(.callout)
-                        .foregroundColor(.secondary)
-
-                    Button {
-                        settings.showLicenseViewer = true
-                    } label: {
-                        Label(l10n.viewLicenseButton, systemImage: "doc.text.magnifyingglass")
-                            .font(.callout.bold())
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .controlSize(.regular)
-                }
-                .padding(14)
-                .frame(maxWidth: 380)
-                .background(Color(NSColor.controlBackgroundColor))
-                .clipShape(RoundedRectangle(cornerRadius: 10))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
-                )
-
                 // Software Updates Card
                 VStack(spacing: 10) {
                     HStack(spacing: 8) {
@@ -1815,9 +1764,6 @@ struct SettingsView: View {
                         .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
                 )
 
-                Text(l10n.copyright)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
             }
         }
         .frame(maxWidth: .infinity)

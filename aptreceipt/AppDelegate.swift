@@ -236,8 +236,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         // 7. About Window (Dark English)
         let aboutView = AboutWindowView(settings: settings)
-            .frame(width: 420, height: 460)
-        render(view: aboutView, size: CGSize(width: 420, height: 460), to: outDir.appendingPathComponent("07_about_window.png"), isDark: true)
+            .frame(width: 500, height: 480)
+        render(view: aboutView, size: CGSize(width: 500, height: 480), to: outDir.appendingPathComponent("07_about_window.png"), isDark: true)
 
         // 8. Management Expense Dashboard (Dark English)
         let mgtDashboardView = MainScreen(
@@ -334,135 +334,142 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 struct AboutWindowView: View {
     @ObservedObject var settings: ReceiptSettingsStore
 
-    private var l10n: L10n {
-        settings.l10n
+    var body: some View {
+        AboutContentView(settings: settings, showsUpdateButton: true)
+            .padding(.horizontal, 30)
+            .padding(.top, 34)
+            .padding(.bottom, 24)
+            .frame(width: 500)
+            .background(.thickMaterial)
+            .sheet(isPresented: $settings.showLicenseViewer) {
+                LicenseViewerSheet(l10n: settings.l10n)
+            }
     }
+}
+
+/// Shared About layout (same structure as Arhivar): icon, name, version, tagline, credit, link buttons, copyright.
+struct AboutContentView: View {
+    @ObservedObject var settings: ReceiptSettingsStore
+    var showsUpdateButton: Bool
+
+    private var l10n: L10n { settings.l10n }
 
     var body: some View {
-        VStack(spacing: 0) {
-            // Header with App Icon and Meta
-            VStack(spacing: 12) {
-                if let appIcon = NSApplication.shared.applicationIconImage {
-                    Image(nsImage: appIcon)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 80, height: 80)
-                        .shadow(color: Color.black.opacity(0.18), radius: 6, x: 0, y: 3)
-                }
+        VStack(spacing: 16) {
+            Image(nsImage: NSApp.applicationIconImage)
+                .resizable()
+                .frame(width: 116, height: 116)
+                .shadow(color: .black.opacity(0.2), radius: 12, y: 5)
 
-                VStack(spacing: 4) {
-                    Text(l10n.appTitle)
-                        .font(.system(size: 20, weight: .bold))
-                        .foregroundColor(Color(NSColor.textColor))
-
-                    Text(l10n.appVersionText)
-                        .font(.system(size: 11, weight: .semibold))
-                        .foregroundColor(Color(NSColor.textColor))
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 3)
-                        .background(Color.secondary.opacity(0.15))
-                        .clipShape(Capsule())
-                }
-
+            VStack(spacing: 5) {
+                Text(l10n.appTitle)
+                    .font(.system(size: 30, weight: .bold, design: .rounded))
+                Text(l10n.aboutVersion(AppInfo.version, AppInfo.build))
+                    .font(.callout)
+                    .foregroundColor(.secondary)
                 Text(l10n.appDescription)
-                    .font(.system(size: 11))
-                    .foregroundColor(Color(NSColor.secondaryLabelColor))
+                    .font(.callout)
                     .multilineTextAlignment(.center)
-                    .lineLimit(3)
-                    .padding(.horizontal, 24)
+                    .fixedSize(horizontal: false, vertical: true)
             }
-            .padding(.top, 24)
-            .padding(.bottom, 16)
 
-            Divider()
+            Divider().padding(.horizontal, 50)
 
-            // Details, Publisher, License
-            VStack(spacing: 14) {
-                // Publisher & GitHub
-                HStack(spacing: 12) {
-                    HStack(spacing: 6) {
-                        Image(systemName: "person.badge.shield.checkmark.fill")
-                            .foregroundColor(.accentColor)
-                        Text(l10n.publisher)
-                            .font(.system(size: 12, weight: .semibold))
-                            .foregroundColor(Color(NSColor.textColor))
-                    }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(Color.accentColor.opacity(0.12))
-                    .clipShape(Capsule())
+            VStack(spacing: 8) {
+                Label(l10n.publisher, systemImage: "building.2")
+                    .font(.callout.weight(.medium))
+                Text(l10n.license)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
 
-                    if let url = URL(string: "https://github.com/berkbb/aptreceipt") {
-                        Link(destination: url) {
-                            HStack(spacing: 5) {
-                                Image(systemName: "link")
-                                Text(l10n.githubRepository)
+            AboutGlassGroup {
+                VStack(spacing: 8) {
+                    HStack(spacing: 8) {
+                        Button {
+                            NSWorkspace.shared.open(AppInfo.websiteURL)
+                        } label: {
+                            Label("babadogan.net", systemImage: "globe")
+                        }
+                        Button {
+                            NSWorkspace.shared.open(AppInfo.repositoryURL)
+                        } label: {
+                            Label(l10n.githubRepository, systemImage: "chevron.left.forwardslash.chevron.right")
+                        }
+                        if showsUpdateButton {
+                            Button {
+                                GitHubUpdateChecker.shared.checkForUpdates(userInitiated: true)
+                            } label: {
+                                Label(l10n.checkForUpdatesButton, systemImage: "arrow.triangle.2.circlepath")
                             }
-                            .font(.system(size: 11, weight: .medium))
+                            .disabled(GitHubUpdateChecker.shared.isChecking)
                         }
                     }
-                }
-
-                // License Section
-                VStack(spacing: 8) {
-                    Text(l10n.license)
-                        .font(.system(size: 11))
-                        .foregroundColor(Color(NSColor.secondaryLabelColor))
-                        .multilineTextAlignment(.center)
-
                     Button {
                         settings.showLicenseViewer = true
                     } label: {
-                        Label(l10n.viewLicenseButton, systemImage: "doc.text.magnifyingglass")
-                            .font(.system(size: 12, weight: .medium))
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .controlSize(.regular)
-                }
-                .padding(14)
-                .frame(maxWidth: .infinity)
-                .background(Color(NSColor.controlBackgroundColor))
-                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
-                )
-
-                // Check for Updates
-                HStack(spacing: 8) {
-                    if GitHubUpdateChecker.shared.isChecking {
-                        ProgressView()
-                            .controlSize(.small)
-                        Text(l10n.checkingForUpdates)
-                            .font(.system(size: 11))
-                            .foregroundColor(Color(NSColor.secondaryLabelColor))
-                    } else {
-                        Button {
-                            GitHubUpdateChecker.shared.checkForUpdates(userInitiated: true)
-                        } label: {
-                            HStack(spacing: 5) {
-                                Image(systemName: "arrow.clockwise")
-                                Text(l10n.checkForUpdatesButton)
-                            }
-                            .font(.system(size: 11, weight: .medium))
-                        }
-                        .buttonStyle(.bordered)
-                        .controlSize(.small)
+                        Label(l10n.viewLicenseButton, systemImage: "doc.text")
                     }
                 }
-
-                // Copyright
-                Text(l10n.copyright)
-                    .font(.system(size: 10))
-                    .foregroundColor(Color(NSColor.secondaryLabelColor))
+                .aboutGlassButtonStyle()
+                .controlSize(.small)
             }
-            .padding(20)
+
+            Text(l10n.aboutCopyright(AppInfo.currentYear))
+                .font(.caption2)
+                .foregroundColor(Color(NSColor.tertiaryLabelColor))
         }
-        .frame(width: 420, height: 500)
-        .background(Color(NSColor.windowBackgroundColor))
-        .sheet(isPresented: $settings.showLicenseViewer) {
-            LicenseViewerSheet(l10n: l10n)
+    }
+}
+
+enum AppInfo {
+    static let websiteURL = URL(string: "https://babadogan.net")!
+    static let repositoryURL = URL(string: "https://github.com/berkbb/aptreceipt")!
+
+    static var version: String {
+        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
+    }
+
+    static var build: String {
+        Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "?"
+    }
+
+    static var currentYear: String {
+        String(Calendar.current.component(.year, from: Date()))
+    }
+}
+
+/// Merges glass buttons into one layer on macOS 26; a plain container on older systems.
+private struct AboutGlassGroup<Content: View>: View {
+    @ViewBuilder var content: Content
+
+    var body: some View {
+        #if compiler(>=6.2)
+        if #available(macOS 26.0, *) {
+            GlassEffectContainer(spacing: 8) { content }
+        } else {
+            content
         }
+        #else
+        content
+        #endif
+    }
+}
+
+private extension View {
+    @ViewBuilder
+    func aboutGlassButtonStyle() -> some View {
+        #if compiler(>=6.2)
+        if #available(macOS 26.0, *) {
+            self.buttonStyle(.glass)
+        } else {
+            self.buttonStyle(.bordered)
+        }
+        #else
+        self.buttonStyle(.bordered)
+        #endif
     }
 }
 
@@ -475,34 +482,36 @@ final class AboutWindowManager: NSObject, NSWindowDelegate {
 
     func show(settings: ReceiptSettingsStore? = nil) {
         let actualSettings = settings ?? ReceiptSettingsStore.shared
-        if let window = window {
-            window.title = actualSettings.l10n.aboutWindowHeader
-            window.contentView = NSHostingView(
-                rootView: AboutWindowView(settings: actualSettings)
-                    .preferredColorScheme(actualSettings.theme.colorScheme)
-            )
-            window.makeKeyAndOrderFront(nil)
-            NSApp.activate(ignoringOtherApps: true)
-            return
-        }
-
-        let newWindow = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 420, height: 500),
-            styleMask: [.titled, .closable],
-            backing: .buffered,
-            defer: false
-        )
-        newWindow.title = actualSettings.l10n.aboutWindowHeader
-        newWindow.isReleasedWhenClosed = false
-        newWindow.delegate = self
-        newWindow.center()
-        newWindow.contentView = NSHostingView(
+        let window = window ?? makeWindow()
+        window.title = actualSettings.l10n.aboutWindowHeader
+        let hostingView = NSHostingView(
             rootView: AboutWindowView(settings: actualSettings)
                 .preferredColorScheme(actualSettings.theme.colorScheme)
         )
-        self.window = newWindow
-        newWindow.makeKeyAndOrderFront(nil)
+        window.contentView = hostingView
+        // The window takes the height of its content, like Arhivar's content-sized About window.
+        window.setContentSize(hostingView.fittingSize)
+        if self.window == nil {
+            window.center()
+            self.window = window
+        }
+        window.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
+    }
+
+    private func makeWindow() -> NSWindow {
+        let newWindow = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 500, height: 480),
+            styleMask: [.titled, .closable, .fullSizeContentView],
+            backing: .buffered,
+            defer: false
+        )
+        newWindow.titleVisibility = .hidden
+        newWindow.titlebarAppearsTransparent = true
+        newWindow.isMovableByWindowBackground = true
+        newWindow.isReleasedWhenClosed = false
+        newWindow.delegate = self
+        return newWindow
     }
 
     func windowWillClose(_ notification: Notification) {

@@ -272,6 +272,21 @@ final class aptreceiptTests: XCTestCase {
 
     // MARK: - 4. Semver & GitHub Release Update Checker Tests
 
+    func testLicenseViewerMatchesRepositoryLicense() throws {
+        let licenseURL = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("LICENSE")
+        let repository = try String(contentsOf: licenseURL, encoding: .utf8)
+        XCTAssertEqual(LicenseViewerSheet.licenseText, repository.trimmingCharacters(in: .newlines))
+    }
+
+    func testAboutVersionAndCopyrightAreFormatted() {
+        XCTAssertEqual(L10n(.english).aboutVersion("3.4.3", "10"), "Version 3.4.3 (Build 10)")
+        XCTAssertEqual(L10n(.turkish).aboutVersion("3.4.3", "10"), "Sürüm 3.4.3 (Yapı 10)")
+        XCTAssertEqual(L10n(.english).aboutCopyright("2026"), "© 2026 Babadogan Tech and Edu")
+    }
+
     func testUpdateCheckFailureClassifiesStatusCodes() {
         XCTAssertNil(UpdateCheckFailure(statusCode: 200))
         XCTAssertEqual(UpdateCheckFailure(statusCode: 404), .noPublicRelease)
