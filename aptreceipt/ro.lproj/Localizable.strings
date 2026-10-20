@@ -483,3 +483,16 @@
 "recoveryCodeRestoreButton" = "Restaurați";
 "recoveryCodeRestored" = "Cheia a fost restaurată; chitanțele sigilate cu ea pot fi acum verificate.";
 "recoveryCodeInvalid" = "Cod nevalid: poate lipsi un caracter sau a fost scris greșit.";
+
+/* Buildings */
+"buildingSwitchHelp" = "Schimbați clădirea";
+"buildingAdd" = "Adăugați o Clădire…";
+"buildingAddTitle" = "Clădire Nouă";
+"buildingAddMessage" = "Administratorul, semnătura, suma întreținerii, numărul de apartamente, moneda, setările de penalitate, furnizorii și serviciile se copiază de la această clădire; locatarii, sigla și chitanțele încep goale.";
+"buildingNewNamePlaceholder" = "Numele clădirii";
+"buildingAddConfirm" = "Adăugați";
+"buildingDelete" = "Ștergeți Această Clădire…";
+"buildingDeleteTitle" = "Ștergeți „%@”?";
+"buildingDeleteMessage" = "Setările, locatarii și furnizorii acestei clădiri se șterg, iar arhiva de chitanțe se mută în Coșul de gunoi. Celelalte clădiri și cheia de verificare nu sunt afectate.";
+"buildingDeleteConfirm" = "Ștergeți";
+"verifyArchiveBuilding" = "Clădire: %@";

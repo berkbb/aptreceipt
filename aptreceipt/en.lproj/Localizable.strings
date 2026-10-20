@@ -483,3 +483,16 @@
 "recoveryCodeRestoreButton" = "Restore";
 "recoveryCodeRestored" = "Key restored; receipts sealed with it can now be verified.";
 "recoveryCodeInvalid" = "Invalid code: a character may be missing or mistyped.";
+
+/* Buildings */
+"buildingSwitchHelp" = "Switch building";
+"buildingAdd" = "Add Building…";
+"buildingAddTitle" = "New Building";
+"buildingAddMessage" = "The manager, signature, dues amount, flat count, currency, late-fee settings, vendors and services are copied from this building; residents, logo and receipts start empty.";
+"buildingNewNamePlaceholder" = "Building name";
+"buildingAddConfirm" = "Add";
+"buildingDelete" = "Delete This Building…";
+"buildingDeleteTitle" = "Delete “%@”?";
+"buildingDeleteMessage" = "This building's settings, residents and vendors are removed and its receipt archive is moved to the Trash. Other buildings and the verification key are not affected.";
+"buildingDeleteConfirm" = "Delete";
+"verifyArchiveBuilding" = "Building: %@";

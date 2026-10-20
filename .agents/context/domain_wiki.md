@@ -86,3 +86,11 @@
 - Recovery code: Settings → Backup → Verification Key shows the current key as 56 characters (14 groups of 4, checksum included) and restores a key from one; restoring keeps the existing keys.
 - Verify Receipt window: QR from a photo, PDF or pasted text (Vision, on device) → `ScannedReceiptVerification` (genuine / not verified / older receipt without code) → `ReceiptArchiveComparison` (matches / differs / missing) → POS-style `ReceiptSlipView`.
 - Receipts printed before 3.6 carry `AptReceipt | … | …` without a code; they are shown but cannot be verified.
+
+## Buildings
+
+- `BuildingRegistry` keeps the building ids (`building_ids`) and the active one (`active_building_id`) in the base defaults. The first building, `main`, reads the original keys and `receipts_archive.json` unchanged; any other building reads `building.<id>.<key>` through `BuildingScopedDefaults` and its own `receipts_archive-<id>.json`.
+- App-wide keys (`BuildingScopedDefaults.appWideKeys`): language, theme, launch update check, `AppleLanguages`, the building list. Everything else in `ReceiptSettingsStore.Keys` (owners, phones, vendors, services, logo, signature, late-fee settings and per-profile rates, currency, receipt number) belongs to a building.
+- Switching calls `ReceiptSettingsStore.switchDefaults(to:)` and `ReceiptArchiveStore.useFile(_:)`, so the shared stores and every view follow; the Settings window closes first because it edits a draft.
+- A new building copies the manager, signature, dues amount, flat count, currency, late-fee settings, vendors and services; residents, phones, logo and receipts start empty; its receipt number starts at 1. Deleting removes its keys and moves its archive file to the Trash; the last building cannot be deleted.
+- Backups export and import the active building. Verify Receipt compares with every building's archive (the active one with its live name) and names the building when there are several.

@@ -340,4 +340,20 @@ final class LocalizationTests: XCTestCase {
         XCTAssertEqual(WhatsAppShareHelper.formatRate(5, l10n: L10n(.english)), "5 percent")
         XCTAssertEqual(WhatsAppShareHelper.formatRate(0.2, l10n: L10n(.romanian)), "0,2 la sută")
     }
+
+    func testNoKeyIsDefinedTwiceInALanguageFile() throws {
+        // A repeated key silently replaces the earlier text, so a new key can overwrite an existing one.
+        let keyLine = try NSRegularExpression(pattern: #"(?m)^"([^"]+)"\s*="#)
+        for language in ["en", "tr", "ro"] {
+            let text = try String(contentsOf: sourceDirectory.appendingPathComponent("\(language).lproj/Localizable.strings"), encoding: .utf8)
+            var seen = Set<String>()
+            var repeated: [String] = []
+            for match in keyLine.matches(in: text, range: NSRange(text.startIndex..., in: text)) {
+                guard let range = Range(match.range(at: 1), in: text) else { continue }
+                let key = String(text[range])
+                if !seen.insert(key).inserted { repeated.append(key) }
+            }
+            XCTAssertTrue(repeated.isEmpty, "\(language): \(repeated)")
+        }
+    }
 }

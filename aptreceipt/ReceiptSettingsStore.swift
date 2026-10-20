@@ -6,7 +6,10 @@ import SwiftUI
 @MainActor
 final class ReceiptSettingsStore: ObservableObject {
     /// The app's settings. During a screenshot run they live in memory only (`ScreenshotMode`).
-    static let shared = ReceiptSettingsStore(defaults: ScreenshotMode.settingsDefaults())
+    static let shared = ReceiptSettingsStore(defaults: BuildingRegistry.defaults(
+        for: BuildingRegistry.storedActiveID(in: ScreenshotMode.baseDefaults),
+        base: ScreenshotMode.baseDefaults
+    ))
 
     @Published var apartmentName: String {
         didSet { defaults.set(apartmentName, forKey: Keys.apartmentName) }
@@ -108,8 +111,9 @@ final class ReceiptSettingsStore: ObservableObject {
         l10n.locale
     }
 
-    /// Backing store. The app uses `.standard`; tests and screenshot runs pass `InMemoryDefaults` so they never touch real user data.
-    private let defaults: UserDefaults
+    /// Backing store. The app uses the active building's defaults (`BuildingRegistry`); tests and screenshot
+    /// runs pass `InMemoryDefaults` so they never touch real user data.
+    private(set) var defaults: UserDefaults
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
@@ -117,71 +121,136 @@ final class ReceiptSettingsStore: ObservableObject {
         let resolvedLang = AppLanguage(rawValue: savedLang) ?? .english
         language = resolvedLang
 
-        let savedCurrency = defaults.string(forKey: Keys.currency)
-        let resolvedCurrency = savedCurrency.flatMap(AppCurrency.init(rawValue:)) ?? AppCurrency.default(for: resolvedLang)
-        currency = resolvedCurrency
-
-        let isConfigured = defaults.object(forKey: Keys.apartmentName) != nil
-        let savedApt = defaults.string(forKey: Keys.apartmentName) ?? ""
-        let isScreenshotPollution = (savedApt == "Asociația Parcul Tineretului" || savedApt.isEmpty) && (resolvedLang == .english || resolvedLang == .system)
-
-        if !isConfigured || isScreenshotPollution {
-            let samples = SampleData.defaults(for: resolvedLang)
-            apartmentName = samples.apartmentName
-            issuer = samples.issuer
-            defaultPayment = samples.defaultPayment
-            flatCount = samples.flatCount
-            currency = samples.currency
-            seqNumber = 1
-            for (apt, name) in samples.residents {
-                defaults.set(name, forKey: Keys.owner(apt))
-            }
-        } else {
-            apartmentName = defaults.string(forKey: Keys.apartmentName) ?? ""
-            issuer = defaults.string(forKey: Keys.issuer) ?? ""
-            defaultPayment = defaults.string(forKey: Keys.defaultPayment) ?? ""
-            flatCount = max(1, ReceiptSettingsStore.readInt(defaults, key: Keys.flatCount, fallback: 1))
-            seqNumber = max(1, ReceiptSettingsStore.readInt(defaults, key: Keys.seqNumber, fallback: 1))
-        }
-
-        if let vendorData = defaults.data(forKey: Keys.vendors),
-           let savedVendors = try? JSONDecoder().decode([VendorRecord].self, from: vendorData),
-           !savedVendors.isEmpty {
-            vendors = savedVendors
-        } else {
-            vendors = SampleData.defaults(for: resolvedLang).defaultVendors
-        }
-
-        if let serviceData = defaults.data(forKey: Keys.expenseServices),
-           let savedServices = try? JSONDecoder().decode([ExpenseServicePreset].self, from: serviceData),
-           !savedServices.isEmpty {
-            expenseServices = savedServices
-        } else {
-            expenseServices = SampleData.defaults(for: resolvedLang).defaultServices
-        }
+        let building = BuildingValues.read(from: defaults, language: resolvedLang)
+        apartmentName = building.apartmentName
+        issuer = building.issuer
+        defaultPayment = building.defaultPayment
+        flatCount = building.flatCount
+        seqNumber = building.seqNumber
+        currency = building.currency
+        vendors = building.vendors
+        expenseServices = building.expenseServices
+        isLateFeeEnabled = building.isLateFeeEnabled
+        lateFeeMonthlyRate = building.lateFeeMonthlyRate
+        lateFeeDueDay = building.lateFeeDueDay
+        lateFeeCountryProfile = building.lateFeeCountryProfile
+        lateFeeGracePeriodDays = building.lateFeeGracePeriodDays
+        lateFeeCustomFootnote = building.lateFeeCustomFootnote
+        signatureData = building.signatureData
+        logoData = building.logoData
 
         let savedTheme = defaults.string(forKey: Keys.theme) ?? Defaults.theme.rawValue
         let resolvedTheme = AppTheme(rawValue: savedTheme) ?? .system
         theme = resolvedTheme
-
-        isLateFeeEnabled = defaults.bool(forKey: Keys.isLateFeeEnabled)
-        let savedFeeRate = defaults.double(forKey: Keys.lateFeeMonthlyRate)
-        lateFeeMonthlyRate = savedFeeRate > 0 ? savedFeeRate : Defaults.lateFeeMonthlyRate
-        let savedDueDay = defaults.integer(forKey: Keys.lateFeeDueDay)
-        lateFeeDueDay = savedDueDay > 0 ? savedDueDay : Defaults.lateFeeDueDay
-
-        let savedProfile = defaults.string(forKey: Keys.lateFeeCountryProfile)
-        let resolvedProfile = savedProfile.flatMap(LateFeeCountryProfile.init(rawValue:)) ?? LateFeeCountryProfile.default(for: resolvedLang)
-        lateFeeCountryProfile = resolvedProfile
-        let savedGrace = defaults.integer(forKey: Keys.lateFeeGracePeriodDays)
-        lateFeeGracePeriodDays = defaults.object(forKey: Keys.lateFeeGracePeriodDays) != nil ? savedGrace : resolvedProfile.defaultGraceDays
-        lateFeeCustomFootnote = defaults.string(forKey: Keys.lateFeeCustomFootnote) ?? Defaults.lateFeeCustomFootnote
         checkUpdatesAtLaunch = defaults.bool(forKey: Keys.checkUpdatesAtLaunch)
 
-        signatureData = defaults.data(forKey: Keys.signature)
-        logoData = defaults.data(forKey: Keys.logo)
-
         applyTheme(resolvedTheme)
+    }
+
+    /// Switches to another building's defaults and reloads its values in place, so every view that observes
+    /// this store follows. Language, theme and the launch update check are app-wide and stay as they are.
+    func switchDefaults(to newDefaults: UserDefaults) {
+        defaults = newDefaults
+        let building = BuildingValues.read(from: newDefaults, language: language)
+        apartmentName = building.apartmentName
+        issuer = building.issuer
+        defaultPayment = building.defaultPayment
+        flatCount = building.flatCount
+        seqNumber = building.seqNumber
+        currency = building.currency
+        vendors = building.vendors
+        expenseServices = building.expenseServices
+        isLateFeeEnabled = building.isLateFeeEnabled
+        lateFeeMonthlyRate = building.lateFeeMonthlyRate
+        lateFeeDueDay = building.lateFeeDueDay
+        lateFeeCountryProfile = building.lateFeeCountryProfile
+        lateFeeGracePeriodDays = building.lateFeeGracePeriodDays
+        lateFeeCustomFootnote = building.lateFeeCustomFootnote
+        signatureData = building.signatureData
+        logoData = building.logoData
+        objectWillChange.send()
+    }
+
+    /// One building's stored values, with the fresh-install fallbacks the store has always used.
+    private struct BuildingValues {
+        var apartmentName = ""
+        var issuer = ""
+        var defaultPayment = ""
+        var flatCount = 1
+        var seqNumber = 1
+        var currency = AppCurrency.usDollar
+        var vendors: [VendorRecord] = []
+        var expenseServices: [ExpenseServicePreset] = []
+        var isLateFeeEnabled = false
+        var lateFeeMonthlyRate = Defaults.lateFeeMonthlyRate
+        var lateFeeDueDay = Defaults.lateFeeDueDay
+        var lateFeeCountryProfile = LateFeeCountryProfile.international
+        var lateFeeGracePeriodDays = 0
+        var lateFeeCustomFootnote = Defaults.lateFeeCustomFootnote
+        var signatureData: Data?
+        var logoData: Data?
+
+        static func read(from defaults: UserDefaults, language resolvedLang: AppLanguage) -> BuildingValues {
+            var values = BuildingValues()
+            let savedCurrency = defaults.string(forKey: Keys.currency)
+            values.currency = savedCurrency.flatMap(AppCurrency.init(rawValue:)) ?? AppCurrency.default(for: resolvedLang)
+
+            let isConfigured = defaults.object(forKey: Keys.apartmentName) != nil
+            let savedApt = defaults.string(forKey: Keys.apartmentName) ?? ""
+            let isScreenshotPollution = (savedApt == "Asociația Parcul Tineretului" || savedApt.isEmpty) && (resolvedLang == .english || resolvedLang == .system)
+
+            if !isConfigured || isScreenshotPollution {
+                let samples = SampleData.defaults(for: resolvedLang)
+                values.apartmentName = samples.apartmentName
+                values.issuer = samples.issuer
+                values.defaultPayment = samples.defaultPayment
+                values.flatCount = samples.flatCount
+                values.currency = samples.currency
+                values.seqNumber = 1
+                for (apt, name) in samples.residents {
+                    defaults.set(name, forKey: Keys.owner(apt))
+                }
+            } else {
+                values.apartmentName = defaults.string(forKey: Keys.apartmentName) ?? ""
+                values.issuer = defaults.string(forKey: Keys.issuer) ?? ""
+                values.defaultPayment = defaults.string(forKey: Keys.defaultPayment) ?? ""
+                values.flatCount = max(1, ReceiptSettingsStore.readInt(defaults, key: Keys.flatCount, fallback: 1))
+                values.seqNumber = max(1, ReceiptSettingsStore.readInt(defaults, key: Keys.seqNumber, fallback: 1))
+            }
+
+            if let vendorData = defaults.data(forKey: Keys.vendors),
+               let savedVendors = try? JSONDecoder().decode([VendorRecord].self, from: vendorData),
+               !savedVendors.isEmpty {
+                values.vendors = savedVendors
+            } else {
+                values.vendors = SampleData.defaults(for: resolvedLang).defaultVendors
+            }
+
+            if let serviceData = defaults.data(forKey: Keys.expenseServices),
+               let savedServices = try? JSONDecoder().decode([ExpenseServicePreset].self, from: serviceData),
+               !savedServices.isEmpty {
+                values.expenseServices = savedServices
+            } else {
+                values.expenseServices = SampleData.defaults(for: resolvedLang).defaultServices
+            }
+
+            values.isLateFeeEnabled = defaults.bool(forKey: Keys.isLateFeeEnabled)
+            let savedFeeRate = defaults.double(forKey: Keys.lateFeeMonthlyRate)
+            values.lateFeeMonthlyRate = savedFeeRate > 0 ? savedFeeRate : Defaults.lateFeeMonthlyRate
+            let savedDueDay = defaults.integer(forKey: Keys.lateFeeDueDay)
+            values.lateFeeDueDay = savedDueDay > 0 ? savedDueDay : Defaults.lateFeeDueDay
+
+            let savedProfile = defaults.string(forKey: Keys.lateFeeCountryProfile)
+            let resolvedProfile = savedProfile.flatMap(LateFeeCountryProfile.init(rawValue:)) ?? LateFeeCountryProfile.default(for: resolvedLang)
+            values.lateFeeCountryProfile = resolvedProfile
+            let savedGrace = defaults.integer(forKey: Keys.lateFeeGracePeriodDays)
+            values.lateFeeGracePeriodDays = defaults.object(forKey: Keys.lateFeeGracePeriodDays) != nil ? savedGrace : resolvedProfile.defaultGraceDays
+            values.lateFeeCustomFootnote = defaults.string(forKey: Keys.lateFeeCustomFootnote) ?? Defaults.lateFeeCustomFootnote
+
+            values.signatureData = defaults.data(forKey: Keys.signature)
+            values.logoData = defaults.data(forKey: Keys.logo)
+            return values
+        }
     }
 
     /// Fresh-install values of the preferences that "Reset Settings…" restores.
@@ -451,7 +520,7 @@ final class ReceiptSettingsStore: ObservableObject {
         objectWillChange.send()
     }
 
-    private static func readInt(_ defaults: UserDefaults, key: String, fallback: Int) -> Int {
+    nonisolated private static func readInt(_ defaults: UserDefaults, key: String, fallback: Int) -> Int {
         if let value = defaults.object(forKey: key) as? Int {
             return value
         }

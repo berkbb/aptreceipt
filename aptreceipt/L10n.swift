@@ -342,6 +342,19 @@ struct L10n {
         String(format: tr("lateFeeStatusLate"), "\(months) \(months > 1 ? monthsUnit : monthUnit)")
     }
 
+    // Buildings
+    var buildingSwitchHelp: String { tr("buildingSwitchHelp") }
+    var buildingAdd: String { tr("buildingAdd") }
+    var buildingAddTitle: String { tr("buildingAddTitle") }
+    var buildingAddMessage: String { tr("buildingAddMessage") }
+    var buildingNamePlaceholder: String { tr("buildingNamePlaceholder") }
+    var buildingAddConfirm: String { tr("buildingAddConfirm") }
+    var buildingDelete: String { tr("buildingDelete") }
+    var buildingDeleteMessage: String { tr("buildingDeleteMessage") }
+    var buildingDeleteConfirm: String { tr("buildingDeleteConfirm") }
+    func buildingDeleteTitle(_ name: String) -> String { String(format: tr("buildingDeleteTitle"), name) }
+    func verifyArchiveBuilding(_ name: String) -> String { String(format: tr("verifyArchiveBuilding"), name) }
+
     // Verification key recovery code
     var verificationKeyTitle: String { tr("verificationKeyTitle") }
     var verificationKeyFooter: String { tr("verificationKeyFooter") }
@@ -579,7 +592,7 @@ struct L10n {
     var errFlatCountInvalid: String { tr("errFlatCountInvalid") }
 
     // Placeholders & Labels
-    var buildingNamePlaceholder: String { tr("buildingNamePlaceholder") }
+    var buildingNewNamePlaceholder: String { tr("buildingNewNamePlaceholder") }
     var defaultManagerPlaceholder: String { tr("defaultManagerPlaceholder") }
     var totalFlatsPlaceholder: String { tr("totalFlatsPlaceholder") }
     var publisherLabel: String { tr("publisherLabel") }

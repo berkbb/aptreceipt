@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### Added
+- **Several buildings**: the building name in the main window's header is now a menu to switch between buildings, add one ("Add Building…") or delete the current one after confirmation. Each building keeps its own settings, residents and phones, vendors, services, logo, late-fee settings, currency, receipt number and receipt archive; language, theme, the launch update check and the verification key are shared. Your existing data becomes the first building without being moved. A new building copies the manager, signature, dues amount, flat count, currency, late-fee settings, vendors and services from the current one; residents, logo and receipts start empty. Deleting moves the building's receipt archive to the Trash. Backups export and import the current building, and Verify Receipt finds a receipt in any building's archive and names the building.
 - **Recovery code for the verification key** (Settings → Backup → Verification Key): shows this Mac's key as a 56-character code to write down, with Copy and a warning not to share it, and restores a key from such a code on another Mac. A checksum rejects any mistyped character; restoring keeps the existing keys, so older receipts still verify.
 
 ### Changed

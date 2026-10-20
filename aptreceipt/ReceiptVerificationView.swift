@@ -90,6 +90,8 @@ struct ReceiptVerificationView: View {
     @State private var qrText = ""
     @State private var scan: ScannedReceiptVerification?
     @State private var comparison: ReceiptArchiveComparison?
+    /// The building whose archive holds the receipt, shown when there is more than one building.
+    @State private var comparedBuilding: String?
     @State private var message: String?
     @State private var isDropTargeted = false
     @State private var isReading = false
@@ -105,7 +107,9 @@ struct ReceiptVerificationView: View {
               let scan = ScannedReceiptVerification(scannedText: initialText, keys: (verificationKeys ?? .shared).allKeys) else { return }
         _qrText = State(initialValue: initialText)
         _scan = State(initialValue: scan)
-        _comparison = State(initialValue: ReceiptArchiveComparison.compare(scan, with: (archiveStore ?? .shared).records, apartmentName: settings.apartmentName))
+        let result = Self.compareWithArchives(scan, settings: settings, archiveStore: archiveStore)
+        _comparison = State(initialValue: result.comparison)
+        _comparedBuilding = State(initialValue: result.building)
     }
 
     var body: some View {
@@ -254,6 +258,10 @@ struct ReceiptVerificationView: View {
                 Label {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(archiveText(comparison, scan: scan))
+                        if let comparedBuilding {
+                            Text(l10n.verifyArchiveBuilding(comparedBuilding.isEmpty ? l10n.defaultBuildingName : comparedBuilding))
+                                .font(.caption.weight(.semibold))
+                        }
                         if case .differs(let lines) = comparison {
                             ForEach(Array(lines.enumerated()), id: \.offset) { _, line in
                                 Text(line)
@@ -295,12 +303,25 @@ struct ReceiptVerificationView: View {
         guard let result = ScannedReceiptVerification(scannedText: text, keys: (verificationKeys ?? .shared).allKeys) else {
             scan = nil
             comparison = nil
+            comparedBuilding = nil
             message = l10n.verifyNoReceiptFound
             return
         }
         message = nil
         scan = result
-        comparison = ReceiptArchiveComparison.compare(result, with: (archiveStore ?? .shared).records, apartmentName: settings.apartmentName)
+        let archiveResult = Self.compareWithArchives(result, settings: settings, archiveStore: archiveStore)
+        comparison = archiveResult.comparison
+        comparedBuilding = archiveResult.building
+    }
+
+    /// An injected archive (tests) is compared alone; the app compares with every building's archive.
+    private static func compareWithArchives(_ scan: ScannedReceiptVerification, settings: ReceiptSettingsStore, archiveStore: ReceiptArchiveStore?) -> (comparison: ReceiptArchiveComparison, building: String?) {
+        if let archiveStore {
+            return (ReceiptArchiveComparison.compare(scan, with: archiveStore.records, apartmentName: settings.apartmentName), nil)
+        }
+        let registry = BuildingRegistry.shared
+        let result = ReceiptArchiveComparison.compare(scan, archives: registry.archives(settings: settings, archive: .shared))
+        return (result.comparison, registry.buildings.count > 1 ? result.building : nil)
     }
 
     private func read(_ url: URL) {
@@ -318,6 +339,7 @@ struct ReceiptVerificationView: View {
         } else {
             scan = nil
             comparison = nil
+            comparedBuilding = nil
             message = l10n.verifyNoReceiptFound
         }
     }

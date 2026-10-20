@@ -8,6 +8,10 @@ struct MainScreen: View {
     @ObservedObject var settings: ReceiptSettingsStore
     @StateObject var viewModel = MainScreenViewModel()
     @State var isInvoiceDropTargeted: Bool = false
+    @ObservedObject var registry = BuildingRegistry.shared
+    @State var isAddingBuilding = false
+    @State var newBuildingName = ""
+    @State var confirmsBuildingDelete = false
 
     init(settings: ReceiptSettingsStore, initialKind: ReceiptKind = .income, initialVendor: String? = nil, initialNotes: String? = nil) {
         self.settings = settings
@@ -128,6 +132,23 @@ struct MainScreen: View {
                 viewModel.updateLiveFromSettings(settings)
             }
             .frame(width: 720, height: 580)
+        }
+        .onReceive(settings.$apartmentName) { _ in
+            registry.refresh()
+        }
+        .alert(l10n.buildingAddTitle, isPresented: $isAddingBuilding) {
+            TextField(l10n.buildingNewNamePlaceholder, text: $newBuildingName)
+            Button(l10n.buildingAddConfirm) { addBuilding() }
+                .disabled(newBuildingName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            Button(l10n.cancel, role: .cancel) { newBuildingName = "" }
+        } message: {
+            Text(l10n.buildingAddMessage)
+        }
+        .confirmationDialog(l10n.buildingDeleteTitle(buildingTitle(settings.apartmentName)), isPresented: $confirmsBuildingDelete, titleVisibility: .visible) {
+            Button(l10n.buildingDeleteConfirm, role: .destructive) { deleteActiveBuilding() }
+            Button(l10n.cancel, role: .cancel) {}
+        } message: {
+            Text(l10n.buildingDeleteMessage)
         }
         .alert(item: $viewModel.validationError) { issue in
             Alert(

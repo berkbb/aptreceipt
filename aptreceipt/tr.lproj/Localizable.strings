@@ -483,3 +483,16 @@
 "recoveryCodeRestoreButton" = "Geri Yükle";
 "recoveryCodeRestored" = "Anahtar geri yüklendi; bu anahtarla kesilen makbuzlar artık doğrulanabilir.";
 "recoveryCodeInvalid" = "Kod geçersiz: bir karakter eksik ya da yanlış yazılmış olabilir.";
+
+/* Buildings */
+"buildingSwitchHelp" = "Bina değiştir";
+"buildingAdd" = "Bina Ekle…";
+"buildingAddTitle" = "Yeni Bina";
+"buildingAddMessage" = "Yönetici, imza, aidat tutarı, daire sayısı, para birimi, gecikme ayarları, tedarikçiler ve hizmetler bu binadan kopyalanır; sakinler, logo ve makbuzlar boş başlar.";
+"buildingNewNamePlaceholder" = "Bina adı";
+"buildingAddConfirm" = "Ekle";
+"buildingDelete" = "Bu Binayı Sil…";
+"buildingDeleteTitle" = "“%@” silinsin mi?";
+"buildingDeleteMessage" = "Bu binanın ayarları, sakinleri ve tedarikçileri silinir; makbuz arşivi Çöp Sepeti'ne taşınır. Diğer binalar ve doğrulama anahtarı etkilenmez.";
+"buildingDeleteConfirm" = "Sil";
+"verifyArchiveBuilding" = "Bina: %@";

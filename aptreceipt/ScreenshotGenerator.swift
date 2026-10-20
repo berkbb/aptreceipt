@@ -13,6 +13,9 @@ enum ScreenshotMode {
         screenshotRun ? InMemoryDefaults() : .standard
     }
 
+    /// The one defaults the shared settings and the building list are built on.
+    static let baseDefaults = settingsDefaults()
+
     /// File for the shared archive: the user's archive, or `nil` (memory only) during a screenshot run.
     static func archiveFileURL(screenshotRun: Bool = isActive) -> URL? {
         screenshotRun ? nil : ReceiptArchiveStore.defaultFileURL

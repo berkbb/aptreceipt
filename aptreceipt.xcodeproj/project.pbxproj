@@ -14,6 +14,7 @@
 		9A9CF87D27E204920042D276 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9A9CF87C27E204920042D276 /* Assets.xcassets */; };
 		9A9CF88027E204920042D276 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9A9CF87E27E204920042D276 /* Main.storyboard */; };
 		9A9CF88B27E204930042D276 /* ReceiptModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A9CF88A27E204930042D276 /* ReceiptModelTests.swift */; };
+		4ABE39DCE1E3E6B321A0278B /* BuildingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2487EAA156CD274C00574DCE /* BuildingTests.swift */; };
 		0BF8C63AF8A561D920D8C67B /* SettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E8007227864849707AAFE46 /* SettingsTests.swift */; };
 		FD9FD2057F4ACDE21BF50ECA /* WhatsAppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B22FA38DBFD2A5993AB784 /* WhatsAppTests.swift */; };
 		BB364C09D1C6645795342BFF /* LocalizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A68D5A181D053AFB1D682746 /* LocalizationTests.swift */; };
@@ -34,6 +35,7 @@
 		2BBF72065869D41D26A10AA0 /* MainScreenViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DB48C99EE1963A0583E0104 /* MainScreenViewModel.swift */; };
 		9395B5905B3F9570533B2F9A /* ReceiptArchiveStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7FC3ACDE65754CE5A5444F /* ReceiptArchiveStore.swift */; };
 		DE4FCED20A93C5417BDD34A4 /* SharingHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C91E6AC2BD31BE032FAB520 /* SharingHelpers.swift */; };
+		07ED636EFB116C582C2B9A8D /* Buildings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EE4336EF571E6E29021F7BA /* Buildings.swift */; };
 		01CA193A09A4940EF8996903 /* ScreenshotGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77307130AA7C59EADF6F88B5 /* ScreenshotGenerator.swift */; };
 		385FFE8577F4C2242429E4F3 /* AboutWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3A6FBC64901CB38C9939428 /* AboutWindow.swift */; };
 		C200D14EF551E75A78587C9E /* SettingsWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03D5B6FEF2D66767FCB56001 /* SettingsWindow.swift */; };
@@ -96,6 +98,7 @@
 		9A9CF88127E204920042D276 /* aptreceipt.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = aptreceipt.entitlements; sourceTree = "<group>"; };
 		9A9CF88627E204920042D276 /* aptreceiptTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = aptreceiptTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A9CF88A27E204930042D276 /* ReceiptModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptModelTests.swift; sourceTree = "<group>"; };
+		2487EAA156CD274C00574DCE /* BuildingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildingTests.swift; sourceTree = "<group>"; };
 		4E8007227864849707AAFE46 /* SettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTests.swift; sourceTree = "<group>"; };
 		F9B22FA38DBFD2A5993AB784 /* WhatsAppTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhatsAppTests.swift; sourceTree = "<group>"; };
 		A68D5A181D053AFB1D682746 /* LocalizationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizationTests.swift; sourceTree = "<group>"; };
@@ -124,6 +127,7 @@
 		8DB48C99EE1963A0583E0104 /* MainScreenViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainScreenViewModel.swift; sourceTree = "<group>"; };
 		8B7FC3ACDE65754CE5A5444F /* ReceiptArchiveStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptArchiveStore.swift; sourceTree = "<group>"; };
 		8C91E6AC2BD31BE032FAB520 /* SharingHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharingHelpers.swift; sourceTree = "<group>"; };
+		6EE4336EF571E6E29021F7BA /* Buildings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Buildings.swift; sourceTree = "<group>"; };
 		77307130AA7C59EADF6F88B5 /* ScreenshotGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotGenerator.swift; sourceTree = "<group>"; };
 		B3A6FBC64901CB38C9939428 /* AboutWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutWindow.swift; sourceTree = "<group>"; };
 		03D5B6FEF2D66767FCB56001 /* SettingsWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsWindow.swift; sourceTree = "<group>"; };
@@ -219,6 +223,7 @@
 				8DB48C99EE1963A0583E0104 /* MainScreenViewModel.swift */,
 				8B7FC3ACDE65754CE5A5444F /* ReceiptArchiveStore.swift */,
 				8C91E6AC2BD31BE032FAB520 /* SharingHelpers.swift */,
+				6EE4336EF571E6E29021F7BA /* Buildings.swift */,
 				77307130AA7C59EADF6F88B5 /* ScreenshotGenerator.swift */,
 				B3A6FBC64901CB38C9939428 /* AboutWindow.swift */,
 				03D5B6FEF2D66767FCB56001 /* SettingsWindow.swift */,
@@ -267,6 +272,7 @@
 			isa = PBXGroup;
 			children = (
 				9A9CF88A27E204930042D276 /* ReceiptModelTests.swift */,
+				2487EAA156CD274C00574DCE /* BuildingTests.swift */,
 				4E8007227864849707AAFE46 /* SettingsTests.swift */,
 				F9B22FA38DBFD2A5993AB784 /* WhatsAppTests.swift */,
 				A68D5A181D053AFB1D682746 /* LocalizationTests.swift */,
@@ -433,6 +439,7 @@
 				2BBF72065869D41D26A10AA0 /* MainScreenViewModel.swift in Sources */,
 				9395B5905B3F9570533B2F9A /* ReceiptArchiveStore.swift in Sources */,
 				DE4FCED20A93C5417BDD34A4 /* SharingHelpers.swift in Sources */,
+				07ED636EFB116C582C2B9A8D /* Buildings.swift in Sources */,
 				01CA193A09A4940EF8996903 /* ScreenshotGenerator.swift in Sources */,
 				385FFE8577F4C2242429E4F3 /* AboutWindow.swift in Sources */,
 				C200D14EF551E75A78587C9E /* SettingsWindow.swift in Sources */,
@@ -474,6 +481,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9A9CF88B27E204930042D276 /* ReceiptModelTests.swift in Sources */,
+				4ABE39DCE1E3E6B321A0278B /* BuildingTests.swift in Sources */,
 				0BF8C63AF8A561D920D8C67B /* SettingsTests.swift in Sources */,
 				FD9FD2057F4ACDE21BF50ECA /* WhatsAppTests.swift in Sources */,
 				BB364C09D1C6645795342BFF /* LocalizationTests.swift in Sources */,

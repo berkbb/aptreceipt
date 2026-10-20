@@ -26,15 +26,7 @@ extension MainScreen {
                 HStack(spacing: 8) {
                     Text(l10n.appTitle)
                         .font(.system(size: 18, weight: .bold))
-                    if !settings.apartmentName.isEmpty {
-                        Text(settings.apartmentName)
-                            .font(.system(size: 11, weight: .semibold))
-                            .foregroundColor(.accentColor)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 2)
-                            .background(Color.accentColor.opacity(0.12))
-                            .clipShape(Capsule())
-                    }
+                    buildingMenu
                 }
                 Text(l10n.appSubtitle)
                     .font(.caption)
@@ -123,5 +115,78 @@ extension MainScreen {
 
     func openSettingsWindow() {
         SettingsWindowManager.shared.show(settings: settings)
+    }
+
+    // MARK: - Buildings
+
+    /// The active building's name; its menu switches, adds and deletes buildings.
+    var buildingMenu: some View {
+        Menu {
+            ForEach(registry.buildings) { building in
+                Button {
+                    switchBuilding(to: building.id)
+                } label: {
+                    if building.id == registry.activeID {
+                        Label(buildingTitle(settings.apartmentName), systemImage: "checkmark")
+                    } else {
+                        Text(buildingTitle(building.name))
+                    }
+                }
+            }
+            Divider()
+            Button(l10n.buildingAdd) {
+                newBuildingName = ""
+                isAddingBuilding = true
+            }
+            if registry.buildings.count > 1 {
+                Button(l10n.buildingDelete, role: .destructive) {
+                    confirmsBuildingDelete = true
+                }
+            }
+        } label: {
+            HStack(spacing: 4) {
+                Text(buildingTitle(settings.apartmentName))
+                Image(systemName: "chevron.down")
+                    .font(.system(size: 8, weight: .bold))
+            }
+            .font(.system(size: 11, weight: .semibold))
+            .foregroundColor(.accentColor)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 2)
+            .background(Color.accentColor.opacity(0.12))
+            .clipShape(Capsule())
+        }
+        .menuStyle(.button)
+        .buttonStyle(.plain)
+        .menuIndicator(.hidden)
+        .fixedSize()
+        .help(l10n.buildingSwitchHelp)
+    }
+
+    func buildingTitle(_ name: String) -> String {
+        name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? l10n.defaultBuildingName : name
+    }
+
+    /// Settings edits a draft of the active building, so its window closes before the building changes.
+    func switchBuilding(to id: String) {
+        guard id != registry.activeID else { return }
+        SettingsWindowManager.shared.close()
+        registry.select(id)
+        viewModel.syncWithSettings(settings)
+    }
+
+    func addBuilding() {
+        let name = newBuildingName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !name.isEmpty else { return }
+        SettingsWindowManager.shared.close()
+        registry.add(name: name)
+        newBuildingName = ""
+        viewModel.syncWithSettings(settings)
+    }
+
+    func deleteActiveBuilding() {
+        SettingsWindowManager.shared.close()
+        registry.delete(registry.activeID)
+        viewModel.syncWithSettings(settings)
     }
 }

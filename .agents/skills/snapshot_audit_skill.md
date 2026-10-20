@@ -5,6 +5,7 @@
 
 ## What is persisted
 
+- Buildings: `building_ids` and `active_building_id`; the first building uses the original keys and `receipts_archive.json`, others use `building.<id>.<key>` and `receipts_archive-<id>.json` (`BuildingRegistry`). Never rename these prefixes or file names.
 - Settings in `UserDefaults` through `ReceiptSettingsStore` (keys in `ReceiptSettingsStore.Keys`, owners and phones per flat, vendors, services, logo, signature, late-fee configuration, per-profile saved rates).
 - The receipt archive: `Application Support/aptreceipt/receipts_archive.json` (`ReceiptArchiveStore`).
 - Receipt verification keys: `Application Support/aptreceipt/receipt-verification-keys` (`ReceiptVerificationKeyStore`, 32 bytes per key, current first). Never delete or replace them: printed receipts are verified with them forever; restoring a backup or a recovery code (`ReceiptRecoveryCode`, format pinned by `testRecoveryCodeFormatIsPinned`) adds keys in front and keeps the existing ones.

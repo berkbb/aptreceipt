@@ -116,13 +116,16 @@ struct ReceiptRecord: Identifiable, Codable, Hashable {
 
 @MainActor
 final class ReceiptArchiveStore: ObservableObject {
-    /// The app's archive. During a screenshot run it lives in memory only (`ScreenshotMode`).
-    static let shared = ReceiptArchiveStore(fileURL: ScreenshotMode.archiveFileURL())
+    /// The active building's archive. During a screenshot run it lives in memory only (`ScreenshotMode`).
+    static let shared = ReceiptArchiveStore(fileURL: BuildingRegistry.archiveFile(
+        for: BuildingRegistry.storedActiveID(in: ScreenshotMode.baseDefaults),
+        mainArchiveFile: ScreenshotMode.archiveFileURL()
+    ))
 
     @Published var records: [ReceiptRecord] = []
 
     /// File the archive is saved to; `nil` keeps it in memory only, so nothing is read from or written to disk.
-    let fileURL: URL?
+    private(set) var fileURL: URL?
 
     /// The user's archive file in Application Support.
     nonisolated static var defaultFileURL: URL {
@@ -135,6 +138,13 @@ final class ReceiptArchiveStore: ObservableObject {
 
     init(fileURL: URL?) {
         self.fileURL = fileURL
+        load()
+    }
+
+    /// Switches to another building's archive file and loads its receipts.
+    func useFile(_ url: URL?) {
+        fileURL = url
+        records = []
         load()
     }
 

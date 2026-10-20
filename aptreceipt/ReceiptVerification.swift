@@ -370,6 +370,23 @@ enum ReceiptArchiveComparison: Equatable {
     /// No archived receipt has this number and kind (deleted, or issued on another Mac).
     case missing
 
+    /// Compares with every building's archive: a match wins, otherwise the closest differing receipt.
+    /// Returns the building it was found in.
+    static func compare(_ scan: ScannedReceiptVerification, archives: [(name: String, records: [ReceiptRecord])]) -> (comparison: ReceiptArchiveComparison, building: String?) {
+        var closest: (lines: [String], building: String)?
+        for archive in archives {
+            switch compare(scan, with: archive.records, apartmentName: archive.name) {
+            case .matches:
+                return (.matches, archive.name)
+            case .differs(let lines):
+                if closest == nil || lines.count < closest!.lines.count { closest = (lines, archive.name) }
+            case .missing:
+                continue
+            }
+        }
+        return closest.map { (.differs(lines: $0.lines), $0.building) } ?? (.missing, nil)
+    }
+
     /// Rebuilds each candidate's QR lines in the scanned receipt's language and compares the values, so
     /// reworded labels in a later version do not count as differences.
     static func compare(_ scan: ScannedReceiptVerification, with records: [ReceiptRecord], apartmentName: String) -> ReceiptArchiveComparison {

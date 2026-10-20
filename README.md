@@ -16,6 +16,7 @@ A modern, native macOS application to effortlessly generate, manage, and export 
 - **Real-Time Live Receipt Preview:** Live interactive preview card dynamically updates as you type.
 - **Automatic Theme Support:** Light, Dark, and Automatic System appearance modes.
 - **Dedicated Settings Window:** Accessible from the macOS Menu Bar (`Cmd+,` / `Preferences`) or the compact gear icon on the main screen. Toolbar tabs for Building, Residents, Vendors, Appearance, Signature, Backup and About, each laid out as grouped native sections. Edits on all tabs form one draft that **Save & Close** validates and commits and **Cancel** discards. Settings → About also offers **Reset Settings…**, which restores language, theme, currency, late-fee configuration and the launch update check while keeping all building data, residents, vendors, receipts, logo and signature.
+- **Several Buildings:** Switch, add or delete buildings from the building menu in the main window's header. Each building keeps its own settings, residents, vendors, services, late-fee settings, receipt number and archive; language, theme and the verification key are shared. Existing data stays the first building.
 - **Residents Directory:** Save flat numbers and resident names for one-click auto-fill.
 - **Digital Signature:** Import authorized signature images (PNG/JPEG) to print directly onto exported receipts.
 - **Auto-Incrementing Sequence Numbers:** Receipt numbers increment automatically after generation.
