@@ -6,15 +6,11 @@ Pending work only. Remove an item as soon as it ships; shipped history lives in 
 
 ## Safety & data integrity
 
-- [ ] **Decimal money arithmetic.** `LateFeeCalculator.roundedToCents` rounds a `Double`; values exactly on half a cent can round the wrong way because of binary representation. Move money math to `Decimal` with explicit round-half-up.
+- [ ] **Decimal money arithmetic** (`quality_plan.md`, phase 1). `LateFeeCalculator.roundedToCents` rounds a `Double`; values exactly on half a cent can round the wrong way because of binary representation. Move money math to `Decimal` with explicit round-half-up.
 
 ## Product
 
-- [ ] **Use due day and grace period in the late fee.** They are stored, edited and backed up, but `LateFeeCalculator` computes `base × rate × months` without them; decide with the user how they should affect the number of late months.
-- [ ] **Multi-building portfolio management**: switch between several apartments, complexes or sites in one app instance.
+- [ ] **Use due day and grace period in the late fee** (`quality_plan.md`, phase 2): every started month after the due day plus grace counts.
+- [ ] **Multi-building portfolio management** (`quality_plan.md`, phase 6): switch between several apartments, complexes or sites in one app instance.
 - [ ] **Bank statement import & reconciliation**: parse CSV/OFX/CAMT.053 statements and match resident payments against due dates.
 - [ ] **Resident self-service export**: static HTML ledger generation for offline distribution to resident groups.
-
-## Distribution
-
-- [ ] **Notarized releases**: sign with a Developer ID and notarize so Gatekeeper no longer blocks the first launch.
