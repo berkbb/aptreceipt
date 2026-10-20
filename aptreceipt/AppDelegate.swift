@@ -43,7 +43,7 @@ struct AptReceiptApp: App {
 }
 
 /// `--generate-screenshots` renders the README screenshots from sample data. For that run the shared
-/// settings and receipt archive live in memory only, so the user's real settings and receipts are never
+/// settings, receipt archive and verification keys live in memory only, so the user's real settings and receipts are never
 /// read into the images or overwritten.
 enum ScreenshotMode {
     static let argument = "--generate-screenshots"
@@ -57,6 +57,11 @@ enum ScreenshotMode {
     /// File for the shared archive: the user's archive, or `nil` (memory only) during a screenshot run.
     static func archiveFileURL(screenshotRun: Bool = isActive) -> URL? {
         screenshotRun ? nil : ReceiptArchiveStore.defaultFileURL
+    }
+
+    /// File for the receipt verification keys: the user's keys, or `nil` (memory only) during a screenshot run.
+    static func verificationKeyFileURL(screenshotRun: Bool = isActive) -> URL? {
+        screenshotRun ? nil : ReceiptVerificationKeyStore.defaultFileURL
     }
 }
 

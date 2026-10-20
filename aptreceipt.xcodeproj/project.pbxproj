@@ -28,6 +28,7 @@
 		2BBF72065869D41D26A10AA0 /* MainScreenViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DB48C99EE1963A0583E0104 /* MainScreenViewModel.swift */; };
 		9395B5905B3F9570533B2F9A /* ReceiptArchiveStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7FC3ACDE65754CE5A5444F /* ReceiptArchiveStore.swift */; };
 		DE4FCED20A93C5417BDD34A4 /* SharingHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C91E6AC2BD31BE032FAB520 /* SharingHelpers.swift */; };
+		7D1B3AA3D489D485D1E5FBEE /* ReceiptVerification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B90959C6BBBA2BA3843348D /* ReceiptVerification.swift */; };
 		F0B1A05023D618C52EBF5ADA /* ReceiptSettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B461E0B1ED4FC4F4CFED59B /* ReceiptSettingsStore.swift */; };
 		D76D776295A2C9954A6F947C /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B18CC4073B67A7AEA909377E /* Extensions.swift */; };
 		B1B4EE1F020BA471871E5238 /* LicenseViewerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E94616E39EDF2D41A48DD52B /* LicenseViewerSheet.swift */; };
@@ -88,6 +89,7 @@
 		8DB48C99EE1963A0583E0104 /* MainScreenViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainScreenViewModel.swift; sourceTree = "<group>"; };
 		8B7FC3ACDE65754CE5A5444F /* ReceiptArchiveStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptArchiveStore.swift; sourceTree = "<group>"; };
 		8C91E6AC2BD31BE032FAB520 /* SharingHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharingHelpers.swift; sourceTree = "<group>"; };
+		3B90959C6BBBA2BA3843348D /* ReceiptVerification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptVerification.swift; sourceTree = "<group>"; };
 		3B461E0B1ED4FC4F4CFED59B /* ReceiptSettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptSettingsStore.swift; sourceTree = "<group>"; };
 		B18CC4073B67A7AEA909377E /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		E94616E39EDF2D41A48DD52B /* LicenseViewerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LicenseViewerSheet.swift; sourceTree = "<group>"; };
@@ -159,6 +161,7 @@
 				8DB48C99EE1963A0583E0104 /* MainScreenViewModel.swift */,
 				8B7FC3ACDE65754CE5A5444F /* ReceiptArchiveStore.swift */,
 				8C91E6AC2BD31BE032FAB520 /* SharingHelpers.swift */,
+				3B90959C6BBBA2BA3843348D /* ReceiptVerification.swift */,
 				3B461E0B1ED4FC4F4CFED59B /* ReceiptSettingsStore.swift */,
 				B18CC4073B67A7AEA909377E /* Extensions.swift */,
 				E94616E39EDF2D41A48DD52B /* LicenseViewerSheet.swift */,
@@ -343,6 +346,7 @@
 				2BBF72065869D41D26A10AA0 /* MainScreenViewModel.swift in Sources */,
 				9395B5905B3F9570533B2F9A /* ReceiptArchiveStore.swift in Sources */,
 				DE4FCED20A93C5417BDD34A4 /* SharingHelpers.swift in Sources */,
+				7D1B3AA3D489D485D1E5FBEE /* ReceiptVerification.swift in Sources */,
 				F0B1A05023D618C52EBF5ADA /* ReceiptSettingsStore.swift in Sources */,
 				D76D776295A2C9954A6F947C /* Extensions.swift in Sources */,
 				B1B4EE1F020BA471871E5238 /* LicenseViewerSheet.swift in Sources */,

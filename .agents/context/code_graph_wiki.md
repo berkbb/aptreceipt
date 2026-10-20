@@ -17,6 +17,7 @@
 | `SampleData.swift` | `SampleData.defaults(for:)` | Per-language sample building, residents, vendors, services |
 | `Extensions.swift` | `AppFormat`, `ReceiptPeriod`, `Date.monthYearString`, `Date.dayMonthYearString`, `Notification.Name.appLanguageDidChange` / `.settingsDidSave` | Formatting, period parsing, notifications |
 | `SharingHelpers.swift` | `QRCodeGenerator`, `WhatsAppShareHelper` | QR bitmap (whole pixels per module, 4-module quiet zone; `testReceiptQRCodeScansInExportedImageAndPDF` decodes it); WhatsApp/email URLs and messages |
+| `ReceiptVerification.swift` | `ReceiptVerificationCode`, `ReceiptVerificationKeyStore` | Offline receipt verification: HMAC code over the normalized QR text (Crockford Base32, pinned by `testVerificationCodeIsPinnedAndIgnoresLayoutOnly`), installation keys in `Application Support/aptreceipt/receipt-verification-keys` (0600), in memory for tests and screenshot runs |
 | `L10n.swift` | `L10n` (`resolvedLanguage`, `locale`, private `tr(_:)`) | Lookup in the per-language `Localizable.strings` |
 | `MainScreen.swift` | `MainScreen` | Main window: receipt form, live preview, header buttons, sheets |
 | `MainScreenViewModel.swift` | `MainScreenViewModel` | Form state, late-fee math, invoice import, `createReceipt` |

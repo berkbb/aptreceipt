@@ -7,7 +7,8 @@
 
 - Settings in `UserDefaults` through `ReceiptSettingsStore` (keys in `ReceiptSettingsStore.Keys`, owners and phones per flat, vendors, services, logo, signature, late-fee configuration, per-profile saved rates).
 - The receipt archive: `Application Support/aptreceipt/receipts_archive.json` (`ReceiptArchiveStore`).
-- User backups: the JSON package from *Export Full System Backup* (`SystemBackupPackage`).
+- Receipt verification keys: `Application Support/aptreceipt/receipt-verification-keys` (`ReceiptVerificationKeyStore`, 32 bytes per key, current first). Never delete or replace them: printed receipts are verified with them forever; restoring a backup adds keys in front and keeps the existing ones.
+- User backups: the JSON package from *Export Full System Backup* (`SystemBackupPackage`, now with `receiptVerificationKeys`).
 
 ## When to use
 

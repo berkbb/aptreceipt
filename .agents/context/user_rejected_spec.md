@@ -11,3 +11,4 @@ This document tracks rejected ideas, anti-features, and design redlines that mus
 - **Untranslated or English-fallback text in a non-English language file**, and user-facing text written directly into code (2026-10-20).
 - **Settings tabs with different widths that resize or move the window** (2026-10-20): every settings tab uses the widest width (760 pt) so the window keeps its size and position.
 - **A bottom "Close" button on About windows instead of the standard traffic lights** (2026-10-20).
+- **QR verification through a web page** (2026-10-20): no hosted verification page, not on GitHub Pages, not on the user's own domain, not even a static cache-first one. Receipt QR verification must work fully offline with no server involved.

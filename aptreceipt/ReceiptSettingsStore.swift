@@ -362,7 +362,10 @@ final class ReceiptSettingsStore: ObservableObject {
         objectWillChange.send()
     }
 
-    func exportSystemBackup() -> Data? {
+    /// `archive` and `verificationKeys` default to the app's shared stores; tests pass in-memory ones.
+    func exportSystemBackup(archive: ReceiptArchiveStore? = nil, verificationKeys: ReceiptVerificationKeyStore? = nil) -> Data? {
+        let archive = archive ?? .shared
+        let verificationKeys = verificationKeys ?? .shared
         var resMap: [Int: String] = [:]
         var phoneMap: [Int: String] = [:]
         for flat in 1...max(flatCount, 1) {
@@ -373,7 +376,7 @@ final class ReceiptSettingsStore: ObservableObject {
         }
 
         let pkg = SystemBackupPackage(
-            version: "2.1",
+            version: "2.2",
             exportDate: Date(),
             apartmentName: apartmentName,
             issuer: issuer,
@@ -386,18 +389,21 @@ final class ReceiptSettingsStore: ObservableObject {
             residentPhones: phoneMap,
             vendors: vendors,
             expenseServices: expenseServices,
-            archivedReceipts: ReceiptArchiveStore.shared.records,
+            archivedReceipts: archive.records,
             isLateFeeEnabled: isLateFeeEnabled,
             lateFeeMonthlyRate: lateFeeMonthlyRate,
             lateFeeDueDay: lateFeeDueDay,
             lateFeeCountryProfile: lateFeeCountryProfile.rawValue,
             lateFeeGracePeriodDays: lateFeeGracePeriodDays,
-            lateFeeCustomFootnote: lateFeeCustomFootnote
+            lateFeeCustomFootnote: lateFeeCustomFootnote,
+            receiptVerificationKeys: verificationKeys.exportedKeys().map { $0.base64EncodedString() }
         )
         return try? JSONEncoder().encode(pkg)
     }
 
-    func importSystemBackup(from data: Data) throws {
+    func importSystemBackup(from data: Data, archive: ReceiptArchiveStore? = nil, verificationKeys: ReceiptVerificationKeyStore? = nil) throws {
+        let archive = archive ?? .shared
+        let verificationKeys = verificationKeys ?? .shared
         let decoder = JSONDecoder()
         let pkg = try decoder.decode(SystemBackupPackage.self, from: data)
         apartmentName = pkg.apartmentName
@@ -437,7 +443,10 @@ final class ReceiptSettingsStore: ObservableObject {
         }
         vendors = pkg.vendors
         expenseServices = pkg.expenseServices
-        ReceiptArchiveStore.shared.replaceRecords(pkg.archivedReceipts)
+        archive.replaceRecords(pkg.archivedReceipts)
+        if let keys = pkg.receiptVerificationKeys {
+            verificationKeys.restore(keys.compactMap { Data(base64Encoded: $0) })
+        }
         NotificationCenter.default.post(name: .settingsDidSave, object: nil)
         objectWillChange.send()
     }

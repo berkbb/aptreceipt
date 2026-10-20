@@ -61,7 +61,7 @@
 - `receiptSummary` and `paymentReminder` are written separately for each language. The reminder fee is one month at the stored rate. `emailURL` builds a `mailto:` link whose body goes through `plainText` to remove the `*` bold markers.
 
 ## Backups
-- `SystemBackupPackage` (version "2.1") holds the building fields, sequence number, language, currency, residents and phones (`[Int: String]`), vendors, services, archived receipts and optional late-fee fields.
+- `SystemBackupPackage` (version "2.2"; "2.1" before 3.6) holds the building fields, sequence number, language, currency, residents and phones (`[Int: String]`), vendors, services, archived receipts and optional late-fee fields, and the receipt verification keys (`receiptVerificationKeys`, Base64, current first; restoring puts them first and keeps this Mac's keys).
 - Export: `exportSystemBackup()` saves `AptReceipt_Backup_yyyyMMdd_HHmmss.json`. Import (`importSystemBackup`) immediately replaces the settings, owners, vendors, services and the whole archive, bypassing the draft, then posts `.settingsDidSave`.
 
 ## Update checker

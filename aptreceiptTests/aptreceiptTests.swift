@@ -1433,4 +1433,96 @@ final class aptreceiptTests: XCTestCase {
         let english = ReceiptDocumentView(draft: draft, apartmentName: "Yıldız Sitesi Yönetimi", signatureImage: nil, l10n: L10n(.english))
         XCTAssertTrue(english.qrVerificationPayload.contains("| YILDIZ SITESI YÖNETIMI |"), english.qrVerificationPayload)
     }
+
+    // MARK: - 18. Receipt Verification Codes and Keys (offline QR plan, phase 1)
+
+    private static let codeKey = SymmetricKey(data: Data(repeating: 7, count: 32))
+    private static let codeText = "AptReceipt\nYILDIZ SİTESİ YÖNETİMİ\nTahsilat Makbuzu · TAH-1042\nToplam: ₺12.750,50"
+
+    @MainActor private func rawKeys(_ store: ReceiptVerificationKeyStore) -> [Data] { store.exportedKeys() }
+
+    func testVerificationCodeIsPinnedAndIgnoresLayoutOnly() {
+        let code = ReceiptVerificationCode.code(for: Self.codeText, key: Self.codeKey)
+        // Printed receipts keep their codes forever: this value must never change (computed independently).
+        XCTAssertEqual(code, "MYT3-6FAA-81BK-6T3W")
+
+        let relaidOut = "\r\n  " + Self.codeText.decomposedStringWithCanonicalMapping.replacingOccurrences(of: "\n", with: "  \r\n\r\n") + "\n"
+        XCTAssertEqual(ReceiptVerificationCode.code(for: relaidOut, key: Self.codeKey), code)
+
+        XCTAssertNotEqual(ReceiptVerificationCode.code(for: Self.codeText.replacingOccurrences(of: "12.750,50", with: "12.750,51"), key: Self.codeKey), code)
+        XCTAssertNotEqual(ReceiptVerificationCode.code(for: Self.codeText.replacingOccurrences(of: "TAH-1042", with: "TAH-1043"), key: Self.codeKey), code)
+        XCTAssertNotEqual(ReceiptVerificationCode.code(for: Self.codeText, key: SymmetricKey(data: Data(repeating: 8, count: 32))), code)
+    }
+
+    func testVerificationCodeAcceptsTypedVariantsAndFindsTheKey() {
+        let code = ReceiptVerificationCode.code(for: Self.codeText, key: Self.codeKey)
+        let typed = code.replacingOccurrences(of: "-", with: " ").lowercased()
+            .replacingOccurrences(of: "0", with: "o").replacingOccurrences(of: "1", with: "l")
+        XCTAssertEqual(ReceiptVerificationCode.canonicalCode(typed), code)
+        XCTAssertNil(ReceiptVerificationCode.canonicalCode("MYT3-6FAA-81BK"))
+        XCTAssertNil(ReceiptVerificationCode.canonicalCode("MYT3-6FAA-81BK-6T3U"))
+
+        let otherKey = SymmetricKey(data: Data(repeating: 9, count: 32))
+        XCTAssertEqual(ReceiptVerificationCode.matchingKeyIndex(code: typed, text: Self.codeText, keys: [otherKey, Self.codeKey]), 1)
+        XCTAssertNil(ReceiptVerificationCode.matchingKeyIndex(code: code, text: Self.codeText + "\nX", keys: [otherKey, Self.codeKey]))
+        XCTAssertNil(ReceiptVerificationCode.matchingKeyIndex(code: code, text: Self.codeText, keys: [otherKey]))
+    }
+
+    @MainActor
+    func testVerificationKeysStayInMemoryOrInTheirOwnFile() throws {
+        XCTAssertNil(ScreenshotMode.verificationKeyFileURL(screenshotRun: true))
+        XCTAssertEqual(ScreenshotMode.verificationKeyFileURL(screenshotRun: false), ReceiptVerificationKeyStore.defaultFileURL)
+
+        let memory = ReceiptVerificationKeyStore(fileURL: nil)
+        XCTAssertEqual(rawKeys(memory), rawKeys(memory))
+        XCTAssertEqual(rawKeys(memory).count, 1)
+        XCTAssertNotEqual(rawKeys(ReceiptVerificationKeyStore(fileURL: nil)), rawKeys(memory))
+
+        let folder = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let fileURL = folder.appendingPathComponent("receipt-verification-keys")
+        XCTAssertNotEqual(fileURL, ReceiptVerificationKeyStore.defaultFileURL)
+
+        let first = ReceiptVerificationKeyStore(fileURL: fileURL)
+        let key = try XCTUnwrap(rawKeys(first).first)
+        let attributes = try FileManager.default.attributesOfItem(atPath: fileURL.path)
+        XCTAssertEqual(attributes[.size] as? Int, 32)
+        XCTAssertEqual((attributes[.posixPermissions] as? NSNumber)?.intValue, 0o600)
+        XCTAssertEqual(rawKeys(ReceiptVerificationKeyStore(fileURL: fileURL)), [key])
+
+        let restoredKey = Data(repeating: 3, count: 32)
+        first.restore([restoredKey, Data(repeating: 1, count: 5)])
+        first.restore([restoredKey])
+        XCTAssertEqual(rawKeys(first), [restoredKey, key])
+        XCTAssertEqual(rawKeys(ReceiptVerificationKeyStore(fileURL: fileURL)), [restoredKey, key])
+
+        // An unreadable file is moved aside, never overwritten.
+        try Data([1, 2, 3, 4, 5]).write(to: fileURL)
+        XCTAssertEqual(rawKeys(ReceiptVerificationKeyStore(fileURL: fileURL)).count, 1)
+        let leftovers = try FileManager.default.contentsOfDirectory(atPath: folder.path)
+        XCTAssertTrue(leftovers.contains { $0.hasPrefix("receipt-verification-keys.unreadable-") }, "\(leftovers)")
+    }
+
+    @MainActor
+    func testSystemBackupCarriesTheVerificationKeys() throws {
+        let sourceKeys = ReceiptVerificationKeyStore(fileURL: nil)
+        let source = ReceiptSettingsStore(defaults: InMemoryDefaults())
+        let data = try XCTUnwrap(source.exportSystemBackup(archive: ReceiptArchiveStore(fileURL: nil), verificationKeys: sourceKeys))
+        let package = try JSONDecoder().decode(SystemBackupPackage.self, from: data)
+        XCTAssertEqual(package.version, "2.2")
+        XCTAssertEqual(package.receiptVerificationKeys, rawKeys(sourceKeys).map { $0.base64EncodedString() })
+
+        let targetKeys = ReceiptVerificationKeyStore(fileURL: nil)
+        let ownKeys = rawKeys(targetKeys)
+        try ReceiptSettingsStore(defaults: InMemoryDefaults()).importSystemBackup(from: data, archive: ReceiptArchiveStore(fileURL: nil), verificationKeys: targetKeys)
+        XCTAssertEqual(rawKeys(targetKeys), rawKeys(sourceKeys) + ownKeys)
+
+        // A backup from before 3.6 has no keys and leaves them as they are.
+        var older = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        older["receiptVerificationKeys"] = nil
+        let olderKeys = ReceiptVerificationKeyStore(fileURL: nil)
+        let olderOwn = rawKeys(olderKeys)
+        try ReceiptSettingsStore(defaults: InMemoryDefaults()).importSystemBackup(from: JSONSerialization.data(withJSONObject: older), archive: ReceiptArchiveStore(fileURL: nil), verificationKeys: olderKeys)
+        XCTAssertEqual(rawKeys(olderKeys), olderOwn)
+    }
 }

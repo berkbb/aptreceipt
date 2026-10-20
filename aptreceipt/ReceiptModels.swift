@@ -183,4 +183,6 @@ struct SystemBackupPackage: Codable {
     var lateFeeCountryProfile: String? = "international"
     var lateFeeGracePeriodDays: Int? = 0
     var lateFeeCustomFootnote: String? = nil
+    /// Receipt verification keys (Base64), the current one first; missing in backups made before 3.6.
+    var receiptVerificationKeys: [String]? = nil
 }
