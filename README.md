@@ -23,6 +23,7 @@ A modern, native macOS application to effortlessly generate, manage, and export 
 - **Dues Tracking Checklist & WhatsApp Reminders:** Interactive resident payment ledger showing who paid and who is pending for any period, with 1-click WhatsApp payment reminders.
 - **A4 Printable Apartment Bulletin Board Notice (Pano İlanı):** Generates and exports official A4 PDF notice sheets ready to hang on building bulletin boards or share on resident groups.
 - **Batch Dues Generator (Toplu Aidat Makbuzu):** 1-click generation of sequential receipts for all or selected apartment flats in a single operation.
+- **Offline QR Receipt Verification:** Each receipt's QR code holds the receipt as readable lines in its language plus a 16-character verification code, so any phone camera shows the details without internet. **File → Verify Receipt…** (or the Receipt Archive) checks a photo, PDF or pasted QR text on this Mac and shows the receipt as a POS-style slip stamped Genuine, Not Verified or Older Receipt, together with how it compares with the archive. No server or web page is involved; the verification key stays on this Mac and travels with *Export Full System Backup*.
 - **Apple Vision & PDFKit Invoice OCR Import:** Smart OCR text and amount recognition from scanned vendor invoices or PDFs, with automated page-2 attachment merging into exported receipt PDFs.
 
 ---
@@ -77,6 +78,12 @@ A modern, native macOS application to effortlessly generate, manage, and export 
 <tr>
   <td><img src="docs/screenshots/02_receipt_document.png" width="480" alt="Income Receipt Certificate" /></td>
   <td><img src="docs/screenshots/04_receipt_outcome.png" width="480" alt="Expense Receipt Certificate" /></td>
+</tr>
+<tr>
+  <td align="center" colspan="2"><b>Verify Receipt (Offline QR Check)</b></td>
+</tr>
+<tr>
+  <td align="center" colspan="2"><img src="docs/screenshots/15_verify_receipt.png" width="720" alt="Verify Receipt window with a POS-style receipt slip" /></td>
 </tr>
 </table>
 

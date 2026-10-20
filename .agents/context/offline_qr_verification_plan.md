@@ -1,6 +1,6 @@
 # Offline QR Verification — Plan
 
-- **Status:** Approved 2026-10-20. Phase 1 done (verification code, key store, backup, tests). Phase 2 done (labeled QR text with the code, QR sized per module, new footer text). Phase 3 done (Verify Receipt window, File menu and Archive entry points, tests). Phase 4 pending.
+- **Status:** Approved 2026-10-20. Phase 1 done (verification code, key store, backup, tests). Phase 2 done (labeled QR text with the code, QR sized per module, new footer text). Phase 3 done (Verify Receipt window, File menu and Archive entry points, tests). Phase 4: screenshots (generator image 15; the hand-made About capture 07 kept), README and CHANGELOG done; the 3.6.0 release waits for approval.
 - **Scope:** Receipt QR code (`ReceiptDocumentView`), a verification secret, a "Verify Receipt" window in AptReceipt, Settings and the system backup.
 - **Constraint:** Fully offline. No web page, no server, no domain (`user_rejected_spec.md`). A hosted verification page was proposed first and rejected.
 

@@ -78,3 +78,10 @@
 - `AppFormat.currency` uses `l10n.locale` with the currency symbol, for example "₺1.750,00", "$1,750.00" or "1.750,00 Lei". `AppFormat.percent` puts `%` first in Turkish. Currencies: TRY ₺, RON Lei, USD $, EUR €, GBP £. Amounts in words come from `NumberToWords.convert`.
 - Each language has its own strings file, `aptreceipt/<lang>.lproj/Localizable.strings`, for en, tr and ro, with identical keys (404 each) and no `.xcstrings`. `L10n` properties call the private `tr("key")`, which looks the key up in the in-app language's bundle, then in English, then returns the key itself.
 - The parity tests (see `.agents/rules/localization_parity.md`) check for identical keys and format specifiers, real translations, no hardcoded text in views and no fixed number formats.
+
+## Offline receipt verification
+
+- The receipt QR code holds `ReceiptDocumentView.qrText`: labeled lines in the receipt's language with the printed labels and amounts, then `Verification code: XXXX-XXXX-XXXX-XXXX` (HMAC of the normalized lines with this installation's key, 80 bits, Crockford Base32).
+- Keys: `ReceiptVerificationKeyStore`, file `Application Support/aptreceipt/receipt-verification-keys`, current key first; carried by the system backup (2.2). Nothing is ever sent to a server or web page (`user_rejected_spec.md`).
+- Verify Receipt window: QR from a photo, PDF or pasted text (Vision, on device) → `ScannedReceiptVerification` (genuine / not verified / older receipt without code) → `ReceiptArchiveComparison` (matches / differs / missing) → POS-style `ReceiptSlipView`.
+- Receipts printed before 3.6 carry `AptReceipt | … | …` without a code; they are shown but cannot be verified.

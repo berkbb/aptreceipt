@@ -4,8 +4,16 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+- **Offline receipt verification**: Every receipt's QR code now holds the receipt as readable lines in its language (building, receipt type and number, date, period, payer or payee, flat, dues, late fee, total, manager) followed by a 16-character verification code. Any phone camera shows these details without internet.
+- **Verify Receipt window** (File → Verify Receipt…, or the button in the Receipt Archive): drop or choose a photo, screenshot or PDF of a receipt, or paste its QR text. The QR code is read on this Mac and the receipt is shown as a POS-style slip stamped **Genuine** (issued by this installation and unchanged), **Not Verified** (changed, or issued elsewhere) or **Older Receipt, No Code**. It also says whether the archive holds the receipt and lists any lines that differ from it. No server, web page or internet connection is involved.
+- **Verification key in the system backup**: The installation's verification key is created on first use and kept in the app's own folder. *Export Full System Backup* (format 2.2) now includes it, so receipts stay verifiable on a new Mac; restoring a backup keeps this Mac's key as well. Older backups import as before.
+
+### Changed
+- **Receipt QR code and footer**: The QR code grows with its content at half a millimetre per module (about 35 mm on paper), and the footer now says what it does: scan to read the receipt details; the management checks the code with AptReceipt.
+
 ### Fixed
-- **Receipt QR code could not be scanned**: The verification QR was scaled by an uneven factor, had no white border (quiet zone) and was only 52 pt wide, so cameras could not read it on screen, in the PDF or on paper. It is now drawn with sharp, equal modules and a quiet zone at 72 pt, and a test decodes it from the exported image and PDF.
+- **Receipt QR code could not be scanned**: The verification QR was scaled by an uneven factor, had no white border (quiet zone) and was only 52 pt wide, so cameras could not read it on screen, in the PDF or on paper. It is now drawn with sharp, equal modules and a quiet zone, and tests decode it from the exported image and PDF for every language and receipt type.
 - **Turkish capital İ**: Building names and the flat label were upper-cased with English rules, so "Yönetimi" became "YÖNETIMI" and "Daire" became "DAIRE" on receipts, in the QR code, the live preview, the bulletin board and the residents list. They now follow the app language ("YÖNETİMİ", "DAİRE").
 
 ## [3.5.1] - 2026-10-20
