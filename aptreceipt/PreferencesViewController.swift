@@ -27,6 +27,16 @@ enum SettingsTab: String, CaseIterable, Identifiable {
 
     static let preferredHeight: CGFloat = 620
 
+    /// Tabs already moved to Arhivar's grouped `Form` layout (phase by phase).
+    var usesGroupedForm: Bool {
+        switch self {
+        case .appearance, .signature, .backup:
+            return true
+        default:
+            return false
+        }
+    }
+
     func title(l10n: L10n) -> String {
         switch self {
         case .general:
@@ -107,29 +117,19 @@ struct SettingsView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Active Tab Content
-            ScrollView {
-                VStack(spacing: 16) {
-                    switch tab {
-                    case .general:
-                        generalSettingsTab
-                    case .residents:
-                        residentsTab
-                    case .vendors:
-                        vendorsTab
-                    case .appearance:
-                        appearanceTab
-                    case .signature:
-                        signatureTab
-                    case .backup:
-                        backupTab
-                    case .about:
-                        aboutTab
+            // Active Tab Content. Converted tabs are grouped Forms that scroll on their own.
+            if tab.usesGroupedForm {
+                tabContent
+                    .frame(maxHeight: .infinity)
+            } else {
+                ScrollView {
+                    VStack(spacing: 16) {
+                        tabContent
                     }
+                    .padding(20)
                 }
-                .padding(20)
+                .frame(maxHeight: .infinity)
             }
-            .frame(maxHeight: .infinity)
 
             Divider()
 
@@ -175,6 +175,26 @@ struct SettingsView: View {
                 message: Text(l10n.restartMenuBarNotice),
                 dismissButton: .default(Text(l10n.okButton))
             )
+        }
+    }
+
+    @ViewBuilder
+    private var tabContent: some View {
+        switch tab {
+        case .general:
+            generalSettingsTab
+        case .residents:
+            residentsTab
+        case .vendors:
+            vendorsTab
+        case .appearance:
+            appearanceTab
+        case .signature:
+            signatureTab
+        case .backup:
+            backupTab
+        case .about:
+            aboutTab
         }
     }
 
@@ -1272,94 +1292,84 @@ struct SettingsView: View {
     // MARK: - Tab: Appearance & Language
 
     private var appearanceTab: some View {
-        VStack(alignment: .leading, spacing: 18) {
-            // Theme selection (Hero Deck)
-            VStack(alignment: .leading, spacing: 10) {
-                Label(l10n.appearanceSection, systemImage: "circle.righthalf.filled")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(.secondary)
-
-                themeHeroDeck
-            }
-            .padding(14)
-            .background(Color(NSColor.controlBackgroundColor))
-            .clipShape(RoundedRectangle(cornerRadius: 10))
-
-            // Language selection (Hero Deck)
-            VStack(alignment: .leading, spacing: 10) {
-                Label(l10n.languageSection, systemImage: "globe")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(.secondary)
-
-                languageHeroDeck
-
-                // Restart warning notice
-                HStack(alignment: .top, spacing: 8) {
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .foregroundColor(.orange)
-                        .font(.system(size: 13))
-                    Text(l10n.restartMenuBarNotice)
-                        .font(.system(size: 11))
-                        .foregroundColor(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
+        Form {
+            Section {
+                Picker(l10n.appearanceSection, selection: themeSelection) {
+                    ForEach(AppTheme.allCases) { theme in
+                        Label(theme.title(l10n: l10n), systemImage: themeIcon(theme))
+                            .tag(theme)
+                    }
                 }
-                .padding(10)
-                .background(Color.orange.opacity(0.08))
-                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .pickerStyle(.segmented)
+                .labelsHidden()
+            } header: {
+                Text(l10n.appearanceSection)
             }
-            .padding(14)
-            .background(Color(NSColor.controlBackgroundColor))
-            .clipShape(RoundedRectangle(cornerRadius: 10))
 
-            // Currency selection (Hero Deck)
-            VStack(alignment: .leading, spacing: 10) {
-                Label(l10n.currencySection, systemImage: "coloncurrencysign.circle.fill")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(.secondary)
-
-                currencyHeroDeck
+            Section {
+                Picker(l10n.languageSection, selection: languageSelection) {
+                    ForEach(languageOptions, id: \.language) { option in
+                        Text("\(option.flag)  \(option.title)").tag(option.language)
+                    }
+                }
+                .labelsHidden()
+            } header: {
+                Text(l10n.languageSection)
+            } footer: {
+                VStack(alignment: .leading, spacing: 6) {
+                    if let selected = languageOptions.first(where: { $0.language == viewModel.language }) {
+                        Text(selected.description)
+                    }
+                    Label {
+                        Text(l10n.restartMenuBarNotice)
+                    } icon: {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundColor(.orange)
+                    }
+                }
+                .font(.footnote)
+                .foregroundColor(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
             }
-            .padding(14)
-            .background(Color(NSColor.controlBackgroundColor))
-            .clipShape(RoundedRectangle(cornerRadius: 10))
+
+            Section {
+                currencyPicker
+            } header: {
+                Text(l10n.currencySection)
+            }
         }
+        .formStyle(.grouped)
     }
 
-    // MARK: - Theme Hero Deck
+    /// Theme applies immediately (draft and store), as the former theme cards did.
+    private var themeSelection: Binding<AppTheme> {
+        Binding(
+            get: { viewModel.theme },
+            set: { theme in
+                viewModel.theme = theme
+                settings.theme = theme
+            }
+        )
+    }
 
-    private var themeHeroDeck: some View {
-        HStack(spacing: 10) {
-            ForEach(AppTheme.allCases) { theme in
-                let isSelected = viewModel.theme == theme
-                Button {
-                    viewModel.theme = theme
-                    settings.theme = theme
-                } label: {
-                    HStack(spacing: 8) {
-                        Image(systemName: themeIcon(theme))
-                            .font(.system(size: 13))
-                            .foregroundColor(isSelected ? .accentColor : .secondary)
-                        Text(theme.title(l10n: l10n))
-                            .font(.system(size: 12, weight: isSelected ? .bold : .medium))
-                            .foregroundColor(isSelected ? .primary : .secondary)
-                    }
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 8)
-                    .frame(maxWidth: .infinity)
-                    .background(
-                        isSelected
-                        ? Color.accentColor.opacity(0.14)
-                        : Color(NSColor.textBackgroundColor)
-                    )
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(isSelected ? Color.accentColor : Color.secondary.opacity(0.2), lineWidth: isSelected ? 1.5 : 1)
-                    )
-                }
-                .buttonStyle(.plain)
+    /// Currency applies immediately (draft and store), as the former currency cards did.
+    private var currencySelection: Binding<AppCurrency> {
+        Binding(
+            get: { viewModel.currency },
+            set: { currency in
+                viewModel.currency = currency
+                settings.currency = currency
+            }
+        )
+    }
+
+    private var currencyPicker: some View {
+        Picker(l10n.currencySection, selection: currencySelection) {
+            ForEach(AppCurrency.allCases) { currency in
+                Text("\(currency.symbol)  \(currency.code) · \(currency.title(l10n: l10n))").tag(currency)
             }
         }
+        .labelsHidden()
     }
 
     private func themeIcon(_ theme: AppTheme) -> String {
@@ -1370,105 +1380,44 @@ struct SettingsView: View {
         }
     }
 
-    // MARK: - Language Hero Deck
+    // MARK: - Language Selection
 
-    private var languageHeroDeck: some View {
-        let columns = [
-            GridItem(.flexible(), spacing: 10),
-            GridItem(.flexible(), spacing: 10)
-        ]
-        return LazyVGrid(columns: columns, spacing: 10) {
-            languageHeroCard(lang: .turkish, flag: "🇹🇷", title: "Türkçe", desc: l10n.langDescTR)
-            languageHeroCard(lang: .english, flag: "🇬🇧", title: "English", desc: l10n.langDescEN)
-            languageHeroCard(lang: .romanian, flag: "🇷🇴", title: "Română", desc: l10n.langDescRO)
-            languageHeroCard(lang: .system, flag: "🌐", title: l10n.langSystem, desc: l10n.langDescSystem)
-        }
+    private struct LanguageOption {
+        let language: AppLanguage
+        let flag: String
+        let title: String
+        let description: String
     }
 
-    private func languageHeroCard(lang: AppLanguage, flag: String, title: String, desc: String) -> some View {
-        let isSelected = viewModel.language == lang
-        return Button {
-            withAnimation(.spring(response: 0.3, dampingFraction: 0.75)) {
-                viewModel.language = lang
-                settings.language = lang
-                let resolved = L10n(lang).resolvedLanguage
-                let newCurrency = AppCurrency.default(for: resolved)
-                viewModel.currency = newCurrency
-                settings.currency = newCurrency
+    private var languageOptions: [LanguageOption] {
+        [
+            LanguageOption(language: .turkish, flag: "🇹🇷", title: "Türkçe", description: l10n.langDescTR),
+            LanguageOption(language: .english, flag: "🇬🇧", title: "English", description: l10n.langDescEN),
+            LanguageOption(language: .romanian, flag: "🇷🇴", title: "Română", description: l10n.langDescRO),
+            LanguageOption(language: .system, flag: "🌐", title: l10n.langSystem, description: l10n.langDescSystem),
+        ]
+    }
 
-                let sampleApts = [
-                    SampleData.defaults(for: .english).apartmentName,
-                    SampleData.defaults(for: .turkish).apartmentName,
-                    SampleData.defaults(for: .romanian).apartmentName
-                ]
-                if sampleApts.contains(viewModel.apartmentName) || viewModel.apartmentName.isEmpty {
-                    viewModel.loadSampleDefaults(for: lang)
-                    _ = viewModel.save(to: settings)
-                }
-                viewModel.showRestartAlert = true
-            }
-        } label: {
-            HStack(alignment: .top, spacing: 10) {
-                Text(flag)
-                    .font(.system(size: 24))
-                    .frame(width: 34, height: 34)
-                    .background(Color.secondary.opacity(0.1))
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
+    private var languageSelection: Binding<AppLanguage> {
+        Binding(
+            get: { viewModel.language },
+            set: { selectLanguage($0) }
+        )
+    }
 
-                VStack(alignment: .leading, spacing: 3) {
-                    HStack {
-                        Text(title)
-                            .font(.system(size: 13, weight: .bold))
-                            .foregroundColor(isSelected ? .primary : .secondary)
-                        Spacer()
-                        if isSelected {
-                            Image(systemName: "checkmark.circle.fill")
-                                .foregroundColor(.accentColor)
-                                .font(.system(size: 13))
-                        }
-                    }
-
-                    Text(desc)
-                        .font(.system(size: 10))
-                        .foregroundColor(.secondary)
-                        .lineLimit(2)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-            }
-            .padding(10)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(
-                isSelected
-                ? Color.accentColor.opacity(0.12)
-                : Color(NSColor.textBackgroundColor)
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 9))
-            .overlay(
-                RoundedRectangle(cornerRadius: 9)
-                    .stroke(isSelected ? Color.accentColor : Color.secondary.opacity(0.18), lineWidth: isSelected ? 1.5 : 1)
-            )
+    private func selectLanguage(_ lang: AppLanguage) {
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.75)) {
+            viewModel.selectLanguage(lang, settings: settings)
         }
-        .buttonStyle(.plain)
     }
 
     // MARK: - Tab 4: Signature
 
     private var signatureTab: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            Text(l10n.signatureTitle)
-                .font(.system(size: 14, weight: .bold))
-
-            Text(l10n.signatureDesc)
-                .font(.caption)
-                .foregroundColor(.secondary)
-
-            ZStack {
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(Color(NSColor.controlBackgroundColor))
-                    .frame(height: 150)
-
-                if let image = settings.signatureImage {
-                    VStack(spacing: 6) {
+        Form {
+            Section {
+                LabeledContent(settings.signatureImage == nil ? l10n.noSignatureYet : l10n.loadedSignature) {
+                    if let image = settings.signatureImage {
                         Image(nsImage: image)
                             .resizable()
                             .scaledToFit()
@@ -1476,157 +1425,84 @@ struct SettingsView: View {
                             .padding(6)
                             .background(Color.white)
                             .clipShape(RoundedRectangle(cornerRadius: 6))
-                        Text(l10n.loadedSignature)
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
-                    }
-                } else {
-                    VStack(spacing: 6) {
+                    } else {
                         Image(systemName: "signature")
                             .resizable()
                             .scaledToFit()
                             .frame(width: 36, height: 36)
                             .foregroundColor(.secondary.opacity(0.6))
-                        Text(l10n.noSignatureYet)
-                            .font(.callout)
-                            .foregroundColor(.secondary)
                     }
                 }
-            }
 
-            HStack(spacing: 12) {
-                Button {
-                    settings.importSignature()
-                } label: {
-                    Label(l10n.uploadSignatureButton, systemImage: "arrow.up.doc.fill")
-                }
-                .buttonStyle(.borderedProminent)
-
-                if settings.signatureImage != nil {
-                    Button(role: .destructive) {
-                        settings.clearSignature()
+                HStack(spacing: 12) {
+                    Button {
+                        settings.importSignature()
                     } label: {
-                        Label(l10n.removeSignatureButton, systemImage: "trash.fill")
+                        Label(l10n.uploadSignatureButton, systemImage: "arrow.up.doc.fill")
                     }
-                    .buttonStyle(.bordered)
+                    .buttonStyle(.borderedProminent)
+
+                    if settings.signatureImage != nil {
+                        Button(role: .destructive) {
+                            settings.clearSignature()
+                        } label: {
+                            Label(l10n.removeSignatureButton, systemImage: "trash.fill")
+                        }
+                        .buttonStyle(.bordered)
+                    }
                 }
+            } header: {
+                Text(l10n.signatureTitle)
+            } footer: {
+                Text(l10n.signatureDesc)
             }
         }
+        .formStyle(.grouped)
     }
 
     // MARK: - Tab: Backup & Restore
 
     private var backupTab: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            // Hero Header
-            HStack(spacing: 14) {
-                Image(systemName: "arrow.triangle.2.circlepath.circle.fill")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 44, height: 44)
-                    .foregroundColor(.accentColor)
+        Form {
+            Section {
+                LabeledContent(l10n.totalFlatsBadge, value: "\(viewModel.availableApartments.count)")
+                LabeledContent(l10n.totalArchived, value: "\(ReceiptArchiveStore.shared.records.count)")
 
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(l10n.backupTitle)
-                        .font(.system(size: 16, weight: .bold))
+                // One row per action: the full labels do not fit side by side at 560 pt.
+                Button {
+                    exportFullBackup()
+                } label: {
+                    Label(l10n.exportBackupButton, systemImage: "square.and.arrow.up.fill")
+                }
+                .buttonStyle(.borderedProminent)
+
+                Button {
+                    importFullBackup()
+                } label: {
+                    Label(l10n.importBackupButton, systemImage: "square.and.arrow.down.fill")
+                }
+                .buttonStyle(.bordered)
+
+                if let msg = viewModel.backupSuccessMessage {
+                    Label(msg, systemImage: "checkmark.circle.fill")
+                        .foregroundColor(.green)
+                        .font(.callout.bold())
+                } else if let err = viewModel.backupErrorMessage {
+                    Label(err, systemImage: "exclamationmark.triangle.fill")
+                        .foregroundColor(.red)
+                        .font(.callout.bold())
+                }
+            } header: {
+                Text(l10n.backupTitle)
+            } footer: {
+                VStack(alignment: .leading, spacing: 6) {
                     Text(l10n.backupSubtitle)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                    Label(l10n.backupNotice, systemImage: "info.circle.fill")
                 }
-            }
-            .padding(14)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color(NSColor.controlBackgroundColor))
-            .clipShape(RoundedRectangle(cornerRadius: 10))
-
-            // Notice Box
-            HStack(spacing: 10) {
-                Image(systemName: "info.circle.fill")
-                    .foregroundColor(.accentColor)
-                    .font(.title3)
-                Text(l10n.backupNotice)
-                    .font(.system(size: 11))
-                    .foregroundColor(.secondary)
-            }
-            .padding(12)
-            .background(Color.accentColor.opacity(0.08))
-            .clipShape(RoundedRectangle(cornerRadius: 8))
-
-            // Feedback Message
-            if let msg = viewModel.backupSuccessMessage {
-                Label(msg, systemImage: "checkmark.circle.fill")
-                    .foregroundColor(.green)
-                    .font(.callout.bold())
-                    .padding(8)
-            } else if let err = viewModel.backupErrorMessage {
-                Label(err, systemImage: "exclamationmark.triangle.fill")
-                    .foregroundColor(.red)
-                    .font(.callout.bold())
-                    .padding(8)
-            }
-
-            // Action Cards
-            VStack(spacing: 12) {
-                // Export Card
-                HStack {
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text(l10n.exportBackupButton)
-                            .font(.system(size: 13, weight: .bold))
-                        Text("\(viewModel.availableApartments.count) \(l10n.totalFlatsBadge) • \(ReceiptArchiveStore.shared.records.count) \(l10n.totalArchived)")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-
-                    Spacer()
-
-                    Button {
-                        exportFullBackup()
-                    } label: {
-                        Label(l10n.exportBackupButton, systemImage: "square.and.arrow.up.fill")
-                            .font(.system(size: 12, weight: .medium))
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .controlSize(.regular)
-                }
-                .padding(14)
-                .background(Color(NSColor.textBackgroundColor))
-                .clipShape(RoundedRectangle(cornerRadius: 8))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color.secondary.opacity(0.18), lineWidth: 1)
-                )
-
-                // Import Card
-                HStack {
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text(l10n.importBackupButton)
-                            .font(.system(size: 13, weight: .bold))
-                        Text(l10n.backupSubtitle)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                            .lineLimit(1)
-                    }
-
-                    Spacer()
-
-                    Button {
-                        importFullBackup()
-                    } label: {
-                        Label(l10n.importBackupButton, systemImage: "square.and.arrow.down.fill")
-                            .font(.system(size: 12, weight: .medium))
-                    }
-                    .buttonStyle(.bordered)
-                    .controlSize(.regular)
-                }
-                .padding(14)
-                .background(Color(NSColor.textBackgroundColor))
-                .clipShape(RoundedRectangle(cornerRadius: 8))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color.secondary.opacity(0.18), lineWidth: 1)
-                )
+                .fixedSize(horizontal: false, vertical: true)
             }
         }
+        .formStyle(.grouped)
     }
 
     private func exportFullBackup() {
@@ -1965,6 +1841,29 @@ final class SettingsViewModel: ObservableObject {
         }
         residents = loaded
         residentPhones = loadedPhones
+    }
+
+    /// Unchanged behavior of the former language cards: the language and its default currency apply at
+    /// once; a sample (or empty) building switches to that language's sample data and the whole draft is
+    /// saved; the restart notice is shown.
+    func selectLanguage(_ lang: AppLanguage, settings: ReceiptSettingsStore) {
+        language = lang
+        settings.language = lang
+        let resolved = L10n(lang).resolvedLanguage
+        let newCurrency = AppCurrency.default(for: resolved)
+        currency = newCurrency
+        settings.currency = newCurrency
+
+        let sampleApts = [
+            SampleData.defaults(for: .english).apartmentName,
+            SampleData.defaults(for: .turkish).apartmentName,
+            SampleData.defaults(for: .romanian).apartmentName
+        ]
+        if sampleApts.contains(apartmentName) || apartmentName.isEmpty {
+            loadSampleDefaults(for: lang)
+            _ = save(to: settings)
+        }
+        showRestartAlert = true
     }
 
     func selectCountryProfile(_ profile: LateFeeCountryProfile) {

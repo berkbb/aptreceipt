@@ -778,7 +778,54 @@ final class aptreceiptTests: XCTestCase {
         XCTAssertEqual(controller.draft.apartmentName, "Edited On Building Tab")
         XCTAssertTrue(controller.draft.isLoaded)
     }
+
+    // MARK: - 8. Appearance Tab (Arhivar alignment phase 2)
+
+    @MainActor
+    func testLanguageSelectionOnSampleBuildingSwitchesSamplesAndSavesDraft() {
+        let store = makeIsolatedStore()
+        let draft = SettingsViewModel()
+        draft.load(from: store)
+        draft.loadSampleDefaults(for: .english)
+        draft.sequenceNumber = "9"
+
+        draft.selectLanguage(.romanian, settings: store)
+
+        let samples = SampleData.defaults(for: .romanian)
+        XCTAssertEqual(store.language, .romanian)
+        XCTAssertEqual(store.currency, AppCurrency.default(for: .romanian))
+        XCTAssertEqual(draft.currency, AppCurrency.default(for: .romanian))
+        XCTAssertEqual(store.apartmentName, samples.apartmentName)
+        // The whole draft is committed, including fields edited on other tabs.
+        XCTAssertEqual(store.seqNumber, 9)
+        XCTAssertTrue(draft.showRestartAlert)
+    }
+
+    @MainActor
+    func testLanguageSelectionOnCustomBuildingKeepsDraftUnsaved() {
+        let store = makeIsolatedStore()
+        let draft = SettingsViewModel()
+        draft.load(from: store)
+        draft.apartmentName = "Custom Building"
+        draft.sequenceNumber = "9"
+        let originalSequence = store.seqNumber
+        let originalName = store.apartmentName
+
+        draft.selectLanguage(.turkish, settings: store)
+
+        XCTAssertEqual(store.language, .turkish)
+        XCTAssertEqual(store.currency, AppCurrency.default(for: .turkish))
+        XCTAssertEqual(draft.apartmentName, "Custom Building")
+        XCTAssertEqual(store.apartmentName, originalName)
+        XCTAssertEqual(store.seqNumber, originalSequence)
+        XCTAssertTrue(draft.showRestartAlert)
+    }
+
+    func testConvertedSettingsTabsUseGroupedForms() {
+        XCTAssertEqual(SettingsTab.allCases.filter(\.usesGroupedForm), [.appearance, .signature, .backup])
+    }
 }
+
 
 // MARK: - Test Doubles
 
