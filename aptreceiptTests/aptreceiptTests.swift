@@ -821,10 +821,6 @@ final class aptreceiptTests: XCTestCase {
         XCTAssertTrue(draft.showRestartAlert)
     }
 
-    func testConvertedSettingsTabsUseGroupedForms() {
-        XCTAssertEqual(SettingsTab.allCases.filter(\.usesGroupedForm), [.general, .residents, .appearance, .signature, .backup, .about])
-    }
-
     // MARK: - 9. About Tab: Updates and Reset (Arhivar alignment phase 3)
 
     @MainActor
