@@ -3819,6 +3819,29 @@
         }
       }
     },
+    "lateFeeEnableToggle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apply late fees to receipts"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aplică penalități de întârziere pe chitanțe"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Makbuzlara gecikme tazminatı uygula"
+          }
+        }
+      }
+    },
     "lateFeeEnabledToggle" : {
       "extractionState" : "manual",
       "localizations" : {

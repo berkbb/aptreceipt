@@ -30,7 +30,7 @@ enum SettingsTab: String, CaseIterable, Identifiable {
     /// Tabs already moved to Arhivar's grouped `Form` layout (phase by phase).
     var usesGroupedForm: Bool {
         switch self {
-        case .appearance, .signature, .backup, .about:
+        case .general, .appearance, .signature, .backup, .about:
             return true
         default:
             return false
@@ -212,323 +212,30 @@ struct SettingsView: View {
     // MARK: - Tab 1: General Settings
 
     private var generalSettingsTab: some View {
-        VStack(alignment: .leading, spacing: 18) {
-            // Hero Showcase: Apartman Başlık & Durum Kartı
-            buildingHeroCard
-
-            // Group 1: Apartman Bilgileri & Hızlı Daire Seçici
-            VStack(alignment: .leading, spacing: 12) {
-                Label(l10n.buildingDetails, systemImage: "building.2.fill")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(.secondary)
-
-                settingsField(title: l10n.buildingName, text: $viewModel.apartmentName, placeholder: l10n.buildingNamePlaceholder)
-                settingsField(title: l10n.defaultManager, text: $viewModel.issuer, placeholder: l10n.defaultManagerPlaceholder)
-
-                // Total Flats with Interactive Hero Chips
-                VStack(alignment: .leading, spacing: 8) {
-                    settingsField(title: l10n.totalFlats, text: $viewModel.flatCount, placeholder: l10n.totalFlatsPlaceholder)
-
-                    HStack(spacing: 8) {
-                        Text(l10n.heroQuickFlats)
-                            .font(.system(size: 11))
-                            .foregroundColor(.secondary)
-                            .frame(width: 200, alignment: .leading)
-
-                        HStack(spacing: 5) {
-                            ForEach([6, 8, 10, 12, 16, 20, 24, 30], id: \.self) { count in
-                                let isSelected = viewModel.flatCount == String(count)
-                                Button {
-                                    viewModel.setQuickFlatCount(count)
-                                } label: {
-                                    Text("\(count)")
-                                        .font(.system(size: 11, weight: isSelected ? .bold : .medium))
-                                        .padding(.horizontal, 9)
-                                        .padding(.vertical, 4)
-                                        .background(isSelected ? Color.accentColor : Color.secondary.opacity(0.12))
-                                        .foregroundColor(isSelected ? .white : .primary)
-                                        .clipShape(Capsule())
-                                }
-                                .buttonStyle(.plain)
-                            }
-                        }
-                    }
-                }
-            }
-            .padding(14)
-            .background(Color(NSColor.controlBackgroundColor))
-            .clipShape(RoundedRectangle(cornerRadius: 10))
-
-
-            // Group 2: Mali Ayarlar & Hero Para Birimi Kartları
-            VStack(alignment: .leading, spacing: 12) {
-                Label(l10n.financialSettings, systemImage: "banknote.fill")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(.secondary)
-
-                settingsField(title: "\(l10n.defaultDues) (\(viewModel.currency.symbol))", text: $viewModel.defaultPayment, placeholder: "1750")
-                settingsField(title: l10n.nextReceiptNo, text: $viewModel.sequenceNumber, placeholder: "1")
-
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(l10n.currencySelection)
-                        .font(.system(size: 12))
-                        .foregroundColor(.secondary)
-
-                    currencyHeroDeck
-                }
-            }
-            .padding(14)
-            .background(Color(NSColor.controlBackgroundColor))
-            .clipShape(RoundedRectangle(cornerRadius: 10))
-
-            // Group: Kat Mülkiyeti Kanunu (KMK Md. 20) Gecikme Tazminatı
-            lateFeeSettingsCard
-
-            // Group 3: Hızlı Başlangıç Senaryo Kartları
-            VStack(alignment: .leading, spacing: 12) {
-                HStack {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Label(l10n.quickScenarioTitle, systemImage: "sparkles.rectangle.stack.fill")
-                            .font(.system(size: 13, weight: .bold))
-                            .foregroundColor(.secondary)
-                        Text(l10n.quickScenarioSubtitle)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    Spacer()
-                    if viewModel.showSampleDefaultsFeedback {
-                        HStack(spacing: 4) {
-                            Image(systemName: "checkmark.circle.fill")
-                                .foregroundColor(.green)
-                            Text(l10n.sampleDefaultsLoadedFeedback)
-                                .font(.caption)
-                                .foregroundColor(.green)
-                        }
-                    }
-                }
-
-                HStack(spacing: 10) {
-                    scenarioHeroCard(
-                        flag: "🇹🇷",
-                        title: l10n.sampleScenarioTR,
-                        desc: l10n.sampleScenarioDescTR,
-                        lang: .turkish,
-                        color: .red
-                    )
-
-                    scenarioHeroCard(
-                        flag: "🇬🇧",
-                        title: l10n.sampleScenarioEN,
-                        desc: l10n.sampleScenarioDescEN,
-                        lang: .english,
-                        color: .blue
-                    )
-
-                    scenarioHeroCard(
-                        flag: "🇷🇴",
-                        title: l10n.sampleScenarioRO,
-                        desc: l10n.sampleScenarioDescRO,
-                        lang: .romanian,
-                        color: .yellow
-                    )
-                }
-            }
-            .padding(14)
-            .background(Color(NSColor.controlBackgroundColor))
-            .clipShape(RoundedRectangle(cornerRadius: 10))
+        Form {
+            buildingProfileSection
+            buildingDetailsSection
+            financialSection
+            lateFeeSection
+            scenarioSection
         }
+        .formStyle(.grouped)
     }
 
-    // MARK: - Kat Mülkiyeti Kanunu (KMK Md. 20) Gecikme Tazminatı Card
-
-    private var lateFeeSettingsCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack(spacing: 10) {
-                Image(systemName: "scalemass.fill")
-                    .font(.system(size: 15))
-                    .foregroundColor(.orange)
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(l10n.lateFeeTitle)
-                        .font(.system(size: 13, weight: .bold))
-                        .foregroundColor(.primary)
-                    Text(l10n.lateFeeSubtitle)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-
-                Spacer()
-
-                Toggle("", isOn: $viewModel.isLateFeeEnabled)
-                    .toggleStyle(.switch)
-            }
-
-            if viewModel.isLateFeeEnabled {
-                Divider()
-
-                VStack(alignment: .leading, spacing: 12) {
-                    // Jurisdiction & Country Profile Selector
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text(l10n.lateFeeCountryProfileTitle)
-                            .font(.system(size: 12, weight: .medium))
-                            .foregroundColor(.secondary)
-
-                        HStack(spacing: 6) {
-                            ForEach(LateFeeCountryProfile.allCases) { profile in
-                                let isSelected = viewModel.lateFeeCountryProfile == profile
-                                Button {
-                                    viewModel.selectCountryProfile(profile)
-                                } label: {
-                                    HStack(spacing: 4) {
-                                        Text(profile.flagEmoji)
-                                        Text(profile.title(l10n: l10n))
-                                            .font(.system(size: 10.5, weight: isSelected ? .bold : .medium))
-                                    }
-                                    .padding(.horizontal, 9)
-                                    .padding(.vertical, 5)
-                                    .background(isSelected ? Color.orange : Color.secondary.opacity(0.12))
-                                    .foregroundColor(isSelected ? .white : .primary)
-                                    .clipShape(Capsule())
-                                }
-                                .buttonStyle(.plain)
-                            }
-                        }
-                    }
-
-                    // Rate Entry & Country Presets
-                    HStack(alignment: .center, spacing: 12) {
-                        Text(l10n.lateFeeMonthlyRateTitle)
-                            .font(.system(size: 12, weight: .medium))
-                            .foregroundColor(.secondary)
-                            .frame(width: 170, alignment: .leading)
-
-                        HStack(spacing: 4) {
-                            Text("%")
-                                .font(.system(size: 12, weight: .bold))
-                                .foregroundColor(.secondary)
-                            TextField("5.0", text: $viewModel.lateFeeMonthlyRate)
-                                .textFieldStyle(.plain)
-                                .font(.system(size: 12, weight: .semibold, design: .monospaced))
-                                .frame(width: 55)
-                        }
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 5)
-                        .background(Color(NSColor.textBackgroundColor))
-                        .clipShape(RoundedRectangle(cornerRadius: 6))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 6)
-                                .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
-                        )
-
-                        // Quick Chips: from country quick presets
-                        HStack(spacing: 5) {
-                            ForEach(viewModel.lateFeeCountryProfile.quickPresets, id: \.self) { rate in
-                                let isSelected = (Double(viewModel.lateFeeMonthlyRate.replacingOccurrences(of: ",", with: ".")) ?? -1) == rate
-                                Button {
-                                    viewModel.lateFeeMonthlyRate = String(format: "%.1f", rate)
-                                } label: {
-                                    Text(rate == viewModel.lateFeeCountryProfile.defaultRate ? "%\(String(format: "%.1f", rate)) (\(l10n.statutoryRateChip))" : "%\(String(format: "%.1f", rate))")
-                                        .font(.system(size: 10.5, weight: isSelected ? .bold : .medium))
-                                        .padding(.horizontal, 8)
-                                        .padding(.vertical, 4)
-                                        .background(isSelected ? Color.orange : Color.secondary.opacity(0.12))
-                                        .foregroundColor(isSelected ? .white : .primary)
-                                        .clipShape(Capsule())
-                                }
-                                .buttonStyle(.plain)
-                            }
-                        }
-                    }
-
-                    // Monthly Due Day and Grace Period
-                    HStack(spacing: 24) {
-                        HStack(spacing: 8) {
-                            Text(l10n.lateFeeDueDayTitle)
-                                .font(.system(size: 12, weight: .medium))
-                                .foregroundColor(.secondary)
-
-                            HStack(spacing: 4) {
-                                Text(l10n.dueDayDayPrefix)
-                                    .font(.system(size: 12))
-                                    .foregroundColor(.secondary)
-
-                                Picker("", selection: $viewModel.lateFeeDueDay) {
-                                    ForEach(1...31, id: \.self) { day in
-                                        Text("\(day)").tag(day)
-                                    }
-                                }
-                                .frame(width: 60)
-
-                                Text(l10n.dueDayDaySuffix)
-                                    .font(.system(size: 12))
-                                    .foregroundColor(.secondary)
-                            }
-                        }
-
-                        HStack(spacing: 8) {
-                            Text(l10n.lateFeeGracePeriodTitle)
-                                .font(.system(size: 12, weight: .medium))
-                                .foregroundColor(.secondary)
-
-                            Picker("", selection: $viewModel.lateFeeGracePeriodDays) {
-                                ForEach([0, 5, 10, 15, 20, 30, 45, 60], id: \.self) { days in
-                                    Text("\(days)").tag(days)
-                                }
-                            }
-                            .frame(width: 65)
-                        }
-                    }
-
-                    // Receipt Footnote & Customization
-                    VStack(alignment: .leading, spacing: 4) {
-                        HStack {
-                            Text(l10n.lateFeeCustomFootnoteTitle)
-                                .font(.system(size: 12, weight: .medium))
-                                .foregroundColor(.secondary)
-                            Spacer()
-                            Button {
-                                viewModel.lateFeeCustomFootnote = ""
-                            } label: {
-                                Text(l10n.lateFeeResetFootnoteButton)
-                                    .font(.system(size: 10.5))
-                                    .foregroundColor(.accentColor)
-                            }
-                            .buttonStyle(.plain)
-                        }
-
-                        TextField(viewModel.lateFeeCountryProfile.defaultFootnote(for: settings.language), text: $viewModel.lateFeeCustomFootnote)
-                            .textFieldStyle(.roundedBorder)
-                            .font(.system(size: 11))
-                    }
-
-                    // Legal Footnote Summary Notice
-                    HStack(alignment: .top, spacing: 6) {
-                        Image(systemName: "info.circle.fill")
-                            .font(.system(size: 11))
-                            .foregroundColor(.orange)
-                            .padding(.top, 2)
-                        Text(viewModel.lateFeeCountryProfile.defaultLegalNotice(for: settings.language))
-                            .font(.system(size: 10.5))
-                            .foregroundColor(.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                    .padding(8)
-                    .background(Color.orange.opacity(0.08))
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                }
-            }
+    /// Form rows carry their own alignment, so the catalog's trailing colons are dropped for display only.
+    private func formLabel(_ text: String) -> String {
+        var label = text.trimmingCharacters(in: .whitespaces)
+        while label.hasSuffix(":") {
+            label.removeLast()
         }
-        .padding(14)
-        .background(Color(NSColor.controlBackgroundColor))
-        .clipShape(RoundedRectangle(cornerRadius: 10))
+        return label.trimmingCharacters(in: .whitespaces)
     }
 
-    // MARK: - Building Hero Showcase Card
+    // MARK: - Building Profile (logo + live summary)
 
-    private var buildingHeroCard: some View {
-        VStack(spacing: 12) {
-            HStack(spacing: 16) {
-                // Interactive Building Logo Avatar
+    private var buildingProfileSection: some View {
+        Section {
+            HStack(spacing: 14) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 12, style: .continuous)
                         .fill(Color(NSColor.textBackgroundColor))
@@ -546,128 +253,78 @@ struct SettingsView: View {
                     }
                 }
                 .frame(width: 68, height: 68)
-                .shadow(color: Color.black.opacity(0.06), radius: 4, x: 0, y: 2)
 
-                // Building Identity Details
                 VStack(alignment: .leading, spacing: 4) {
-                    HStack(spacing: 8) {
-                        Text(l10n.buildingHeroBadge)
-                            .font(.system(size: 9, weight: .bold))
-                            .padding(.horizontal, 7)
-                            .padding(.vertical, 3)
-                            .background(Color.accentColor.opacity(0.14))
-                            .foregroundColor(.accentColor)
-                            .clipShape(Capsule())
-
-                        if settings.logoImage != nil {
-                            HStack(spacing: 3) {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .foregroundColor(.green)
-                                    .font(.system(size: 10))
-                                Text(l10n.activeLogoBadge)
-                                    .font(.system(size: 10, weight: .semibold))
-                                    .foregroundColor(.green)
-                            }
-                        } else {
-                            HStack(spacing: 3) {
-                                Image(systemName: "sparkles")
-                                    .foregroundColor(.accentColor)
-                                    .font(.system(size: 10))
-                                Text(l10n.default2DLogoBadge)
-                                    .font(.system(size: 10))
-                                    .foregroundColor(.secondary)
-                            }
-                        }
-                    }
-
                     Text(viewModel.apartmentName.isEmpty ? l10n.buildingNamePlaceholder : viewModel.apartmentName)
-                        .font(.system(size: 17, weight: .bold))
+                        .font(.system(size: 15, weight: .bold))
                         .foregroundColor(viewModel.apartmentName.isEmpty ? .secondary : .primary)
                         .lineLimit(1)
 
-                    HStack(spacing: 6) {
-                        Image(systemName: "person.badge.shield.checkmark.fill")
-                            .font(.system(size: 11))
-                            .foregroundColor(.secondary)
-                        Text(viewModel.issuer.isEmpty ? l10n.heroNotSpecified : "\(l10n.heroStatsManager): \(viewModel.issuer)")
-                            .font(.system(size: 12))
-                            .foregroundColor(.secondary)
-                            .lineLimit(1)
-                    }
-                }
-
-                Spacer()
-
-                // Logo Action Buttons
-                VStack(spacing: 6) {
-                    Button {
-                        settings.importLogo()
-                    } label: {
-                        Label(l10n.uploadLogoButton, systemImage: "arrow.up.doc.fill")
-                            .font(.system(size: 11, weight: .medium))
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .controlSize(.small)
+                    Label(
+                        viewModel.issuer.isEmpty ? l10n.heroNotSpecified : "\(l10n.heroStatsManager): \(viewModel.issuer)",
+                        systemImage: "person.badge.shield.checkmark.fill"
+                    )
+                    .font(.callout)
+                    .foregroundColor(.secondary)
+                    .lineLimit(1)
 
                     if settings.logoImage != nil {
-                        Button(role: .destructive) {
-                            settings.clearLogo()
-                        } label: {
-                            Label(l10n.removeLogoButton, systemImage: "trash.fill")
-                                .font(.system(size: 11, weight: .medium))
-                        }
-                        .buttonStyle(.bordered)
-                        .controlSize(.small)
+                        Label(l10n.activeLogoBadge, systemImage: "checkmark.circle.fill")
+                            .font(.caption)
+                            .foregroundColor(.green)
+                    } else {
+                        Label(l10n.default2DLogoBadge, systemImage: "sparkles")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
                     }
                 }
+
+                Spacer(minLength: 0)
             }
 
-            Divider()
-
-            // 4 Live Stats Chips
             HStack(spacing: 8) {
                 heroStatChip(
                     icon: "building.2.fill",
                     label: "\(viewModel.flatCount) \(l10n.heroStatsFlats)",
                     color: .accentColor
                 )
-
                 heroStatChip(
                     icon: "person.fill",
                     label: viewModel.issuer.isEmpty ? "-" : viewModel.issuer,
                     color: .purple
                 )
-
                 heroStatChip(
                     icon: "banknote.fill",
                     label: "\(viewModel.defaultPayment) \(viewModel.currency.symbol)",
                     color: .green
                 )
-
                 heroStatChip(
                     icon: "number.circle.fill",
                     label: "#\(viewModel.sequenceNumber)",
                     color: .orange
                 )
             }
+
+            HStack(spacing: 10) {
+                Button {
+                    settings.importLogo()
+                } label: {
+                    Label(l10n.uploadLogoButton, systemImage: "arrow.up.doc.fill")
+                }
+                .buttonStyle(.borderedProminent)
+
+                if settings.logoImage != nil {
+                    Button(role: .destructive) {
+                        settings.clearLogo()
+                    } label: {
+                        Label(l10n.removeLogoButton, systemImage: "trash.fill")
+                    }
+                    .buttonStyle(.bordered)
+                }
+            }
+        } header: {
+            Text(l10n.buildingHeroBadge)
         }
-        .padding(14)
-        .background(
-            LinearGradient(
-                colors: [
-                    Color(NSColor.controlBackgroundColor),
-                    Color(NSColor.controlBackgroundColor).opacity(0.85)
-                ],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .stroke(Color.accentColor.opacity(0.2), lineWidth: 1)
-        )
-        .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 2)
     }
 
     private func heroStatChip(icon: String, label: String, color: Color) -> some View {
@@ -687,91 +344,214 @@ struct SettingsView: View {
         .clipShape(RoundedRectangle(cornerRadius: 6))
     }
 
-    // MARK: - Scenario Hero Card
+    // MARK: - Building Details
 
-    private func scenarioHeroCard(flag: String, title: String, desc: String, lang: AppLanguage, color: Color) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 6) {
-                Text(flag)
-                    .font(.system(size: 16))
-                Text(title)
-                    .font(.system(size: 11, weight: .bold))
-                    .lineLimit(1)
+    private var buildingDetailsSection: some View {
+        Section {
+            TextField(formLabel(l10n.buildingName), text: $viewModel.apartmentName, prompt: Text(l10n.buildingNamePlaceholder))
+            TextField(formLabel(l10n.defaultManager), text: $viewModel.issuer, prompt: Text(l10n.defaultManagerPlaceholder))
+            TextField(formLabel(l10n.totalFlats), text: $viewModel.flatCount, prompt: Text(l10n.totalFlatsPlaceholder))
+
+            LabeledContent(formLabel(l10n.heroQuickFlats)) {
+                HStack(spacing: 5) {
+                    ForEach([6, 8, 10, 12, 16, 20, 24, 30], id: \.self) { count in
+                        let isSelected = viewModel.flatCount == String(count)
+                        Button {
+                            viewModel.setQuickFlatCount(count)
+                        } label: {
+                            Text("\(count)")
+                                .font(.system(size: 11, weight: isSelected ? .bold : .medium))
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(isSelected ? Color.accentColor : Color.secondary.opacity(0.12))
+                                .foregroundColor(isSelected ? .white : .primary)
+                                .clipShape(Capsule())
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+        } header: {
+            Text(l10n.buildingDetails)
+        }
+    }
+
+    // MARK: - Financial Defaults
+
+    private var financialSection: some View {
+        Section {
+            TextField("\(formLabel(l10n.defaultDues)) (\(viewModel.currency.symbol))", text: $viewModel.defaultPayment, prompt: Text("1750"))
+            TextField(formLabel(l10n.nextReceiptNo), text: $viewModel.sequenceNumber, prompt: Text("1"))
+            LabeledContent(formLabel(l10n.currencySelection)) {
+                currencyPicker
+                    .fixedSize()
+            }
+        } header: {
+            Text(l10n.financialSettings)
+        }
+    }
+
+    // MARK: - Late Fee (jurisdiction profiles stay neutral; see user_rejected_spec.md)
+
+    private var lateFeeSection: some View {
+        Section {
+            Toggle(isOn: $viewModel.isLateFeeEnabled) {
+                Label(l10n.lateFeeEnableToggle, systemImage: "scalemass.fill")
             }
 
-            Text(desc)
-                .font(.system(size: 10))
-                .foregroundColor(.secondary)
-                .lineLimit(2)
-                .fixedSize(horizontal: false, vertical: true)
+            if viewModel.isLateFeeEnabled {
+                // Buttons rather than a picker: re-selecting the current profile re-applies its defaults.
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(formLabel(l10n.lateFeeCountryProfileTitle))
+                    // Profile titles cite statutes and are long; a 2×2 grid keeps each on one line.
+                    LazyVGrid(columns: [GridItem(.flexible(), spacing: 6), GridItem(.flexible(), spacing: 6)], alignment: .leading, spacing: 6) {
+                        ForEach(LateFeeCountryProfile.allCases) { profile in
+                            let isSelected = viewModel.lateFeeCountryProfile == profile
+                            Button {
+                                viewModel.selectCountryProfile(profile)
+                            } label: {
+                                HStack(spacing: 4) {
+                                    Text(profile.flagEmoji)
+                                    Text(profile.title(l10n: l10n))
+                                        .font(.system(size: 10.5, weight: isSelected ? .bold : .medium))
+                                        .lineLimit(1)
+                                }
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(isSelected ? Color.orange : Color.secondary.opacity(0.12))
+                                .foregroundColor(isSelected ? .white : .primary)
+                                .clipShape(Capsule())
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                }
 
-            Spacer()
+                LabeledContent(formLabel(l10n.lateFeeMonthlyRateTitle)) {
+                    HStack(spacing: 4) {
+                        Text("%")
+                            .foregroundColor(.secondary)
+                        TextField("5.0", text: $viewModel.lateFeeMonthlyRate)
+                            .textFieldStyle(.roundedBorder)
+                            .font(.system(.body, design: .monospaced))
+                            .frame(width: 70)
+                            .labelsHidden()
+                    }
+                }
 
+                HStack(spacing: 5) {
+                    Spacer(minLength: 0)
+                    ForEach(viewModel.lateFeeCountryProfile.quickPresets, id: \.self) { rate in
+                        let isSelected = (Double(viewModel.lateFeeMonthlyRate.replacingOccurrences(of: ",", with: ".")) ?? -1) == rate
+                        Button {
+                            viewModel.lateFeeMonthlyRate = String(format: "%.1f", rate)
+                        } label: {
+                            Text(rate == viewModel.lateFeeCountryProfile.defaultRate ? "%\(String(format: "%.1f", rate)) (\(l10n.statutoryRateChip))" : "%\(String(format: "%.1f", rate))")
+                                .font(.system(size: 10.5, weight: isSelected ? .bold : .medium))
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(isSelected ? Color.orange : Color.secondary.opacity(0.12))
+                                .foregroundColor(isSelected ? .white : .primary)
+                                .clipShape(Capsule())
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+
+                LabeledContent(formLabel(l10n.lateFeeDueDayTitle)) {
+                    HStack(spacing: 4) {
+                        Text(l10n.dueDayDayPrefix)
+                            .foregroundColor(.secondary)
+                        Picker("", selection: $viewModel.lateFeeDueDay) {
+                            ForEach(1...31, id: \.self) { day in
+                                Text("\(day)").tag(day)
+                            }
+                        }
+                        .labelsHidden()
+                        .fixedSize()
+                        Text(l10n.dueDayDaySuffix)
+                            .foregroundColor(.secondary)
+                    }
+                }
+
+                Picker(formLabel(l10n.lateFeeGracePeriodTitle), selection: $viewModel.lateFeeGracePeriodDays) {
+                    ForEach([0, 5, 10, 15, 20, 30, 45, 60], id: \.self) { days in
+                        Text("\(days)").tag(days)
+                    }
+                }
+
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack {
+                        Text(formLabel(l10n.lateFeeCustomFootnoteTitle))
+                        Spacer()
+                        Button(l10n.lateFeeResetFootnoteButton) {
+                            viewModel.lateFeeCustomFootnote = ""
+                        }
+                        .buttonStyle(.link)
+                        .font(.callout)
+                    }
+                    TextField("", text: $viewModel.lateFeeCustomFootnote, prompt: Text(viewModel.lateFeeCountryProfile.defaultFootnote(for: settings.language)))
+                        .textFieldStyle(.roundedBorder)
+                        .labelsHidden()
+                }
+            }
+        } header: {
+            Text(l10n.lateFeeTitle)
+        } footer: {
+            VStack(alignment: .leading, spacing: 6) {
+                Text(l10n.lateFeeSubtitle)
+                if viewModel.isLateFeeEnabled {
+                    Label {
+                        Text(viewModel.lateFeeCountryProfile.defaultLegalNotice(for: settings.language))
+                    } icon: {
+                        Image(systemName: "info.circle.fill")
+                            .foregroundColor(.orange)
+                    }
+                }
+            }
+            .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    // MARK: - Starter Scenarios
+
+    private var scenarioSection: some View {
+        Section {
+            if viewModel.showSampleDefaultsFeedback {
+                Label(l10n.sampleDefaultsLoadedFeedback, systemImage: "checkmark.circle.fill")
+                    .foregroundColor(.green)
+            }
+            scenarioRow(flag: "🇹🇷", title: l10n.sampleScenarioTR, desc: l10n.sampleScenarioDescTR, lang: .turkish)
+            scenarioRow(flag: "🇬🇧", title: l10n.sampleScenarioEN, desc: l10n.sampleScenarioDescEN, lang: .english)
+            scenarioRow(flag: "🇷🇴", title: l10n.sampleScenarioRO, desc: l10n.sampleScenarioDescRO, lang: .romanian)
+        } header: {
+            Text(l10n.quickScenarioTitle)
+        } footer: {
+            Text(l10n.quickScenarioSubtitle)
+        }
+    }
+
+    private func scenarioRow(flag: String, title: String, desc: String, lang: AppLanguage) -> some View {
+        HStack(alignment: .center, spacing: 10) {
+            Text(flag)
+                .font(.system(size: 20))
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.system(size: 12, weight: .bold))
+                Text(desc)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer(minLength: 8)
             Button {
                 viewModel.loadSampleDefaults(for: lang)
             } label: {
-                HStack(spacing: 4) {
-                    Image(systemName: "arrow.counterclockwise")
-                        .font(.system(size: 10))
-                    Text(l10n.applyScenarioButton)
-                        .font(.system(size: 10, weight: .semibold))
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 4)
+                Label(l10n.applyScenarioButton, systemImage: "arrow.counterclockwise")
             }
             .buttonStyle(.bordered)
             .controlSize(.small)
-        }
-        .padding(10)
-        .frame(maxWidth: .infinity, minHeight: 110)
-        .background(Color(NSColor.textBackgroundColor))
-        .clipShape(RoundedRectangle(cornerRadius: 8))
-        .overlay(
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(Color.secondary.opacity(0.18), lineWidth: 1)
-        )
-    }
-
-    // MARK: - Currency Hero Deck
-
-    private var currencyHeroDeck: some View {
-        HStack(spacing: 8) {
-            ForEach(AppCurrency.allCases) { curr in
-                let isSelected = viewModel.currency == curr
-                Button {
-                    viewModel.currency = curr
-                    settings.currency = curr
-                } label: {
-                    HStack(spacing: 6) {
-                        Text(curr.symbol)
-                            .font(.system(size: 14, weight: .bold))
-                            .foregroundColor(isSelected ? .accentColor : .secondary)
-                        VStack(alignment: .leading, spacing: 1) {
-                            Text(curr.code)
-                                .font(.system(size: 11, weight: .bold))
-                                .foregroundColor(isSelected ? .primary : .secondary)
-                            Text(curr.title(l10n: l10n))
-                                .font(.system(size: 9))
-                                .foregroundColor(.secondary)
-                                .lineLimit(1)
-                        }
-                    }
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(
-                        isSelected
-                        ? Color.accentColor.opacity(0.12)
-                        : Color(NSColor.textBackgroundColor)
-                    )
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(isSelected ? Color.accentColor : Color.secondary.opacity(0.18), lineWidth: isSelected ? 1.5 : 1)
-                    )
-                }
-                .buttonStyle(.plain)
-            }
         }
     }
 
@@ -1646,17 +1426,6 @@ struct SettingsView: View {
                 .foregroundColor(isInfo ? .secondary : .orange)
                 .multilineTextAlignment(.trailing)
                 .fixedSize(horizontal: false, vertical: true)
-        }
-    }
-
-    private func settingsField(title: String, text: Binding<String>, placeholder: String) -> some View {
-        HStack {
-            Text(title)
-                .font(.system(size: 12))
-                .foregroundColor(.secondary)
-                .frame(width: 200, alignment: .leading)
-            TextField(placeholder, text: text)
-                .textFieldStyle(.roundedBorder)
         }
     }
 }

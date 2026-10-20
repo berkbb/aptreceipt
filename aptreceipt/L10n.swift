@@ -262,6 +262,7 @@ struct L10n {
     var deselectAll: String { tr("deselectAll") }
 
     // MARK: - Late Payment Compensation & Penalty Strings
+    var lateFeeEnableToggle: String { tr("lateFeeEnableToggle") }
     var lateFeeTitle: String { tr("lateFeeTitle") }
     var lateFeeSubtitle: String { tr("lateFeeSubtitle") }
     var lateFeeEnabledToggle: String { tr("lateFeeEnabledToggle") }
