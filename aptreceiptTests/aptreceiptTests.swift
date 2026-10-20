@@ -782,12 +782,13 @@ final class aptreceiptTests: XCTestCase {
     // MARK: - 8. Appearance Tab (Arhivar alignment phase 2)
 
     @MainActor
-    func testLanguageSelectionOnSampleBuildingSwitchesSamplesAndSavesDraft() {
+    func testLanguageSelectionOnSampleBuildingStoresSamplesButNotOtherDraftEdits() {
         let store = makeIsolatedStore()
         let draft = SettingsViewModel()
         draft.load(from: store)
         draft.loadSampleDefaults(for: .english)
         draft.sequenceNumber = "9"
+        let originalSequence = store.seqNumber
 
         draft.selectLanguage(.romanian, settings: store)
 
@@ -796,8 +797,15 @@ final class aptreceiptTests: XCTestCase {
         XCTAssertEqual(store.currency, AppCurrency.default(for: .romanian))
         XCTAssertEqual(draft.currency, AppCurrency.default(for: .romanian))
         XCTAssertEqual(store.apartmentName, samples.apartmentName)
-        // The whole draft is committed, including fields edited on other tabs.
-        XCTAssertEqual(store.seqNumber, 9)
+        XCTAssertEqual(store.issuer, samples.issuer)
+        XCTAssertEqual(store.flatCount, samples.flatCount)
+        XCTAssertEqual(store.vendors.map(\.name), samples.defaultVendors.map(\.name))
+        for (flat, name) in samples.residents {
+            XCTAssertEqual(store.owner(for: flat), name.localizedCapitalized)
+        }
+        // A receipt number typed on another tab stays a pending draft edit.
+        XCTAssertEqual(store.seqNumber, originalSequence)
+        XCTAssertEqual(draft.sequenceNumber, "9")
         XCTAssertTrue(draft.showRestartAlert)
     }
 
@@ -913,6 +921,18 @@ final class aptreceiptTests: XCTestCase {
         XCTAssertEqual(draft.apartmentName, "Unsaved Draft Name")
         XCTAssertNotEqual(store.apartmentName, "Unsaved Draft Name")
     }
+
+    // MARK: - 10. Settings Quirk Fixes
+
+    func testStatutoryRateLabelHasNoRateInsideItInEveryLanguage() {
+        for language in [AppLanguage.english, .turkish, .romanian] {
+            let label = L10n(language).statutoryRateLabel
+            XCTAssertFalse(label.isEmpty)
+            XCTAssertFalse(label.contains("%"), "\(language): \(label)")
+            XCTAssertFalse(label.contains(where: \.isNumber), "\(language): \(label)")
+        }
+        XCTAssertNotEqual(L10n(.turkish).clearResidentButton, L10n(.turkish).clearAllResidentsButton)
+    }
 }
 
 
@@ -953,4 +973,3 @@ final class InMemoryDefaults: UserDefaults {
     }
     override func float(forKey defaultName: String) -> Float { Float(double(forKey: defaultName)) }
 }
-

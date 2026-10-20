@@ -15,7 +15,6 @@ final class MainScreenViewModel: ObservableObject {
     @Published var receiptKind: ReceiptKind = .income
 
     @Published var previewDraft: ReceiptDraft?
-    @Published var isPresentingSettings: Bool = false
     @Published var isPresentingArchive: Bool = false
     @Published var isPresentingFinancialReport: Bool = false
     @Published var isPresentingBatchDues: Bool = false

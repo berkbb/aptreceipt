@@ -129,10 +129,6 @@ struct MainScreen: View {
             }
             .frame(width: 720, height: 580)
         }
-        .sheet(isPresented: $viewModel.isPresentingSettings) {
-            SettingsView(settings: settings)
-                .frame(width: 840, height: 640)
-        }
         .sheet(isPresented: $settings.showLicenseViewer) {
             LicenseViewerSheet(l10n: l10n)
         }

@@ -427,7 +427,7 @@ struct SettingsView: View {
                         Button {
                             viewModel.lateFeeMonthlyRate = String(format: "%.1f", rate)
                         } label: {
-                            Text(rate == viewModel.lateFeeCountryProfile.defaultRate ? "%\(String(format: "%.1f", rate)) (\(l10n.statutoryRateChip))" : "%\(String(format: "%.1f", rate))")
+                            Text(rate == viewModel.lateFeeCountryProfile.defaultRate ? "%\(String(format: "%.1f", rate)) (\(l10n.statutoryRateLabel))" : "%\(String(format: "%.1f", rate))")
                                 .font(.system(size: 10.5, weight: isSelected ? .bold : .medium))
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 4)
@@ -705,7 +705,7 @@ struct SettingsView: View {
                         .foregroundColor(.secondary.opacity(0.6))
                 }
                 .buttonStyle(.plain)
-                .help(l10n.clearAllResidentsButton)
+                .help(l10n.clearResidentButton)
             }
         }
         .padding(.vertical, 2)
@@ -1468,9 +1468,9 @@ final class SettingsViewModel: ObservableObject {
         residentPhones = loadedPhones
     }
 
-    /// Unchanged behavior of the former language cards: the language and its default currency apply at
-    /// once; a sample (or empty) building switches to that language's sample data and the whole draft is
-    /// saved; the restart notice is shown.
+    /// The language and its default currency apply at once; a sample (or empty) building switches to that
+    /// language's sample data, which is stored right away; the restart notice is shown. Unrelated pending
+    /// edits on other tabs stay in the draft for Save & Close or Cancel.
     func selectLanguage(_ lang: AppLanguage, settings: ReceiptSettingsStore) {
         language = lang
         settings.language = lang
@@ -1486,9 +1486,27 @@ final class SettingsViewModel: ObservableObject {
         ]
         if sampleApts.contains(apartmentName) || apartmentName.isEmpty {
             loadSampleDefaults(for: lang)
-            _ = save(to: settings)
+            commitSampleData(to: settings)
         }
         showRestartAlert = true
+    }
+
+    /// Stores the fields `loadSampleDefaults(for:)` filled, with the same normalization as `save(to:)`.
+    private func commitSampleData(to settings: ReceiptSettingsStore) {
+        let flats = max(1, Int(flatCount) ?? settings.flatCount)
+        settings.apartmentName = apartmentName.trimmingCharacters(in: .whitespacesAndNewlines)
+        settings.issuer = issuer.trimmingCharacters(in: .whitespacesAndNewlines).localizedCapitalized
+        settings.defaultPayment = defaultPayment.trimmingCharacters(in: .whitespacesAndNewlines)
+        settings.flatCount = flats
+        settings.currency = currency
+        settings.vendors = vendors
+        settings.expenseServices = expenseServices
+        for apt in 1...flats {
+            let name = (residents[apt] ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+            settings.saveOwner(name.localizedCapitalized, apartmentNumber: apt)
+        }
+        settings.objectWillChange.send()
+        NotificationCenter.default.post(name: .settingsDidSave, object: settings)
     }
 
     /// Resets the stored preferences and mirrors them into the draft. Other draft edits (building,

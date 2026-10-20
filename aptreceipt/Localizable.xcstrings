@@ -1174,6 +1174,29 @@
         }
       }
     },
+    "clearResidentButton" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear this flat"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Golește acest apartament"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bu daireyi temizle"
+          }
+        }
+      }
+    },
     "close" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -7725,6 +7748,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%5.0 (Kanuni)"
+          }
+        }
+      }
+    },
+    "statutoryRateLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Statutory"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Legal"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kanuni"
           }
         }
       }

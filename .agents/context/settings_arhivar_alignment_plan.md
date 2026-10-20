@@ -103,3 +103,12 @@ Each phase is one commit. It must pass `./run_all_tests_mac.command`, and before
 - **Phase 6:** Vendors is a grouped `Form` with three sections. The first, under the vendors title, shows the vendor and service counts, Load Sample Vendors and its feedback, with the subtitle in the footer. *Vendors* has the labelled add fields (name, category, contact), a Save button that stays disabled without a name, search, the empty state, and rows with category, contact and delete. *Services* has the add fields (name, suggested vendor, description), Save, the empty state, and rows with icon, suggested vendor, description and delete. Every tab is now a `Form`, so the transitional `usesGroupedForm` flag and the old `ScrollView` wrapper are gone.
 - **Phase 7:** CHANGELOG (Unreleased: Added/Changed) and README (settings window, updating) describe the new settings. `docs/screenshots/03_settings_view.png`, `09_settings_vendors.png` and `10_settings_appearance.png` were regenerated with the app's own `--generate-screenshots` (run from a scratch folder; only these three files were copied). Open follow-ups that need a user decision: the "odd but kept" behaviors listed above.
 
+## Follow-up fixes (2026-10-20, approved by the user)
+
+The four "odd but kept" behaviors were fixed afterwards, without changing any feature:
+
+- Picking a language on a sample (or empty) building still stores that language's sample data at once, but through `SettingsViewModel.commitSampleData(to:)`, which writes only the fields `loadSampleDefaults(for:)` fills. Other pending edits, such as a receipt number typed on another tab, stay in the draft for Save & Close or Cancel.
+- The statutory chip uses the new `statutoryRateLabel` ("Statutory" / "Kanuni" / "Legal"), so it reads "%5.0 (Kanuni)". `statutoryRateChip` stays in the catalog for compatibility.
+- The per-flat clear button's tooltip uses the new `clearResidentButton`.
+- `MainScreen`'s unreachable settings sheet and `MainScreenViewModel.isPresentingSettings` were removed; Settings opens only through `SettingsWindowManager`.
+

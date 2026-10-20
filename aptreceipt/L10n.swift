@@ -284,6 +284,7 @@ struct L10n {
     var lateFeeCalculated: String { tr("lateFeeCalculated") }
     var totalWithLateFee: String { tr("totalWithLateFee") }
     var statutoryRateChip: String { tr("statutoryRateChip") }
+    var statutoryRateLabel: String { tr("statutoryRateLabel") }
     var dueDayDayPrefix: String { tr("dueDayDayPrefix") }
     var dueDayDaySuffix: String { tr("dueDayDaySuffix") }
     func lateFeeItemName(rate: Double, months: Int) -> String {
@@ -388,6 +389,7 @@ struct L10n {
     var searchNeighborsPlaceholder: String { tr("searchNeighborsPlaceholder") }
     var fillSampleResidentsButton: String { tr("fillSampleResidentsButton") }
     var clearAllResidentsButton: String { tr("clearAllResidentsButton") }
+    var clearResidentButton: String { tr("clearResidentButton") }
     var flatUnassigned: String { tr("flatUnassigned") }
     var flatAssigned: String { tr("flatAssigned") }
     var noMatchingResidents: String { tr("noMatchingResidents") }

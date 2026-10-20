@@ -11,6 +11,11 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 - **Settings window** follows the Arhivar standard: toolbar tabs (560 pt wide; Residents and Vendors 760 pt) and grouped native sections with headers on every tab. All existing settings, actions and validations are unchanged, and edits on all tabs still form one draft committed by **Save & Close** or discarded by **Cancel**. The language and currency cards became pickers with the same immediate behavior; the theme cards became a segmented control.
+
+### Fixed
+- Picking a language on a sample building no longer also saves unrelated pending edits from other Settings tabs; only the switched sample data is stored at once.
+- The statutory late-fee rate chip showed its rate twice ("%5.0 (%5.0 (Statutory))"); it now reads "%5.0 (Statutory)".
+- The per-flat clear button in Residents showed the "Clear All" tooltip; it now has its own text.
 - **Update check errors**: A failed update check now explains what went wrong instead of always saying "check your internet connection": no internet connection, timeout, GitHub unreachable, no public release yet (HTTP 404), rate limit reached, GitHub server error, or an unreadable response. Messages are translated into English, Turkish and Romanian.
 - **About window**: Redesigned to match Arhivar: large icon, name, version and build read from the app bundle (previously hardcoded as 3.3.0), tagline, publisher and license credit, glass link buttons (babadogan.net, GitHub, Check for Updates, License) and a copyright line with the current year. The window now sizes itself to its content and hides its title bar. The Settings > About tab uses the same layout and keeps its software update card.
 - **License viewer**: Shows the full, unmodified GPL-3.0 text from the repository `LICENSE` instead of a shortened, edited excerpt. It stays read-only, and a test keeps it in sync with `LICENSE`.
