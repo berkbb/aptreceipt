@@ -2,10 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [3.5.1] - 2026-10-20
 
 ### Changed
 - **Every language has its own string file**: the single String Catalog (`Localizable.xcstrings`) was split into `en.lproj`, `tr.lproj` and `ro.lproj` `Localizable.strings` files with identical keys (404 each, values unchanged). A test keeps one file per language and rejects a shared catalog.
+- Bumped marketing version to `3.5.1` (build `12`).
 
 ### Fixed
 - **Screenshot generator no longer touches your data**: `--generate-screenshots` replaced the receipt archive with two samples and wiped most settings (vendors, services, phones, signature, late-fee settings). It now keeps its settings and archive in memory, so the real ones are neither read into the images nor changed; tests cover it.
