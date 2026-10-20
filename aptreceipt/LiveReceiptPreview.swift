@@ -99,7 +99,7 @@ struct LiveReceiptPreview: View {
                 }
 
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(apartmentName.isEmpty ? l10n.defaultBuildingName : apartmentName.uppercased())
+                    Text(apartmentName.isEmpty ? l10n.defaultBuildingName : l10n.uppercased(apartmentName))
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(.primary)
                     Text(badgeText)

@@ -16,7 +16,7 @@
 | `LateFee.swift` | `LateFeeCountryProfile`, `LateFeeCalculator` | Profile defaults, footnotes, legal notices; fee math |
 | `SampleData.swift` | `SampleData.defaults(for:)` | Per-language sample building, residents, vendors, services |
 | `Extensions.swift` | `AppFormat`, `ReceiptPeriod`, `Date.monthYearString`, `Date.dayMonthYearString`, `Notification.Name.appLanguageDidChange` / `.settingsDidSave` | Formatting, period parsing, notifications |
-| `SharingHelpers.swift` | `QRCodeGenerator`, `WhatsAppShareHelper` | QR image; WhatsApp/email URLs and messages |
+| `SharingHelpers.swift` | `QRCodeGenerator`, `WhatsAppShareHelper` | QR bitmap (whole pixels per module, 4-module quiet zone; `testReceiptQRCodeScansInExportedImageAndPDF` decodes it); WhatsApp/email URLs and messages |
 | `L10n.swift` | `L10n` (`resolvedLanguage`, `locale`, private `tr(_:)`) | Lookup in the per-language `Localizable.strings` |
 | `MainScreen.swift` | `MainScreen` | Main window: receipt form, live preview, header buttons, sheets |
 | `MainScreenViewModel.swift` | `MainScreenViewModel` | Form state, late-fee math, invoice import, `createReceipt` |

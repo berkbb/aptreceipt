@@ -8,6 +8,7 @@
 - Every user-facing text comes from the per-language files through `L10n` (`localization_parity.md`). No words in `Text("…")`, `Label("…")`, `Button("…")`, alerts, file names or generated documents. Only brand names and language self-names may stay literal.
 - Version, build and year are read at runtime (`AppInfo.version`, `AppInfo.build`, `AppInfo.currentYear`); never hardcode them.
 - Amounts and percentages go through `AppFormat`; dates and month names through locale-aware formatters with `l10n.locale`.
+- Upper-case display text with `l10n.uppercased(_:)`, never `.uppercased()`: Turkish needs "İ" for "i".
 
 ## 2. Windows
 

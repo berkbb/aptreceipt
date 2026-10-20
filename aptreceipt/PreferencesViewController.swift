@@ -621,7 +621,7 @@ struct SettingsView: View {
         return HStack(spacing: 12) {
             // Flat Badge
             VStack(spacing: 1) {
-                Text(l10n.flatPrefix.uppercased())
+                Text(l10n.uppercased(l10n.flatPrefix))
                     .font(.system(size: 9, weight: .bold))
                     .foregroundColor(isAssigned ? .white.opacity(0.9) : .secondary)
                 Text("\(flat)")

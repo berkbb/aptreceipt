@@ -4,22 +4,38 @@ import CoreImage
 // MARK: - CoreImage QR Code Generator
 
 enum QRCodeGenerator {
+    /// Bitmap pixels per QR module: every module is a whole, sharp square in previews, PDFs and prints.
+    private static let pixelsPerModule = 10
+    /// White border around the code, in modules; scanners need this quiet zone to find the code.
+    private static let quietZoneModules = 4
+    private static let context = CIContext()
+
+    /// A black-on-white QR code (with its quiet zone) shown at `size` points.
     static func generate(from string: String, size: CGFloat = 64) -> NSImage? {
         guard let filter = CIFilter(name: "CIQRCodeGenerator") else { return nil }
-        let data = string.data(using: .utf8)
-        filter.setValue(data, forKey: "inputMessage")
+        filter.setValue(Data(string.utf8), forKey: "inputMessage")
         filter.setValue("M", forKey: "inputCorrectionLevel")
-        guard let output = filter.outputImage else { return nil }
+        guard let output = filter.outputImage,
+              let modules = context.createCGImage(output, from: output.extent),
+              modules.width > 0, modules.height > 0 else { return nil }
 
-        let extent = output.extent
-        guard extent.width > 0, extent.height > 0 else { return nil }
-        let scale = size / extent.width
-        let transformed = output.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
-
-        let rep = NSCIImageRep(ciImage: transformed)
-        let image = NSImage(size: NSSize(width: size, height: size))
-        image.addRepresentation(rep)
-        return image
+        // One module per pixel in `modules`; enlarge by a whole factor without smoothing so no module blurs.
+        let width = (modules.width + 2 * quietZoneModules) * pixelsPerModule
+        let height = (modules.height + 2 * quietZoneModules) * pixelsPerModule
+        guard let bitmap = CGContext(
+            data: nil, width: width, height: height, bitsPerComponent: 8, bytesPerRow: 0,
+            space: CGColorSpaceCreateDeviceGray(), bitmapInfo: CGImageAlphaInfo.none.rawValue
+        ) else { return nil }
+        bitmap.setFillColor(gray: 1, alpha: 1)
+        bitmap.fill(CGRect(x: 0, y: 0, width: width, height: height))
+        bitmap.interpolationQuality = .none
+        let inset = CGFloat(quietZoneModules * pixelsPerModule)
+        bitmap.draw(modules, in: CGRect(
+            x: inset, y: inset,
+            width: CGFloat(modules.width * pixelsPerModule), height: CGFloat(modules.height * pixelsPerModule)
+        ))
+        guard let image = bitmap.makeImage() else { return nil }
+        return NSImage(cgImage: image, size: NSSize(width: size, height: size))
     }
 }
 

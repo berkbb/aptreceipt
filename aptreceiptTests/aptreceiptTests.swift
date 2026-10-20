@@ -7,6 +7,9 @@
 //
 
 import CryptoKit
+import PDFKit
+import SwiftUI
+import Vision
 import XCTest
 @testable import aptreceipt
 
@@ -1369,5 +1372,65 @@ final class aptreceiptTests: XCTestCase {
 
         XCTAssertTrue(FileManager.default.fileExists(atPath: fileURL.path))
         XCTAssertEqual(ReceiptArchiveStore(fileURL: fileURL).records.map(\.id), store.records.map(\.id))
+    }
+
+    // MARK: - 16. Receipt QR Code (must scan in the exported image and PDF)
+
+    private func decodedQRCodes(in image: CGImage) -> [String] {
+        let request = VNDetectBarcodesRequest()
+        request.symbologies = [.qr]
+        try? VNImageRequestHandler(cgImage: image).perform([request])
+        return (request.results ?? []).compactMap(\.payloadStringValue)
+    }
+
+    @MainActor
+    func testReceiptQRCodeScansInExportedImageAndPDF() throws {
+        let draft = ReceiptDraft(receiver: "Ayşe Yılmaz Öztürkoğlu", issuer: "Mehmet Çağlar Şahin", notes: "Ekim 2026 aidatı", monthYear: "Ekim 2026", apartmentNumber: 12, amount: 12750.5, sequenceNumber: 1042, createdDate: "20.10.2026", showApartmentNumber: true, kind: .income, currency: .turkishLira)
+        let view = ReceiptDocumentView(draft: draft, apartmentName: "Test Apartmanı Yönetimi", signatureImage: nil, l10n: L10n(.turkish))
+        let payload = view.qrVerificationPayload
+        let document = view.frame(width: 595, height: 842).environment(\.colorScheme, .light)
+
+        // JPEG export path: rendered at 2x.
+        let imageRenderer = ImageRenderer(content: document)
+        imageRenderer.scale = 2
+        imageRenderer.proposedSize = ProposedViewSize(width: 595, height: 842)
+        let image = try XCTUnwrap(imageRenderer.cgImage)
+        XCTAssertEqual(decodedQRCodes(in: image), [payload], "JPEG export")
+
+        // PDF export path, then viewed or scanned at 150 dpi.
+        let pdfRenderer = ImageRenderer(content: document)
+        pdfRenderer.proposedSize = ProposedViewSize(width: 595, height: 842)
+        let pdfData = NSMutableData()
+        var box = CGRect(x: 0, y: 0, width: 595, height: 842)
+        let consumer = try XCTUnwrap(CGDataConsumer(data: pdfData as CFMutableData))
+        let pdfContext = try XCTUnwrap(CGContext(consumer: consumer, mediaBox: &box, nil))
+        pdfContext.beginPDFPage(nil)
+        pdfRenderer.render { _, draw in draw(pdfContext) }
+        pdfContext.endPDFPage()
+        pdfContext.closePDF()
+        let pdf = try XCTUnwrap(PDFDocument(data: pdfData as Data))
+        let page = try XCTUnwrap(pdf.page(at: 0))
+        let thumbnail = page.thumbnail(of: NSSize(width: 1240, height: 1754), for: .mediaBox)
+        let scan = try XCTUnwrap(thumbnail.cgImage(forProposedRect: nil, context: nil, hints: nil))
+        XCTAssertEqual(decodedQRCodes(in: scan), [payload], "PDF export")
+    }
+
+    // MARK: - 17. Upper-casing follows the app language (Turkish dotted İ)
+
+    func testUppercasingFollowsTheAppLanguage() {
+        XCTAssertEqual(L10n(.turkish).uppercased("Yıldız Sitesi"), "YILDIZ SİTESİ")
+        XCTAssertEqual(L10n(.english).uppercased("Yıldız Sitesi"), "YILDIZ SITESI")
+        XCTAssertEqual(L10n(.romanian).uppercased("Asociația Parcul Tineretului"), "ASOCIAȚIA PARCUL TINERETULUI")
+        XCTAssertEqual(L10n(.turkish).uppercased(L10n(.turkish).flatPrefix), "DAİRE")
+        XCTAssertEqual(L10n(.english).uppercased(L10n(.english).flatPrefix), "FLAT")
+    }
+
+    @MainActor
+    func testReceiptBuildingNameUsesTheAppLanguageUppercase() {
+        let draft = ReceiptDraft(receiver: "R", issuer: "I", notes: "N", monthYear: "Ekim 2026", apartmentNumber: 5, amount: 1, sequenceNumber: 1, createdDate: "1", showApartmentNumber: true, kind: .income)
+        let turkish = ReceiptDocumentView(draft: draft, apartmentName: "Yıldız Sitesi Yönetimi", signatureImage: nil, l10n: L10n(.turkish))
+        XCTAssertTrue(turkish.qrVerificationPayload.contains("| YILDIZ SİTESİ YÖNETİMİ |"), turkish.qrVerificationPayload)
+        let english = ReceiptDocumentView(draft: draft, apartmentName: "Yıldız Sitesi Yönetimi", signatureImage: nil, l10n: L10n(.english))
+        XCTAssertTrue(english.qrVerificationPayload.contains("| YILDIZ SITESI YÖNETIMI |"), english.qrVerificationPayload)
     }
 }

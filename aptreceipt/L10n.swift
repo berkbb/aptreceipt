@@ -36,6 +36,11 @@ struct L10n {
         }
     }
 
+    /// Upper-cases display text by the rules of the in-app language (Turkish "i" becomes "İ", not "I").
+    func uppercased(_ text: String) -> String {
+        text.uppercased(with: locale)
+    }
+
     /// Looks up `key` in `<language>.lproj/Localizable.strings` for the in-app language (which may differ
     /// from the system language), falling back to English and then to the key itself.
     private func tr(_ key: String) -> String {

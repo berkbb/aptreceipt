@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Fixed
+- **Receipt QR code could not be scanned**: The verification QR was scaled by an uneven factor, had no white border (quiet zone) and was only 52 pt wide, so cameras could not read it on screen, in the PDF or on paper. It is now drawn with sharp, equal modules and a quiet zone at 72 pt, and a test decodes it from the exported image and PDF.
+- **Turkish capital İ**: Building names and the flat label were upper-cased with English rules, so "Yönetimi" became "YÖNETIMI" and "Daire" became "DAIRE" on receipts, in the QR code, the live preview, the bulletin board and the residents list. They now follow the app language ("YÖNETİMİ", "DAİRE").
+
 ## [3.5.1] - 2026-10-20
 
 ### Changed

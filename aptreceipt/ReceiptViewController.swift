@@ -641,7 +641,7 @@ struct ReceiptDocumentView: View {
     }
 
     private var mainTitle: String {
-        apartmentName.isEmpty ? l10n.defaultBuildingName : apartmentName.uppercased()
+        apartmentName.isEmpty ? l10n.defaultBuildingName : l10n.uppercased(apartmentName)
     }
 
     private var receiptBadgeText: String {
@@ -708,7 +708,7 @@ struct ReceiptDocumentView: View {
         }
     }
 
-    private var qrVerificationPayload: String {
+    var qrVerificationPayload: String {
         "AptReceipt | \(mainTitle) | \(documentSerialFormatted) | \(draft.createdDate) | \(draft.receiver) | \(formattedAmount) | \(draft.issuer)"
     }
 
@@ -1137,11 +1137,12 @@ struct ReceiptDocumentView: View {
             // MARK: 5. Footer & Authorized Signature
             HStack(alignment: .bottom, spacing: 14) {
                 // QR Verification Code
-                if let qrImage = QRCodeGenerator.generate(from: qrVerificationPayload, size: 52) {
+                // 72 pt: about half a millimetre per module on paper, so phone cameras read it.
+                if let qrImage = QRCodeGenerator.generate(from: qrVerificationPayload, size: 72) {
                     Image(nsImage: qrImage)
                         .interpolation(.none)
                         .resizable()
-                        .frame(width: 52, height: 52)
+                        .frame(width: 72, height: 72)
                         .clipShape(RoundedRectangle(cornerRadius: 4))
                         .overlay(
                             RoundedRectangle(cornerRadius: 4)

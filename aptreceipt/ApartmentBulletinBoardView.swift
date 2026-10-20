@@ -28,7 +28,7 @@ struct ApartmentBulletinBoardView: View {
                 }
 
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(settings.apartmentName.isEmpty ? l10n.defaultBuildingName : settings.apartmentName.uppercased())
+                    Text(settings.apartmentName.isEmpty ? l10n.defaultBuildingName : l10n.uppercased(settings.apartmentName))
                         .font(.system(size: 16, weight: .bold))
                     Text(l10n.bulletinBoardNoticeTitle)
                         .font(.system(size: 12, weight: .heavy))

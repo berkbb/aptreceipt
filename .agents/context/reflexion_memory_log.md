@@ -41,3 +41,8 @@ Each entry: what happened, why, and the lesson to apply next time.
 
 - **What:** The cash summary listed periods exactly as stored ("October 2026" next to "Ekim 2026"), sorted alphabetically.
 - **Lesson:** Code that reads stored text back (`ReceiptPeriod`) must understand every supported language and present the result in the current one.
+
+## R-008 — The receipt QR code looked fine but could not be scanned (2026-10-20)
+
+- **What:** The verification QR on receipts did not scan on screen, in the PDF or on paper. It was a `CIImage` scaled by a non-integer factor into 52 pt (uneven, blurred modules after rasterizing) with no quiet zone, next to a border stroke.
+- **Lesson:** Verify machine-readable output by machine: decode generated codes in a test (Vision `VNDetectBarcodesRequest`) through the real export paths, not by eye. Draw codes as bitmaps with whole pixels per module and a quiet zone.
