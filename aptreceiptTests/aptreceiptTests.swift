@@ -1587,4 +1587,120 @@ final class aptreceiptTests: XCTestCase {
         try ReceiptSettingsStore(defaults: InMemoryDefaults()).importSystemBackup(from: JSONSerialization.data(withJSONObject: older), archive: ReceiptArchiveStore(fileURL: nil), verificationKeys: olderKeys)
         XCTAssertEqual(rawKeys(olderKeys), olderOwn)
     }
+
+    // MARK: - 19. Verify Receipt (offline QR plan, phase 3)
+
+    private static let verifyDraft = ReceiptDraft(receiver: "Ayşe Yılmaz", issuer: "Mehmet Şahin", notes: "Ekim 2026 aidatı", monthYear: "Ekim 2026", apartmentNumber: 12, amount: 12750.5, sequenceNumber: 1042, createdDate: "20.10.2026", showApartmentNumber: true, kind: .income, currency: .turkishLira, isLateFeeApplied: true, lateFeeRate: 2.5, lateMonths: 3, lateFeeAmount: 750.5, baseAmount: 12000)
+
+    @MainActor
+    private func verifyReceiptView(_ draft: ReceiptDraft = verifyDraft, keys: ReceiptVerificationKeyStore) -> ReceiptDocumentView {
+        ReceiptDocumentView(draft: draft, apartmentName: "Yıldız Sitesi Yönetimi", signatureImage: nil, l10n: L10n(.turkish), verificationKeys: keys)
+    }
+
+    func testReceiptSerialPrefixesRoundTrip() {
+        for language in [AppLanguage.turkish, .english, .romanian] {
+            for kind in ReceiptKind.allCases {
+                let serial = ReceiptSerial.formatted(kind: kind, language: language, sequenceNumber: 42)
+                let parsed = ReceiptSerial.parse("Document · \(serial)")
+                XCTAssertEqual(parsed?.kind, kind, serial)
+                XCTAssertEqual(parsed?.language, language, serial)
+                XCTAssertEqual(parsed?.sequenceNumber, 42, serial)
+            }
+        }
+        XCTAssertEqual(ReceiptSerial.formatted(kind: .income, language: .turkish, sequenceNumber: 1042), "TAH-1042")
+        XCTAssertNil(ReceiptSerial.parse("No receipt number here"))
+    }
+
+    @MainActor
+    func testScannedReceiptIsGenuineOnlyWhenUnchangedAndFromThisInstallation() throws {
+        let keys = ReceiptVerificationKeyStore(fileURL: nil)
+        let text = verifyReceiptView(keys: keys).qrText
+
+        let scan = try XCTUnwrap(ScannedReceiptVerification(scannedText: text.replacingOccurrences(of: "\n", with: "\r\n"), keys: keys.allKeys))
+        XCTAssertEqual(scan.status, .genuine(keyIndex: 0))
+        XCTAssertEqual(scan.kind, .income)
+        XCTAssertEqual(scan.language, .turkish)
+        XCTAssertEqual(scan.sequenceNumber, 1042)
+        XCTAssertEqual(scan.lines, Array(text.components(separatedBy: "\n").dropLast()))
+        XCTAssertEqual(scan.code, String(text.suffix(19)))
+
+        let altered = text.replacingOccurrences(of: "₺12.750,50", with: "₺13.750,50")
+        XCTAssertEqual(ScannedReceiptVerification(scannedText: altered, keys: keys.allKeys)?.status, .notVerified)
+        XCTAssertEqual(ScannedReceiptVerification(scannedText: text, keys: ReceiptVerificationKeyStore(fileURL: nil).allKeys)?.status, .notVerified)
+        let withoutCode = text.components(separatedBy: "\n").dropLast().joined(separator: "\n")
+        XCTAssertEqual(ScannedReceiptVerification(scannedText: withoutCode, keys: keys.allKeys)?.status, .notVerified)
+
+        // A receipt made before restoring another Mac's backup is still genuine, with this Mac's older key.
+        let restored = ReceiptVerificationKeyStore(fileURL: nil)
+        let earlier = verifyReceiptView(keys: restored).qrText
+        restored.restore([Data(repeating: 4, count: 32)])
+        XCTAssertEqual(ScannedReceiptVerification(scannedText: earlier, keys: restored.allKeys)?.status, .genuine(keyIndex: 1))
+
+        // A name shaped like a code is never read as the code.
+        let codeLike = ReceiptDraft(receiver: "Ayşe Yılmaz", issuer: "Abcd Efgh Ijkl Mnop", notes: "N", monthYear: "Ekim 2026", apartmentNumber: 12, amount: 100, sequenceNumber: 1043, createdDate: "20.10.2026", showApartmentNumber: true, kind: .income, currency: .turkishLira)
+        let codeLikeLines = verifyReceiptView(codeLike, keys: keys).qrText.components(separatedBy: "\n").dropLast()
+        let codeLikeScan = try XCTUnwrap(ScannedReceiptVerification(scannedText: codeLikeLines.joined(separator: "\n"), keys: keys.allKeys))
+        XCTAssertNil(codeLikeScan.code)
+        XCTAssertEqual(codeLikeScan.lines.last, "Yönetici: Abcd Efgh Ijkl Mnop")
+    }
+
+    func testOlderAndForeignQRTextsAreRecognized() throws {
+        let older = try XCTUnwrap(ScannedReceiptVerification(scannedText: "AptReceipt | SUNSHINE RESIDENCE | REC-0104 | 19 October 2026 | Jane Smith | $1,750.00 | John Doe", keys: []))
+        XCTAssertEqual(older.status, .olderWithoutCode)
+        XCTAssertEqual(older.lines, ["SUNSHINE RESIDENCE", "REC-0104", "19 October 2026", "Jane Smith", "$1,750.00", "John Doe"])
+        XCTAssertEqual(older.kind, .income)
+        XCTAssertEqual(older.language, .english)
+        XCTAssertEqual(older.sequenceNumber, 104)
+        XCTAssertNil(older.code)
+
+        XCTAssertNil(ScannedReceiptVerification(scannedText: "https://example.com", keys: []))
+        XCTAssertNil(ScannedReceiptVerification(scannedText: "AptReceipt", keys: []))
+        XCTAssertNil(ReceiptQRReader.receiptText(in: ["hello", "https://example.com"]))
+    }
+
+    @MainActor
+    func testScannedReceiptIsComparedWithTheArchive() throws {
+        let keys = ReceiptVerificationKeyStore(fileURL: nil)
+        let scan = try XCTUnwrap(ScannedReceiptVerification(scannedText: verifyReceiptView(keys: keys).qrText, keys: keys.allKeys))
+        let record = ReceiptRecord(draft: Self.verifyDraft)
+        var changed = record
+        changed.amount = 13750.5
+        var otherNumber = record
+        otherNumber.sequenceNumber = 7
+
+        XCTAssertEqual(ReceiptArchiveComparison.compare(scan, with: [record], apartmentName: "Yıldız Sitesi Yönetimi"), .matches)
+        XCTAssertEqual(ReceiptArchiveComparison.compare(scan, with: [changed], apartmentName: "Yıldız Sitesi Yönetimi"), .differs(lines: ["GENEL TOPLAM: ₺12.750,50"]))
+        XCTAssertEqual(ReceiptArchiveComparison.compare(scan, with: [changed, record], apartmentName: "Yıldız Sitesi Yönetimi"), .matches)
+        XCTAssertEqual(ReceiptArchiveComparison.compare(scan, with: [otherNumber], apartmentName: "Yıldız Sitesi Yönetimi"), .missing)
+        XCTAssertEqual(ReceiptArchiveComparison.compare(scan, with: [], apartmentName: "Yıldız Sitesi Yönetimi"), .missing)
+        XCTAssertEqual(ReceiptArchiveComparison.compare(scan, with: [record], apartmentName: "Başka Site"), .differs(lines: ["YILDIZ SİTESİ YÖNETİMİ"]))
+    }
+
+    @MainActor
+    func testQRReaderFindsTheReceiptInAnExportedPDFAndImage() throws {
+        let keys = ReceiptVerificationKeyStore(fileURL: nil)
+        let view = verifyReceiptView(keys: keys)
+        let document = view.frame(width: 595, height: 842).environment(\.colorScheme, .light)
+        let folder = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: folder) }
+
+        let pdfURL = folder.appendingPathComponent("receipt.pdf")
+        let pdfRenderer = ImageRenderer(content: document)
+        pdfRenderer.proposedSize = ProposedViewSize(width: 595, height: 842)
+        var box = CGRect(x: 0, y: 0, width: 595, height: 842)
+        let pdfContext = try XCTUnwrap(CGContext(consumer: try XCTUnwrap(CGDataConsumer(url: pdfURL as CFURL)), mediaBox: &box, nil))
+        pdfContext.beginPDFPage(nil)
+        pdfRenderer.render { _, draw in draw(pdfContext) }
+        pdfContext.endPDFPage()
+        pdfContext.closePDF()
+        XCTAssertEqual(ReceiptQRReader.receiptText(in: ReceiptQRReader.texts(in: pdfURL)), view.qrText)
+
+        let pngURL = folder.appendingPathComponent("receipt.png")
+        let imageRenderer = ImageRenderer(content: document)
+        imageRenderer.scale = 2
+        let bitmap = NSBitmapImageRep(cgImage: try XCTUnwrap(imageRenderer.cgImage))
+        try XCTUnwrap(bitmap.representation(using: .png, properties: [:])).write(to: pngURL)
+        XCTAssertEqual(ReceiptQRReader.receiptText(in: ReceiptQRReader.texts(in: pngURL)), view.qrText)
+    }
 }

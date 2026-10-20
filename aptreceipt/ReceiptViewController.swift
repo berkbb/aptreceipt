@@ -660,28 +660,7 @@ struct ReceiptDocumentView: View {
     }
 
     private var documentSerialFormatted: String {
-        let prefix: String
-        switch l10n.resolvedLanguage {
-        case .turkish:
-            switch draft.kind {
-            case .income: prefix = "TAH"
-            case .outcome: prefix = "GID"
-            case .managementExpense: prefix = "HAR"
-            }
-        case .romanian:
-            switch draft.kind {
-            case .income: prefix = "INC"
-            case .outcome: prefix = "DIS"
-            case .managementExpense: prefix = "ADM"
-            }
-        default:
-            switch draft.kind {
-            case .income: prefix = "REC"
-            case .outcome: prefix = "EXP"
-            case .managementExpense: prefix = "MGT"
-            }
-        }
-        return String(format: "%@-%04d", prefix, draft.sequenceNumber)
+        ReceiptSerial.formatted(kind: draft.kind, language: l10n.resolvedLanguage, sequenceNumber: draft.sequenceNumber)
     }
 
     private var amountInWords: String {

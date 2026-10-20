@@ -167,3 +167,142 @@ final class ReceiptVerificationKeyStore {
         }
     }
 }
+
+// MARK: - Receipt Serial
+
+/// The printed receipt number, e.g. `TAH-1042`: a prefix per receipt kind and language, then the sequence number.
+enum ReceiptSerial {
+    static func prefix(for kind: ReceiptKind, language: AppLanguage) -> String {
+        switch language {
+        case .turkish:
+            switch kind {
+            case .income: return "TAH"
+            case .outcome: return "GID"
+            case .managementExpense: return "HAR"
+            }
+        case .romanian:
+            switch kind {
+            case .income: return "INC"
+            case .outcome: return "DIS"
+            case .managementExpense: return "ADM"
+            }
+        case .english, .system:
+            switch kind {
+            case .income: return "REC"
+            case .outcome: return "EXP"
+            case .managementExpense: return "MGT"
+            }
+        }
+    }
+
+    static func formatted(kind: ReceiptKind, language: AppLanguage, sequenceNumber: Int) -> String {
+        String(format: "%@-%04d", prefix(for: kind, language: language), sequenceNumber)
+    }
+
+    /// Kind, language and sequence number of the first receipt number found in `text`.
+    static func parse(_ text: String) -> (kind: ReceiptKind, language: AppLanguage, sequenceNumber: Int)? {
+        guard let match = text.range(of: #"\b[A-Z]{3}-\d{4,}\b"#, options: .regularExpression) else { return nil }
+        let parts = text[match].split(separator: "-")
+        guard parts.count == 2, let number = Int(parts[1]) else { return nil }
+        for language in [AppLanguage.turkish, .english, .romanian] {
+            for kind in ReceiptKind.allCases where prefix(for: kind, language: language) == parts[0] {
+                return (kind, language, number)
+            }
+        }
+        return nil
+    }
+}
+
+// MARK: - Scanned Receipt Verification
+
+/// What a scanned receipt QR text says, checked offline against this installation's keys.
+struct ScannedReceiptVerification {
+    enum Status: Equatable {
+        /// The code was made for exactly these lines by one of this installation's keys (0 = the current key).
+        case genuine(keyIndex: Int)
+        /// An AptReceipt receipt whose code is missing or does not match: changed, or issued elsewhere.
+        case notVerified
+        /// A receipt printed before verification codes (`AptReceipt | … | …`): shown, not verified.
+        case olderWithoutCode
+    }
+
+    let status: Status
+    /// The receipt lines as printed, without the code line.
+    let lines: [String]
+    /// The code as printed, in canonical form.
+    let code: String?
+    let kind: ReceiptKind?
+    let language: AppLanguage?
+    let sequenceNumber: Int?
+
+    private static let brand = "AptReceipt"
+
+    /// `nil` when the text is not an AptReceipt receipt QR code.
+    init?(scannedText: String, keys: [SymmetricKey]) {
+        var lines = ReceiptVerificationCode.normalizedText(scannedText).components(separatedBy: "\n")
+        if lines.count == 1, lines[0].hasPrefix(Self.brand + " | ") {
+            // Receipts printed before 3.6: one line, fields separated by " | ".
+            self.lines = lines[0].components(separatedBy: " | ").dropFirst().map { $0 }
+            self.status = .olderWithoutCode
+            self.code = nil
+        } else {
+            guard lines.first == Self.brand, lines.count >= 3 else { return nil }
+            // Exactly as printed, so a name such as "Abcd Efgh Ijkl Mnop" is never taken for a code.
+            let codePattern = #":\s*[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{4}$"#
+            if let last = lines.last,
+               let range = last.range(of: codePattern, options: .regularExpression),
+               let code = ReceiptVerificationCode.canonicalCode(String(last[range].dropFirst())) {
+                lines.removeLast()
+                let index = ReceiptVerificationCode.matchingKeyIndex(code: code, text: lines.joined(separator: "\n"), keys: keys)
+                self.status = index.map { .genuine(keyIndex: $0) } ?? .notVerified
+                self.code = code
+            } else {
+                self.status = .notVerified
+                self.code = nil
+            }
+            self.lines = lines
+        }
+        let serial = self.lines.lazy.compactMap(ReceiptSerial.parse).first
+        self.kind = serial?.kind
+        self.language = serial?.language
+        self.sequenceNumber = serial?.sequenceNumber
+    }
+
+    /// The value part of a line (`Label: value` → `value`), which stays the same when labels are reworded.
+    static func value(of line: String) -> String {
+        guard let separator = line.range(of: ": ") else { return line }
+        return String(line[separator.upperBound...])
+    }
+}
+
+/// How a scanned receipt compares with the archive.
+enum ReceiptArchiveComparison: Equatable {
+    /// The archive has a receipt with this number and kind, and every printed value matches it.
+    case matches
+    /// The closest archived receipt with this number and kind differs in these printed lines.
+    case differs(lines: [String])
+    /// No archived receipt has this number and kind (deleted, or issued on another Mac).
+    case missing
+
+    /// Rebuilds each candidate's QR lines in the scanned receipt's language and compares the values, so
+    /// reworded labels in a later version do not count as differences.
+    @MainActor
+    static func compare(_ scan: ScannedReceiptVerification, with records: [ReceiptRecord], apartmentName: String) -> ReceiptArchiveComparison {
+        guard let kind = scan.kind, let language = scan.language, let number = scan.sequenceNumber else { return .missing }
+        let candidates = records.filter { $0.sequenceNumber == number && $0.kind == kind }
+        guard !candidates.isEmpty else { return .missing }
+        guard scan.status != .olderWithoutCode else { return .matches }
+
+        let keys = ReceiptVerificationKeyStore(fileURL: nil)
+        let differences = candidates.map { record -> [String] in
+            let rebuilt = ReceiptDocumentView(
+                draft: record.toDraft(), apartmentName: apartmentName, signatureImage: nil,
+                l10n: L10n(language), verificationKeys: keys
+            ).qrText.components(separatedBy: "\n").dropLast()
+            let values = Set(rebuilt.map(ScannedReceiptVerification.value(of:)))
+            return scan.lines.filter { !values.contains(ScannedReceiptVerification.value(of: $0)) }
+        }
+        let closest = differences.min { $0.count < $1.count } ?? []
+        return closest.isEmpty ? .matches : .differs(lines: closest)
+    }
+}

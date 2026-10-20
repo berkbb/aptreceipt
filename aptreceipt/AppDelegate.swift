@@ -25,6 +25,11 @@ struct AptReceiptApp: App {
                     GitHubUpdateChecker.shared.checkForUpdates(userInitiated: true)
                 }
             }
+            CommandGroup(after: .newItem) {
+                Button(settings.l10n.verifyReceiptMenu) {
+                    ReceiptVerificationWindowManager.shared.show(settings: ReceiptSettingsStore.shared)
+                }
+            }
             CommandGroup(replacing: .appSettings) {
                 Button(settings.l10n.menuSettings) {
                     SettingsWindowManager.shared.show(settings: ReceiptSettingsStore.shared)
@@ -301,6 +306,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         .frame(width: 595, height: 842)
         .environment(\.colorScheme, .light)
         render(view: bulletinBoardView, size: CGSize(width: 595, height: 842), to: outDir.appendingPathComponent("14_bulletin_board_notice.png"), isDark: false)
+
+        // 15. Verify Receipt window with the sample receipt's QR text (Dark English)
+        let sampleQRText = ReceiptDocumentView(draft: sampleDraft, apartmentName: "Sunshine Residence", signatureImage: nil, l10n: settings.l10n).qrText
+        let verifyView = ReceiptVerificationView(settings: settings, initialText: sampleQRText)
+        render(view: verifyView, size: ReceiptVerificationView.size, to: outDir.appendingPathComponent("15_verify_receipt.png"), isDark: true)
 
         print("Screenshots successfully generated in \(outDir.path)")
     }

@@ -225,6 +225,29 @@ struct L10n {
     // QR Code Verification Strings
     var qrVerificationNotice: String { tr("qrVerificationNotice") }
     var qrVerificationCodeLabel: String { tr("qrVerificationCodeLabel") }
+
+    // Verify Receipt window
+    var verifyReceiptTitle: String { tr("verifyReceiptTitle") }
+    var verifyReceiptMenu: String { tr("verifyReceiptMenu") }
+    var verifyReceiptSubtitle: String { tr("verifyReceiptSubtitle") }
+    var verifyDropHint: String { tr("verifyDropHint") }
+    var verifyChooseFile: String { tr("verifyChooseFile") }
+    var verifyPaste: String { tr("verifyPaste") }
+    var verifyTextLabel: String { tr("verifyTextLabel") }
+    var verifyButton: String { tr("verifyButton") }
+    var verifyStatusGenuine: String { tr("verifyStatusGenuine") }
+    var verifyStatusGenuineDetail: String { tr("verifyStatusGenuineDetail") }
+    var verifyStatusRestoredKey: String { tr("verifyStatusRestoredKey") }
+    var verifyStatusNotVerified: String { tr("verifyStatusNotVerified") }
+    var verifyStatusNotVerifiedDetail: String { tr("verifyStatusNotVerifiedDetail") }
+    var verifyStatusOlder: String { tr("verifyStatusOlder") }
+    var verifyStatusOlderDetail: String { tr("verifyStatusOlderDetail") }
+    var verifyNoReceiptFound: String { tr("verifyNoReceiptFound") }
+    var verifyArchiveMatches: String { tr("verifyArchiveMatches") }
+    var verifyArchiveFound: String { tr("verifyArchiveFound") }
+    var verifyArchiveDiffers: String { tr("verifyArchiveDiffers") }
+    var verifyArchiveMissing: String { tr("verifyArchiveMissing") }
+    var verifyEmptyState: String { tr("verifyEmptyState") }
     var qrCodeActive: String { tr("qrCodeActive") }
 
     // Backup & Restore Strings

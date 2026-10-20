@@ -269,6 +269,29 @@
 "qrCodeActive" = "Doğrulanabilir QR Kod Aktif";
 "qrVerificationNotice" = "Makbuz bilgilerini görmek için okutun. Doğrulama kodunu yönetim AptReceipt ile kontrol eder.";
 "qrVerificationCodeLabel" = "Doğrulama kodu";
+
+/* Verify Receipt */
+"verifyReceiptTitle" = "Makbuz Doğrula";
+"verifyReceiptMenu" = "Makbuz Doğrula…";
+"verifyReceiptSubtitle" = "Makbuzun fotoğrafını veya PDF'ini bırakın ya da QR metnini yapıştırın. Doğrulama internetsiz yapılır.";
+"verifyDropHint" = "Makbuzu buraya bırakın";
+"verifyChooseFile" = "Dosya Seç…";
+"verifyPaste" = "Panodan Yapıştır";
+"verifyTextLabel" = "QR metni";
+"verifyButton" = "Doğrula";
+"verifyStatusGenuine" = "GERÇEK";
+"verifyStatusGenuineDetail" = "Bu makbuz bu kurulumda kesilmiş ve QR'daki bilgiler değiştirilmemiş.";
+"verifyStatusRestoredKey" = "Geri yüklenen bir yedekten gelen anahtarla doğrulandı.";
+"verifyStatusNotVerified" = "DOĞRULANAMADI";
+"verifyStatusNotVerifiedDetail" = "Doğrulama kodu tutmuyor: makbuz değiştirilmiş ya da başka bir kurulumda kesilmiş.";
+"verifyStatusOlder" = "KODSUZ ESKİ MAKBUZ";
+"verifyStatusOlderDetail" = "Doğrulama kodundan önceki bir sürümle basılmış; bilgileri gösteriliyor ama doğrulanamaz.";
+"verifyNoReceiptFound" = "Burada AptReceipt QR kodu bulunamadı.";
+"verifyArchiveMatches" = "Arşivde kayıtlı ve bilgiler arşivle aynı.";
+"verifyArchiveFound" = "Arşivde bu numarayla bir makbuz var.";
+"verifyArchiveDiffers" = "Arşivdeki kayıttan farklı satırlar:";
+"verifyArchiveMissing" = "Arşivde yok: silinmiş ya da başka bir Mac'te kesilmiş olabilir.";
+"verifyEmptyState" = "Doğrulanan makbuz burada görünecek.";
 "quickPresetsLabel" = "Hızlı Harcama Şablonları:";
 "quickScenarioSubtitle" = "Hızlı deneme veya ilk kurulum için hazır örnek verileri tek tıkla yükleyin";
 "quickScenarioTitle" = "Hızlı Başlangıç Senaryoları";

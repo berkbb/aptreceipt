@@ -269,6 +269,29 @@
 "qrCodeActive" = "Verifiable QR Code Active";
 "qrVerificationNotice" = "Scan to read the receipt details. The management checks the verification code with AptReceipt.";
 "qrVerificationCodeLabel" = "Verification code";
+
+/* Verify Receipt */
+"verifyReceiptTitle" = "Verify Receipt";
+"verifyReceiptMenu" = "Verify Receipt…";
+"verifyReceiptSubtitle" = "Drop a photo or PDF of a receipt, or paste its QR text. Verification works offline.";
+"verifyDropHint" = "Drop a receipt here";
+"verifyChooseFile" = "Choose File…";
+"verifyPaste" = "Paste from Clipboard";
+"verifyTextLabel" = "QR text";
+"verifyButton" = "Verify";
+"verifyStatusGenuine" = "GENUINE";
+"verifyStatusGenuineDetail" = "Issued by this installation, and the details in the QR code are unchanged.";
+"verifyStatusRestoredKey" = "Verified with a key from a restored backup.";
+"verifyStatusNotVerified" = "NOT VERIFIED";
+"verifyStatusNotVerifiedDetail" = "The verification code does not match: the receipt was changed or issued by another installation.";
+"verifyStatusOlder" = "OLDER RECEIPT, NO CODE";
+"verifyStatusOlderDetail" = "Printed by a version before verification codes; its details are shown but cannot be verified.";
+"verifyNoReceiptFound" = "No AptReceipt QR code was found here.";
+"verifyArchiveMatches" = "In the archive, and the details match it.";
+"verifyArchiveFound" = "The archive has a receipt with this number.";
+"verifyArchiveDiffers" = "Lines that differ from the archived receipt:";
+"verifyArchiveMissing" = "Not in the archive: it may have been deleted or issued on another Mac.";
+"verifyEmptyState" = "The verified receipt appears here.";
 "quickPresetsLabel" = "Quick Expense Presets:";
 "quickScenarioSubtitle" = "Populate full realistic building data sets for quick testing or onboarding";
 "quickScenarioTitle" = "Starter Scenarios & Presets";

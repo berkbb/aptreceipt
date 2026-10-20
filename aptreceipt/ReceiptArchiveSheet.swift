@@ -56,6 +56,14 @@ struct ReceiptArchiveSheet: View {
                 Spacer()
 
                 Button {
+                    ReceiptVerificationWindowManager.shared.show(settings: settings)
+                } label: {
+                    Label(l10n.verifyReceiptTitle, systemImage: "checkmark.seal")
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.regular)
+
+                Button {
                     exportArchiveCSV()
                 } label: {
                     Label(l10n.exportCSV, systemImage: "arrow.down.doc.fill")
