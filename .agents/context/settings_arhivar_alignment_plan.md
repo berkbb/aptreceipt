@@ -1,6 +1,6 @@
 # Settings Window: Arhivar Standard Alignment Plan
 
-- **Status:** Approved 2026-10-20 with D1a, D2a, D3a. Phase 0 in progress.
+- **Status:** Approved 2026-10-20 with D1a, D2a, D3a. Phase 0 done (characterization tests); phase 1 next.
 - **Date:** 2026-10-20
 - **Scope:** `aptreceipt/PreferencesViewController.swift` (`SettingsView`, `SettingsViewModel`, `SettingsTab`), `SettingsWindowManager` in `AppDelegate.swift`, `GitHubUpdateChecker.swift`, `L10n.swift`, `Localizable.xcstrings`.
 - **Reference:** `arhivar-mac-universal/Sources/Arhivar/Views/SettingsView.swift` and the already-aligned `ilef_radio_swift` settings (commit `2833101`).

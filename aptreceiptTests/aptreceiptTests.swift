@@ -498,5 +498,261 @@ final class aptreceiptTests: XCTestCase {
         XCTAssertEqual(decoded.lateFeeGracePeriodDays, 30)
         XCTAssertEqual(decoded.lateFeeCustomFootnote, "Penalități cf. Legea 196/2018")
     }
-}
 
+    // MARK: - 6. Settings Draft Characterization (Arhivar alignment phase 0)
+    //
+    // These pin today's settings behavior before the settings window is restructured, so the
+    // migration cannot silently drop or change an app-specific feature. They use an isolated
+    // UserDefaults suite and never touch the real app data.
+
+    @MainActor
+    private func makeIsolatedStore() -> ReceiptSettingsStore {
+        let suite = "aptreceiptTests.settings.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suite)!
+        addTeardownBlock {
+            defaults.removePersistentDomain(forName: suite)
+            // cfprefsd keeps an empty plist after the domain is removed; delete it too.
+            let plist = FileManager.default.homeDirectoryForCurrentUser
+                .appendingPathComponent("Library/Preferences/\(suite).plist")
+            try? FileManager.default.removeItem(at: plist)
+        }
+        let store = ReceiptSettingsStore(defaults: defaults)
+        store.language = .english
+        return store
+    }
+
+    @MainActor
+    func testSettingsDraftSaveWritesTrimmedClampedValuesToStore() {
+        let store = makeIsolatedStore()
+        let draft = SettingsViewModel()
+        draft.load(from: store)
+        draft.language = .english
+        draft.apartmentName = "  Test Building  "
+        draft.issuer = "jane doe"
+        draft.defaultPayment = " 1500,50 "
+        draft.flatCount = "4"
+        draft.sequenceNumber = "7"
+        draft.theme = .dark
+        draft.currency = .euro
+        draft.isLateFeeEnabled = true
+        draft.lateFeeMonthlyRate = "7,5"
+        draft.lateFeeDueDay = 40
+        draft.lateFeeGracePeriodDays = 99
+        draft.lateFeeCustomFootnote = "  Custom note  "
+        draft.residents[2] = "  john smith "
+        draft.residentPhones[2] = " 0000000000 "
+        draft.newVendorName = "Sample Lift Co"
+        draft.addVendor()
+
+        XCTAssertTrue(draft.save(to: store))
+        XCTAssertNil(draft.validationError)
+        XCTAssertEqual(store.apartmentName, "Test Building")
+        XCTAssertEqual(store.issuer, "Jane Doe")
+        XCTAssertEqual(store.defaultPayment, "1500,50")
+        XCTAssertEqual(store.flatCount, 4)
+        XCTAssertEqual(store.seqNumber, 7)
+        XCTAssertEqual(store.theme, .dark)
+        XCTAssertEqual(store.currency, .euro)
+        XCTAssertTrue(store.isLateFeeEnabled)
+        XCTAssertEqual(store.lateFeeMonthlyRate, 7.5, accuracy: 0.0001)
+        XCTAssertEqual(store.lateFeeDueDay, 31)
+        XCTAssertEqual(store.lateFeeGracePeriodDays, 60)
+        XCTAssertEqual(store.lateFeeCustomFootnote, "Custom note")
+        XCTAssertEqual(store.owner(for: 2), "John Smith")
+        XCTAssertEqual(store.ownerPhone(for: 2), "0000000000")
+        XCTAssertTrue(store.vendors.contains { $0.name == "Sample Lift Co" })
+
+        // A fresh draft loads back exactly what was saved.
+        let reloaded = SettingsViewModel()
+        reloaded.load(from: store)
+        XCTAssertEqual(reloaded.apartmentName, "Test Building")
+        XCTAssertEqual(reloaded.flatCount, "4")
+        XCTAssertEqual(reloaded.sequenceNumber, "7")
+        XCTAssertEqual(reloaded.lateFeeMonthlyRate, "7.5")
+        XCTAssertEqual(reloaded.residents[2], "John Smith")
+        XCTAssertEqual(reloaded.residents.count, 4)
+    }
+
+    @MainActor
+    func testSettingsDraftValidationRejectsInvalidInputAndLeavesStoreUntouched() {
+        let store = makeIsolatedStore()
+        let l10n = L10n(.english)
+        let cases: [(String, (SettingsViewModel) -> Void, String)] = [
+            ("zero flats", { $0.flatCount = "0" }, l10n.errFlatCountInvalid),
+            ("non-numeric flats", { $0.flatCount = "abc" }, l10n.errFlatCountInvalid),
+            ("zero sequence", { $0.sequenceNumber = "0" }, l10n.errSequenceInvalid),
+            ("non-numeric dues", { $0.defaultPayment = "abc" }, l10n.errAmountInvalid),
+            ("blank building", { $0.apartmentName = "   " }, l10n.errBuildingIssuerRequired),
+            ("blank issuer", { $0.issuer = "" }, l10n.errBuildingIssuerRequired),
+        ]
+        let originalName = store.apartmentName
+        let originalFlats = store.flatCount
+
+        for (label, breakDraft, expectedMessage) in cases {
+            let draft = SettingsViewModel()
+            draft.load(from: store)
+            draft.language = .english
+            breakDraft(draft)
+            XCTAssertFalse(draft.save(to: store), label)
+            XCTAssertEqual(draft.validationError?.message, expectedMessage, label)
+            XCTAssertEqual(store.apartmentName, originalName, label)
+            XCTAssertEqual(store.flatCount, originalFlats, label)
+        }
+    }
+
+    @MainActor
+    func testSettingsDraftWithoutSaveLeavesStoreUntouched() {
+        let store = makeIsolatedStore()
+        let originalName = store.apartmentName
+        let originalVendors = store.vendors
+        let draft = SettingsViewModel()
+        draft.load(from: store)
+
+        draft.apartmentName = "Changed"
+        draft.clearAllResidents()
+        draft.loadSampleVendorsAndServices(for: .romanian)
+        draft.vendors.removeAll()
+
+        // Cancel only closes the window; the store keeps its values.
+        XCTAssertEqual(store.apartmentName, originalName)
+        XCTAssertEqual(store.vendors, originalVendors)
+    }
+
+    @MainActor
+    func testSelectCountryProfileResetsEveryLateFeeField() {
+        let draft = SettingsViewModel()
+        for profile in LateFeeCountryProfile.allCases {
+            draft.lateFeeCustomFootnote = "stale"
+            draft.lateFeeDueDay = 3
+            draft.selectCountryProfile(profile)
+            XCTAssertEqual(draft.lateFeeCountryProfile, profile)
+            XCTAssertEqual(draft.lateFeeMonthlyRate, String(format: "%.1f", profile.defaultRate))
+            XCTAssertEqual(draft.lateFeeDueDay, profile.defaultDueDay)
+            XCTAssertEqual(draft.lateFeeGracePeriodDays, profile.defaultGraceDays)
+            XCTAssertEqual(draft.lateFeeCustomFootnote, "")
+        }
+    }
+
+    @MainActor
+    func testQuickFlatCountFillsOnlyEmptyResidentSlots() {
+        let draft = SettingsViewModel()
+        draft.language = .english
+        draft.residents = [1: "Kept Resident"]
+        draft.setQuickFlatCount(3)
+
+        let samples = SampleData.defaults(for: .english)
+        XCTAssertEqual(draft.flatCount, "3")
+        XCTAssertEqual(draft.residents[1], "Kept Resident")
+        for (flat, name) in samples.residents where flat > 1 && flat <= 3 {
+            XCTAssertEqual(draft.residents[flat], name)
+        }
+        XCTAssertTrue(draft.residents.keys.allSatisfy { $0 <= 3 })
+    }
+
+    @MainActor
+    func testResidentDirectoryCountsSearchFillAndClear() {
+        let draft = SettingsViewModel()
+        draft.flatCount = "3"
+        draft.residents = [1: "Alice Example", 2: "  ", 3: ""]
+        draft.residentPhones = [1: "111"]
+
+        XCTAssertEqual(draft.availableApartments, [1, 2, 3])
+        XCTAssertEqual(draft.registeredCount, 1)
+        XCTAssertEqual(draft.unassignedCount, 2)
+        draft.residentSearchQuery = "alice"
+        XCTAssertEqual(draft.filteredApartments, [1])
+        draft.residentSearchQuery = "3"
+        XCTAssertEqual(draft.filteredApartments, [3])
+        draft.residentSearchQuery = ""
+
+        draft.clearResident(for: 1)
+        XCTAssertEqual(draft.residents[1], "")
+        XCTAssertEqual(draft.residentPhones[1], "")
+
+        draft.fillSampleResidents(for: .english)
+        let samples = SampleData.defaults(for: .english)
+        for (flat, name) in samples.residents {
+            XCTAssertEqual(draft.residents[flat], flat <= 3 ? name : nil)
+        }
+
+        draft.clearAllResidents()
+        XCTAssertEqual(draft.registeredCount, 0)
+        XCTAssertTrue([1, 2, 3].allSatisfy { draft.residentPhones[$0] == "" })
+    }
+
+    @MainActor
+    func testVendorAndServiceDraftEditing() {
+        let draft = SettingsViewModel()
+
+        draft.newVendorName = "   "
+        draft.addVendor()
+        XCTAssertTrue(draft.vendors.isEmpty)
+
+        draft.newVendorName = "  Lift Service  "
+        draft.newVendorCategory = " Elevator "
+        draft.newVendorContact = " 000 "
+        draft.addVendor()
+        XCTAssertEqual(draft.vendors, [VendorRecord(id: draft.vendors[0].id, name: "Lift Service", category: "Elevator", contactInfo: "000")])
+        XCTAssertEqual([draft.newVendorName, draft.newVendorCategory, draft.newVendorContact], ["", "", ""])
+        draft.vendorSearchQuery = "elev"
+        XCTAssertEqual(draft.filteredVendors.count, 1)
+        draft.deleteVendor(id: draft.vendors[0].id)
+        XCTAssertTrue(draft.vendors.isEmpty)
+
+        draft.newServiceName = " Cleaning "
+        draft.addExpenseService()
+        let service = draft.expenseServices[0]
+        XCTAssertEqual(service.name, "Cleaning")
+        XCTAssertEqual(service.defaultDescription, "Cleaning")
+        XCTAssertEqual(service.iconName, "briefcase.fill")
+        XCTAssertNil(service.suggestedVendor)
+        XCTAssertEqual([draft.newServiceName, draft.newServiceDescription, draft.newServiceSuggestedVendor], ["", "", ""])
+
+        draft.newServiceName = "Repairs"
+        draft.newServiceDescription = "Monthly repairs"
+        draft.newServiceSuggestedVendor = "Lift Service"
+        draft.addExpenseService()
+        XCTAssertEqual(draft.expenseServices[1].defaultDescription, "Monthly repairs")
+        XCTAssertEqual(draft.expenseServices[1].suggestedVendor, "Lift Service")
+        draft.deleteExpenseService(id: service.id)
+        XCTAssertEqual(draft.expenseServices.map(\.name), ["Repairs"])
+    }
+
+    @MainActor
+    func testScenarioSamplesFillTheDraftOnly() {
+        let store = makeIsolatedStore()
+        let originalName = store.apartmentName
+        let draft = SettingsViewModel()
+        draft.load(from: store)
+
+        draft.loadSampleDefaults(for: .romanian)
+
+        let samples = SampleData.defaults(for: .romanian)
+        XCTAssertEqual(draft.apartmentName, samples.apartmentName)
+        XCTAssertEqual(draft.issuer, samples.issuer)
+        XCTAssertEqual(draft.defaultPayment, samples.defaultPayment)
+        XCTAssertEqual(draft.flatCount, String(samples.flatCount))
+        XCTAssertEqual(draft.currency, samples.currency)
+        // Sample records get fresh UUIDs on every call, so compare their content.
+        XCTAssertEqual(draft.vendors.map { [$0.name, $0.category, $0.contactInfo] },
+                       samples.defaultVendors.map { [$0.name, $0.category, $0.contactInfo] })
+        XCTAssertEqual(draft.expenseServices.map { [$0.name, $0.defaultDescription, $0.iconName, $0.suggestedVendor ?? ""] },
+                       samples.defaultServices.map { [$0.name, $0.defaultDescription, $0.iconName, $0.suggestedVendor ?? ""] })
+        XCTAssertEqual(draft.residents, samples.residents)
+        XCTAssertTrue(draft.showSampleDefaultsFeedback)
+        XCTAssertEqual(store.apartmentName, originalName)
+    }
+
+    @MainActor
+    func testSettingsTabsStayCompleteAndLocalized() {
+        // Order, identifiers and icons are part of the feature set (deep links, screenshots).
+        XCTAssertEqual(SettingsTab.allCases.map(\.rawValue), ["building", "residents", "vendors", "appearance", "signature", "backup", "about"])
+        for tab in SettingsTab.allCases {
+            XCTAssertFalse(tab.iconName.isEmpty, tab.rawValue)
+            for language in [AppLanguage.english, .turkish, .romanian] {
+                let title = tab.title(l10n: L10n(language))
+                XCTAssertFalse(title.isEmpty, "\(tab.rawValue) \(language)")
+            }
+        }
+    }
+}
