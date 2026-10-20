@@ -1,5 +1,6 @@
 import Cocoa
 import SwiftUI
+import Combine
 
 @main
 struct AptReceiptApp: App {
@@ -189,8 +190,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         // 3. Settings View (Hero Building & KMK Late Fee Settings - Dark English)
         let settingsView = SettingsView(settings: settings, initialTab: .general)
-            .frame(width: 840, height: 640)
-        render(view: settingsView, size: CGSize(width: 840, height: 640), to: outDir.appendingPathComponent("03_settings_view.png"), isDark: true)
+        render(view: settingsView, size: CGSize(width: SettingsTab.general.preferredWidth, height: SettingsTab.preferredHeight), to: outDir.appendingPathComponent("03_settings_view.png"), isDark: true)
 
         // 4. Management Expense Receipt Document (English)
         let sampleOutcomeDraft = ReceiptDraft(
@@ -251,13 +251,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         // 9. Settings Vendors & Services Tab (Dark English)
         let vendorsSettingsView = SettingsView(settings: settings, initialTab: .vendors)
-            .frame(width: 840, height: 640)
-        render(view: vendorsSettingsView, size: CGSize(width: 840, height: 640), to: outDir.appendingPathComponent("09_settings_vendors.png"), isDark: true)
+        render(view: vendorsSettingsView, size: CGSize(width: SettingsTab.vendors.preferredWidth, height: SettingsTab.preferredHeight), to: outDir.appendingPathComponent("09_settings_vendors.png"), isDark: true)
 
         // 10. Settings Appearance & Language Hero Deck (Dark English)
         let appearanceSettingsView = SettingsView(settings: settings, initialTab: .appearance)
-            .frame(width: 840, height: 640)
-        render(view: appearanceSettingsView, size: CGSize(width: 840, height: 640), to: outDir.appendingPathComponent("10_settings_appearance.png"), isDark: true)
+        render(view: appearanceSettingsView, size: CGSize(width: SettingsTab.appearance.preferredWidth, height: SettingsTab.preferredHeight), to: outDir.appendingPathComponent("10_settings_appearance.png"), isDark: true)
 
         // 11. Receipt Archive Sheet (Dark English)
         let sampleArchiveStore = ReceiptArchiveStore.shared
@@ -530,35 +528,28 @@ final class SettingsWindowManager: NSObject, NSWindowDelegate {
         super.init()
     }
 
+    /// Opens Settings on `tab`. Every call starts a fresh draft, as before.
     func show(settings: ReceiptSettingsStore? = nil, tab: SettingsTab = .general) {
         let actualSettings = settings ?? ReceiptSettingsStore.shared
+        let tabController = SettingsTabViewController(settings: actualSettings, initialTab: tab) { [weak self] in
+            self?.close()
+        }
+
         if let window = window {
-            window.title = actualSettings.l10n.settingsTitle
-            window.contentView = NSHostingView(
-                rootView: SettingsView(settings: actualSettings, initialTab: tab)
-                    .preferredColorScheme(actualSettings.theme.colorScheme)
-            )
+            window.contentViewController = tabController
+            tabController.fitWindow(animated: false)
             window.makeKeyAndOrderFront(nil)
             NSApp.activate(ignoringOtherApps: true)
             return
         }
 
-        let newWindow = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 840, height: 640),
-            styleMask: [.titled, .closable, .miniaturizable, .resizable],
-            backing: .buffered,
-            defer: false
-        )
-        newWindow.minSize = NSSize(width: 800, height: 580)
-        newWindow.maxSize = NSSize(width: 1040, height: 850)
-        newWindow.title = actualSettings.l10n.settingsTitle
+        let newWindow = NSWindow(contentViewController: tabController)
+        newWindow.styleMask = [.titled, .closable, .miniaturizable]
+        newWindow.toolbarStyle = .preference
         newWindow.isReleasedWhenClosed = false
         newWindow.delegate = self
+        tabController.fitWindow(animated: false)
         newWindow.center()
-        newWindow.contentView = NSHostingView(
-            rootView: SettingsView(settings: actualSettings, initialTab: tab)
-                .preferredColorScheme(actualSettings.theme.colorScheme)
-        )
         self.window = newWindow
         newWindow.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
@@ -571,6 +562,85 @@ final class SettingsWindowManager: NSObject, NSWindowDelegate {
 
     func windowWillClose(_ notification: Notification) {
         self.window = nil
+    }
+}
+
+// MARK: - Settings Toolbar Tabs
+
+/// Arhivar-style toolbar tabs. Each tab hosts a `SettingsView` page; all pages share one draft so
+/// Cancel and Save & Close keep working across tabs exactly as in the single-page window.
+@MainActor
+final class SettingsTabViewController: NSTabViewController {
+    private let settings: ReceiptSettingsStore
+    let draft = SettingsViewModel()
+    private var languageObserver: AnyCancellable?
+
+    init(settings: ReceiptSettingsStore, initialTab: SettingsTab, onClose: @escaping () -> Void) {
+        self.settings = settings
+        super.init(nibName: nil, bundle: nil)
+        tabStyle = .toolbar
+        transitionOptions = []
+        draft.selectedTab = initialTab
+
+        for tab in SettingsTab.allCases {
+            let page = NSHostingController(
+                rootView: AnyView(
+                    SettingsView(settings: settings, initialTab: tab, viewModel: draft, onClose: onClose)
+                        .preferredColorScheme(settings.theme.colorScheme)
+                )
+            )
+            let item = NSTabViewItem(viewController: page)
+            item.identifier = tab.rawValue
+            item.image = NSImage(systemSymbolName: tab.iconName, accessibilityDescription: nil)
+            addTabViewItem(item)
+        }
+        applyTitles()
+        selectedTabViewItemIndex = SettingsTab.allCases.firstIndex(of: initialTab) ?? 0
+
+        // Picking a language saves at once (existing behavior); keep the toolbar labels in step.
+        languageObserver = settings.$language
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in self?.applyTitles() }
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) is not supported")
+    }
+
+    var selectedSettingsTab: SettingsTab {
+        let index = max(0, selectedTabViewItemIndex)
+        return SettingsTab.allCases[min(index, SettingsTab.allCases.count - 1)]
+    }
+
+    override func tabView(_ tabView: NSTabView, didSelect tabViewItem: NSTabViewItem?) {
+        super.tabView(tabView, didSelect: tabViewItem)
+        draft.selectedTab = selectedSettingsTab
+        fitWindow(animated: view.window?.isVisible == true)
+        applyTitles()
+    }
+
+    /// Resizes the window to the selected tab's width, keeping its top edge in place.
+    func fitWindow(animated: Bool) {
+        let tab = selectedSettingsTab
+        guard let window = view.window else {
+            preferredContentSize = NSSize(width: tab.preferredWidth, height: SettingsTab.preferredHeight)
+            return
+        }
+        let contentRect = NSRect(x: 0, y: 0, width: tab.preferredWidth, height: SettingsTab.preferredHeight)
+        var frame = window.frameRect(forContentRect: contentRect)
+        frame.origin.x = window.frame.midX - frame.width / 2
+        frame.origin.y = window.frame.maxY - frame.height
+        window.setFrame(frame, display: true, animate: animated)
+    }
+
+    private func applyTitles() {
+        let l10n = settings.l10n
+        for (item, tab) in zip(tabViewItems, SettingsTab.allCases) {
+            item.label = tab.title(l10n: l10n)
+            item.viewController?.title = tab.title(l10n: l10n)
+        }
+        view.window?.title = selectedSettingsTab.title(l10n: l10n)
     }
 }
 

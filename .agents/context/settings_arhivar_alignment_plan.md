@@ -1,6 +1,6 @@
 # Settings Window: Arhivar Standard Alignment Plan
 
-- **Status:** Approved 2026-10-20 with D1a, D2a, D3a. Phase 0 done (characterization tests); phase 1 next.
+- **Status:** Approved 2026-10-20 with D1a, D2a, D3a. Phases 0–1 done; phase 2 next.
 - **Date:** 2026-10-20
 - **Scope:** `aptreceipt/PreferencesViewController.swift` (`SettingsView`, `SettingsViewModel`, `SettingsTab`), `SettingsWindowManager` in `AppDelegate.swift`, `GitHubUpdateChecker.swift`, `L10n.swift`, `Localizable.xcstrings`.
 - **Reference:** `arhivar-mac-universal/Sources/Arhivar/Views/SettingsView.swift` and the already-aligned `ilef_radio_swift` settings (commit `2833101`).
@@ -30,7 +30,7 @@ No app-specific feature may be removed or have its behavior changed. Each phase 
 | Signature | Signature preview; upload/remove (immediate, not draft). |
 | Backup | Export full backup (NSSavePanel); import full backup (NSOpenPanel, reloads the draft); stats (total flats, archived receipts); success/error messages; notice text. |
 | About | Shared `AboutContentView`; software update card with last-checked time and Check for Updates. |
-| Window shell | Header (icon, title, subtitle); Cancel (discards draft) and Save & Close (validates, then writes); validation alerts (flat count, sequence, amount, building/issuer required); restart alert; `initialTab` deep links used by `SettingsWindowManager.show(tab:)` and the screenshot generator (`--generate-screenshots` renders general, vendors and appearance). |
+| Window shell | Header (icon, title, subtitle) — *replaced in phase 1 by the toolbar tab bar and window title, as in Arhivar; the strings stay in the catalog;* Cancel (discards draft) and Save & Close (validates, then writes); validation alerts (flat count, sequence, amount, building/issuer required); restart alert; `initialTab` deep links used by `SettingsWindowManager.show(tab:)` and the screenshot generator (`--generate-screenshots` renders general, vendors and appearance). |
 
 ### Existing behavior that looks odd but stays as is
 
@@ -89,3 +89,9 @@ Each phase is one commit. It must pass `./run_all_tests_mac.command`, and before
 - **D1, tab switcher.** (a) Toolbar tabs through `NSTabViewController(.toolbar)` hosting each SwiftUI tab. This looks exactly like Arhivar and keeps the NSWindow manager. *Recommended.* (b) SwiftUI `TabView` inside the existing window. Simpler, but it draws a segmented control in the content rather than toolbar tabs.
 - **D2, width.** (a) 560 pt for preference tabs and 760 pt for Residents and Vendors, resizing on tab change as Arhivar's settings window does. *Recommended*, because the resident and vendor lists don't fit in 560. (b) One fixed width for all tabs, around 680 pt.
 - **D3, reset scope.** (a) Only preferences: theme, language, currency, late-fee configuration, launch check. *Recommended.* (b) Also building defaults (name, manager, default dues, flat count). Data is excluded in both options.
+
+## Progress log
+
+- **Phase 0 (489f5a4):** 9 characterization tests on an isolated `UserDefaults` suite.
+- **Phase 1:** `SettingsTabViewController` (`NSTabViewController`, `.toolbar`, `.preference` toolbar style) inside `SettingsWindowManager`. One `SettingsViewModel` draft is shared by all seven pages, loaded once (`isLoaded`), so switching tabs keeps edits and Save & Close commits all of them. Only the visible page presents alerts. Widths 560/760, height 620, window keeps its top edge when resizing. The screenshot generator renders each page at its tab width. Tab bodies are unchanged; at 560 pt the currency cards on the Building tab truncate their subtitles until phase 4 converts that card.
+

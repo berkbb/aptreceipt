@@ -15,6 +15,18 @@ enum SettingsTab: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
+    /// Arhivar standard: compact preference tabs; the data-heavy directories get more room.
+    var preferredWidth: CGFloat {
+        switch self {
+        case .residents, .vendors:
+            return 760
+        default:
+            return 560
+        }
+    }
+
+    static let preferredHeight: CGFloat = 620
+
     func title(l10n: L10n) -> String {
         switch self {
         case .general:
@@ -58,97 +70,47 @@ enum SettingsTab: String, CaseIterable, Identifiable {
 
 struct SettingsView: View {
     @ObservedObject var settings: ReceiptSettingsStore
-    @StateObject private var viewModel = SettingsViewModel()
+    @StateObject private var viewModel: SettingsViewModel
     @Environment(\.presentationMode) private var presentationMode
+    /// The tab this page shows. In the settings window each toolbar tab hosts its own page and all
+    /// pages share one draft, so Save & Close commits the edits made on every tab.
+    private let tab: SettingsTab
+    private let onClose: (() -> Void)?
 
-    init(settings: ReceiptSettingsStore, initialTab: SettingsTab = .general) {
+    /// - Parameters:
+    ///   - viewModel: The shared draft. When `nil` (screenshots, standalone sheet) the page owns a fresh draft.
+    ///   - onClose: Closes the hosting window after Cancel or a successful save.
+    init(
+        settings: ReceiptSettingsStore,
+        initialTab: SettingsTab = .general,
+        viewModel: SettingsViewModel? = nil,
+        onClose: (() -> Void)? = nil
+    ) {
         self.settings = settings
-        let vm = SettingsViewModel()
-        vm.selectedTab = initialTab
+        let vm = viewModel ?? SettingsViewModel()
+        if viewModel == nil {
+            vm.selectedTab = initialTab
+        }
         _viewModel = StateObject(wrappedValue: vm)
+        self.tab = initialTab
+        self.onClose = onClose
     }
 
     private var l10n: L10n {
         L10n(viewModel.language)
     }
 
+    /// Only the visible page presents alerts; hidden toolbar pages stay quiet.
+    private var isActivePage: Bool {
+        viewModel.selectedTab == tab
+    }
+
     var body: some View {
         VStack(spacing: 0) {
-            // Header
-            HStack(spacing: 12) {
-                if let icon = NSApplication.shared.applicationIconImage {
-                    Image(nsImage: icon)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 30, height: 30)
-                } else {
-                    Image(systemName: "gearshape.2.fill")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 22, height: 22)
-                        .foregroundColor(.accentColor)
-                }
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(l10n.settingsTitle)
-                        .font(.system(size: 16, weight: .bold))
-                    Text(l10n.settingsSubtitle)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-
-                Spacer()
-            }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 14)
-            .background(Color(NSColor.windowBackgroundColor))
-
-            Divider()
-
-            // Tab Bar (Hero Segmented Deck)
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 6) {
-                    ForEach(SettingsTab.allCases) { tab in
-                        let isSelected = viewModel.selectedTab == tab
-                        Button {
-                            viewModel.selectedTab = tab
-                        } label: {
-                            HStack(spacing: 5) {
-                                Image(systemName: tab.iconName)
-                                    .font(.system(size: 11, weight: isSelected ? .bold : .medium))
-                                Text(tab.title(l10n: l10n))
-                                    .font(.system(size: 12, weight: isSelected ? .bold : .medium))
-                                    .lineLimit(1)
-                                    .fixedSize(horizontal: true, vertical: false)
-                            }
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
-                            .background(
-                                isSelected
-                                ? Color.accentColor.opacity(0.18)
-                                : Color.clear
-                            )
-                            .foregroundColor(isSelected ? .accentColor : .secondary)
-                            .clipShape(Capsule())
-                            .overlay(
-                                Capsule()
-                                    .stroke(isSelected ? Color.accentColor.opacity(0.35) : Color.clear, lineWidth: 1)
-                            )
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-            }
-            .background(Color(NSColor.controlBackgroundColor).opacity(0.6))
-
-            Divider()
-
             // Active Tab Content
             ScrollView {
                 VStack(spacing: 16) {
-                    switch viewModel.selectedTab {
+                    switch tab {
                     case .general:
                         generalSettingsTab
                     case .residents:
@@ -174,8 +136,7 @@ struct SettingsView: View {
             // Footer Buttons
             HStack {
                 Button(l10n.cancel) {
-                    presentationMode.wrappedValue.dismiss()
-                    SettingsWindowManager.shared.close()
+                    close()
                 }
                 .keyboardShortcut(.cancelAction)
 
@@ -184,8 +145,7 @@ struct SettingsView: View {
                 Button(l10n.saveAndClose) {
                     if viewModel.save(to: settings) {
                         NotificationCenter.default.post(name: .settingsDidSave, object: settings)
-                        presentationMode.wrappedValue.dismiss()
-                        SettingsWindowManager.shared.close()
+                        close()
                     }
                 }
                 .buttonStyle(.borderedProminent)
@@ -195,23 +155,35 @@ struct SettingsView: View {
             .padding(.vertical, 12)
             .background(Color(NSColor.windowBackgroundColor))
         }
-        .frame(minWidth: 800, idealWidth: 840, minHeight: 580, idealHeight: 640)
+        .frame(width: tab.preferredWidth, height: SettingsTab.preferredHeight)
         .onAppear {
-            viewModel.load(from: settings)
+            // Load once per draft; switching toolbar tabs must not discard edits made on other tabs.
+            if !viewModel.isLoaded {
+                viewModel.load(from: settings)
+            }
         }
-        .alert(item: $viewModel.validationError) { issue in
+        .alert(item: isActivePage ? $viewModel.validationError : .constant(nil)) { issue in
             Alert(
                 title: Text(l10n.validationErrorTitle),
                 message: Text(issue.message),
                 dismissButton: .default(Text(l10n.okButton))
             )
         }
-        .alert(isPresented: $viewModel.showRestartAlert) {
+        .alert(isPresented: isActivePage ? $viewModel.showRestartAlert : .constant(false)) {
             Alert(
                 title: Text(l10n.restartWarningTitle),
                 message: Text(l10n.restartMenuBarNotice),
                 dismissButton: .default(Text(l10n.okButton))
             )
+        }
+    }
+
+    private func close() {
+        presentationMode.wrappedValue.dismiss()
+        if let onClose {
+            onClose()
+        } else {
+            SettingsWindowManager.shared.close()
         }
     }
 
@@ -1831,6 +1803,9 @@ final class SettingsViewModel: ObservableObject {
 
     @Published var validationError: ValidationError?
 
+    /// Set by `load(from:)`; pages load the shared draft only once.
+    private(set) var isLoaded = false
+
     var totalFlatCount: Int {
         Int(flatCount) ?? 1
     }
@@ -1959,6 +1934,7 @@ final class SettingsViewModel: ObservableObject {
     }
 
     func load(from settings: ReceiptSettingsStore) {
+        isLoaded = true
         apartmentName = settings.apartmentName
         issuer = settings.issuer
         defaultPayment = settings.defaultPayment

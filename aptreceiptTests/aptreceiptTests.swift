@@ -507,16 +507,7 @@ final class aptreceiptTests: XCTestCase {
 
     @MainActor
     private func makeIsolatedStore() -> ReceiptSettingsStore {
-        let suite = "aptreceiptTests.settings.\(UUID().uuidString)"
-        let defaults = UserDefaults(suiteName: suite)!
-        addTeardownBlock {
-            defaults.removePersistentDomain(forName: suite)
-            // cfprefsd keeps an empty plist after the domain is removed; delete it too.
-            let plist = FileManager.default.homeDirectoryForCurrentUser
-                .appendingPathComponent("Library/Preferences/\(suite).plist")
-            try? FileManager.default.removeItem(at: plist)
-        }
-        let store = ReceiptSettingsStore(defaults: defaults)
+        let store = ReceiptSettingsStore(defaults: InMemoryDefaults())
         store.language = .english
         return store
     }
@@ -755,4 +746,75 @@ final class aptreceiptTests: XCTestCase {
             }
         }
     }
+
+    // MARK: - 7. Settings Toolbar Tabs (Arhivar alignment phase 1)
+
+    func testSettingsTabWidthsFollowArhivarStandard() {
+        for tab in SettingsTab.allCases {
+            let expected: CGFloat = (tab == .residents || tab == .vendors) ? 760 : 560
+            XCTAssertEqual(tab.preferredWidth, expected, tab.rawValue)
+        }
+        XCTAssertGreaterThan(SettingsTab.preferredHeight, 0)
+    }
+
+    @MainActor
+    func testSettingsToolbarTabsShareOneDraftAndOpenOnTheRequestedTab() {
+        let store = makeIsolatedStore()
+        for initialTab in SettingsTab.allCases {
+            let controller = SettingsTabViewController(settings: store, initialTab: initialTab) {}
+            XCTAssertEqual(controller.tabStyle, .toolbar)
+            XCTAssertEqual(controller.tabViewItems.compactMap { $0.identifier as? String }, SettingsTab.allCases.map(\.rawValue))
+            XCTAssertEqual(controller.selectedSettingsTab, initialTab)
+            XCTAssertEqual(controller.draft.selectedTab, initialTab)
+            XCTAssertEqual(controller.tabViewItems.map(\.label), SettingsTab.allCases.map { $0.title(l10n: store.l10n) })
+        }
+
+        let controller = SettingsTabViewController(settings: store, initialTab: .general) {}
+        controller.draft.load(from: store)
+        controller.draft.apartmentName = "Edited On Building Tab"
+        controller.selectedTabViewItemIndex = SettingsTab.allCases.firstIndex(of: .vendors)!
+        XCTAssertEqual(controller.draft.selectedTab, .vendors)
+        // Switching tabs keeps the shared draft; nothing reloads it from the store.
+        XCTAssertEqual(controller.draft.apartmentName, "Edited On Building Tab")
+        XCTAssertTrue(controller.draft.isLoaded)
+    }
 }
+
+// MARK: - Test Doubles
+
+/// `UserDefaults` that keeps values in memory only. A real suite would leave a plist in
+/// ~/Library/Preferences on every run, because cfprefsd writes it back after the domain is removed.
+final class InMemoryDefaults: UserDefaults {
+    private var values: [String: Any] = [:]
+
+    convenience init() {
+        self.init(suiteName: nil)!
+    }
+
+    override init?(suiteName suitename: String?) {
+        super.init(suiteName: suitename)
+    }
+
+    override func object(forKey defaultName: String) -> Any? { values[defaultName] }
+    override func set(_ value: Any?, forKey defaultName: String) { values[defaultName] = value }
+    override func set(_ value: Bool, forKey defaultName: String) { values[defaultName] = value }
+    override func set(_ value: Int, forKey defaultName: String) { values[defaultName] = value }
+    override func set(_ value: Double, forKey defaultName: String) { values[defaultName] = value }
+    override func set(_ value: Float, forKey defaultName: String) { values[defaultName] = value }
+    override func removeObject(forKey defaultName: String) { values[defaultName] = nil }
+    override func string(forKey defaultName: String) -> String? { values[defaultName] as? String }
+    override func data(forKey defaultName: String) -> Data? { values[defaultName] as? Data }
+    override func array(forKey defaultName: String) -> [Any]? { values[defaultName] as? [Any] }
+    override func dictionary(forKey defaultName: String) -> [String: Any]? { values[defaultName] as? [String: Any] }
+    override func bool(forKey defaultName: String) -> Bool { (values[defaultName] as? NSNumber)?.boolValue ?? false }
+    override func integer(forKey defaultName: String) -> Int {
+        if let string = values[defaultName] as? String { return Int(string) ?? 0 }
+        return (values[defaultName] as? NSNumber)?.intValue ?? 0
+    }
+    override func double(forKey defaultName: String) -> Double {
+        if let string = values[defaultName] as? String { return Double(string) ?? 0 }
+        return (values[defaultName] as? NSNumber)?.doubleValue ?? 0
+    }
+    override func float(forKey defaultName: String) -> Float { Float(double(forKey: defaultName)) }
+}
+
