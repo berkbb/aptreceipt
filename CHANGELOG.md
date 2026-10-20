@@ -10,7 +10,7 @@ All notable changes to this project will be documented in this file.
 - **Reset Settings…** (Settings → About): asks for confirmation, then restores language, theme, currency, late-fee configuration and the launch update check. Building details, residents, phones, vendors, services, receipts, logo, signature and the receipt number are kept.
 
 ### Changed
-- **Settings window** follows the Arhivar standard: toolbar tabs (560 pt wide; Residents and Vendors 760 pt) and grouped native sections with headers on every tab. All existing settings, actions and validations are unchanged, and edits on all tabs still form one draft committed by **Save & Close** or discarded by **Cancel**. The language and currency cards became pickers with the same immediate behavior; the theme cards became a segmented control.
+- **Settings window** follows the Arhivar standard: toolbar tabs in one 760 pt wide window that keeps its size and position when switching tabs and grouped native sections with headers on every tab. All existing settings, actions and validations are unchanged, and edits on all tabs still form one draft committed by **Save & Close** or discarded by **Cancel**. The language and currency cards became pickers with the same immediate behavior; the theme cards became a segmented control.
 
 ### Fixed
 - Picking a language on a sample building no longer also saves unrelated pending edits from other Settings tabs; only the switched sample data is stored at once.

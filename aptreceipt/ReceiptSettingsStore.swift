@@ -98,7 +98,6 @@ final class ReceiptSettingsStore: ObservableObject {
             }
         }
     }
-    @Published var showLicenseViewer: Bool = false
 
     var l10n: L10n {
         L10n(language)

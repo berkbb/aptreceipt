@@ -112,3 +112,7 @@ The four "odd but kept" behaviors were fixed afterwards, without changing any fe
 - The per-flat clear button's tooltip uses the new `clearResidentButton`.
 - `MainScreen`'s unreachable settings sheet and `MainScreenViewModel.isPresentingSettings` were removed; Settings opens only through `SettingsWindowManager`.
 
+## Width change (2026-10-20, requested by the user)
+
+D2 changed from (a) to a single width: every tab is 760 pt, the width of the widest tabs (Residents, Vendors), via `SettingsTab.preferredWidth`. The window keeps one size and position when switching tabs. Before this, the 560/760 resize fought `NSTabViewController`'s own sizing: the window drifted 100 pt left on every switch and Residents/Vendors were clipped to 560. Pages now report their size through `preferredContentSize` (`sizingOptions = []`), and `fitWindow` keeps the top-left corner fixed; `testSwitchingSettingsTabsKeepsWindowSizeAndPosition` guards both.
+

@@ -129,9 +129,6 @@ struct MainScreen: View {
             }
             .frame(width: 720, height: 580)
         }
-        .sheet(isPresented: $settings.showLicenseViewer) {
-            LicenseViewerSheet(l10n: l10n)
-        }
         .alert(item: $viewModel.validationError) { issue in
             Alert(
                 title: Text(l10n.validationErrorTitle),

@@ -15,14 +15,11 @@ enum SettingsTab: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
-    /// Arhivar standard: compact preference tabs; the data-heavy directories get more room.
+    /// Every tab uses the width of the widest one (Residents, Vendors), so the window keeps one size.
+    static let preferredWidth: CGFloat = 760
+
     var preferredWidth: CGFloat {
-        switch self {
-        case .residents, .vendors:
-            return 760
-        default:
-            return 560
-        }
+        Self.preferredWidth
     }
 
     static let preferredHeight: CGFloat = 620
@@ -1078,7 +1075,7 @@ struct SettingsView: View {
                 LabeledContent(l10n.totalFlatsBadge, value: "\(viewModel.availableApartments.count)")
                 LabeledContent(l10n.totalArchived, value: "\(ReceiptArchiveStore.shared.records.count)")
 
-                // One row per action: the full labels do not fit side by side at 560 pt.
+                // One row per action keeps both long labels fully readable.
                 Button {
                     exportFullBackup()
                 } label: {
@@ -1224,9 +1221,6 @@ struct SettingsView: View {
             Button(l10n.resetSettingsConfirmAction, role: .destructive) {
                 viewModel.resetPreferences(settings: settings)
             }
-        }
-        .sheet(isPresented: $settings.showLicenseViewer) {
-            LicenseViewerSheet(l10n: l10n)
         }
     }
 

@@ -344,9 +344,6 @@ struct AboutWindowView: View {
             .padding(.bottom, 24)
             .frame(width: 500)
             .background(.thickMaterial)
-            .sheet(isPresented: $settings.showLicenseViewer) {
-                LicenseViewerSheet(l10n: settings.l10n)
-            }
     }
 }
 
@@ -354,6 +351,8 @@ struct AboutWindowView: View {
 struct AboutContentView: View {
     @ObservedObject var settings: ReceiptSettingsStore
     var showsUpdateButton: Bool
+    /// Local to this view, so the license opens only in the window whose button was pressed.
+    @State private var showsLicense = false
 
     private var l10n: L10n { settings.l10n }
 
@@ -411,7 +410,7 @@ struct AboutContentView: View {
                         }
                     }
                     Button {
-                        settings.showLicenseViewer = true
+                        showsLicense = true
                     } label: {
                         Label(l10n.viewLicenseButton, systemImage: "doc.text")
                     }
@@ -423,6 +422,9 @@ struct AboutContentView: View {
             Text(l10n.aboutCopyright(AppInfo.currentYear))
                 .font(.caption2)
                 .foregroundColor(Color(NSColor.tertiaryLabelColor))
+        }
+        .sheet(isPresented: $showsLicense) {
+            LicenseViewerSheet(l10n: l10n)
         }
     }
 }
@@ -594,6 +596,10 @@ final class SettingsTabViewController: NSTabViewController {
                         .preferredColorScheme(settings.theme.colorScheme)
                 )
             )
+            // Each page reports its own size; the tab controller and `fitWindow` both size the window
+            // from it, so they never fight (which made the window drift and clipped the wide tabs).
+            page.sizingOptions = []
+            page.preferredContentSize = NSSize(width: tab.preferredWidth, height: SettingsTab.preferredHeight)
             let item = NSTabViewItem(viewController: page)
             item.identifier = tab.rawValue
             item.image = NSImage(systemSymbolName: tab.iconName, accessibilityDescription: nil)
@@ -625,17 +631,17 @@ final class SettingsTabViewController: NSTabViewController {
         applyTitles()
     }
 
-    /// Resizes the window to the selected tab's width, keeping its top edge in place.
+    /// Resizes the window to the selected tab's width. The top-left corner stays where it is, as in
+    /// macOS settings windows, so switching tabs never moves the window.
     func fitWindow(animated: Bool) {
         let tab = selectedSettingsTab
-        guard let window = view.window else {
-            preferredContentSize = NSSize(width: tab.preferredWidth, height: SettingsTab.preferredHeight)
-            return
-        }
-        let contentRect = NSRect(x: 0, y: 0, width: tab.preferredWidth, height: SettingsTab.preferredHeight)
-        var frame = window.frameRect(forContentRect: contentRect)
-        frame.origin.x = window.frame.midX - frame.width / 2
+        let size = NSSize(width: tab.preferredWidth, height: SettingsTab.preferredHeight)
+        preferredContentSize = size
+        guard let window = view.window else { return }
+        var frame = window.frameRect(forContentRect: NSRect(origin: .zero, size: size))
+        frame.origin.x = window.frame.minX
         frame.origin.y = window.frame.maxY - frame.height
+        guard frame != window.frame else { return }
         window.setFrame(frame, display: true, animate: animated)
     }
 

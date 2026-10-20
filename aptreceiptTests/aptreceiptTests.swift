@@ -749,10 +749,9 @@ final class aptreceiptTests: XCTestCase {
 
     // MARK: - 7. Settings Toolbar Tabs (Arhivar alignment phase 1)
 
-    func testSettingsTabWidthsFollowArhivarStandard() {
+    func testEverySettingsTabUsesTheWidestWidth() {
         for tab in SettingsTab.allCases {
-            let expected: CGFloat = (tab == .residents || tab == .vendors) ? 760 : 560
-            XCTAssertEqual(tab.preferredWidth, expected, tab.rawValue)
+            XCTAssertEqual(tab.preferredWidth, 760, tab.rawValue)
         }
         XCTAssertGreaterThan(SettingsTab.preferredHeight, 0)
     }
@@ -932,6 +931,27 @@ final class aptreceiptTests: XCTestCase {
             XCTAssertFalse(label.contains(where: \.isNumber), "\(language): \(label)")
         }
         XCTAssertNotEqual(L10n(.turkish).clearResidentButton, L10n(.turkish).clearAllResidentsButton)
+    }
+
+    @MainActor
+    func testSwitchingSettingsTabsKeepsWindowSizeAndPosition() async throws {
+        let store = makeIsolatedStore()
+        SettingsWindowManager.shared.show(settings: store, tab: .general)
+        defer { SettingsWindowManager.shared.close() }
+        let window = try XCTUnwrap(NSApp.windows.first { $0.contentViewController is SettingsTabViewController })
+        let controller = try XCTUnwrap(window.contentViewController as? SettingsTabViewController)
+        try await Task.sleep(for: .milliseconds(400))
+        let topLeft = NSPoint(x: window.frame.minX, y: window.frame.maxY)
+
+        for tab in [SettingsTab.residents, .vendors, .appearance, .residents, .general, .about] {
+            controller.selectedTabViewItemIndex = SettingsTab.allCases.firstIndex(of: tab)!
+            try await Task.sleep(for: .milliseconds(600))
+            // The top-left corner never moves (it used to drift 100 pt per switch).
+            XCTAssertEqual(window.frame.minX, topLeft.x, accuracy: 0.5, tab.rawValue)
+            XCTAssertEqual(window.frame.maxY, topLeft.y, accuracy: 0.5, tab.rawValue)
+            // One width for every tab, so nothing is clipped and the window never resizes.
+            XCTAssertEqual(window.contentLayoutRect.width, SettingsTab.preferredWidth, accuracy: 0.5, tab.rawValue)
+        }
     }
 }
 
