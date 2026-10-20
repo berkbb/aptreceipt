@@ -2,7 +2,7 @@
 
 - **Status:** Approved 2026-10-20 with D1a, D2a, D3a. Completed 2026-10-20 (phases 0–7).
 - **Date:** 2026-10-20
-- **Scope:** `aptreceipt/PreferencesViewController.swift` (`SettingsView`, `SettingsViewModel`, `SettingsTab`), `SettingsWindowManager` in `AppDelegate.swift`, `GitHubUpdateChecker.swift`, `L10n.swift`, `Localizable.xcstrings`.
+- **Scope:** `aptreceipt/PreferencesViewController.swift` (`SettingsView`, `SettingsViewModel`, `SettingsTab`), `SettingsWindowManager` in `AppDelegate.swift`, `GitHubUpdateChecker.swift`, `L10n.swift`, `Localizable.xcstrings` (split on 2026-10-20 into `en/tr/ro.lproj/Localizable.strings`; see the follow-up fixes section for the later language-selection change).
 - **Reference:** `arhivar-mac-universal/Sources/Arhivar/Views/SettingsView.swift` and the already-aligned `ilef_radio_swift` settings (commit `2833101`).
 
 ## Hard constraint (from the user)

@@ -1,0 +1,43 @@
+# Reflexion Memory Log
+
+- **Last updated:** 2026-10-20
+- **Scope:** AptReceipt (aptreceipt)
+
+Each entry: what happened, why, and the lesson to apply next time.
+
+## R-001 — The screenshot generator overwrote the real receipt archive (2026-10-20)
+
+- **What:** `--generate-screenshots` was run from a signed (sandboxed) build at 09:47. The generator calls `records.removeAll()` and adds two sample receipts, then saves; it does not restore the previous archive. It also removes the app's whole defaults domain and writes back only some keys (building fields, language, theme, currency, logo, owners 1–50): vendors, services, phones, the signature, late-fee settings, per-profile rates and the launch-check flag are lost. A local Time Machine snapshot from 09:02 holds the previous archive and preferences; restoring them is up to the user (the container is protected by macOS).
+- **Why:** The generator backs up only part of `UserDefaults`, not the archive file, and it was run against the real data location.
+- **Lesson:** Never run the generator against real data. Run it only from an unsigned scratch build in a scratch working directory. Fixing the generator to back up and restore the archive is on `roadmap.md`.
+
+## R-002 — Two sizing mechanisms made the settings window drift (2026-10-20)
+
+- **What:** Switching settings tabs moved the window 100 pt left each time and clipped the wide tabs.
+- **Why:** Custom centering code and `NSTabViewController`'s own sizing fought each other.
+- **Lesson:** One source of truth for size (`preferredContentSize`, `sizingOptions = []`), keep the top-left corner fixed; later one width (760 pt) for every tab. Guarded by `testSwitchingSettingsTabsKeepsWindowSizeAndPosition`.
+
+## R-003 — A shared flag opened the license twice (2026-10-20)
+
+- **What:** `showLicenseViewer` on the settings store drove sheets in the About window, the settings window and the main window, so one click opened several sheets.
+- **Lesson:** Presentation state belongs to the view that presents it (`@State` in `AboutContentView`), not to a shared store.
+
+## R-004 — Hardcoded formats and single-language texts slipped through (2026-10-20)
+
+- **What:** Amounts as `1750.00 $`, Turkish-style percentages in every language, Turkish-only batch receipt texts, bulletin footer and file names, a hardcoded `v3.3.0`.
+- **Lesson:** Format numbers through `AppFormat`, read versions from the bundle, keep every text in each language's own file; the parity tests now fail on these patterns. Mutation-check new guard tests (add a deliberate violation, see the test fail, remove it).
+
+## R-005 — Hosted tests could write to the real defaults (2026-10-20)
+
+- **What:** Tests run inside the app host; `ReceiptSettingsStore` used `UserDefaults.standard` directly.
+- **Lesson:** Inject `UserDefaults` and use the in-memory `InMemoryDefaults` double; named suites leave plists in `~/Library/Preferences`.
+
+## R-006 — WhatsApp messages broke in practice (2026-10-20)
+
+- **What:** Local phone numbers (`0532 …`) opened wrong chats; `&` and `+` in texts cut or changed the message; amounts did not match the receipt.
+- **Lesson:** Normalize numbers to international form per building country, escape query values with a strict character set, and test the decoded URL.
+
+## R-007 — Stored text is in the language it was created in (2026-10-20)
+
+- **What:** The cash summary listed periods exactly as stored ("October 2026" next to "Ekim 2026"), sorted alphabetically.
+- **Lesson:** Code that reads stored text back (`ReceiptPeriod`) must understand every supported language and present the result in the current one.
