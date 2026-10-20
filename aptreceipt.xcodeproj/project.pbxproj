@@ -7,13 +7,19 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		9A1F6CAA27E485B5006C171B /* ReceiptViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A1F6CA927E485B5006C171B /* ReceiptViewController.swift */; };
-		9A90651127E728020085AA4B /* PreferencesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A90651027E728020085AA4B /* PreferencesViewController.swift */; };
+		9A1F6CAA27E485B5006C171B /* ReceiptPreviewSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A1F6CA927E485B5006C171B /* ReceiptPreviewSheet.swift */; };
+		9A90651127E728020085AA4B /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A90651027E728020085AA4B /* SettingsView.swift */; };
 		9A90652127E728020085AA4B /* GitHubUpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A90652027E728020085AA4B /* GitHubUpdateChecker.swift */; };
 		9A9CF87927E204920042D276 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A9CF87827E204920042D276 /* AppDelegate.swift */; };
 		9A9CF87D27E204920042D276 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9A9CF87C27E204920042D276 /* Assets.xcassets */; };
 		9A9CF88027E204920042D276 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9A9CF87E27E204920042D276 /* Main.storyboard */; };
-		9A9CF88B27E204930042D276 /* aptreceiptTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A9CF88A27E204930042D276 /* aptreceiptTests.swift */; };
+		9A9CF88B27E204930042D276 /* ReceiptModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A9CF88A27E204930042D276 /* ReceiptModelTests.swift */; };
+		0BF8C63AF8A561D920D8C67B /* SettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E8007227864849707AAFE46 /* SettingsTests.swift */; };
+		FD9FD2057F4ACDE21BF50ECA /* WhatsAppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B22FA38DBFD2A5993AB784 /* WhatsAppTests.swift */; };
+		BB364C09D1C6645795342BFF /* LocalizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A68D5A181D053AFB1D682746 /* LocalizationTests.swift */; };
+		5996AA80BEA2F20D0BBF6892 /* ScreenshotIsolationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E43EB11CA5C83DE33A02673 /* ScreenshotIsolationTests.swift */; };
+		064328B5C04F0ADC63C547A6 /* VerificationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66073847FB085C79D085D247 /* VerificationTests.swift */; };
+		C1673A901426E5F668BD8C7D /* MoneyAndLateFeeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E57E3CE51ACBED158BC76A4C /* MoneyAndLateFeeTests.swift */; };
 		9A9CF89527E204930042D276 /* aptreceiptUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A9CF89427E204930042D276 /* aptreceiptUITests.swift */; };
 		9A9CF89727E204930042D276 /* aptreceiptUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A9CF89627E204930042D276 /* aptreceiptUITestsLaunchTests.swift */; };
 		9A9CF8B427E22E670042D276 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9A9CF8B627E22E670042D276 /* InfoPlist.strings */; };
@@ -28,6 +34,27 @@
 		2BBF72065869D41D26A10AA0 /* MainScreenViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DB48C99EE1963A0583E0104 /* MainScreenViewModel.swift */; };
 		9395B5905B3F9570533B2F9A /* ReceiptArchiveStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7FC3ACDE65754CE5A5444F /* ReceiptArchiveStore.swift */; };
 		DE4FCED20A93C5417BDD34A4 /* SharingHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C91E6AC2BD31BE032FAB520 /* SharingHelpers.swift */; };
+		01CA193A09A4940EF8996903 /* ScreenshotGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77307130AA7C59EADF6F88B5 /* ScreenshotGenerator.swift */; };
+		385FFE8577F4C2242429E4F3 /* AboutWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3A6FBC64901CB38C9939428 /* AboutWindow.swift */; };
+		C200D14EF551E75A78587C9E /* SettingsWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03D5B6FEF2D66767FCB56001 /* SettingsWindow.swift */; };
+		D3680E4B05BFB141232B3473 /* MenuBarManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1F4A4DCF6FB18872659150E /* MenuBarManager.swift */; };
+		2AC9CECAAE9CB64BA930E99D /* ExportFileName.swift in Sources */ = {isa = PBXBuildFile; fileRef = D06773576638AD706BCFFC4C /* ExportFileName.swift */; };
+		790EB12BAF164F35FD13D9CB /* ReceiptDocumentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8787713B2D44EA885049355 /* ReceiptDocumentView.swift */; };
+		ABF6EB45FFCC487958938D2B /* InvoiceOCRParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B3421A60F0A2B5C1B8DF103 /* InvoiceOCRParser.swift */; };
+		D68D75065CCCEBC6917E7BB1 /* InvoiceAttachmentManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4911C7887D1B11AD6FECDF8 /* InvoiceAttachmentManager.swift */; };
+		6CCCF6BA6B95E97C73F3C914 /* SettingsTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41C594D66B4BDFA0BFB972CB /* SettingsTab.swift */; };
+		4293AD84931F00939DEA9585 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB51B027737CD0C613DCD989 /* SettingsViewModel.swift */; };
+		80FB9D6AF1EB024D3E30EA4E /* SettingsView+General.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49D9C1A7B2E76047A7EAF5A /* SettingsView+General.swift */; };
+		DFB5858D98AE83C8E72EB28B /* SettingsView+Residents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DC878FC8AC0B986BD399BC6 /* SettingsView+Residents.swift */; };
+		5432186B3A4F307A3D7DA50C /* SettingsView+Vendors.swift in Sources */ = {isa = PBXBuildFile; fileRef = B377BB554D37DD6719DBF9BA /* SettingsView+Vendors.swift */; };
+		8A2D0B6D97FD08A5A921B446 /* SettingsView+Appearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBA086F3BC87ADADEAC058B5 /* SettingsView+Appearance.swift */; };
+		0FE053816238CFCBA4FB4638 /* SettingsView+Signature.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEDEFDEBA580258D80263C2F /* SettingsView+Signature.swift */; };
+		B06CC3D44BA97165CA43F944 /* SettingsView+Backup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A0BB0273E98B1D1C4784D70 /* SettingsView+Backup.swift */; };
+		04124F1B2CECE4DFFAAF116A /* SettingsView+About.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF0047B214F9CE4A054E809A /* SettingsView+About.swift */; };
+		B92EE8E75E1D5EBAE6C1267D /* MainScreen+Header.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28C092215A453924B66C0E53 /* MainScreen+Header.swift */; };
+		023B74C3BD8B0C99A59786C2 /* MainScreen+Parties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56FFA61300D01B4D76ECBFDC /* MainScreen+Parties.swift */; };
+		411A8F88605A21C684AF7ED5 /* MainScreen+Invoice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E6692C1527E6F697FEB59F8 /* MainScreen+Invoice.swift */; };
+		1648F19F7E194162EE0E453C /* MainScreen+Financial.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60EC0F83542E4C44377D2BA3 /* MainScreen+Financial.swift */; };
 		31BFBE3791F8AD705A0381B9 /* NumberToWords.swift in Sources */ = {isa = PBXBuildFile; fileRef = 302D14E894CB1ED099225FA4 /* NumberToWords.swift */; };
 		7D1B3AA3D489D485D1E5FBEE /* ReceiptVerification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B90959C6BBBA2BA3843348D /* ReceiptVerification.swift */; };
 		B71139704EDB5D51D5323F98 /* ReceiptVerificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0CB3F180AE5DE0787C724A7 /* ReceiptVerificationView.swift */; };
@@ -59,8 +86,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		9A1F6CA927E485B5006C171B /* ReceiptViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptViewController.swift; sourceTree = "<group>"; };
-		9A90651027E728020085AA4B /* PreferencesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesViewController.swift; sourceTree = "<group>"; };
+		9A1F6CA927E485B5006C171B /* ReceiptPreviewSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptPreviewSheet.swift; sourceTree = "<group>"; };
+		9A90651027E728020085AA4B /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		9A90652027E728020085AA4B /* GitHubUpdateChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubUpdateChecker.swift; sourceTree = "<group>"; };
 		9A9CF87527E204920042D276 /* aptreceipt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = aptreceipt.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A9CF87827E204920042D276 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -68,7 +95,13 @@
 		9A9CF87F27E204920042D276 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		9A9CF88127E204920042D276 /* aptreceipt.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = aptreceipt.entitlements; sourceTree = "<group>"; };
 		9A9CF88627E204920042D276 /* aptreceiptTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = aptreceiptTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		9A9CF88A27E204930042D276 /* aptreceiptTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = aptreceiptTests.swift; sourceTree = "<group>"; };
+		9A9CF88A27E204930042D276 /* ReceiptModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptModelTests.swift; sourceTree = "<group>"; };
+		4E8007227864849707AAFE46 /* SettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTests.swift; sourceTree = "<group>"; };
+		F9B22FA38DBFD2A5993AB784 /* WhatsAppTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhatsAppTests.swift; sourceTree = "<group>"; };
+		A68D5A181D053AFB1D682746 /* LocalizationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizationTests.swift; sourceTree = "<group>"; };
+		8E43EB11CA5C83DE33A02673 /* ScreenshotIsolationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotIsolationTests.swift; sourceTree = "<group>"; };
+		66073847FB085C79D085D247 /* VerificationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerificationTests.swift; sourceTree = "<group>"; };
+		E57E3CE51ACBED158BC76A4C /* MoneyAndLateFeeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoneyAndLateFeeTests.swift; sourceTree = "<group>"; };
 		9A9CF89027E204930042D276 /* aptreceiptUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = aptreceiptUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A9CF89427E204930042D276 /* aptreceiptUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = aptreceiptUITests.swift; sourceTree = "<group>"; };
 		9A9CF89627E204930042D276 /* aptreceiptUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = aptreceiptUITestsLaunchTests.swift; sourceTree = "<group>"; };
@@ -91,6 +124,27 @@
 		8DB48C99EE1963A0583E0104 /* MainScreenViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainScreenViewModel.swift; sourceTree = "<group>"; };
 		8B7FC3ACDE65754CE5A5444F /* ReceiptArchiveStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptArchiveStore.swift; sourceTree = "<group>"; };
 		8C91E6AC2BD31BE032FAB520 /* SharingHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharingHelpers.swift; sourceTree = "<group>"; };
+		77307130AA7C59EADF6F88B5 /* ScreenshotGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotGenerator.swift; sourceTree = "<group>"; };
+		B3A6FBC64901CB38C9939428 /* AboutWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutWindow.swift; sourceTree = "<group>"; };
+		03D5B6FEF2D66767FCB56001 /* SettingsWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsWindow.swift; sourceTree = "<group>"; };
+		C1F4A4DCF6FB18872659150E /* MenuBarManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarManager.swift; sourceTree = "<group>"; };
+		D06773576638AD706BCFFC4C /* ExportFileName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportFileName.swift; sourceTree = "<group>"; };
+		B8787713B2D44EA885049355 /* ReceiptDocumentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptDocumentView.swift; sourceTree = "<group>"; };
+		3B3421A60F0A2B5C1B8DF103 /* InvoiceOCRParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvoiceOCRParser.swift; sourceTree = "<group>"; };
+		A4911C7887D1B11AD6FECDF8 /* InvoiceAttachmentManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvoiceAttachmentManager.swift; sourceTree = "<group>"; };
+		41C594D66B4BDFA0BFB972CB /* SettingsTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTab.swift; sourceTree = "<group>"; };
+		BB51B027737CD0C613DCD989 /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
+		B49D9C1A7B2E76047A7EAF5A /* SettingsView+General.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SettingsView+General.swift"; sourceTree = "<group>"; };
+		1DC878FC8AC0B986BD399BC6 /* SettingsView+Residents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SettingsView+Residents.swift"; sourceTree = "<group>"; };
+		B377BB554D37DD6719DBF9BA /* SettingsView+Vendors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SettingsView+Vendors.swift"; sourceTree = "<group>"; };
+		CBA086F3BC87ADADEAC058B5 /* SettingsView+Appearance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SettingsView+Appearance.swift"; sourceTree = "<group>"; };
+		FEDEFDEBA580258D80263C2F /* SettingsView+Signature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SettingsView+Signature.swift"; sourceTree = "<group>"; };
+		9A0BB0273E98B1D1C4784D70 /* SettingsView+Backup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SettingsView+Backup.swift"; sourceTree = "<group>"; };
+		DF0047B214F9CE4A054E809A /* SettingsView+About.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SettingsView+About.swift"; sourceTree = "<group>"; };
+		28C092215A453924B66C0E53 /* MainScreen+Header.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MainScreen+Header.swift"; sourceTree = "<group>"; };
+		56FFA61300D01B4D76ECBFDC /* MainScreen+Parties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MainScreen+Parties.swift"; sourceTree = "<group>"; };
+		9E6692C1527E6F697FEB59F8 /* MainScreen+Invoice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MainScreen+Invoice.swift"; sourceTree = "<group>"; };
+		60EC0F83542E4C44377D2BA3 /* MainScreen+Financial.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MainScreen+Financial.swift"; sourceTree = "<group>"; };
 		302D14E894CB1ED099225FA4 /* NumberToWords.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberToWords.swift; sourceTree = "<group>"; };
 		3B90959C6BBBA2BA3843348D /* ReceiptVerification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptVerification.swift; sourceTree = "<group>"; };
 		E0CB3F180AE5DE0787C724A7 /* ReceiptVerificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptVerificationView.swift; sourceTree = "<group>"; };
@@ -165,6 +219,27 @@
 				8DB48C99EE1963A0583E0104 /* MainScreenViewModel.swift */,
 				8B7FC3ACDE65754CE5A5444F /* ReceiptArchiveStore.swift */,
 				8C91E6AC2BD31BE032FAB520 /* SharingHelpers.swift */,
+				77307130AA7C59EADF6F88B5 /* ScreenshotGenerator.swift */,
+				B3A6FBC64901CB38C9939428 /* AboutWindow.swift */,
+				03D5B6FEF2D66767FCB56001 /* SettingsWindow.swift */,
+				C1F4A4DCF6FB18872659150E /* MenuBarManager.swift */,
+				D06773576638AD706BCFFC4C /* ExportFileName.swift */,
+				B8787713B2D44EA885049355 /* ReceiptDocumentView.swift */,
+				3B3421A60F0A2B5C1B8DF103 /* InvoiceOCRParser.swift */,
+				A4911C7887D1B11AD6FECDF8 /* InvoiceAttachmentManager.swift */,
+				41C594D66B4BDFA0BFB972CB /* SettingsTab.swift */,
+				BB51B027737CD0C613DCD989 /* SettingsViewModel.swift */,
+				B49D9C1A7B2E76047A7EAF5A /* SettingsView+General.swift */,
+				1DC878FC8AC0B986BD399BC6 /* SettingsView+Residents.swift */,
+				B377BB554D37DD6719DBF9BA /* SettingsView+Vendors.swift */,
+				CBA086F3BC87ADADEAC058B5 /* SettingsView+Appearance.swift */,
+				FEDEFDEBA580258D80263C2F /* SettingsView+Signature.swift */,
+				9A0BB0273E98B1D1C4784D70 /* SettingsView+Backup.swift */,
+				DF0047B214F9CE4A054E809A /* SettingsView+About.swift */,
+				28C092215A453924B66C0E53 /* MainScreen+Header.swift */,
+				56FFA61300D01B4D76ECBFDC /* MainScreen+Parties.swift */,
+				9E6692C1527E6F697FEB59F8 /* MainScreen+Invoice.swift */,
+				60EC0F83542E4C44377D2BA3 /* MainScreen+Financial.swift */,
 				302D14E894CB1ED099225FA4 /* NumberToWords.swift */,
 				3B90959C6BBBA2BA3843348D /* ReceiptVerification.swift */,
 				E0CB3F180AE5DE0787C724A7 /* ReceiptVerificationView.swift */,
@@ -179,8 +254,8 @@
 				9A9CF87E27E204920042D276 /* Main.storyboard */,
 				9A9CF88127E204920042D276 /* aptreceipt.entitlements */,
 				9A9CF8B627E22E670042D276 /* InfoPlist.strings */,
-				9A1F6CA927E485B5006C171B /* ReceiptViewController.swift */,
-				9A90651027E728020085AA4B /* PreferencesViewController.swift */,
+				9A1F6CA927E485B5006C171B /* ReceiptPreviewSheet.swift */,
+				9A90651027E728020085AA4B /* SettingsView.swift */,
 				9A90652027E728020085AA4B /* GitHubUpdateChecker.swift */,
 				9ADECA1627E5DC3500EB0A7F /* File.strings */,
 				D1560FD55F164F23F586FC62 /* Localizable.strings */,
@@ -191,7 +266,13 @@
 		9A9CF88927E204920042D276 /* aptreceiptTests */ = {
 			isa = PBXGroup;
 			children = (
-				9A9CF88A27E204930042D276 /* aptreceiptTests.swift */,
+				9A9CF88A27E204930042D276 /* ReceiptModelTests.swift */,
+				4E8007227864849707AAFE46 /* SettingsTests.swift */,
+				F9B22FA38DBFD2A5993AB784 /* WhatsAppTests.swift */,
+				A68D5A181D053AFB1D682746 /* LocalizationTests.swift */,
+				8E43EB11CA5C83DE33A02673 /* ScreenshotIsolationTests.swift */,
+				66073847FB085C79D085D247 /* VerificationTests.swift */,
+				E57E3CE51ACBED158BC76A4C /* MoneyAndLateFeeTests.swift */,
 			);
 			path = aptreceiptTests;
 			sourceTree = "<group>";
@@ -340,7 +421,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9A1F6CAA27E485B5006C171B /* ReceiptViewController.swift in Sources */,
+				9A1F6CAA27E485B5006C171B /* ReceiptPreviewSheet.swift in Sources */,
 				9A9CF87927E204920042D276 /* AppDelegate.swift in Sources */,
 				68C1BA92E973AA28D86BC2AE /* AppSettingsEnums.swift in Sources */,
 				22844F312E056BAA6CB6E2FB /* LateFee.swift in Sources */,
@@ -352,6 +433,27 @@
 				2BBF72065869D41D26A10AA0 /* MainScreenViewModel.swift in Sources */,
 				9395B5905B3F9570533B2F9A /* ReceiptArchiveStore.swift in Sources */,
 				DE4FCED20A93C5417BDD34A4 /* SharingHelpers.swift in Sources */,
+				01CA193A09A4940EF8996903 /* ScreenshotGenerator.swift in Sources */,
+				385FFE8577F4C2242429E4F3 /* AboutWindow.swift in Sources */,
+				C200D14EF551E75A78587C9E /* SettingsWindow.swift in Sources */,
+				D3680E4B05BFB141232B3473 /* MenuBarManager.swift in Sources */,
+				2AC9CECAAE9CB64BA930E99D /* ExportFileName.swift in Sources */,
+				790EB12BAF164F35FD13D9CB /* ReceiptDocumentView.swift in Sources */,
+				ABF6EB45FFCC487958938D2B /* InvoiceOCRParser.swift in Sources */,
+				D68D75065CCCEBC6917E7BB1 /* InvoiceAttachmentManager.swift in Sources */,
+				6CCCF6BA6B95E97C73F3C914 /* SettingsTab.swift in Sources */,
+				4293AD84931F00939DEA9585 /* SettingsViewModel.swift in Sources */,
+				80FB9D6AF1EB024D3E30EA4E /* SettingsView+General.swift in Sources */,
+				DFB5858D98AE83C8E72EB28B /* SettingsView+Residents.swift in Sources */,
+				5432186B3A4F307A3D7DA50C /* SettingsView+Vendors.swift in Sources */,
+				8A2D0B6D97FD08A5A921B446 /* SettingsView+Appearance.swift in Sources */,
+				0FE053816238CFCBA4FB4638 /* SettingsView+Signature.swift in Sources */,
+				B06CC3D44BA97165CA43F944 /* SettingsView+Backup.swift in Sources */,
+				04124F1B2CECE4DFFAAF116A /* SettingsView+About.swift in Sources */,
+				B92EE8E75E1D5EBAE6C1267D /* MainScreen+Header.swift in Sources */,
+				023B74C3BD8B0C99A59786C2 /* MainScreen+Parties.swift in Sources */,
+				411A8F88605A21C684AF7ED5 /* MainScreen+Invoice.swift in Sources */,
+				1648F19F7E194162EE0E453C /* MainScreen+Financial.swift in Sources */,
 				31BFBE3791F8AD705A0381B9 /* NumberToWords.swift in Sources */,
 				7D1B3AA3D489D485D1E5FBEE /* ReceiptVerification.swift in Sources */,
 				B71139704EDB5D51D5323F98 /* ReceiptVerificationView.swift in Sources */,
@@ -362,7 +464,7 @@
 				F519961A217C0540E3B6FB56 /* ApartmentFinancialReportSheet.swift in Sources */,
 				EBD3F5D514DFF5EF577DE795 /* BatchDuesGeneratorSheet.swift in Sources */,
 				3D40934AC58F13968AA5D9B7 /* ApartmentBulletinBoardView.swift in Sources */,
-				9A90651127E728020085AA4B /* PreferencesViewController.swift in Sources */,
+				9A90651127E728020085AA4B /* SettingsView.swift in Sources */,
 				9A90652127E728020085AA4B /* GitHubUpdateChecker.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -371,7 +473,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9A9CF88B27E204930042D276 /* aptreceiptTests.swift in Sources */,
+				9A9CF88B27E204930042D276 /* ReceiptModelTests.swift in Sources */,
+				0BF8C63AF8A561D920D8C67B /* SettingsTests.swift in Sources */,
+				FD9FD2057F4ACDE21BF50ECA /* WhatsAppTests.swift in Sources */,
+				BB364C09D1C6645795342BFF /* LocalizationTests.swift in Sources */,
+				5996AA80BEA2F20D0BBF6892 /* ScreenshotIsolationTests.swift in Sources */,
+				064328B5C04F0ADC63C547A6 /* VerificationTests.swift in Sources */,
+				C1673A901426E5F668BD8C7D /* MoneyAndLateFeeTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

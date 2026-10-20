@@ -2,13 +2,17 @@
 
 - **Last updated:** 2026-10-20
 - **Scope:** AptReceipt (aptreceipt)
-- **Layout:** sources in `aptreceipt/`, unit tests in `aptreceiptTests/aptreceiptTests.swift`, runner `./run_all_tests_mac.command`.
+- **Layout:** sources in `aptreceipt/`, unit tests in `aptreceiptTests/` (one XCTestCase class per area), runner `./run_all_tests_mac.command`.
 
 ## Symbol index (per file)
 
 | File | Main symbols | Responsibility |
 | --- | --- | --- |
-| `AppDelegate.swift` | `AptReceiptApp` (`@main`), `ScreenshotMode`, `AppDelegate`, `AboutWindowView`, `AboutContentView`, `AppInfo`, `AboutWindowManager`, `SettingsWindowManager`, `SettingsTabViewController`, `MenuBarManager` | App scene and commands, launch, screenshot generator, About and Settings windows, localized menu bar |
+| `AppDelegate.swift` | `AptReceiptApp` (`@main`), `AppDelegate` | App scene and commands, launch, menu actions |
+| `ScreenshotGenerator.swift` | `ScreenshotMode`, `AppDelegate.generateScreenshots` | `--generate-screenshots`: README images from in-memory sample data |
+| `AboutWindow.swift` | `AboutWindowView`, `AboutContentView`, `AppInfo`, `AboutWindowManager` | About window and its shared content |
+| `SettingsWindow.swift` | `SettingsWindowManager`, `SettingsTabViewController` | Settings window with toolbar tabs (one size, fixed top-left corner) |
+| `MenuBarManager.swift` | `MenuBarManager` | Localized macOS menu bar |
 | `AppSettingsEnums.swift` | `AppLanguage`, `AppTheme`, `AppCurrency` (`default(for:)`) | Language, theme and currency options |
 | `ReceiptModels.swift` | `VendorRecord`, `ExpenseServicePreset`, `ValidationError`, `ReceiptKind`, `ReceiptDraft`, `SystemBackupPackage` | Core Codable models and the backup format |
 | `ReceiptArchiveStore.swift` | `ReceiptRecord`, `ReceiptArchiveStore.shared`, `init(fileURL:)`, `defaultFileURL` | Archive record and JSON persistence (`receipts_archive.json`); `fileURL: nil` keeps it in memory |
@@ -20,19 +24,25 @@
 | `ReceiptVerification.swift` | `ReceiptVerificationCode`, `ReceiptVerificationKeyStore`, `ReceiptRecoveryCode`, `ReceiptSerial`, `ScannedReceiptVerification`, `ReceiptArchiveComparison`, `ReceiptPrintedText`, `ReceiptQRBlock` | Offline receipt verification: HMAC code over the normalized QR text (Crockford Base32, pinned by `testVerificationCodeIsPinnedAndIgnoresLayoutOnly`), installation keys in `Application Support/aptreceipt/receipt-verification-keys` (0600), in memory for tests and screenshot runs; receipt numbers (`TAH-1042`) per kind and language; parsing a scanned QR text and comparing it with the archive; printed values shared by the paper and the Verify window; the sealed `AR1.` block (format pinned by `testSealedBlockFormatIsPinned`); recovery code (32 key bytes + 3-byte SHA-256 checksum, 56 Crockford Base32 characters) |
 | `ReceiptVerificationView.swift` | `ReceiptQRReader`, `ReceiptVerificationWindowManager`, `ReceiptVerificationView`, `ReceiptSlipView` | Verify Receipt window: Vision QR reading from images and PDFs, drop/choose/paste input, POS-style slip with status stamp and archive result |
 | `L10n.swift` | `L10n` (`resolvedLanguage`, `locale`, private `tr(_:)`) | Lookup in the per-language `Localizable.strings` |
-| `MainScreen.swift` | `MainScreen` | Main window: receipt form, live preview, header buttons, sheets |
+| `MainScreen.swift`, `MainScreen+Header.swift`, `MainScreen+Parties.swift`, `MainScreen+Invoice.swift`, `MainScreen+Financial.swift` | `MainScreen` and its sections as extensions | Main window: body and sheets; header bar; receipt type, property and parties; invoice import; amounts, notes, late fee card and actions |
 | `MainScreenViewModel.swift` | `MainScreenViewModel` | Form state, late-fee math, invoice import, `createReceipt` |
 | `LiveReceiptPreview.swift` | `LiveReceiptPreview`, `Default2DBuildingLogo` | On-screen preview next to the form |
 | `NumberToWords.swift` | `NumberToWords` | Amount in words per language (number-word grammar; the one place language data branches in code) |
-| `ReceiptViewController.swift` | `buildExportFileName`, `sanitizeForFileName`, `ReceiptPreviewSheet`, `ReceiptDocumentView`, `NSImage.writeJPEG`, `InvoiceOCRParser`, `ParsedInvoiceResult`, `InvoiceAttachmentManager` | A4 document, PDF/JPEG export, sharing, OCR, attachments |
+| `ReceiptPreviewSheet.swift` | `ReceiptPreviewSheet`, `NSImage.writeJPEG` | Preview sheet, PDF/JPEG export, sharing |
+| `ReceiptDocumentView.swift` | `ReceiptDocumentView` | The A4 receipt document and its QR code |
+| `ExportFileName.swift` | `buildExportFileName`, `sanitizeForFileName` | Export file names per language |
+| `InvoiceOCRParser.swift` | `ParsedInvoiceResult`, `InvoiceOCRParser` | Vision/PDFKit invoice text and amount recognition |
+| `InvoiceAttachmentManager.swift` | `InvoiceAttachmentManager` | Invoice attachments in Application Support |
 | `ReceiptArchiveSheet.swift` | `ReceiptArchiveSheet` | Archive browsing, filters, CSV export |
 | `ApartmentFinancialReportSheet.swift` | `ApartmentFinancialReportSheet` | Cash summary, dues status, reminders, transactions, bulletin export |
 | `ApartmentBulletinBoardView.swift` | `ApartmentBulletinBoardView` | A4 bulletin board notice |
 | `BatchDuesGeneratorSheet.swift` | `BatchDuesGeneratorSheet` | Batch income receipts into the archive |
-| `PreferencesViewController.swift` | `SettingsTab`, `SettingsView`, `SettingsViewModel` | Settings pages and the draft model |
+| `SettingsTab.swift` | `SettingsTab` | Settings tabs, titles, icons, the shared width and height |
+| `SettingsView.swift`, `SettingsView+General.swift`, `+Residents`, `+Vendors`, `+Appearance`, `+Signature`, `+Backup`, `+About` | `SettingsView` and one extension per tab | Settings pages; members are internal so each tab can live in its own file |
+| `SettingsViewModel.swift` | `SettingsViewModel` | The shared settings draft |
 | `GitHubUpdateChecker.swift` | `GitHubRelease`, `GitHubReleaseAsset`, `SemverCompare`, `UpdateCheckStatus`, `UpdateCheckFailure`, `GitHubUpdateChecker.shared`, `UpdateChecksums`, `UpdateSignature`, `UpdateDownloadError`, `UpdateFileDownloader`, `UpdateDownloadWindowManager`, `UpdateDownloadProgressView` | Release check, download, verification |
 | `LicenseViewerSheet.swift` | `LicenseViewerSheet.licenseText` | Verbatim copy of `LICENSE` (GPL v3) |
-| `aptreceiptTests.swift` | `aptreceiptTests` | Unit, parity and screenshot-isolation tests |
+| `aptreceiptTests/*.swift` | `ReceiptModelTests`, `SettingsTests`, `WhatsAppTests`, `LocalizationTests`, `ScreenshotIsolationTests`, `VerificationTests`, `MoneyAndLateFeeTests` | Unit tests by area (sections keep their original numbers) |
 
 ## Key call paths
 
