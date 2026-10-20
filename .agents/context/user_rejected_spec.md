@@ -14,3 +14,4 @@ This document tracks rejected ideas, anti-features, and design redlines that mus
 - **QR verification through a web page** (2026-10-20): no hosted verification page, not on GitHub Pages, not on the user's own domain, not even a static cache-first one. Receipt QR verification must work fully offline with no server involved.
 - **Receipt QR code as a `mailto:` email link** (2026-10-20): the QR code holds only the sealed code, which the phone camera offers to copy.
 - **Developer ID signing and notarization** (2026-10-20): ad-hoc signed releases are the user's distribution choice; do not propose notarization as a fix.
+- **Windows, iPad or iPhone versions — not for now** (2026-10-20): AptReceipt stays a Mac app; do not propose other platforms unless the user brings them up again.
