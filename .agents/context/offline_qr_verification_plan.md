@@ -82,6 +82,8 @@ Doğrulama: K7QM-2XPA-9TRB-4HWD
 
 ## Revision 2026-10-20: sealed block instead of readable text
 
+- **Status:** released as 3.6.1 (build 14).
+
 - **Why:** phone cameras offered a web search for the plain-text QR code of 3.6.0, which would send names and amounts to a search engine (`reflexion_memory_log.md`, R-009).
 - **QR content:** only the sealed code `AR1.…` (`ReceiptDocumentView.qrContent`). The camera shows it and offers Copy (confirmed by the user on iOS); the resident sends the copied code to the management. A `mailto:` link was tried first and rejected by the user (`user_rejected_spec.md`). Upper-case letters, digits and `.` let the QR use its compact alphanumeric mode (about 73 pt).
 - **Block:** `AR1.` + Crockford Base32 of nonce (12) ‖ ChaCha20-Poly1305 ciphertext ‖ tag (16) (`ReceiptQRBlock`). Key: HKDF-SHA256 of the installation key (info `AptReceipt receipt block v1`); nonce: HMAC of the plaintext with a second derived key (SIV-style, deterministic, never shared by two receipts). Plaintext format v1: version, flags (kind, language, flat shown, late fee), varints (number, flat, amount cents, late-fee base, fee, rate × 100, months), ISO currency, five length-prefixed strings (building, payer, manager, date, period; names capped at 40 characters).

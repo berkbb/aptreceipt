@@ -2,11 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [3.6.1] - 2026-10-20
 
 ### Changed
 - **Receipt QR code no longer exposes receipt details**: Phone cameras offered a web search for the 3.6.0 text QR code, which sent the payer, amounts and building name to a search engine. The QR code now holds only a sealed code (`AR1.…`): the receipt details encrypted with this installation's key (ChaCha20-Poly1305), so only AptReceipt can open it and any change makes it fail. The camera shows the code and offers to copy it; even a search reveals nothing. Residents copy the code and send it to the management, who paste it into Verify Receipt (or drop a photo or PDF of the receipt) to see the receipt and its Genuine / Not Verified stamp. The QR code is also smaller (about 26 mm). The footer now says to copy and send the code; texts in all three languages.
 - 3.6.0 text QR codes and older receipts are still recognized and verified.
+- Bumped marketing version to `3.6.1` (build `14`).
 
 ## [3.6.0] - 2026-10-20
 
