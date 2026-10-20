@@ -746,7 +746,7 @@ struct UpdateDownloadProgressView: View {
             ProgressView(value: checker.downloadProgress)
                 .progressViewStyle(.linear)
             HStack {
-                Text("\(Int((checker.downloadProgress * 100).rounded()))%")
+                Text(AppFormat.percent(checker.downloadProgress * 100, l10n: l10n, minimumFractionDigits: 0, maximumFractionDigits: 0))
                     .font(.system(size: 11).monospacedDigit())
                     .foregroundColor(Color(NSColor.secondaryLabelColor))
                 Spacer()

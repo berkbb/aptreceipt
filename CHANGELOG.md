@@ -15,7 +15,11 @@ All notable changes to this project will be documented in this file.
 - **Batch dues receipts** always stored a Turkish description and, for flats without an owner, a Turkish recipient (`… Sakini (Daire 5)`); both now use the app language.
 - **Bulletin board PDF**: the footer tagline was always Turkish, and the suggested file name was always `…_Mali_Pano_Raporu_…` with `Apartman` as the fallback building name; both now use the app language.
 - **Receipt footer version**: Receipts printed `AptReceipt v3.3.0` regardless of the installed version; they now show the real version.
+- The late fee on the main screen was still written as `+1750.00 ₺`, and the update download progress as `42%` in every language; both now use the per-language format.
 - **Receipt preview footer**: The buttons now sit in two rows (share actions, then Close / JPEG / PDF), so every label fits in all three languages, including when an invoice is attached.
+
+### Tests
+- **Trilingual parity checks** keep Turkish, English and Romanian one to one: every catalog string is really translated (only a short, explicit allowlist may equal English), every key used in code exists in all three languages, no view contains hardcoded text, no screen uses a fixed number format, and every text the code builds per language (WhatsApp messages, legal notes, amount in words, file names, sample data, option titles) differs in each language.
 
 ## [3.5.0] - 2026-10-20
 

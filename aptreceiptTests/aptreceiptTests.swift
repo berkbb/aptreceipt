@@ -1121,6 +1121,169 @@ final class aptreceiptTests: XCTestCase {
         XCTAssertEqual(L10n(.turkish).bulletinPdfFileName(building: "test_apt", period: "Ekim_2026"), "test_apt_Mali_Pano_Raporu_Ekim_2026")
         XCTAssertEqual(L10n(.english).bulletinPdfFileName(building: "test_apt", period: "October_2026"), "test_apt_Financial_Bulletin_October_2026")
     }
+
+    // MARK: - 14. Trilingual Parity (Turkish, English, Romanian must match one to one)
+
+    private static let parityLanguages: [AppLanguage] = [.turkish, .english, .romanian]
+
+    /// Strings that are legitimately the same in English and another language (brand, international words).
+    private static let sameAsEnglishAllowed: Set<String> = ["aboutCopyrightFormat", "currencyEUR", "menuZoom", "okButton", "subtotal"]
+
+    private var sourceDirectory: URL {
+        URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("aptreceipt")
+    }
+
+    private func catalogTable(_ localization: String) throws -> [String: String] {
+        let url = try XCTUnwrap(Bundle.main.url(forResource: "Localizable", withExtension: "strings", subdirectory: nil, localization: localization))
+        return try XCTUnwrap(NSDictionary(contentsOf: url) as? [String: String])
+    }
+
+    func testEveryCatalogStringIsReallyTranslated() throws {
+        let english = try catalogTable("en")
+        for localization in ["tr", "ro"] {
+            let translated = try catalogTable(localization)
+            for (key, englishValue) in english where !Self.sameAsEnglishAllowed.contains(key) {
+                XCTAssertNotEqual(translated[key], englishValue, "\(localization).\(key) is still English: \(englishValue)")
+            }
+        }
+    }
+
+    func testEveryKeyUsedInCodeExistsInAllThreeLanguages() throws {
+        var used = Set<String>()
+        let regex = try NSRegularExpression(pattern: #"\btr\("([^"]+)"\)|"(lateFeeItemName\.[a-z]+)""#)
+        let source = try String(contentsOf: sourceDirectory.appendingPathComponent("L10n.swift"), encoding: .utf8)
+        for match in regex.matches(in: source, range: NSRange(source.startIndex..., in: source)) {
+            for group in 1...2 {
+                if let range = Range(match.range(at: group), in: source) { used.insert(String(source[range])) }
+            }
+        }
+        XCTAssertGreaterThan(used.count, 300)
+        for localization in ["en", "tr", "ro"] {
+            let table = try catalogTable(localization)
+            let missing = used.subtracting(table.keys).sorted()
+            XCTAssertTrue(missing.isEmpty, "\(localization) is missing keys used by L10n: \(missing)")
+        }
+    }
+
+    /// Drops every `\\( … )` segment, including nested parentheses, so only literal text remains.
+    private static func removingInterpolations(_ literal: String) -> String {
+        var result = ""
+        var depth = 0
+        let characters = Array(literal)
+        var index = 0
+        while index < characters.count {
+            if depth == 0, characters[index] == "\\", index + 1 < characters.count, characters[index + 1] == "(" {
+                depth = 1
+                index += 2
+                continue
+            }
+            if depth > 0 {
+                if characters[index] == "(" { depth += 1 }
+                if characters[index] == ")" { depth -= 1 }
+                index += 1
+                continue
+            }
+            result.append(characters[index])
+            index += 1
+        }
+        return result
+    }
+
+    /// No user-facing text may be written straight into a view; it has to come from the catalog (L10n).
+    func testNoHardcodedTextInViews() throws {
+        let allowedLiterals: Set<String> = ["Babadogan Tech and Edu", "GNU GPL v3.0", "babadogan.net", "Türkçe", "English", "Română", "OK"]
+        let uiCall = try NSRegularExpression(pattern: #"\b(Text|Label|Button|Toggle|Picker|TextField|Section|Menu|help|navigationTitle)\s*\(\s*"((?:[^"\\]|\\.)*)""#)
+        let wordPattern = try NSRegularExpression(pattern: #"\p{L}{2,}"#)
+        let files = try FileManager.default.contentsOfDirectory(at: sourceDirectory, includingPropertiesForKeys: nil).filter { $0.pathExtension == "swift" }
+        XCTAssertGreaterThan(files.count, 10)
+        var offenders: [String] = []
+        for file in files {
+            let lines = try String(contentsOf: file, encoding: .utf8).components(separatedBy: "\n")
+            for (index, line) in lines.enumerated() where !line.trimmingCharacters(in: .whitespaces).hasPrefix("//") {
+                for match in uiCall.matches(in: line, range: NSRange(line.startIndex..., in: line)) {
+                    guard let range = Range(match.range(at: 2), in: line) else { continue }
+                    let literal = String(line[range])
+                    // Interpolated values (l10n.…, numbers) are fine; only literal words count.
+                    let withoutInterpolation = Self.removingInterpolations(literal)
+                    let hasWords = wordPattern.firstMatch(in: withoutInterpolation, range: NSRange(withoutInterpolation.startIndex..., in: withoutInterpolation)) != nil
+                    if hasWords && !allowedLiterals.contains(literal) {
+                        offenders.append("\(file.lastPathComponent):\(index + 1): \(literal)")
+                    }
+                }
+            }
+        }
+        XCTAssertTrue(offenders.isEmpty, "Hardcoded UI text:\n" + offenders.joined(separator: "\n"))
+    }
+
+    /// Amounts and percentages on screen must go through AppFormat, never a fixed "%.2f" pattern.
+    func testNoFixedNumberFormatsOnScreen() throws {
+        let banned = [#"String(format: "%.2f %@""#, #"String(format: "+%.2f %@""#, #""%%%"#, #"(%\(String(format: "%.1f""#]
+        let files = try FileManager.default.contentsOfDirectory(at: sourceDirectory, includingPropertiesForKeys: nil).filter { $0.pathExtension == "swift" }
+        var offenders: [String] = []
+        for file in files {
+            let lines = try String(contentsOf: file, encoding: .utf8).components(separatedBy: "\n")
+            for (index, line) in lines.enumerated() where banned.contains(where: line.contains) {
+                offenders.append("\(file.lastPathComponent):\(index + 1): \(line.trimmingCharacters(in: .whitespaces))")
+            }
+        }
+        XCTAssertTrue(offenders.isEmpty, "Fixed number formats:\n" + offenders.joined(separator: "\n"))
+    }
+
+    private func assertDistinctPerLanguage(_ label: String, file: StaticString = #filePath, line: UInt = #line, _ make: (AppLanguage) -> String) {
+        let texts = Self.parityLanguages.map { make($0) }
+        for (language, text) in zip(Self.parityLanguages, texts) {
+            XCTAssertFalse(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, "\(label) is empty in \(language)", file: file, line: line)
+        }
+        XCTAssertEqual(Set(texts).count, texts.count, "\(label) is not translated into every language: \(texts)", file: file, line: line)
+    }
+
+    /// Texts the code builds per language (messages, legal notes, sample data, words, file names).
+    func testGeneratedTextsExistInAllThreeLanguages() {
+        let draft = ReceiptDraft(receiver: "Test Resident", issuer: "Test Manager", notes: "Note", monthYear: "Ekim 2026", apartmentNumber: 5, amount: 2087.5, sequenceNumber: 7, createdDate: "19.10.2026", showApartmentNumber: true, kind: .income, currency: .turkishLira, isLateFeeApplied: true, lateFeeRate: 2.5, lateMonths: 3, lateFeeAmount: 337.5, baseAmount: 1750)
+
+        assertDistinctPerLanguage("WhatsApp receipt message") { WhatsAppShareHelper.receiptSummary(draft: draft, buildingName: "Test Apt", l10n: L10n($0)) }
+        assertDistinctPerLanguage("WhatsApp payment reminder") {
+            WhatsAppShareHelper.paymentReminder(flat: 3, owner: "Test Owner", period: "10/2026", dues: 1750, currency: .turkishLira, lateFeeRate: 5, buildingName: "Test Apt", manager: "Test Manager", l10n: L10n($0))
+        }
+        for profile in LateFeeCountryProfile.allCases {
+            assertDistinctPerLanguage("late-fee footnote \(profile)") { profile.defaultFootnote(for: $0) }
+            assertDistinctPerLanguage("late-fee legal notice \(profile)") { profile.defaultLegalNotice(for: $0) }
+        }
+        for currency in AppCurrency.allCases {
+            assertDistinctPerLanguage("amount in words \(currency)") { NumberToWords.convert(2087.5, language: $0, currency: currency) }
+        }
+        for kind in ReceiptKind.allCases {
+            let kindDraft = ReceiptDraft(receiver: "R", issuer: "I", notes: "N", monthYear: "Ekim 2026", apartmentNumber: 5, amount: 1, sequenceNumber: 1, createdDate: "1", showApartmentNumber: true, kind: kind)
+            assertDistinctPerLanguage("export file name \(kind)") { buildExportFileName(draft: kindDraft, apartmentName: "", language: $0, ext: "pdf") }
+        }
+        assertDistinctPerLanguage("sample building") { SampleData.defaults(for: $0).apartmentName }
+        assertDistinctPerLanguage("sample vendors") { SampleData.defaults(for: $0).defaultVendors.map(\.category).joined(separator: ",") }
+        assertDistinctPerLanguage("sample services") { SampleData.defaults(for: $0).defaultServices.map(\.defaultDescription).joined(separator: ",") }
+        assertDistinctPerLanguage("batch receipt note") { L10n($0).batchReceiptNote(period: "10/2026") }
+        assertDistinctPerLanguage("late-fee row") { L10n($0).lateFeeItemName(rate: 2.5, months: 3) }
+        assertDistinctPerLanguage("month title") { ReceiptPeriod(year: 2026, month: 10).title(locale: L10n($0).locale) }
+        assertDistinctPerLanguage("percent") { AppFormat.percent(16.666, l10n: L10n($0)) }
+    }
+
+    /// Every option list the user picks from has a non-empty, translated title in each language.
+    func testEnumTitlesExistInAllThreeLanguages() {
+        for kind in ReceiptKind.allCases {
+            assertDistinctPerLanguage("receipt kind \(kind)") { kind.title(l10n: L10n($0)) }
+            assertDistinctPerLanguage("receipt badge \(kind)") { kind.badgeTitle(l10n: L10n($0)) }
+        }
+        for theme in AppTheme.allCases {
+            assertDistinctPerLanguage("theme \(theme)") { theme.title(l10n: L10n($0)) }
+        }
+        for profile in LateFeeCountryProfile.allCases {
+            assertDistinctPerLanguage("country profile \(profile)") { profile.title(l10n: L10n($0)) }
+        }
+        for tab in SettingsTab.allCases {
+            assertDistinctPerLanguage("settings tab \(tab)") { tab.title(l10n: L10n($0)) }
+        }
+        for currency in AppCurrency.allCases where currency != .euro {
+            assertDistinctPerLanguage("currency \(currency)") { currency.title(l10n: L10n($0)) }
+        }
+    }
 }
 
 

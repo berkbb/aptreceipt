@@ -1013,7 +1013,7 @@ struct MainScreen: View {
                             Text("\(l10n.lateFeeCalculated) (\(AppFormat.percent(viewModel.effectiveLateRate(settings: settings), l10n: l10n, maximumFractionDigits: 2)) × \(viewModel.lateMonths))")
                                 .font(.system(size: 9.5))
                                 .foregroundColor(.orange)
-                            Text(String(format: "+%.2f %@", viewModel.calculatedLateFee(settings: settings), settings.currency.symbol))
+                            Text("+\(AppFormat.currency(viewModel.calculatedLateFee(settings: settings), settings.currency, l10n: l10n))")
                                 .font(.system(size: 11, weight: .bold, design: .monospaced))
                                 .foregroundColor(.orange)
                         }
