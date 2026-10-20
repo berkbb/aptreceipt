@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [3.6.0] - 2026-10-20
 
 ### Added
 - **Offline receipt verification**: Every receipt's QR code now holds the receipt as readable lines in its language (building, receipt type and number, date, period, payer or payee, flat, dues, late fee, total, manager) followed by a 16-character verification code. Any phone camera shows these details without internet.
@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 - **Receipt QR code and footer**: The QR code grows with its content at half a millimetre per module (about 35 mm on paper), and the footer now says what it does: scan to read the receipt details; the management checks the code with AptReceipt.
+- Bumped marketing version to `3.6.0` (build `13`).
 
 ### Fixed
 - **Receipt QR code could not be scanned**: The verification QR was scaled by an uneven factor, had no white border (quiet zone) and was only 52 pt wide, so cameras could not read it on screen, in the PDF or on paper. It is now drawn with sharp, equal modules and a quiet zone, and tests decode it from the exported image and PDF for every language and receipt type.
