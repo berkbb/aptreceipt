@@ -318,7 +318,8 @@ struct ReceiptArchiveSheet: View {
     private func shareViaWhatsApp(_ record: ReceiptRecord) {
         let phone = record.apartmentNumber > 0 ? settings.ownerPhone(for: record.apartmentNumber) : nil
         let msg = WhatsAppShareHelper.receiptSummary(draft: record.toDraft(), buildingName: settings.apartmentName, l10n: l10n)
-        if let url = WhatsAppShareHelper.shareURL(phone: phone, message: msg) {
+        let callingCode = WhatsAppShareHelper.defaultCallingCode(for: settings.currency)
+        if let url = WhatsAppShareHelper.shareURL(phone: phone, message: msg, callingCode: callingCode) {
             NSWorkspace.shared.open(url)
         }
     }

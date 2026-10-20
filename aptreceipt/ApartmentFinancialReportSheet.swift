@@ -423,40 +423,21 @@ struct ApartmentFinancialReportSheet: View {
 
     private func sendWhatsAppReminder(flat: Int, owner: String, phone: String) {
         let periodName = selectedPeriod == "all" ? (availablePeriods.first ?? "") : selectedPeriod
-        let duesAmt = settings.defaultPayment.isEmpty ? "1750" : settings.defaultPayment
-        let duesAmtValue = Double(duesAmt.replacingOccurrences(of: ",", with: ".")) ?? 1750.0
-        let currencySym = settings.currency.symbol
-        let apt = settings.apartmentName.isEmpty ? l10n.defaultBuildingName : settings.apartmentName
-        let manager = settings.issuer.isEmpty ? l10n.managerSignatureTitle : settings.issuer
-
-        let message: String
-        if settings.isLateFeeEnabled {
-            let lateFeeVal = LateFeeCalculator.fee(base: duesAmtValue, monthlyRate: settings.lateFeeMonthlyRate, months: 1)
-            let totalVal = duesAmtValue + lateFeeVal
-            let rateStr = String(format: "%.1f", settings.lateFeeMonthlyRate)
-            let feeStr = String(format: "%.2f", lateFeeVal)
-            let totalStr = String(format: "%.2f", totalVal)
-            switch l10n.resolvedLanguage {
-            case .turkish:
-                message = "Sayın Komşumuz (Daire \(flat)), \(apt) \(periodName) dönemi \(duesAmt) \(currencySym) aidat ve aylık %\(rateStr) gecikme tazminatı (\(feeStr) \(currencySym)) ile birlikte toplam \(totalStr) \(currencySym) ödemeniz henüz kaydımıza geçmemiştir. Bilginize sunar, iyi günler dileriz. - \(manager)"
-            case .romanian:
-                message = "Stimate Vecin (Ap. \(flat)), plata întreținerii pentru \(periodName) la \(apt) (\(duesAmt) \(currencySym)) plus penalități de întârziere (%\(rateStr): \(feeStr) \(currencySym)), total \(totalStr) \(currencySym) este în așteptare. Vă mulțumim! - \(manager)"
-            default:
-                message = "Dear Resident (Flat \(flat)), dues for \(periodName) at \(apt) (\(duesAmt) \(currencySym)) plus late fee compensation (%\(rateStr): \(feeStr) \(currencySym)), total \(totalStr) \(currencySym) is currently pending. Thank you! - \(manager)"
-            }
-        } else {
-            switch l10n.resolvedLanguage {
-            case .turkish:
-                message = "Sayın Komşumuz (Daire \(flat)), \(apt) \(periodName) dönemi \(duesAmt) \(currencySym) aidat ödemeniz henüz kaydımıza geçmemiştir. Bilginize sunar, iyi günler dileriz. - \(manager)"
-            case .romanian:
-                message = "Stimate Vecin (Ap. \(flat)), plata întreținerii pentru perioada \(periodName) la \(apt) în valoare de \(duesAmt) \(currencySym) este în așteptare. Vă mulțumim! - \(manager)"
-            default:
-                message = "Dear Resident (Flat \(flat)), dues payment for \(periodName) at \(apt) in the amount of \(duesAmt) \(currencySym) is currently pending. Thank you! - \(manager)"
-            }
-        }
-
+        let dues = Double(settings.defaultPayment.trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: ",", with: "."))
+        let message = WhatsAppShareHelper.paymentReminder(
+            flat: flat,
+            owner: owner,
+            period: periodName,
+            dues: dues,
+            currency: settings.currency,
+            lateFeeRate: settings.isLateFeeEnabled ? settings.lateFeeMonthlyRate : nil,
+            buildingName: settings.apartmentName.isEmpty ? l10n.defaultBuildingName : settings.apartmentName,
+            manager: settings.issuer.isEmpty ? l10n.managerSignatureTitle : settings.issuer,
+            l10n: l10n
+        )
         let cleanPhone = phone.trimmingCharacters(in: .whitespacesAndNewlines)
-        if let url = WhatsAppShareHelper.shareURL(phone: cleanPhone.isEmpty ? nil : cleanPhone, message: message) {
+        let callingCode = WhatsAppShareHelper.defaultCallingCode(for: settings.currency)
+        if let url = WhatsAppShareHelper.shareURL(phone: cleanPhone.isEmpty ? nil : cleanPhone, message: message, callingCode: callingCode) {
             NSWorkspace.shared.open(url)
         }
     }

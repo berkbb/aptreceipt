@@ -394,69 +394,76 @@ struct ReceiptPreviewSheet: View {
 
             Divider()
 
-            // Footer Actions
-            HStack(spacing: 12) {
-                if let msg = successMessage {
-                    Label(msg, systemImage: "checkmark.circle.fill")
-                        .foregroundColor(.green)
-                        .font(.callout)
-                }
-
-                Spacer()
-
-                // WhatsApp Share Button
-                Button {
-                    shareWhatsApp()
-                } label: {
-                    Label(l10n.shareWhatsApp, systemImage: "message.fill")
-                        .foregroundColor(.green)
-                }
-                .buttonStyle(.bordered)
-
-                // Email Share Button
-                Button {
-                    shareEmail()
-                } label: {
-                    Label(l10n.shareEmail, systemImage: "envelope.fill")
-                }
-                .buttonStyle(.bordered)
-
-                // View Attached Invoice Button (If Available)
-                if let path = draft.invoiceAttachmentPath, !path.isEmpty {
+            // Footer Actions: two rows so every label fits at 760 pt in all three languages.
+            VStack(spacing: 10) {
+                // Share row
+                HStack(spacing: 10) {
                     Button {
-                        InvoiceAttachmentManager.shared.openAttachment(at: path)
+                        shareWhatsApp()
                     } label: {
-                        Label(l10n.viewAttachedInvoice, systemImage: "doc.text.magnifyingglass")
-                            .foregroundColor(Color(red: 0.22, green: 0.42, blue: 0.88))
+                        Label(l10n.shareWhatsApp, systemImage: "message.fill")
+                            .foregroundColor(.green)
                     }
                     .buttonStyle(.bordered)
+
+                    Button {
+                        shareEmail()
+                    } label: {
+                        Label(l10n.shareEmail, systemImage: "envelope.fill")
+                    }
+                    .buttonStyle(.bordered)
+
+                    // View Attached Invoice Button (If Available)
+                    if let path = draft.invoiceAttachmentPath, !path.isEmpty {
+                        Button {
+                            InvoiceAttachmentManager.shared.openAttachment(at: path)
+                        } label: {
+                            Label(l10n.viewAttachedInvoice, systemImage: "doc.text.magnifyingglass")
+                                .foregroundColor(Color(red: 0.22, green: 0.42, blue: 0.88))
+                        }
+                        .buttonStyle(.bordered)
+                    }
+
+                    Spacer(minLength: 8)
+
+                    if let msg = successMessage {
+                        Label(msg, systemImage: "checkmark.circle.fill")
+                            .foregroundColor(.green)
+                            .font(.callout)
+                            .lineLimit(1)
+                            .truncationMode(.middle)
+                    }
                 }
 
-                Button(l10n.close) {
-                    presentationMode.wrappedValue.dismiss()
-                }
-                .buttonStyle(.bordered)
-                .keyboardShortcut(.cancelAction)
+                // Save row
+                HStack(spacing: 10) {
+                    Button(l10n.close) {
+                        presentationMode.wrappedValue.dismiss()
+                    }
+                    .buttonStyle(.bordered)
+                    .keyboardShortcut(.cancelAction)
 
-                // Save as JPEG Button
-                Button {
-                    saveReceiptImage()
-                } label: {
-                    Label(l10n.saveAsJPEG, systemImage: "photo.fill")
-                        .padding(.horizontal, 4)
-                }
-                .buttonStyle(.bordered)
+                    Spacer()
 
-                // Save as PDF Button (Primary)
-                Button {
-                    saveReceiptPDF()
-                } label: {
-                    Label(l10n.saveAsPDF, systemImage: "doc.text.fill")
-                        .padding(.horizontal, 6)
+                    Button {
+                        saveReceiptImage()
+                    } label: {
+                        Label(l10n.saveAsJPEG, systemImage: "photo.fill")
+                            .padding(.horizontal, 4)
+                    }
+                    .buttonStyle(.bordered)
+
+                    Button {
+                        saveReceiptPDF()
+                    } label: {
+                        Label(l10n.saveAsPDF, systemImage: "doc.text.fill")
+                            .padding(.horizontal, 6)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .keyboardShortcut(.defaultAction)
                 }
-                .buttonStyle(.borderedProminent)
-                .keyboardShortcut(.defaultAction)
             }
+            .lineLimit(1)
             .padding(.horizontal, 20)
             .padding(.vertical, 14)
             .background(Color(NSColor.windowBackgroundColor))
@@ -467,7 +474,8 @@ struct ReceiptPreviewSheet: View {
     private func shareWhatsApp() {
         let phone = draft.apartmentNumber > 0 ? settings.ownerPhone(for: draft.apartmentNumber) : nil
         let msg = WhatsAppShareHelper.receiptSummary(draft: draft, buildingName: settings.apartmentName, l10n: l10n)
-        if let url = WhatsAppShareHelper.shareURL(phone: phone, message: msg) {
+        let callingCode = WhatsAppShareHelper.defaultCallingCode(for: settings.currency)
+        if let url = WhatsAppShareHelper.shareURL(phone: phone, message: msg, callingCode: callingCode) {
             NSWorkspace.shared.open(url)
         }
     }

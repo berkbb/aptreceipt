@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Fixed
+- **WhatsApp phone numbers**: Numbers saved in local form (`0532 …`, `0722 …`) opened a wrong or missing chat because wa.me needs the international form. Turkish and Romanian buildings now complete them with `90` / `40`; numbers that already start with `+` or `00` are kept.
+- **WhatsApp and email text**: A `&`, `+`, `=` or `?` in a building name or note cut the message short or turned into a space; the whole text now arrives. The email body no longer shows WhatsApp's `*bold*` asterisks.
+- **WhatsApp receipt message**: Amounts use the same format as the printed receipt (e.g. `₺2.300,00` instead of `₺ 2300.00`), a late fee is shown as dues plus late fee under the total, and empty description, flat number or manager lines are left out.
+- **WhatsApp payment reminder**: Greets the owner by name when known, formats the dues, late fee and total like the receipt, and writes the rate per language (`%5,0`, `5.0%`).
+- **Receipt preview footer**: The buttons now sit in two rows (share actions, then Close / JPEG / PDF), so every label fits in all three languages, including when an invoice is attached.
+
 ## [3.5.0] - 2026-10-20
 
 ### Added
