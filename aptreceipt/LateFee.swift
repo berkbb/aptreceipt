@@ -180,6 +180,46 @@ enum Money {
     }
 }
 
+// MARK: - Late Payment Schedule
+
+/// When a period's dues become late: due on the due day of the period's month (its last day when the month
+/// is shorter), free of charge through the grace days, and after that every started month counts as one
+/// late month. Example: due 15 October, no grace, paid 3 November → 1; paid 16 November → 2.
+struct LatePaymentSchedule: Equatable {
+    /// Due date and the last day without a late fee, both at the start of the day.
+    let dueDate: Date
+    let graceEnd: Date
+    private let calendar: Calendar
+
+    init?(year: Int, month: Int, dueDay: Int, graceDays: Int, calendar: Calendar = .current) {
+        guard let monthStart = calendar.date(from: DateComponents(year: year, month: month, day: 1)),
+              let dayCount = calendar.range(of: .day, in: .month, for: monthStart)?.count,
+              let due = calendar.date(from: DateComponents(year: year, month: month, day: min(max(1, dueDay), dayCount))),
+              let grace = calendar.date(byAdding: .day, value: max(0, graceDays), to: due) else { return nil }
+        self.dueDate = calendar.startOfDay(for: due)
+        self.graceEnd = calendar.startOfDay(for: grace)
+        self.calendar = calendar
+    }
+
+    /// The schedule for the month of `period`.
+    init?(period: Date, dueDay: Int, graceDays: Int, calendar: Calendar = .current) {
+        let components = calendar.dateComponents([.year, .month], from: period)
+        guard let year = components.year, let month = components.month else { return nil }
+        self.init(year: year, month: month, dueDay: dueDay, graceDays: graceDays, calendar: calendar)
+    }
+
+    var hasGracePeriod: Bool { graceEnd > dueDate }
+
+    /// Started months after the grace end; 0 when paid on or before it.
+    func lateMonths(paidOn date: Date) -> Int {
+        let paid = calendar.startOfDay(for: date)
+        guard paid > graceEnd else { return 0 }
+        let elapsed = calendar.dateComponents([.month, .day], from: graceEnd, to: paid)
+        let fullMonths = max(0, elapsed.month ?? 0)
+        return (elapsed.day ?? 0) > 0 || fullMonths == 0 ? fullMonths + 1 : fullMonths
+    }
+}
+
 // MARK: - Late Payment Compensation Calculator
 
 enum LateFeeCalculator {

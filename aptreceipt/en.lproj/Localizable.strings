@@ -166,6 +166,10 @@
 "lastChecked" = "Last checked:";
 "lateFeeApplyCheckbox" = "Apply Late Payment Compensation";
 "lateFeeCalculated" = "Late Fee:";
+"lateFeeDueInfo" = "Due: %@";
+"lateFeeDueGraceInfo" = "Due: %1$@ · Grace ends: %2$@";
+"lateFeeStatusOnTime" = "No late fee if paid today";
+"lateFeeStatusLate" = "%@ late as of today";
 "lateFeeCountryProfileTitle" = "Jurisdiction & Country Profile:";
 "lateFeeCustomFootnoteTitle" = "Receipt Legal Footnote:";
 "lateFeeDisabledInSettingsNotice" = "Late payment compensation is disabled in Preferences.";

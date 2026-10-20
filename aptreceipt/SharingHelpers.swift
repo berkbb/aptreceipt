@@ -181,15 +181,16 @@ enum WhatsAppShareHelper {
         dues: Double?,
         currency: AppCurrency,
         lateFeeRate: Double?,
+        lateMonths: Int = 1,
         buildingName: String,
         manager: String,
         l10n: L10n
     ) -> String {
         let ownerName = owner.trimmingCharacters(in: .whitespacesAndNewlines)
         let duesText = dues.map { formatAmount($0, currency: currency, l10n: l10n) }
-        let fee = (dues != nil && lateFeeRate != nil) ? LateFeeCalculator.fee(base: dues!, monthlyRate: lateFeeRate!, months: 1) : nil
+        let fee = (dues != nil && lateFeeRate != nil && lateMonths > 0) ? LateFeeCalculator.fee(base: dues!, monthlyRate: lateFeeRate!, months: lateMonths) : nil
         let feeText = fee.map { formatAmount($0, currency: currency, l10n: l10n) }
-        let totalText = (dues != nil && fee != nil) ? formatAmount(dues! + fee!, currency: currency, l10n: l10n) : nil
+        let totalText = (dues != nil && fee != nil) ? formatAmount(LateFeeCalculator.grandTotal(base: dues!, lateFee: fee!), currency: currency, l10n: l10n) : nil
         let rateText = lateFeeRate.map { formatRate($0, l10n: l10n) }
 
         switch l10n.resolvedLanguage {

@@ -79,6 +79,16 @@ struct ApartmentFinancialReportSheet: View {
             .sorted { $0.amount > $1.amount }
     }
 
+    /// Late months of the shown period as of today, from the due day and grace period in Settings;
+    /// one month for a period text that is not a recognized month (as before).
+    private var reminderLateMonths: Int {
+        let key = selectedPeriod == "all" ? (availablePeriods.first ?? "") : selectedPeriod
+        let parts = key.split(separator: "-")
+        guard !key.hasPrefix("raw:"), parts.count == 2, let year = Int(parts[0]), let month = Int(parts[1]),
+              let schedule = LatePaymentSchedule(year: year, month: month, dueDay: settings.lateFeeDueDay, graceDays: settings.lateFeeGracePeriodDays) else { return 1 }
+        return schedule.lateMonths(paidOn: Date())
+    }
+
     private var flatDuesStatusList: [(flat: Int, owner: String, phone: String, isPaid: Bool, record: ReceiptRecord?)] {
         let periodToMatch = selectedPeriod == "all" ? (availablePeriods.first ?? "") : selectedPeriod
         return settings.apartmentNumbers.map { flat in
@@ -348,9 +358,9 @@ struct ApartmentFinancialReportSheet: View {
                             .background(Color.orange.opacity(0.12))
                             .clipShape(Capsule())
 
-                            if settings.isLateFeeEnabled {
+                            if settings.isLateFeeEnabled, reminderLateMonths > 0 {
                                 let defaultAmt = Double(settings.defaultPayment.replacingOccurrences(of: ",", with: ".")) ?? 1750.0
-                                let fee = LateFeeCalculator.fee(base: defaultAmt, monthlyRate: settings.lateFeeMonthlyRate, months: 1)
+                                let fee = LateFeeCalculator.fee(base: defaultAmt, monthlyRate: settings.lateFeeMonthlyRate, months: reminderLateMonths)
                                 Text("+\(AppFormat.currency(fee, settings.currency, l10n: l10n)) \(l10n.lateFeeShortBadge)")
                                     .font(.system(size: 10, weight: .bold, design: .monospaced))
                                     .foregroundColor(.orange)
@@ -454,6 +464,7 @@ struct ApartmentFinancialReportSheet: View {
             dues: dues,
             currency: settings.currency,
             lateFeeRate: settings.isLateFeeEnabled ? settings.lateFeeMonthlyRate : nil,
+            lateMonths: reminderLateMonths,
             buildingName: settings.apartmentName.isEmpty ? l10n.defaultBuildingName : settings.apartmentName,
             manager: settings.issuer.isEmpty ? l10n.managerSignatureTitle : settings.issuer,
             l10n: l10n

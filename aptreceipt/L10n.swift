@@ -330,6 +330,18 @@ struct L10n {
         String(format: tr("bulletinPdfFileName"), building, period)
     }
 
+    /// "Son ödeme: 15 Ekim 2026", with the grace end when there is a grace period.
+    func lateFeeDueInfo(due: String, graceEnd: String?) -> String {
+        guard let graceEnd else { return String(format: tr("lateFeeDueInfo"), due) }
+        return String(format: tr("lateFeeDueGraceInfo"), due, graceEnd)
+    }
+
+    var lateFeeStatusOnTime: String { tr("lateFeeStatusOnTime") }
+
+    func lateFeeStatusLate(months: Int) -> String {
+        String(format: tr("lateFeeStatusLate"), "\(months) \(months > 1 ? monthsUnit : monthUnit)")
+    }
+
     func lateFeeItemName(rate: Double, months: Int) -> String {
         let format = tr(months > 1 ? "lateFeeItemName.other" : "lateFeeItemName.one")
         return String(format: format, AppFormat.percent(rate, l10n: self, maximumFractionDigits: 2), months)

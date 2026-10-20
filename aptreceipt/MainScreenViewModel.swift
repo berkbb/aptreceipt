@@ -72,17 +72,17 @@ final class MainScreenViewModel: ObservableObject {
         return base
     }
 
-    func autoDetectOverdueMonths(settings: ReceiptSettingsStore) {
-        let calendar = Calendar.current
-        let now = Date()
-        let comp = calendar.dateComponents([.month], from: receiptDate, to: now)
-        let months = comp.month ?? 0
-        if months > 0 {
-            self.lateMonths = max(1, months)
-        } else {
-            self.lateMonths = 1
-        }
-        self.isLateFeeApplied = true
+    /// Due date and grace end for the selected period, from the due day and grace period in Settings.
+    func latePaymentSchedule(settings: ReceiptSettingsStore) -> LatePaymentSchedule? {
+        LatePaymentSchedule(period: receiptDate, dueDay: settings.lateFeeDueDay, graceDays: settings.lateFeeGracePeriodDays)
+    }
+
+    /// Late months for the selected period as of `today`; turns the late fee off when the dues are not late
+    /// yet. The months stay editable by hand.
+    func autoDetectOverdueMonths(settings: ReceiptSettingsStore, today: Date = Date()) {
+        let months = latePaymentSchedule(settings: settings)?.lateMonths(paidOn: today) ?? 0
+        lateMonths = max(1, months)
+        isLateFeeApplied = months > 0
     }
 
     func importInvoice(from url: URL, settings: ReceiptSettingsStore) {

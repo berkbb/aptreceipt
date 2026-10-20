@@ -166,6 +166,10 @@
 "lastChecked" = "Son denetleme:";
 "lateFeeApplyCheckbox" = "Gecikme Tazminatı Ekle";
 "lateFeeCalculated" = "Gecikme Tazminatı:";
+"lateFeeDueInfo" = "Son ödeme: %@";
+"lateFeeDueGraceInfo" = "Son ödeme: %1$@ · Tolerans sonu: %2$@";
+"lateFeeStatusOnTime" = "Bugün ödenirse gecikme yok";
+"lateFeeStatusLate" = "Bugün itibarıyla %@ gecikme";
 "lateFeeCountryProfileTitle" = "Yargı Alanı ve Ülke Profili:";
 "lateFeeCustomFootnoteTitle" = "Makbuz Hukuki Dipnot Metni:";
 "lateFeeDisabledInSettingsNotice" = "Gecikme tazminatı hesaplaması Tercihler'den kapatılmıştır.";

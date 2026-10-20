@@ -24,6 +24,15 @@ enum AppFormat {
         let number = formatter.string(from: NSNumber(value: value)) ?? String(format: "%.1f", value)
         return l10n.resolvedLanguage == .turkish ? "%\(number)" : "\(number)%"
     }
+
+    /// e.g. "15 Ekim 2026" (tr), "October 15, 2026" (en), "15 octombrie 2026" (ro).
+    static func longDate(_ date: Date, l10n: L10n) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = l10n.locale
+        formatter.dateStyle = .long
+        formatter.timeStyle = .none
+        return formatter.string(from: date)
+    }
 }
 
 // MARK: - Receipt Period

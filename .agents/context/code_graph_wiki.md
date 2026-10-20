@@ -13,7 +13,7 @@
 | `ReceiptModels.swift` | `VendorRecord`, `ExpenseServicePreset`, `ValidationError`, `ReceiptKind`, `ReceiptDraft`, `SystemBackupPackage` | Core Codable models and the backup format |
 | `ReceiptArchiveStore.swift` | `ReceiptRecord`, `ReceiptArchiveStore.shared`, `init(fileURL:)`, `defaultFileURL` | Archive record and JSON persistence (`receipts_archive.json`); `fileURL: nil` keeps it in memory |
 | `ReceiptSettingsStore.swift` | `ReceiptSettingsStore.shared`, `Defaults`, `Keys`, `InMemoryDefaults` | UserDefaults-backed settings, owners, phones, logo, signature, backup export/import, preference reset; in-memory defaults for tests and screenshot runs |
-| `LateFee.swift` | `LateFeeCountryProfile`, `Money`, `LateFeeCalculator` | Profile defaults, footnotes, legal notices; `Decimal` money arithmetic (half-up to cents) and fee math |
+| `LateFee.swift` | `LateFeeCountryProfile`, `Money`, `LatePaymentSchedule`, `LateFeeCalculator` | Profile defaults, footnotes, legal notices; `Decimal` money arithmetic (half-up to cents); due date, grace end and started late months; fee math |
 | `SampleData.swift` | `SampleData.defaults(for:)` | Per-language sample building, residents, vendors, services |
 | `Extensions.swift` | `AppFormat`, `ReceiptPeriod`, `Date.monthYearString`, `Date.dayMonthYearString`, `Notification.Name.appLanguageDidChange` / `.settingsDidSave` | Formatting, period parsing, notifications |
 | `SharingHelpers.swift` | `QRCodeGenerator`, `WhatsAppShareHelper` | QR bitmap (whole pixels per module, 4-module quiet zone, level L, size from `pointsPerModule`); WhatsApp/email URLs and messages |

@@ -166,6 +166,10 @@
 "lastChecked" = "Ultima verificare:";
 "lateFeeApplyCheckbox" = "Aplică Penalități de Întârziere";
 "lateFeeCalculated" = "Penalitate:";
+"lateFeeDueInfo" = "Scadență: %@";
+"lateFeeDueGraceInfo" = "Scadență: %1$@ · Grație până la %2$@";
+"lateFeeStatusOnTime" = "Fără penalitate dacă se plătește azi";
+"lateFeeStatusLate" = "%@ de întârziere până azi";
 "lateFeeCountryProfileTitle" = "Jurisdicție & Profil Țară:";
 "lateFeeCustomFootnoteTitle" = "Notă Legală pe Chitanță:";
 "lateFeeDisabledInSettingsNotice" = "Calculul penalităților este dezactivat din Preferințe.";

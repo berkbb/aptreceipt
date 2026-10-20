@@ -953,6 +953,22 @@ struct MainScreen: View {
                 }
             }
 
+            if let schedule = viewModel.latePaymentSchedule(settings: settings) {
+                let overdueMonths = schedule.lateMonths(paidOn: Date())
+                HStack(spacing: 5) {
+                    Image(systemName: "calendar.badge.clock")
+                    Text(l10n.lateFeeDueInfo(
+                        due: AppFormat.longDate(schedule.dueDate, l10n: l10n),
+                        graceEnd: schedule.hasGracePeriod ? AppFormat.longDate(schedule.graceEnd, l10n: l10n) : nil
+                    ))
+                    Text("·")
+                    Text(overdueMonths > 0 ? l10n.lateFeeStatusLate(months: overdueMonths) : l10n.lateFeeStatusOnTime)
+                        .foregroundColor(overdueMonths > 0 ? .orange : .green)
+                }
+                .font(.system(size: 10))
+                .foregroundColor(.secondary)
+            }
+
             if viewModel.isLateFeeApplied {
                 VStack(spacing: 8) {
                     HStack(spacing: 12) {
@@ -963,7 +979,7 @@ struct MainScreen: View {
                                 .foregroundColor(.secondary)
 
                             Picker("", selection: $viewModel.lateMonths) {
-                                ForEach(1...24, id: \.self) { m in
+                                ForEach(1...max(24, viewModel.lateMonths), id: \.self) { m in
                                     Text("\(m) \(m > 1 ? l10n.monthsUnit : l10n.monthUnit)").tag(m)
                                 }
                             }
