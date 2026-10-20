@@ -9,7 +9,7 @@ Each entry: what happened, why, and the lesson to apply next time.
 
 - **What:** `--generate-screenshots` was run from a signed (sandboxed) build at 09:47. The generator calls `records.removeAll()` and adds two sample receipts, then saves; it does not restore the previous archive. It also removes the app's whole defaults domain and writes back only some keys (building fields, language, theme, currency, logo, owners 1–50): vendors, services, phones, the signature, late-fee settings, per-profile rates and the launch-check flag are lost. A local Time Machine snapshot from 09:02 holds the previous archive and preferences; restoring them is up to the user (the container is protected by macOS).
 - **Why:** The generator backs up only part of `UserDefaults`, not the archive file, and it was run against the real data location.
-- **Lesson:** Never run the generator against real data. Run it only from an unsigned scratch build in a scratch working directory. Fixing the generator to back up and restore the archive is on `roadmap.md`.
+- **Lesson:** Isolate sample data instead of backing up and restoring real data: a partial backup silently loses everything it forgot. Fixed the same day: a screenshot run keeps the shared settings (`InMemoryDefaults`) and the archive (`ReceiptArchiveStore(fileURL: nil)`) in memory through `ScreenshotMode`, and the generator refuses to run if the archive is on disk. Guarded by the "Screenshot Run Isolation" tests; still render README screenshots from an unsigned scratch build in a scratch working directory.
 
 ## R-002 — Two sizing mechanisms made the settings window drift (2026-10-20)
 

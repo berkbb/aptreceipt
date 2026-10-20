@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 - **Every language has its own string file**: the single String Catalog (`Localizable.xcstrings`) was split into `en.lproj`, `tr.lproj` and `ro.lproj` `Localizable.strings` files with identical keys (404 each, values unchanged). A test keeps one file per language and rejects a shared catalog.
 
 ### Fixed
+- **Screenshot generator no longer touches your data**: `--generate-screenshots` replaced the receipt archive with two samples and wiped most settings (vendors, services, phones, signature, late-fee settings). It now keeps its settings and archive in memory, so the real ones are neither read into the images nor changed; tests cover it.
 - **WhatsApp phone numbers**: Numbers saved in local form (`0532 …`, `0722 …`) opened a wrong or missing chat because wa.me needs the international form. Turkish and Romanian buildings now complete them with `90` / `40`; numbers that already start with `+` or `00` are kept.
 - **WhatsApp and email text**: A `&`, `+`, `=` or `?` in a building name or note cut the message short or turned into a space; the whole text now arrives. The email body no longer shows WhatsApp's `*bold*` asterisks.
 - **WhatsApp receipt message**: Amounts use the same format as the printed receipt (e.g. `₺2.300,00` instead of `₺ 2300.00`), a late fee is shown as dues plus late fee under the total, and empty description, flat number or manager lines are left out.

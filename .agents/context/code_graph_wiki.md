@@ -8,11 +8,11 @@
 
 | File | Main symbols | Responsibility |
 | --- | --- | --- |
-| `AppDelegate.swift` | `AptReceiptApp` (`@main`), `AppDelegate`, `AboutWindowView`, `AboutContentView`, `AppInfo`, `AboutWindowManager`, `SettingsWindowManager`, `SettingsTabViewController`, `MenuBarManager` | App scene and commands, launch, screenshot generator, About and Settings windows, localized menu bar |
+| `AppDelegate.swift` | `AptReceiptApp` (`@main`), `ScreenshotMode`, `AppDelegate`, `AboutWindowView`, `AboutContentView`, `AppInfo`, `AboutWindowManager`, `SettingsWindowManager`, `SettingsTabViewController`, `MenuBarManager` | App scene and commands, launch, screenshot generator, About and Settings windows, localized menu bar |
 | `AppSettingsEnums.swift` | `AppLanguage`, `AppTheme`, `AppCurrency` (`default(for:)`) | Language, theme and currency options |
 | `ReceiptModels.swift` | `VendorRecord`, `ExpenseServicePreset`, `ValidationError`, `ReceiptKind`, `ReceiptDraft`, `SystemBackupPackage` | Core Codable models and the backup format |
-| `ReceiptArchiveStore.swift` | `ReceiptRecord`, `ReceiptArchiveStore.shared` | Archive record and JSON persistence (`receipts_archive.json`) |
-| `ReceiptSettingsStore.swift` | `ReceiptSettingsStore.shared`, `Defaults`, `Keys` | UserDefaults-backed settings, owners, phones, logo, signature, backup export/import, preference reset |
+| `ReceiptArchiveStore.swift` | `ReceiptRecord`, `ReceiptArchiveStore.shared`, `init(fileURL:)`, `defaultFileURL` | Archive record and JSON persistence (`receipts_archive.json`); `fileURL: nil` keeps it in memory |
+| `ReceiptSettingsStore.swift` | `ReceiptSettingsStore.shared`, `Defaults`, `Keys`, `InMemoryDefaults` | UserDefaults-backed settings, owners, phones, logo, signature, backup export/import, preference reset; in-memory defaults for tests and screenshot runs |
 | `LateFee.swift` | `LateFeeCountryProfile`, `LateFeeCalculator` | Profile defaults, footnotes, legal notices; fee math |
 | `SampleData.swift` | `SampleData.defaults(for:)` | Per-language sample building, residents, vendors, services |
 | `Extensions.swift` | `AppFormat`, `ReceiptPeriod`, `Date.monthYearString`, `Date.dayMonthYearString`, `Notification.Name.appLanguageDidChange` / `.settingsDidSave` | Formatting, period parsing, notifications |
@@ -29,13 +29,13 @@
 | `PreferencesViewController.swift` | `SettingsTab`, `SettingsView`, `SettingsViewModel` | Settings pages and the draft model |
 | `GitHubUpdateChecker.swift` | `GitHubRelease`, `GitHubReleaseAsset`, `SemverCompare`, `UpdateCheckStatus`, `UpdateCheckFailure`, `GitHubUpdateChecker.shared`, `UpdateChecksums`, `UpdateSignature`, `UpdateDownloadError`, `UpdateFileDownloader`, `UpdateDownloadWindowManager`, `UpdateDownloadProgressView` | Release check, download, verification |
 | `LicenseViewerSheet.swift` | `LicenseViewerSheet.licenseText` | Verbatim copy of `LICENSE` (GPL v3) |
-| `aptreceiptTests.swift` | `aptreceiptTests`, `InMemoryDefaults` | Unit and parity tests; in-memory UserDefaults double |
+| `aptreceiptTests.swift` | `aptreceiptTests` | Unit, parity and screenshot-isolation tests |
 
 ## Key call paths
 
 **Launch**
 1. `AptReceiptApp` -> `WindowGroup` -> `MainScreen(settings: ReceiptSettingsStore.shared)`; `.commands` add About, Check for Updates, Settings (Cmd+,) and Help.
-2. `AppDelegate.applicationDidFinishLaunching`: when the arguments contain `--generate-screenshots`, it calls `generateScreenshots()` and terminates. Otherwise it runs `applyTheme`, `MenuBarManager.install`, and `GitHubUpdateChecker.checkForUpdates(userInitiated: false, alertWhenAvailable: true)` if `checkUpdatesAtLaunch` is on.
+2. `AppDelegate.applicationDidFinishLaunching`: when `ScreenshotMode.isActive` (`--generate-screenshots`), it calls `generateScreenshots()` and terminates; in that process `ReceiptSettingsStore.shared` and `ReceiptArchiveStore.shared` are in memory. Otherwise it runs `applyTheme`, `MenuBarManager.install`, and `GitHubUpdateChecker.checkForUpdates(userInitiated: false, alertWhenAvailable: true)` if `checkUpdatesAtLaunch` is on.
 
 **Receipt creation and export**
 1. `MainScreen.init` -> `MainScreenViewModel.syncWithSettings`. Form edits drive `LiveReceiptPreview` (`grandTotalAmount`, `calculatedLateFee`, `effectiveLateRate`).
@@ -69,7 +69,7 @@
 | Text built in code per language (`switch l10n.resolvedLanguage`) | One branch per language: `receiptSummary`, `paymentReminder`, profile footnotes and legal notices, `SampleData`, serial prefixes, `buildExportFileName`, `NumberToWords` -> `testGeneratedTextsExistInAllThreeLanguages`, `testEnumTitlesExistInAllThreeLanguages` |
 | `ReceiptDraft` / `ReceiptRecord` fields | `CodingKeys` and `decodeIfPresent` defaults in both types, `ReceiptRecord.init(draft:)` and `toDraft()`, existing `receipts_archive.json` files, `SystemBackupPackage.archivedReceipts` -> `testReceiptDraftBackwardCompatibilityWithLegacyJSON`, `testReceiptDraftCodableRoundTrip` |
 | `SystemBackupPackage` | Add new fields as optionals with defaults; update `exportSystemBackup` and `importSystemBackup` -> `testSystemBackupPackageCodable`, `testSystemBackupPackageWithCountryProfile` |
-| A `ReceiptSettingsStore` field or key | `Keys`, the read in `init`, `Defaults` and `resetPreferencesToDefaults()` (preferences only), `SettingsViewModel.load` / `save`, the backup package, `backupKeys` in the screenshot generator -> `testPreferenceResetRestoresPreferencesAndKeepsAllData` |
+| A `ReceiptSettingsStore` field or key | `Keys`, the read in `init`, `Defaults` and `resetPreferencesToDefaults()` (preferences only), `SettingsViewModel.load` / `save`, the backup package -> `testPreferenceResetRestoresPreferencesAndKeepsAllData` |
 | `LateFeeCountryProfile` | Rate, due day, grace period, presets, footnote and legal notice in all three languages; `SettingsViewModel.selectCountryProfile`; `setLateFeeCountryProfile`; redline in `user_rejected_spec.md` -> `testLateFeeCountryProfiles` |
 | `LateFeeCalculator` | `MainScreenViewModel.calculatedLateFee` / `grandTotalAmount`, `paymentReminder`, the live preview and the document totals -> `testLateFeeCalculatorFee`, `testMainScreenViewModelLateFeeTotals` |
 | Period format (`monthYearString`, "MMMM yyyy") | The `ReceiptPeriod` parsers, the report's period picker, dues status and bulletin title -> the `testReceiptPeriod*` tests |
@@ -79,6 +79,6 @@
 | Version bump | `MARKETING_VERSION` (now 3.5.0) and `CURRENT_PROJECT_VERSION` (now 11) in the app target's Debug and Release configurations in `aptreceipt.xcodeproj/project.pbxproj` -> a `## [x.y.z]` section in `CHANGELOG.md` (`release.sh` takes the release notes from it and stops when it is missing) -> `AppInfo.version` is shown on receipts and in About, and is compared with tag `v<version>` |
 | Update signing key | `AptReceiptUpdatePublicEDKey` in `Info.plist`, `release.sh`, `scripts/update_signing.swift` -> `testBundledUpdatePublicKeyIsValid`, `testUpdateSignatureVerification` |
 | `LICENSE` | `LicenseViewerSheet.licenseText` -> `testLicenseViewerMatchesRepositoryLicense` |
-| Screenshot generator (`--generate-screenshots`) | **Known data-loss risk; never run it against real data.** It calls `ReceiptArchiveStore.shared.records.removeAll()` and then `add`, which overwrites the real `receipts_archive.json`. It also removes the app's whole UserDefaults domain and restores only `backupKeys` plus owners 1-50, so vendors, services, phones, signature, late-fee settings and the launch-check flag are lost. It writes PNGs to `docs/screenshots` under the current directory. |
+| Screenshot generator (`--generate-screenshots`) | Keep every store it uses in memory: `ScreenshotMode.settingsDefaults` / `archiveFileURL`, `ReceiptSettingsStore(defaults: InMemoryDefaults())`, and the guard that stops the run when `ReceiptArchiveStore.shared.fileURL` is set -> "Screenshot Run Isolation" tests. It seeds the two sample receipts first and writes PNGs to `docs/screenshots` under the current directory. |
 | `ReceiptArchiveStore` | Its file URL is fixed and cannot be injected; tests must not call `add`, `replaceRecords`, `clearAll` or `importSystemBackup` |
 | `.settingsDidSave` / `.appLanguageDidChange` | `MainScreen.updateLiveFromSettings`, `MenuBarManager`, `SettingsTabViewController` titles |

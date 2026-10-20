@@ -23,4 +23,4 @@
 
 ## 4. Verification
 
-Check UI changes in the real running window; offscreen renders do not draw glass buttons or window chrome faithfully. Screenshots for the README come from an unsigned scratch build only (never from real data).
+Check UI changes in the real running window; offscreen renders do not draw glass buttons or window chrome faithfully. Screenshots for the README come from `--generate-screenshots` in an unsigned scratch build; it renders sample data from in-memory stores only.

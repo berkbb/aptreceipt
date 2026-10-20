@@ -25,5 +25,5 @@ After every code, resource or project change, before reporting a task as done or
 - Three consecutive failures on the same problem: stop and ask the user.
 - Tests use the in-memory `InMemoryDefaults` and never the real `UserDefaults`; they must not leave files in `~/Library/Preferences`.
 - Temporary screenshot or diagnostic tests are appended only for the run and removed right after; confirm the receipt archive checksum is unchanged.
-- **Never** run the app with `--generate-screenshots` against real data (it replaces the receipt archive). Use an unsigned build in a scratch directory.
+- `--generate-screenshots` keeps its settings and archive in memory (`ScreenshotMode`); still run it from an unsigned build in a scratch directory and confirm the real defaults and archive checksum are unchanged afterwards.
 - When adding a guard test, prove it: add a deliberate violation, see the test fail, then remove the violation.

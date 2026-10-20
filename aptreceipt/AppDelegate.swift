@@ -42,9 +42,27 @@ struct AptReceiptApp: App {
     }
 }
 
+/// `--generate-screenshots` renders the README screenshots from sample data. For that run the shared
+/// settings and receipt archive live in memory only, so the user's real settings and receipts are never
+/// read into the images or overwritten.
+enum ScreenshotMode {
+    static let argument = "--generate-screenshots"
+    static let isActive = CommandLine.arguments.contains(argument)
+
+    /// Backing store for the shared settings: the user's defaults, or memory only during a screenshot run.
+    static func settingsDefaults(screenshotRun: Bool = isActive) -> UserDefaults {
+        screenshotRun ? InMemoryDefaults() : .standard
+    }
+
+    /// File for the shared archive: the user's archive, or `nil` (memory only) during a screenshot run.
+    static func archiveFileURL(screenshotRun: Bool = isActive) -> URL? {
+        screenshotRun ? nil : ReceiptArchiveStore.defaultFileURL
+    }
+}
+
 final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
-        if CommandLine.arguments.contains("--generate-screenshots") {
+        if ScreenshotMode.isActive {
             generateScreenshots()
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 NSApp.terminate(nil)
@@ -116,40 +134,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let outDir = URL(fileURLWithPath: currentDir).appendingPathComponent("docs/screenshots")
         try? FileManager.default.createDirectory(at: outDir, withIntermediateDirectories: true)
 
-        // Backup existing live user defaults so screenshot generation never mutates real user data
-        let defaults = UserDefaults.standard
-        let backupKeys = [
-            ReceiptSettingsStore.Keys.apartmentName,
-            ReceiptSettingsStore.Keys.issuer,
-            ReceiptSettingsStore.Keys.defaultPayment,
-            ReceiptSettingsStore.Keys.flatCount,
-            ReceiptSettingsStore.Keys.seqNumber,
-            ReceiptSettingsStore.Keys.language,
-            ReceiptSettingsStore.Keys.theme,
-            ReceiptSettingsStore.Keys.currency,
-            ReceiptSettingsStore.Keys.logo
-        ]
-        var backupDict: [String: Any] = [:]
-        for key in backupKeys {
-            if let val = defaults.object(forKey: key) {
-                backupDict[key] = val
-            }
-        }
-        for i in 1...50 {
-            let key = ReceiptSettingsStore.Keys.owner(i)
-            if let val = defaults.object(forKey: key) {
-                backupDict[key] = val
-            }
-        }
-        defer {
-            let bundleID = Bundle.main.bundleIdentifier ?? "com.babadogantech.aptreceipt"
-            defaults.removePersistentDomain(forName: bundleID)
-            for (key, val) in backupDict {
-                defaults.set(val, forKey: key)
-            }
+        // Sample data only: every store used here is in memory, so the user's settings and receipts stay untouched.
+        guard ReceiptArchiveStore.shared.fileURL == nil else {
+            print("Screenshots not generated: the receipt archive is not in memory.")
+            return
         }
 
-        let settings = ReceiptSettingsStore()
+        let settings = ReceiptSettingsStore(defaults: InMemoryDefaults())
         settings.loadSampleDefaults(for: .english)
         settings.language = .english
         settings.currency = .usDollar
@@ -159,12 +150,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         settings.lateFeeMonthlyRate = 5.0
         settings.lateFeeDueDay = 15
 
-        // 1. Main Dashboard (Dark English)
-        let mainView = MainScreen(settings: settings)
-            .frame(width: 1080, height: 740)
-        render(view: mainView, size: CGSize(width: 1080, height: 740), to: outDir.appendingPathComponent("01_main_dashboard.png"), isDark: true)
-
-        // 2. Receipt Certificate View (English)
         let sampleDraft = ReceiptDraft(
             receiver: "Jane Smith",
             issuer: "John Doe",
@@ -183,6 +168,33 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             lateFeeAmount: 175.0,
             baseAmount: 1575.0
         )
+
+        let sampleOutcomeDraft = ReceiptDraft(
+            receiver: "Apex Elevator Services Inc.",
+            issuer: "John Doe",
+            notes: "October 2026 periodic elevator maintenance and safety inspection",
+            monthYear: "October 2026",
+            apartmentNumber: 0,
+            amount: 3450.0,
+            sequenceNumber: 105,
+            createdDate: "19 October 2026",
+            showApartmentNumber: false,
+            kind: .managementExpense,
+            currency: .usDollar
+        )
+
+        // The sample receipts are in the archive for every screenshot (badge, archive sheet, report, bulletin).
+        let sampleArchiveStore = ReceiptArchiveStore.shared
+        sampleArchiveStore.replaceRecords([])
+        sampleArchiveStore.add(draft: sampleDraft)
+        sampleArchiveStore.add(draft: sampleOutcomeDraft)
+
+        // 1. Main Dashboard (Dark English)
+        let mainView = MainScreen(settings: settings)
+            .frame(width: 1080, height: 740)
+        render(view: mainView, size: CGSize(width: 1080, height: 740), to: outDir.appendingPathComponent("01_main_dashboard.png"), isDark: true)
+
+        // 2. Receipt Certificate View (English)
         let docView = ReceiptDocumentView(
             draft: sampleDraft,
             apartmentName: "Sunshine Residence",
@@ -198,19 +210,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         render(view: settingsView, size: CGSize(width: SettingsTab.general.preferredWidth, height: SettingsTab.preferredHeight), to: outDir.appendingPathComponent("03_settings_view.png"), isDark: true)
 
         // 4. Management Expense Receipt Document (English)
-        let sampleOutcomeDraft = ReceiptDraft(
-            receiver: "Apex Elevator Services Inc.",
-            issuer: "John Doe",
-            notes: "October 2026 periodic elevator maintenance and safety inspection",
-            monthYear: "October 2026",
-            apartmentNumber: 0,
-            amount: 3450.0,
-            sequenceNumber: 105,
-            createdDate: "19 October 2026",
-            showApartmentNumber: false,
-            kind: .managementExpense,
-            currency: .usDollar
-        )
         let docOutcomeView = ReceiptDocumentView(
             draft: sampleOutcomeDraft,
             apartmentName: "Sunshine Residence",
@@ -226,11 +225,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         render(view: mainViewEN, size: CGSize(width: 1080, height: 740), to: outDir.appendingPathComponent("05_main_dashboard_en.png"), isDark: true)
 
         // 6. Romanian Main Dashboard (Dark Romanian)
-        let settingsRO = ReceiptSettingsStore()
+        let settingsRO = ReceiptSettingsStore(defaults: InMemoryDefaults())
         settingsRO.loadSampleDefaults(for: .romanian)
         settingsRO.language = .romanian
         settingsRO.currency = .romanianLeu
         settingsRO.theme = .dark
+        settingsRO.seqNumber = settings.seqNumber
+        settingsRO.isLateFeeEnabled = settings.isLateFeeEnabled
+        settingsRO.lateFeeMonthlyRate = settings.lateFeeMonthlyRate
+        settingsRO.lateFeeDueDay = settings.lateFeeDueDay
 
         let mainViewRO = MainScreen(settings: settingsRO)
             .frame(width: 1080, height: 740)
@@ -263,11 +266,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         render(view: appearanceSettingsView, size: CGSize(width: SettingsTab.appearance.preferredWidth, height: SettingsTab.preferredHeight), to: outDir.appendingPathComponent("10_settings_appearance.png"), isDark: true)
 
         // 11. Receipt Archive Sheet (Dark English)
-        let sampleArchiveStore = ReceiptArchiveStore.shared
-        sampleArchiveStore.records.removeAll()
-        sampleArchiveStore.add(draft: sampleDraft)
-        sampleArchiveStore.add(draft: sampleOutcomeDraft)
-
         let archiveView = ReceiptArchiveSheet(settings: settings, onSelectDraft: { _ in })
             .frame(width: 860, height: 640)
         render(view: archiveView, size: CGSize(width: 860, height: 640), to: outDir.appendingPathComponent("11_receipt_archive.png"), isDark: true)

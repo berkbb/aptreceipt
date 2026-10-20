@@ -5,7 +5,8 @@ import SwiftUI
 
 @MainActor
 final class ReceiptSettingsStore: ObservableObject {
-    static let shared = ReceiptSettingsStore()
+    /// The app's settings. During a screenshot run they live in memory only (`ScreenshotMode`).
+    static let shared = ReceiptSettingsStore(defaults: ScreenshotMode.settingsDefaults())
 
     @Published var apartmentName: String {
         didSet { defaults.set(apartmentName, forKey: Keys.apartmentName) }
@@ -107,7 +108,7 @@ final class ReceiptSettingsStore: ObservableObject {
         l10n.locale
     }
 
-    /// Backing store. The app uses `.standard`; tests pass an isolated suite so they never touch real user data.
+    /// Backing store. The app uses `.standard`; tests and screenshot runs pass `InMemoryDefaults` so they never touch real user data.
     private let defaults: UserDefaults
 
     init(defaults: UserDefaults = .standard) {
@@ -484,4 +485,47 @@ final class ReceiptSettingsStore: ObservableObject {
             "homeowner_phone_\(number)"
         }
     }
+}
+
+// MARK: - In-memory defaults
+
+/// `UserDefaults` that keeps every value in memory and never reads or writes a preferences file.
+/// Used by tests and screenshot runs so sample data never reaches the user's settings. A named suite
+/// would not do: cfprefsd writes its plist back to ~/Library/Preferences even after the domain is removed.
+final class InMemoryDefaults: UserDefaults {
+    private var values: [String: Any] = [:]
+
+    convenience init() {
+        self.init(suiteName: nil)!
+    }
+
+    override init?(suiteName suitename: String?) {
+        super.init(suiteName: suitename)
+    }
+
+    override func object(forKey defaultName: String) -> Any? { values[defaultName] }
+    override func set(_ value: Any?, forKey defaultName: String) { values[defaultName] = value }
+    override func set(_ value: Bool, forKey defaultName: String) { values[defaultName] = value }
+    override func set(_ value: Int, forKey defaultName: String) { values[defaultName] = value }
+    override func set(_ value: Double, forKey defaultName: String) { values[defaultName] = value }
+    override func set(_ value: Float, forKey defaultName: String) { values[defaultName] = value }
+    override func set(_ url: URL?, forKey defaultName: String) { values[defaultName] = url }
+    override func removeObject(forKey defaultName: String) { values[defaultName] = nil }
+    override func string(forKey defaultName: String) -> String? { values[defaultName] as? String }
+    override func data(forKey defaultName: String) -> Data? { values[defaultName] as? Data }
+    override func array(forKey defaultName: String) -> [Any]? { values[defaultName] as? [Any] }
+    override func stringArray(forKey defaultName: String) -> [String]? { values[defaultName] as? [String] }
+    override func dictionary(forKey defaultName: String) -> [String: Any]? { values[defaultName] as? [String: Any] }
+    override func url(forKey defaultName: String) -> URL? { values[defaultName] as? URL }
+    override func dictionaryRepresentation() -> [String: Any] { values }
+    override func bool(forKey defaultName: String) -> Bool { (values[defaultName] as? NSNumber)?.boolValue ?? false }
+    override func integer(forKey defaultName: String) -> Int {
+        if let string = values[defaultName] as? String { return Int(string) ?? 0 }
+        return (values[defaultName] as? NSNumber)?.intValue ?? 0
+    }
+    override func double(forKey defaultName: String) -> Double {
+        if let string = values[defaultName] as? String { return Double(string) ?? 0 }
+        return (values[defaultName] as? NSNumber)?.doubleValue ?? 0
+    }
+    override func float(forKey defaultName: String) -> Float { Float(double(forKey: defaultName)) }
 }

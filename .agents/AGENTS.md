@@ -27,7 +27,7 @@ All AI agents contributing to this codebase must adhere strictly to:
    - All management data (residents, vendors, receipts, financial summaries) are stored locally on the user's machine (Application Support / UserDefaults).
    - Zero telemetry, zero unconsented network transmission.
    - Robust JSON export and import for user-controlled backups.
-   - Never run code that writes test or sample data against the real data store. The screenshot generator (`--generate-screenshots`) overwrites the receipt archive; never run it with the real app data (see `reflexion_memory_log.md`, R-001).
+   - Never run code that writes test or sample data against the real data store. Sample data goes into in-memory stores (`InMemoryDefaults`, `ReceiptArchiveStore(fileURL: nil)`), never into a backup-and-restore of real data. The screenshot generator (`--generate-screenshots`) works this way through `ScreenshotMode`; keep it so (see `reflexion_memory_log.md`, R-001).
 5. **One-to-One Localization with a Dedicated File per Language (mandatory)**: Every user-facing text must exist in every supported language with the same meaning, whatever the language: screens, alerts, menus, generated documents, WhatsApp/email messages, generated data, file names, and number/currency/percent formats. Each language has its own file (`aptreceipt/<lang>.lproj/Localizable.strings`) with an identical key set; languages are never mixed in a shared file. This applies to `en`, `tr`, `ro` and to any language added later; a partial translation or an English fallback is a bug. Follow `.agents/rules/localization_parity.md`; its parity tests must pass before every commit.
 6. **Git Commit Standards**:
    - Format: `modify type @ scope: 'sentence description' - [tag]`

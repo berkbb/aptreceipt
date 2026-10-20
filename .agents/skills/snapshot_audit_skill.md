@@ -20,4 +20,4 @@ Before changing a stored key, a `Codable` model (`ReceiptRecord`, `ReceiptDraft`
 3. **Backups** from older versions still import; exports stay importable by the previous version where possible.
 4. **Reset** touches preferences only (language, theme, currency, late-fee configuration, launch check); never building data, residents, vendors, receipts, logo, signature or the receipt number.
 5. **No silent overwrite** of the archive or settings without explicit user action (`user_rejected_spec.md`). Any tool that writes sample data must back up and restore real data or use a separate store.
-6. **Tests** use `InMemoryDefaults` and in-memory archive records; verify the real archive file's checksum is unchanged after scratch runs.
+6. **Tests** use `InMemoryDefaults` and `ReceiptArchiveStore(fileURL: nil)` (or a temporary file URL); verify the real archive file's checksum is unchanged after scratch runs.

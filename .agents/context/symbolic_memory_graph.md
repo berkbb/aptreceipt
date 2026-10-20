@@ -58,7 +58,7 @@ stateDiagram-v2
 | node_id | Meaning | Owning symbol |
 | --- | --- | --- |
 | `launch` | App start | `AptReceiptApp`, `AppDelegate.applicationDidFinishLaunching` |
-| `screenshotRun` | Screenshot mode (overwrites the archive) | `AppDelegate.generateScreenshots` |
+| `screenshotRun` | Screenshot mode; shared settings and archive in memory only | `ScreenshotMode`, `AppDelegate.generateScreenshots` |
 | `mainEditing` | Editing the receipt form | `MainScreen`, `MainScreenViewModel` |
 | `validationAlert` | Invalid form | `MainScreenViewModel.validationError` |
 | `archived` | Draft built and stored | `MainScreenViewModel.createReceipt`, `ReceiptArchiveStore.add` |

@@ -6,8 +6,6 @@ Pending work only. Remove an item as soon as it ships; shipped history lives in 
 
 ## Safety & data integrity
 
-- [ ] **Screenshot generator must not touch real data.** `--generate-screenshots` replaces the receipt archive and wipes the defaults domain, restoring only some keys (`reflexion_memory_log.md`, R-001). Run it against an injected in-memory `ReceiptSettingsStore` and a temporary archive instead of the real ones.
-- [ ] **Injectable archive location.** `ReceiptArchiveStore` writes to a fixed Application Support path, so any test that adds or imports receipts would touch the real archive. Inject the file URL (or an in-memory store) like `ReceiptSettingsStore(defaults:)`.
 - [ ] **Decimal money arithmetic.** `LateFeeCalculator.roundedToCents` rounds a `Double`; values exactly on half a cent can round the wrong way because of binary representation. Move money math to `Decimal` with explicit round-half-up.
 
 ## Product

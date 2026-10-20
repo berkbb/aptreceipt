@@ -116,19 +116,25 @@ struct ReceiptRecord: Identifiable, Codable, Hashable {
 
 @MainActor
 final class ReceiptArchiveStore: ObservableObject {
-    static let shared = ReceiptArchiveStore()
+    /// The app's archive. During a screenshot run it lives in memory only (`ScreenshotMode`).
+    static let shared = ReceiptArchiveStore(fileURL: ScreenshotMode.archiveFileURL())
 
     @Published var records: [ReceiptRecord] = []
 
-    private var archiveURL: URL {
+    /// File the archive is saved to; `nil` keeps it in memory only, so nothing is read from or written to disk.
+    let fileURL: URL?
+
+    /// The user's archive file in Application Support.
+    nonisolated static var defaultFileURL: URL {
         let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
             ?? URL(fileURLWithPath: NSTemporaryDirectory())
-        let folder = appSupport.appendingPathComponent("aptreceipt", isDirectory: true)
-        try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
-        return folder.appendingPathComponent("receipts_archive.json")
+        return appSupport
+            .appendingPathComponent("aptreceipt", isDirectory: true)
+            .appendingPathComponent("receipts_archive.json")
     }
 
-    init() {
+    init(fileURL: URL?) {
+        self.fileURL = fileURL
         load()
     }
 
@@ -155,18 +161,20 @@ final class ReceiptArchiveStore: ObservableObject {
     }
 
     func save() {
+        guard let fileURL else { return }
         do {
+            try FileManager.default.createDirectory(at: fileURL.deletingLastPathComponent(), withIntermediateDirectories: true)
             let data = try JSONEncoder().encode(records)
-            try data.write(to: archiveURL, options: .atomic)
+            try data.write(to: fileURL, options: .atomic)
         } catch {
             print("ReceiptArchiveStore: save error \(error)")
         }
     }
 
     func load() {
-        guard FileManager.default.fileExists(atPath: archiveURL.path) else { return }
+        guard let fileURL, FileManager.default.fileExists(atPath: fileURL.path) else { return }
         do {
-            let data = try Data(contentsOf: archiveURL)
+            let data = try Data(contentsOf: fileURL)
             records = try JSONDecoder().decode([ReceiptRecord].self, from: data)
         } catch {
             print("ReceiptArchiveStore: load error \(error)")

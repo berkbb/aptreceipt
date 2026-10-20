@@ -12,7 +12,7 @@ Sets safeguards for validating and executing tool calls.
 
 ## Application in AptReceipt
 
-- Confirm with the user before irreversible or outward-facing actions: deleting releases or tags, running `--generate-screenshots` (it replaces the receipt archive), resetting or importing over real data, pushing, publishing.
+- Confirm with the user before irreversible or outward-facing actions: deleting releases or tags, overwriting `docs/screenshots` with `--generate-screenshots`, resetting or importing over real data, pushing, publishing.
 - Read before overwriting; prefer reversible steps; delete old artifacts only after their replacement is verified.
 
 ## Rollback

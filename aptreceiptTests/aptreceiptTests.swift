@@ -1298,43 +1298,76 @@ final class aptreceiptTests: XCTestCase {
             assertDistinctPerLanguage("currency \(currency)") { currency.title(l10n: L10n($0)) }
         }
     }
-}
 
+    // MARK: - 15. Screenshot Run Isolation (sample data never reaches the user's settings or receipts)
 
-// MARK: - Test Doubles
-
-/// `UserDefaults` that keeps values in memory only. A real suite would leave a plist in
-/// ~/Library/Preferences on every run, because cfprefsd writes it back after the domain is removed.
-final class InMemoryDefaults: UserDefaults {
-    private var values: [String: Any] = [:]
-
-    convenience init() {
-        self.init(suiteName: nil)!
+    private func makeArchiveDraft() -> ReceiptDraft {
+        ReceiptDraft(receiver: "R", issuer: "I", notes: "N", monthYear: "Ekim 2026", apartmentNumber: 5, amount: 1, sequenceNumber: 1, createdDate: "1", showApartmentNumber: true, kind: .income)
     }
 
-    override init?(suiteName suitename: String?) {
-        super.init(suiteName: suitename)
+    private func modificationDate(_ url: URL) -> Date? {
+        (try? FileManager.default.attributesOfItem(atPath: url.path))?[.modificationDate] as? Date
     }
 
-    override func object(forKey defaultName: String) -> Any? { values[defaultName] }
-    override func set(_ value: Any?, forKey defaultName: String) { values[defaultName] = value }
-    override func set(_ value: Bool, forKey defaultName: String) { values[defaultName] = value }
-    override func set(_ value: Int, forKey defaultName: String) { values[defaultName] = value }
-    override func set(_ value: Double, forKey defaultName: String) { values[defaultName] = value }
-    override func set(_ value: Float, forKey defaultName: String) { values[defaultName] = value }
-    override func removeObject(forKey defaultName: String) { values[defaultName] = nil }
-    override func string(forKey defaultName: String) -> String? { values[defaultName] as? String }
-    override func data(forKey defaultName: String) -> Data? { values[defaultName] as? Data }
-    override func array(forKey defaultName: String) -> [Any]? { values[defaultName] as? [Any] }
-    override func dictionary(forKey defaultName: String) -> [String: Any]? { values[defaultName] as? [String: Any] }
-    override func bool(forKey defaultName: String) -> Bool { (values[defaultName] as? NSNumber)?.boolValue ?? false }
-    override func integer(forKey defaultName: String) -> Int {
-        if let string = values[defaultName] as? String { return Int(string) ?? 0 }
-        return (values[defaultName] as? NSNumber)?.intValue ?? 0
+    @MainActor
+    func testScreenshotRunKeepsSettingsAndArchiveInMemory() {
+        XCTAssertFalse(ScreenshotMode.isActive, "Tests run without \(ScreenshotMode.argument)")
+        XCTAssertNil(ScreenshotMode.archiveFileURL(screenshotRun: true))
+        XCTAssertEqual(ScreenshotMode.archiveFileURL(screenshotRun: false), ReceiptArchiveStore.defaultFileURL)
+        XCTAssertTrue(ScreenshotMode.settingsDefaults(screenshotRun: true) is InMemoryDefaults)
+        XCTAssertTrue(ScreenshotMode.settingsDefaults(screenshotRun: false) === UserDefaults.standard)
     }
-    override func double(forKey defaultName: String) -> Double {
-        if let string = values[defaultName] as? String { return Double(string) ?? 0 }
-        return (values[defaultName] as? NSNumber)?.doubleValue ?? 0
+
+    @MainActor
+    func testSampleSettingsOfAScreenshotRunNeverReachTheUserDefaults() {
+        let standard = UserDefaults.standard
+        let keys = [
+            ReceiptSettingsStore.Keys.apartmentName,
+            ReceiptSettingsStore.Keys.language,
+            ReceiptSettingsStore.Keys.currency,
+            ReceiptSettingsStore.Keys.seqNumber,
+            ReceiptSettingsStore.Keys.owner(1),
+            "AppleLanguages",
+        ]
+        let before = keys.map { standard.object(forKey: $0) as? NSObject }
+
+        let store = ReceiptSettingsStore(defaults: ScreenshotMode.settingsDefaults(screenshotRun: true))
+        store.loadSampleDefaults(for: .romanian)
+        store.language = .romanian
+        store.currency = .romanianLeu
+        store.seqNumber = 104
+
+        XCTAssertEqual(store.apartmentName, SampleData.defaults(for: .romanian).apartmentName)
+        XCTAssertEqual(keys.map { standard.object(forKey: $0) as? NSObject }, before)
     }
-    override func float(forKey defaultName: String) -> Float { Float(double(forKey: defaultName)) }
+
+    @MainActor
+    func testInMemoryArchiveWritesNoFile() {
+        let realArchive = ReceiptArchiveStore.defaultFileURL
+        let realArchiveDate = modificationDate(realArchive)
+
+        let store = ReceiptArchiveStore(fileURL: nil)
+        store.add(draft: makeArchiveDraft())
+        store.replaceRecords([])
+        store.add(draft: makeArchiveDraft())
+
+        XCTAssertEqual(store.records.count, 1)
+        XCTAssertTrue(ReceiptArchiveStore(fileURL: nil).records.isEmpty)
+        XCTAssertEqual(modificationDate(realArchive), realArchiveDate)
+    }
+
+    @MainActor
+    func testArchiveStoreSavesAndLoadsOnlyItsOwnFile() {
+        let folder = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let fileURL = folder.appendingPathComponent("receipts_archive.json")
+        XCTAssertNotEqual(fileURL, ReceiptArchiveStore.defaultFileURL)
+
+        let store = ReceiptArchiveStore(fileURL: fileURL)
+        XCTAssertTrue(store.records.isEmpty)
+        store.add(draft: makeArchiveDraft())
+
+        XCTAssertTrue(FileManager.default.fileExists(atPath: fileURL.path))
+        XCTAssertEqual(ReceiptArchiveStore(fileURL: fileURL).records.map(\.id), store.records.map(\.id))
+    }
 }
