@@ -30,7 +30,7 @@ enum SettingsTab: String, CaseIterable, Identifiable {
     /// Tabs already moved to Arhivar's grouped `Form` layout (phase by phase).
     var usesGroupedForm: Bool {
         switch self {
-        case .general, .appearance, .signature, .backup, .about:
+        case .general, .residents, .appearance, .signature, .backup, .about:
             return true
         default:
             return false
@@ -558,137 +558,82 @@ struct SettingsView: View {
     // MARK: - Tab 2: Residents Directory (Hero Scroller List)
 
     private var residentsTab: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            // Header
-            HStack {
-                VStack(alignment: .leading, spacing: 2) {
-                    Label(l10n.residentsDirectoryTitle, systemImage: "person.2.fill")
-                        .font(.system(size: 14, weight: .bold))
-                    Text(l10n.residentsDirectoryDesc)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+        Form {
+            Section {
+                LabeledContent {
+                    Text("\(viewModel.availableApartments.count)")
+                } label: {
+                    Label(l10n.totalFlatsBadge, systemImage: "building.2.fill")
                 }
-                Spacer()
-            }
-
-            // Hero Summary & Action Bar
-            VStack(spacing: 10) {
-                HStack(spacing: 8) {
-                    // Total Flats Badge
-                    HStack(spacing: 5) {
-                        Image(systemName: "building.2.fill")
-                            .foregroundColor(.accentColor)
-                        Text("\(viewModel.availableApartments.count) \(l10n.totalFlatsBadge)")
-                            .font(.system(size: 11, weight: .semibold))
+                LabeledContent {
+                    Text("\(viewModel.registeredCount)")
+                } label: {
+                    Label(l10n.registeredResidentsBadge, systemImage: "checkmark.circle.fill")
+                }
+                if viewModel.unassignedCount > 0 {
+                    LabeledContent {
+                        Text("\(viewModel.unassignedCount)")
+                    } label: {
+                        Label(l10n.vacantFlatsBadge, systemImage: "circle.dashed")
                     }
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 5)
-                    .background(Color.accentColor.opacity(0.12))
-                    .clipShape(Capsule())
+                }
 
-                    // Registered Badge
-                    HStack(spacing: 5) {
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundColor(.green)
-                        Text("\(viewModel.registeredCount) \(l10n.registeredResidentsBadge)")
-                            .font(.system(size: 11, weight: .semibold))
-                    }
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 5)
-                    .background(Color.green.opacity(0.12))
-                    .clipShape(Capsule())
-
-                    // Unassigned Badge
-                    if viewModel.unassignedCount > 0 {
-                        HStack(spacing: 5) {
-                            Image(systemName: "circle.dashed")
-                                .foregroundColor(.orange)
-                            Text("\(viewModel.unassignedCount) \(l10n.vacantFlatsBadge)")
-                                .font(.system(size: 11, weight: .semibold))
-                        }
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 5)
-                        .background(Color.orange.opacity(0.12))
-                        .clipShape(Capsule())
-                    }
-
-                    Spacer()
-
-                    // Quick Action: Fill Sample Residents
+                HStack(spacing: 10) {
                     Button {
                         viewModel.fillSampleResidents(for: viewModel.language)
                     } label: {
                         Label(l10n.fillSampleResidentsButton, systemImage: "sparkles")
-                            .font(.system(size: 11, weight: .medium))
                     }
                     .buttonStyle(.bordered)
-                    .controlSize(.small)
 
-                    // Quick Action: Clear All
+                    // Clears the draft only; Cancel still undoes it.
                     Button(role: .destructive) {
                         viewModel.clearAllResidents()
                     } label: {
                         Label(l10n.clearAllResidentsButton, systemImage: "trash")
-                            .font(.system(size: 11, weight: .medium))
                     }
                     .buttonStyle(.bordered)
-                    .controlSize(.small)
                 }
+            } header: {
+                Text(l10n.residentsDirectoryTitle)
+            } footer: {
+                Text(l10n.residentsDirectoryDesc)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
 
-                // Search & Filter Bar
+            Section {
                 HStack(spacing: 8) {
                     Image(systemName: "magnifyingglass")
                         .foregroundColor(.secondary)
-                        .font(.system(size: 12))
-
-                    TextField(l10n.searchNeighborsPlaceholder, text: $viewModel.residentSearchQuery)
+                    TextField("", text: $viewModel.residentSearchQuery, prompt: Text(l10n.searchNeighborsPlaceholder))
                         .textFieldStyle(.plain)
-                        .font(.system(size: 12))
-
+                        .labelsHidden()
                     if !viewModel.residentSearchQuery.isEmpty {
                         Button {
                             viewModel.residentSearchQuery = ""
                         } label: {
                             Image(systemName: "xmark.circle.fill")
                                 .foregroundColor(.secondary)
-                                .font(.system(size: 12))
                         }
                         .buttonStyle(.plain)
                     }
                 }
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
-                .background(Color(NSColor.textBackgroundColor))
-                .clipShape(RoundedRectangle(cornerRadius: 8))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
-                )
-            }
-            .padding(12)
-            .background(Color(NSColor.controlBackgroundColor))
-            .clipShape(RoundedRectangle(cornerRadius: 10))
 
-            // Flats Hero List
-            if viewModel.filteredApartments.isEmpty {
-                VStack(spacing: 8) {
-                    Image(systemName: "magnifyingglass")
-                        .font(.system(size: 28))
-                        .foregroundColor(.secondary.opacity(0.6))
-                    Text(l10n.noMatchingResidents)
-                        .font(.system(size: 13))
+                if viewModel.filteredApartments.isEmpty {
+                    Label(l10n.noMatchingResidents, systemImage: "magnifyingglass")
                         .foregroundColor(.secondary)
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 30)
-            } else {
-                LazyVStack(spacing: 8) {
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                } else {
                     ForEach(viewModel.filteredApartments, id: \.self) { flat in
                         residentCard(flat: flat)
                     }
                 }
+            } header: {
+                Text(l10n.heroStatsFlats)
             }
         }
+        .formStyle(.grouped)
     }
 
     private func residentCard(flat: Int) -> some View {
@@ -724,8 +669,11 @@ struct SettingsView: View {
 
             // Resident Name & Phone Fields
             VStack(alignment: .leading, spacing: 3) {
-                TextField(l10n.residentNamePlaceholder, text: nameBinding)
+                // Inside a Form a titled TextField becomes "label … value"; use a prompt instead.
+                TextField("", text: nameBinding, prompt: Text(l10n.residentNamePlaceholder))
                     .textFieldStyle(.plain)
+                    .labelsHidden()
+                    .multilineTextAlignment(.leading)
                     .font(.system(size: 13, weight: .medium))
 
                 HStack(spacing: 8) {
@@ -733,8 +681,11 @@ struct SettingsView: View {
                         Image(systemName: "phone.fill")
                             .font(.system(size: 9))
                             .foregroundColor(.secondary)
-                        TextField(l10n.residentPhonePlaceholder, text: phoneBinding)
+                        TextField("", text: phoneBinding, prompt: Text(l10n.residentPhonePlaceholder))
                             .textFieldStyle(.plain)
+                            .labelsHidden()
+                            .multilineTextAlignment(.leading)
+                            .lineLimit(1)
                             .font(.system(size: 10))
                             .foregroundColor(.secondary)
                             .frame(maxWidth: 160)
@@ -777,14 +728,7 @@ struct SettingsView: View {
                 .help(l10n.clearAllResidentsButton)
             }
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 8)
-        .background(Color(NSColor.controlBackgroundColor))
-        .clipShape(RoundedRectangle(cornerRadius: 10))
-        .overlay(
-            RoundedRectangle(cornerRadius: 10)
-                .stroke(isAssigned ? Color.accentColor.opacity(0.25) : Color.secondary.opacity(0.12), lineWidth: 1)
-        )
+        .padding(.vertical, 2)
     }
 
     // MARK: - Tab: Vendors & Services
