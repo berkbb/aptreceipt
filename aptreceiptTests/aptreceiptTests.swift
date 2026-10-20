@@ -1383,11 +1383,10 @@ final class aptreceiptTests: XCTestCase {
         return (request.results ?? []).compactMap(\.payloadStringValue)
     }
 
+    /// Renders `view` through the JPEG and PDF export paths and checks that the QR code reads back as `qrText`.
     @MainActor
-    func testReceiptQRCodeScansInExportedImageAndPDF() throws {
-        let draft = ReceiptDraft(receiver: "Ayşe Yılmaz Öztürkoğlu", issuer: "Mehmet Çağlar Şahin", notes: "Ekim 2026 aidatı", monthYear: "Ekim 2026", apartmentNumber: 12, amount: 12750.5, sequenceNumber: 1042, createdDate: "20.10.2026", showApartmentNumber: true, kind: .income, currency: .turkishLira)
-        let view = ReceiptDocumentView(draft: draft, apartmentName: "Test Apartmanı Yönetimi", signatureImage: nil, l10n: L10n(.turkish))
-        let payload = view.qrVerificationPayload
+    private func assertQRCodeScans(_ view: ReceiptDocumentView, _ label: String) throws {
+        let expected = view.qrText
         let document = view.frame(width: 595, height: 842).environment(\.colorScheme, .light)
 
         // JPEG export path: rendered at 2x.
@@ -1395,7 +1394,7 @@ final class aptreceiptTests: XCTestCase {
         imageRenderer.scale = 2
         imageRenderer.proposedSize = ProposedViewSize(width: 595, height: 842)
         let image = try XCTUnwrap(imageRenderer.cgImage)
-        XCTAssertEqual(decodedQRCodes(in: image), [payload], "JPEG export")
+        XCTAssertEqual(decodedQRCodes(in: image), [expected], "\(label): JPEG export")
 
         // PDF export path, then viewed or scanned at 150 dpi.
         let pdfRenderer = ImageRenderer(content: document)
@@ -1412,7 +1411,69 @@ final class aptreceiptTests: XCTestCase {
         let page = try XCTUnwrap(pdf.page(at: 0))
         let thumbnail = page.thumbnail(of: NSSize(width: 1240, height: 1754), for: .mediaBox)
         let scan = try XCTUnwrap(thumbnail.cgImage(forProposedRect: nil, context: nil, hints: nil))
-        XCTAssertEqual(decodedQRCodes(in: scan), [payload], "PDF export")
+        XCTAssertEqual(decodedQRCodes(in: scan), [expected], "\(label): PDF export")
+    }
+
+    @MainActor
+    func testReceiptQRCodeScansInExportedImageAndPDF() throws {
+        // Worst case: every name over the cap, Turkish two-byte letters, a late fee, large amounts.
+        let keys = ReceiptVerificationKeyStore(fileURL: nil)
+        let longName = String(repeating: "Şükrü İğdır Öztürkoğlu ", count: 4)
+        for language in [AppLanguage.turkish, .english, .romanian] {
+            for kind in ReceiptKind.allCases {
+                let draft = ReceiptDraft(receiver: longName, issuer: longName, notes: "N", monthYear: "Septembrie 2026", apartmentNumber: 128, amount: 1234567.89, sequenceNumber: 99999, createdDate: "30 septembrie 2026", showApartmentNumber: true, kind: kind, currency: .romanianLeu, isLateFeeApplied: true, lateFeeRate: 12.5, lateMonths: 11, lateFeeAmount: 123456.78, baseAmount: 1111111.11)
+                let view = ReceiptDocumentView(draft: draft, apartmentName: longName, signatureImage: nil, l10n: L10n(language), verificationKeys: keys)
+                try assertQRCodeScans(view, "\(language) \(kind)")
+                let width = try XCTUnwrap(QRCodeGenerator.generate(from: view.qrText, pointsPerModule: 72 / 25.4 * 0.5)?.size.width)
+                XCTAssertLessThanOrEqual(width, 130, "\(language) \(kind): QR too wide for the receipt footer")
+            }
+        }
+    }
+
+    @MainActor
+    func testQRTextListsTheReceiptInItsLanguageWithAValidCode() throws {
+        let keys = ReceiptVerificationKeyStore(fileURL: nil)
+        let draft = ReceiptDraft(receiver: "Ayşe Yılmaz", issuer: "Mehmet Şahin", notes: "Ekim 2026 aidatı", monthYear: "Ekim 2026", apartmentNumber: 12, amount: 12750.5, sequenceNumber: 1042, createdDate: "20.10.2026", showApartmentNumber: true, kind: .income, currency: .turkishLira, isLateFeeApplied: true, lateFeeRate: 2.5, lateMonths: 3, lateFeeAmount: 750.5, baseAmount: 12000)
+        var lines = ReceiptDocumentView(draft: draft, apartmentName: "Yıldız Sitesi Yönetimi", signatureImage: nil, l10n: L10n(.turkish), verificationKeys: keys).qrText.components(separatedBy: "\n")
+        let codeLine = try XCTUnwrap(lines.popLast())
+        XCTAssertEqual(lines, [
+            "AptReceipt",
+            "YILDIZ SİTESİ YÖNETİMİ",
+            "Tahsilat Makbuzu · TAH-1042",
+            "Düzenleme Tarihi: 20.10.2026",
+            "Dönem: Ekim 2026",
+            "Sakin / Muhatap: Ayşe Yılmaz",
+            "Daire 12",
+            "Aidat Ana Para: ₺12.000,00",
+            "Gecikme Tazminatı: +₺750,50",
+            "GENEL TOPLAM: ₺12.750,50",
+            "Yönetici: Mehmet Şahin",
+        ])
+        let prefix = "Doğrulama kodu: "
+        XCTAssertTrue(codeLine.hasPrefix(prefix), codeLine)
+        let code = String(codeLine.dropFirst(prefix.count))
+        XCTAssertEqual(ReceiptVerificationCode.matchingKeyIndex(code: code, text: lines.joined(separator: "\n"), keys: keys.allKeys), 0)
+        XCTAssertNil(ReceiptVerificationCode.matchingKeyIndex(code: code, text: lines.joined(separator: "\n"), keys: ReceiptVerificationKeyStore(fileURL: nil).allKeys))
+
+        // A management expense in English: payee label, no flat or late fee lines.
+        let expense = ReceiptDraft(receiver: "Apex Elevator Services", issuer: "John Doe", notes: "N", monthYear: "October 2026", apartmentNumber: 0, amount: 3450, sequenceNumber: 105, createdDate: "19 October 2026", showApartmentNumber: false, kind: .managementExpense, currency: .usDollar)
+        let english = ReceiptDocumentView(draft: expense, apartmentName: "Sunshine Residence", signatureImage: nil, l10n: L10n(.english), verificationKeys: keys).qrText.components(separatedBy: "\n")
+        XCTAssertEqual(Array(english.dropLast()), [
+            "AptReceipt",
+            "SUNSHINE RESIDENCE",
+            "Operating Expenditure Voucher · MGT-0105",
+            "Issue Date: 19 October 2026",
+            "Period: October 2026",
+            "Payee / Vendor: Apex Elevator Services",
+            "GRAND TOTAL: $3,450.00",
+            "Manager: John Doe",
+        ])
+        XCTAssertTrue(english.last?.hasPrefix("Verification code: ") == true)
+
+        // Names over the cap end with an ellipsis.
+        let long = ReceiptDraft(receiver: String(repeating: "a", count: 60), issuer: "I", notes: "N", monthYear: "October 2026", apartmentNumber: 1, amount: 1, sequenceNumber: 1, createdDate: "1", showApartmentNumber: false, kind: .income, currency: .usDollar)
+        let longLines = ReceiptDocumentView(draft: long, apartmentName: "B", signatureImage: nil, l10n: L10n(.english), verificationKeys: keys).qrText.components(separatedBy: "\n")
+        XCTAssertTrue(longLines.contains("Resident / Payer: " + String(repeating: "a", count: ReceiptDocumentView.qrNameLimit - 1) + "…"), "\(longLines)")
     }
 
     // MARK: - 17. Upper-casing follows the app language (Turkish dotted İ)
@@ -1428,10 +1489,11 @@ final class aptreceiptTests: XCTestCase {
     @MainActor
     func testReceiptBuildingNameUsesTheAppLanguageUppercase() {
         let draft = ReceiptDraft(receiver: "R", issuer: "I", notes: "N", monthYear: "Ekim 2026", apartmentNumber: 5, amount: 1, sequenceNumber: 1, createdDate: "1", showApartmentNumber: true, kind: .income)
-        let turkish = ReceiptDocumentView(draft: draft, apartmentName: "Yıldız Sitesi Yönetimi", signatureImage: nil, l10n: L10n(.turkish))
-        XCTAssertTrue(turkish.qrVerificationPayload.contains("| YILDIZ SİTESİ YÖNETİMİ |"), turkish.qrVerificationPayload)
-        let english = ReceiptDocumentView(draft: draft, apartmentName: "Yıldız Sitesi Yönetimi", signatureImage: nil, l10n: L10n(.english))
-        XCTAssertTrue(english.qrVerificationPayload.contains("| YILDIZ SITESI YÖNETIMI |"), english.qrVerificationPayload)
+        let keys = ReceiptVerificationKeyStore(fileURL: nil)
+        let turkish = ReceiptDocumentView(draft: draft, apartmentName: "Yıldız Sitesi Yönetimi", signatureImage: nil, l10n: L10n(.turkish), verificationKeys: keys)
+        XCTAssertEqual(turkish.qrText.components(separatedBy: "\n")[1], "YILDIZ SİTESİ YÖNETİMİ")
+        let english = ReceiptDocumentView(draft: draft, apartmentName: "Yıldız Sitesi Yönetimi", signatureImage: nil, l10n: L10n(.english), verificationKeys: keys)
+        XCTAssertEqual(english.qrText.components(separatedBy: "\n")[1], "YILDIZ SITESI YÖNETIMI")
     }
 
     // MARK: - 18. Receipt Verification Codes and Keys (offline QR plan, phase 1)

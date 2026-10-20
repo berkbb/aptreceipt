@@ -267,7 +267,8 @@
 "publisher" = "Editor: Babadogan Tech and Edu";
 "publisherLabel" = "Editor";
 "qrCodeActive" = "Cod QR de Verificare Activ";
-"qrVerificationNotice" = "Scanați cu camera telefonului pentru a verifica autenticitatea chitanței";
+"qrVerificationNotice" = "Scanați pentru a citi detaliile chitanței. Administrația verifică codul de verificare cu AptReceipt.";
+"qrVerificationCodeLabel" = "Cod de verificare";
 "quickPresetsLabel" = "Categorii Rapide de Cheltuieli:";
 "quickScenarioSubtitle" = "Completați seturi complete de date reale pentru testare rapidă";
 "quickScenarioTitle" = "Scenarii Rapide de Pornire";

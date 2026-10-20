@@ -602,6 +602,13 @@ struct ReceiptDocumentView: View {
     let signatureImage: NSImage?
     var logoImage: NSImage? = nil
     let l10n: L10n
+    /// Keys for the QR verification code; `nil` uses the app's keys (tests pass in-memory ones).
+    var verificationKeys: ReceiptVerificationKeyStore? = nil
+
+    /// Half a millimetre per QR module on paper, so phone cameras read the code.
+    private static let qrPointsPerModule: CGFloat = 72 / 25.4 * 0.5
+    /// Longest building, payer or manager name in the QR text, so the code stays scannable.
+    static let qrNameLimit = 40
 
     // Strict Print Colors (Dark Mode Proof)
     private let textDark = Color(red: 0.08, green: 0.11, blue: 0.15)
@@ -708,8 +715,41 @@ struct ReceiptDocumentView: View {
         }
     }
 
-    var qrVerificationPayload: String {
-        "AptReceipt | \(mainTitle) | \(documentSerialFormatted) | \(draft.createdDate) | \(draft.receiver) | \(formattedAmount) | \(draft.issuer)"
+    /// What the QR code holds: the receipt as labeled lines with the same labels and amounts as the paper,
+    /// in the receipt's language, then a verification code over those lines (`ReceiptVerificationCode`).
+    var qrText: String {
+        let receiverLabel = draft.kind == .income ? l10n.invoicePayerResidentLabel : l10n.invoiceVendorLabel
+        var lines = [
+            "AptReceipt",
+            Self.capped(mainTitle),
+            "\(documentType) · \(documentSerialFormatted)",
+            Self.labeled(l10n.issueDate, draft.createdDate),
+            Self.labeled(l10n.period, draft.monthYear),
+            Self.labeled(receiverLabel, Self.capped(draft.receiver)),
+        ]
+        if draft.kind != .managementExpense, draft.showApartmentNumber, draft.apartmentNumber > 0 {
+            lines.append("\(l10n.flatPrefix) \(draft.apartmentNumber)")
+        }
+        if draft.lateFeeAmount > 0 {
+            lines.append(Self.labeled(l10n.baseDuesAmount, baseAmountFormatted))
+            lines.append(Self.labeled(l10n.lateFeeCalculated, "+" + lateFeeAmountFormatted))
+        }
+        lines.append(Self.labeled(l10n.grandTotal, formattedAmount))
+        lines.append(Self.labeled(l10n.invoiceManagerLabel, Self.capped(draft.issuer)))
+
+        let body = lines.joined(separator: "\n")
+        let code = ReceiptVerificationCode.code(for: body, key: (verificationKeys ?? .shared).currentKey)
+        return body + "\n" + Self.labeled(l10n.qrVerificationCodeLabel, code)
+    }
+
+    private static func labeled(_ label: String, _ value: String) -> String {
+        let label = label.trimmingCharacters(in: .whitespaces)
+        return (label.hasSuffix(":") ? label : label + ":") + " " + value
+    }
+
+    private static func capped(_ text: String) -> String {
+        let text = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        return text.count > qrNameLimit ? String(text.prefix(qrNameLimit - 1)) + "…" : text
     }
 
     private var documentType: String {
@@ -1137,12 +1177,11 @@ struct ReceiptDocumentView: View {
             // MARK: 5. Footer & Authorized Signature
             HStack(alignment: .bottom, spacing: 14) {
                 // QR Verification Code
-                // 72 pt: about half a millimetre per module on paper, so phone cameras read it.
-                if let qrImage = QRCodeGenerator.generate(from: qrVerificationPayload, size: 72) {
+                if let qrImage = QRCodeGenerator.generate(from: qrText, pointsPerModule: Self.qrPointsPerModule) {
                     Image(nsImage: qrImage)
                         .interpolation(.none)
                         .resizable()
-                        .frame(width: 72, height: 72)
+                        .frame(width: qrImage.size.width, height: qrImage.size.height)
                         .clipShape(RoundedRectangle(cornerRadius: 4))
                         .overlay(
                             RoundedRectangle(cornerRadius: 4)

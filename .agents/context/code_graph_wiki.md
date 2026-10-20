@@ -16,7 +16,7 @@
 | `LateFee.swift` | `LateFeeCountryProfile`, `LateFeeCalculator` | Profile defaults, footnotes, legal notices; fee math |
 | `SampleData.swift` | `SampleData.defaults(for:)` | Per-language sample building, residents, vendors, services |
 | `Extensions.swift` | `AppFormat`, `ReceiptPeriod`, `Date.monthYearString`, `Date.dayMonthYearString`, `Notification.Name.appLanguageDidChange` / `.settingsDidSave` | Formatting, period parsing, notifications |
-| `SharingHelpers.swift` | `QRCodeGenerator`, `WhatsAppShareHelper` | QR bitmap (whole pixels per module, 4-module quiet zone; `testReceiptQRCodeScansInExportedImageAndPDF` decodes it); WhatsApp/email URLs and messages |
+| `SharingHelpers.swift` | `QRCodeGenerator`, `WhatsAppShareHelper` | QR bitmap (whole pixels per module, 4-module quiet zone, level L, size from `pointsPerModule`); WhatsApp/email URLs and messages |
 | `ReceiptVerification.swift` | `ReceiptVerificationCode`, `ReceiptVerificationKeyStore` | Offline receipt verification: HMAC code over the normalized QR text (Crockford Base32, pinned by `testVerificationCodeIsPinnedAndIgnoresLayoutOnly`), installation keys in `Application Support/aptreceipt/receipt-verification-keys` (0600), in memory for tests and screenshot runs |
 | `L10n.swift` | `L10n` (`resolvedLanguage`, `locale`, private `tr(_:)`) | Lookup in the per-language `Localizable.strings` |
 | `MainScreen.swift` | `MainScreen` | Main window: receipt form, live preview, header buttons, sheets |
@@ -81,5 +81,6 @@
 | Update signing key | `AptReceiptUpdatePublicEDKey` in `Info.plist`, `release.sh`, `scripts/update_signing.swift` -> `testBundledUpdatePublicKeyIsValid`, `testUpdateSignatureVerification` |
 | `LICENSE` | `LicenseViewerSheet.licenseText` -> `testLicenseViewerMatchesRepositoryLicense` |
 | Screenshot generator (`--generate-screenshots`) | Keep every store it uses in memory: `ScreenshotMode.settingsDefaults` / `archiveFileURL`, `ReceiptSettingsStore(defaults: InMemoryDefaults())`, and the guard that stops the run when `ReceiptArchiveStore.shared.fileURL` is set -> "Screenshot Run Isolation" tests. It seeds the two sample receipts first and writes PNGs to `docs/screenshots` under the current directory. |
-| `ReceiptArchiveStore` | Its file URL is fixed and cannot be injected; tests must not call `add`, `replaceRecords`, `clearAll` or `importSystemBackup` |
+| `ReceiptArchiveStore` / `ReceiptVerificationKeyStore` | Tests use `fileURL: nil` (memory) or a temporary file, never `.shared`; pass them to `exportSystemBackup` / `importSystemBackup` and to `ReceiptDocumentView(verificationKeys:)` |
 | `.settingsDidSave` / `.appLanguageDidChange` | `MainScreen.updateLiveFromSettings`, `MenuBarManager`, `SettingsTabViewController` titles |
+| Receipt QR text (`ReceiptDocumentView.qrText`) | Its lines are what the verification code covers: changing a label, amount format or line order changes the QR of new receipts only (old codes stay valid because they cover their own printed text), the Verify Receipt parser, `testQRTextListsTheReceiptInItsLanguageWithAValidCode`, `testReceiptQRCodeScansInExportedImageAndPDF` |

@@ -267,7 +267,8 @@
 "publisher" = "Yayıncı: Babadogan Tech and Edu";
 "publisherLabel" = "Yayıncı";
 "qrCodeActive" = "Doğrulanabilir QR Kod Aktif";
-"qrVerificationNotice" = "Belge doğruluğunu teyit etmek için telefon kamerasıyla okutunuz";
+"qrVerificationNotice" = "Makbuz bilgilerini görmek için okutun. Doğrulama kodunu yönetim AptReceipt ile kontrol eder.";
+"qrVerificationCodeLabel" = "Doğrulama kodu";
 "quickPresetsLabel" = "Hızlı Harcama Şablonları:";
 "quickScenarioSubtitle" = "Hızlı deneme veya ilk kurulum için hazır örnek verileri tek tıkla yükleyin";
 "quickScenarioTitle" = "Hızlı Başlangıç Senaryoları";

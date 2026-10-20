@@ -10,11 +10,12 @@ enum QRCodeGenerator {
     private static let quietZoneModules = 4
     private static let context = CIContext()
 
-    /// A black-on-white QR code (with its quiet zone) shown at `size` points.
-    static func generate(from string: String, size: CGFloat = 64) -> NSImage? {
+    /// A black-on-white QR code with its quiet zone, `pointsPerModule` points per module, so its size
+    /// follows the amount of text. Correction level L keeps longer texts small enough for a receipt.
+    static func generate(from string: String, pointsPerModule: CGFloat) -> NSImage? {
         guard let filter = CIFilter(name: "CIQRCodeGenerator") else { return nil }
         filter.setValue(Data(string.utf8), forKey: "inputMessage")
-        filter.setValue("M", forKey: "inputCorrectionLevel")
+        filter.setValue("L", forKey: "inputCorrectionLevel")
         guard let output = filter.outputImage,
               let modules = context.createCGImage(output, from: output.extent),
               modules.width > 0, modules.height > 0 else { return nil }
@@ -35,7 +36,11 @@ enum QRCodeGenerator {
             width: CGFloat(modules.width * pixelsPerModule), height: CGFloat(modules.height * pixelsPerModule)
         ))
         guard let image = bitmap.makeImage() else { return nil }
-        return NSImage(cgImage: image, size: NSSize(width: size, height: size))
+        let size = NSSize(
+            width: CGFloat(modules.width + 2 * quietZoneModules) * pointsPerModule,
+            height: CGFloat(modules.height + 2 * quietZoneModules) * pointsPerModule
+        )
+        return NSImage(cgImage: image, size: size)
     }
 }
 

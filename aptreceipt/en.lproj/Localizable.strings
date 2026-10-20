@@ -267,7 +267,8 @@
 "publisher" = "Publisher: Babadogan Tech and Edu";
 "publisherLabel" = "Publisher";
 "qrCodeActive" = "Verifiable QR Code Active";
-"qrVerificationNotice" = "Scan with phone camera to verify receipt authenticity";
+"qrVerificationNotice" = "Scan to read the receipt details. The management checks the verification code with AptReceipt.";
+"qrVerificationCodeLabel" = "Verification code";
 "quickPresetsLabel" = "Quick Expense Presets:";
 "quickScenarioSubtitle" = "Populate full realistic building data sets for quick testing or onboarding";
 "quickScenarioTitle" = "Starter Scenarios & Presets";

@@ -1,6 +1,6 @@
 # Offline QR Verification — Plan
 
-- **Status:** Approved 2026-10-20. Phase 1 done (verification code, key store, backup, tests); phases 2–4 pending.
+- **Status:** Approved 2026-10-20. Phase 1 done (verification code, key store, backup, tests). Phase 2 done (labeled QR text with the code, QR sized per module, new footer text). Phases 3–4 pending.
 - **Scope:** Receipt QR code (`ReceiptDocumentView`), a verification secret, a "Verify Receipt" window in AptReceipt, Settings and the system backup.
 - **Constraint:** Fully offline. No web page, no server, no domain (`user_rejected_spec.md`). A hosted verification page was proposed first and rejected.
 
@@ -28,9 +28,9 @@ Yönetici: Mehmet Şahin
 Doğrulama: K7QM-2XPA-9TRB-4HWD
 ```
 
-- Amounts are formatted with `AppFormat`, upper-casing with `l10n.uppercased`, exactly as printed on the receipt.
+- Labels and amounts are the ones printed on the receipt (`issueDate`, `period`, payer or payee label, `baseDuesAmount`, `lateFeeCalculated`, `grandTotal`, `invoiceManagerLabel`, the receipt's own currency formatting); only `qrVerificationCodeLabel` is new. Built by `ReceiptDocumentView.qrText`.
 - Lines that are hidden on the receipt (flat number, late fee) are left out; notes are left out (length).
-- Long names are capped at 40 characters so the code stays scannable.
+- Long names are capped at 40 characters (`ReceiptDocumentView.qrNameLimit`) so the code stays scannable; the worst case of every language and receipt kind stays under 130 pt and is decoded in tests.
 
 ## Verification code
 

@@ -224,6 +224,7 @@ struct L10n {
 
     // QR Code Verification Strings
     var qrVerificationNotice: String { tr("qrVerificationNotice") }
+    var qrVerificationCodeLabel: String { tr("qrVerificationCodeLabel") }
     var qrCodeActive: String { tr("qrCodeActive") }
 
     // Backup & Restore Strings
