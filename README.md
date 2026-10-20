@@ -15,7 +15,7 @@ A modern, native macOS application to effortlessly generate, manage, and export 
 - **Interactive License Viewer:** Direct read-only inspection of the GNU General Public License v3.0 from Preferences and About windows, highlighting publisher **Babadogan Tech and Edu**.
 - **Real-Time Live Receipt Preview:** Live interactive preview card dynamically updates as you type.
 - **Automatic Theme Support:** Light, Dark, and Automatic System appearance modes.
-- **Dedicated Settings Window:** Accessible from the macOS Menu Bar (`Cmd+,` / `Preferences`) or the compact gear icon on the main screen, with tabbed sections for Building Details, Residents Directory, Vendors & Services, Appearance & Language, Signature, and About.
+- **Dedicated Settings Window:** Accessible from the macOS Menu Bar (`Cmd+,` / `Preferences`) or the compact gear icon on the main screen. Toolbar tabs for Building, Residents, Vendors, Appearance, Signature, Backup and About, each laid out as grouped native sections. Edits on all tabs form one draft that **Save & Close** validates and commits and **Cancel** discards. Settings → About also offers **Reset Settings…**, which restores language, theme, currency, late-fee configuration and the launch update check while keeping all building data, residents, vendors, receipts, logo and signature.
 - **Residents Directory:** Save flat numbers and resident names for one-click auto-fill.
 - **Digital Signature:** Import authorized signature images (PNG/JPEG) to print directly onto exported receipts.
 - **Auto-Incrementing Sequence Numbers:** Receipt numbers increment automatically after generation.
@@ -123,7 +123,7 @@ shasum -a 256 -c SHA256SUMS.txt
 
 ### Updating
 
-AptReceipt checks GitHub Releases for new versions (**Check for Updates…** in the app menu, Settings → About, or the About window). When an update is available, **Download Update** saves the release DMG to your **Downloads** folder, verifies its SHA-256 checksum and Ed25519 signature, and opens it (if macOS blocks opening it, the app explains how to allow it). Quit AptReceipt, drag the new version onto **Applications** and choose **Replace**, then open it again (the Gatekeeper note above applies to each new version). If a release has no DMG attached, the release page opens in your browser instead.
+AptReceipt checks GitHub Releases for new versions (**Check for Updates…** in the app menu, Settings → About, or the About window). Settings → About shows the installed version, the result of the last check and, if you turn it on, checks at every launch; this option is off by default, so the app contacts GitHub only when you ask it to. When an update is available, **Download Update** saves the release DMG to your **Downloads** folder, verifies its SHA-256 checksum and Ed25519 signature, and opens it (if macOS blocks opening it, the app explains how to allow it). Quit AptReceipt, drag the new version onto **Applications** and choose **Replace**, then open it again (the Gatekeeper note above applies to each new version). If a release has no DMG attached, the release page opens in your browser instead.
 
 ---
 
