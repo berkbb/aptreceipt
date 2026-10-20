@@ -424,6 +424,14 @@ struct L10n {
     var laterButton: String { tr("laterButton") }
     var updateCheckFailedTitle: String { tr("updateCheckFailedTitle") }
     var updateCheckFailedMessage: String { tr("updateCheckFailedMessage") }
+    var updateErrorOffline: String { tr("updateErrorOffline") }
+    var updateErrorTimedOut: String { tr("updateErrorTimedOut") }
+    var updateErrorNoPublicRelease: String { tr("updateErrorNoPublicRelease") }
+    var updateErrorRateLimited: String { tr("updateErrorRateLimited") }
+    var updateErrorServer: String { tr("updateErrorServer") }
+    var updateErrorBadResponse: String { tr("updateErrorBadResponse") }
+    var updateErrorInvalidData: String { tr("updateErrorInvalidData") }
+    var updateErrorUnexpected: String { tr("updateErrorUnexpected") }
     var openReleasesPage: String { tr("openReleasesPage") }
     var isNowAvailableText: String { tr("isNowAvailableText") }
     var currentVersionPrefix: String { tr("currentVersionPrefix") }

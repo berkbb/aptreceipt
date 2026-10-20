@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Changed
+- **Update check errors**: A failed update check now explains what went wrong instead of always saying "check your internet connection": no internet connection, timeout, GitHub unreachable, no public release yet (HTTP 404), rate limit reached, GitHub server error, or an unreadable response. Messages are translated into English, Turkish and Romanian.
+
 ## [3.4.3] - 2026-10-19
 
 ### Fixed

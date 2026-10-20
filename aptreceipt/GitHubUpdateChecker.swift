@@ -261,19 +261,12 @@ public final class GitHubUpdateChecker: ObservableObject {
                         }
                     }
                 } else {
-                    let errorMsg = "GitHub API returned status \((response as? HTTPURLResponse)?.statusCode ?? -1)"
-                    self.status = .failed(message: errorMsg)
-                    if userInitiated {
-                        self.presentErrorAlert(message: errorMsg)
-                    }
+                    let statusCode = (response as? HTTPURLResponse)?.statusCode ?? -1
+                    self.reportFailure(UpdateCheckFailure(statusCode: statusCode) ?? .badResponse(statusCode: statusCode), userInitiated: userInitiated)
                 }
             } catch {
                 self.isChecking = false
-                let errorMsg = error.localizedDescription
-                self.status = .failed(message: errorMsg)
-                if userInitiated {
-                    self.presentErrorAlert(message: errorMsg)
-                }
+                self.reportFailure(UpdateCheckFailure(error: error), userInitiated: userInitiated)
             }
         }
     }
@@ -493,12 +486,21 @@ public final class GitHubUpdateChecker: ObservableObject {
         alert.runModal()
     }
 
-    private func presentErrorAlert(message: String) {
+    /// Not every failure is a connection problem, so each kind gets its own explanation.
+    private func reportFailure(_ failure: UpdateCheckFailure, userInitiated: Bool) {
+        let message = failure.message(ReceiptSettingsStore.shared.l10n)
+        status = .failed(message: message)
+        if userInitiated {
+            presentErrorAlert(message: message, style: failure == .noPublicRelease ? .informational : .warning)
+        }
+    }
+
+    private func presentErrorAlert(message: String, style: NSAlert.Style) {
         let l10n = ReceiptSettingsStore.shared.l10n
         let alert = NSAlert()
         alert.messageText = l10n.updateCheckFailedTitle
-        alert.informativeText = "\(l10n.updateCheckFailedMessage)\n\n(\(message))"
-        alert.alertStyle = .warning
+        alert.informativeText = message
+        alert.alertStyle = style
         alert.addButton(withTitle: "OK")
         alert.addButton(withTitle: l10n.openReleasesPage)
 
@@ -506,6 +508,77 @@ public final class GitHubUpdateChecker: ObservableObject {
             if let releasesURL = URL(string: "https://github.com/\(repoOwner)/\(repoName)/releases") {
                 NSWorkspace.shared.open(releasesURL)
             }
+        }
+    }
+}
+
+// MARK: - Update Check Failures
+
+/// Why a `releases/latest` check failed. Each case maps to its own user-facing message.
+public enum UpdateCheckFailure: Error, Equatable {
+    /// The device is offline.
+    case offline
+    /// GitHub did not answer in time.
+    case timedOut
+    /// The network works but GitHub could not be reached (DNS, TLS, proxy).
+    case unreachable
+    /// 404: the repository is private or has no public release yet. Not a connection error.
+    case noPublicRelease
+    /// 403/429: GitHub API rate limit reached.
+    case rateLimited
+    /// 5xx: temporary problem on GitHub's side.
+    case serverError(statusCode: Int)
+    /// Any other unexpected HTTP status.
+    case badResponse(statusCode: Int)
+    /// A response arrived but the release could not be decoded.
+    case invalidData
+    case other(String)
+
+    /// The failure for an HTTP status; `nil` for 200.
+    public init?(statusCode: Int) {
+        switch statusCode {
+        case 200: return nil
+        case 404: self = .noPublicRelease
+        case 403, 429: self = .rateLimited
+        case 500...599: self = .serverError(statusCode: statusCode)
+        default: self = .badResponse(statusCode: statusCode)
+        }
+    }
+
+    public init(error: Error) {
+        if let failure = error as? UpdateCheckFailure {
+            self = failure
+        } else if let urlError = error as? URLError {
+            switch urlError.code {
+            case .notConnectedToInternet, .networkConnectionLost, .dataNotAllowed, .internationalRoamingOff:
+                self = .offline
+            case .timedOut:
+                self = .timedOut
+            case .cannotFindHost, .cannotConnectToHost, .dnsLookupFailed,
+                 .secureConnectionFailed, .serverCertificateUntrusted, .serverCertificateHasBadDate,
+                 .serverCertificateNotYetValid, .serverCertificateHasUnknownRoot, .clientCertificateRejected:
+                self = .unreachable
+            default:
+                self = .other(urlError.localizedDescription)
+            }
+        } else if error is DecodingError {
+            self = .invalidData
+        } else {
+            self = .other(error.localizedDescription)
+        }
+    }
+
+    func message(_ l10n: L10n) -> String {
+        switch self {
+        case .offline: return l10n.updateErrorOffline
+        case .timedOut: return l10n.updateErrorTimedOut
+        case .unreachable: return l10n.updateCheckFailedMessage
+        case .noPublicRelease: return l10n.updateErrorNoPublicRelease
+        case .rateLimited: return l10n.updateErrorRateLimited
+        case .serverError(let statusCode): return "\(l10n.updateErrorServer) (HTTP \(statusCode))"
+        case .badResponse(let statusCode): return "\(l10n.updateErrorBadResponse) (HTTP \(statusCode))"
+        case .invalidData: return l10n.updateErrorInvalidData
+        case .other(let detail): return "\(l10n.updateErrorUnexpected)\n\n(\(detail))"
         }
     }
 }

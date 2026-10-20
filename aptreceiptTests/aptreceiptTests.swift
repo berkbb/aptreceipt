@@ -272,6 +272,23 @@ final class aptreceiptTests: XCTestCase {
 
     // MARK: - 4. Semver & GitHub Release Update Checker Tests
 
+    func testUpdateCheckFailureClassifiesStatusCodes() {
+        XCTAssertNil(UpdateCheckFailure(statusCode: 200))
+        XCTAssertEqual(UpdateCheckFailure(statusCode: 404), .noPublicRelease)
+        XCTAssertEqual(UpdateCheckFailure(statusCode: 403), .rateLimited)
+        XCTAssertEqual(UpdateCheckFailure(statusCode: 429), .rateLimited)
+        XCTAssertEqual(UpdateCheckFailure(statusCode: 503), .serverError(statusCode: 503))
+        XCTAssertEqual(UpdateCheckFailure(statusCode: 301), .badResponse(statusCode: 301))
+    }
+
+    func testUpdateCheckFailureSeparatesNetworkErrorsFromMissingRelease() {
+        XCTAssertEqual(UpdateCheckFailure(error: URLError(.notConnectedToInternet)), .offline)
+        XCTAssertEqual(UpdateCheckFailure(error: URLError(.timedOut)), .timedOut)
+        XCTAssertEqual(UpdateCheckFailure(error: URLError(.cannotFindHost)), .unreachable)
+        let decoding = DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "bad"))
+        XCTAssertEqual(UpdateCheckFailure(error: decoding), .invalidData)
+    }
+
     func testSemverComparison() {
         // Higher minor/patch should detect update
         XCTAssertTrue(SemverCompare.isRemoteNewer(remote: "v3.4.0", local: "3.3.0"))

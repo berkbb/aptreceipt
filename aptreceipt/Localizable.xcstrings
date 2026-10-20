@@ -8212,6 +8212,190 @@
         }
       }
     },
+    "updateErrorUnexpected" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An unexpected error occurred."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A apărut o eroare neașteptată."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beklenmeyen bir hata oluştu."
+          }
+        }
+      }
+    },
+    "updateErrorTimedOut" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub did not respond in time. Try again in a moment."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub nu a răspuns la timp. Încercați din nou peste puțin timp."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub zamanında yanıt vermedi. Biraz sonra yeniden deneyin."
+          }
+        }
+      }
+    },
+    "updateErrorServer" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub is having a temporary problem. Try again later."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub are o problemă temporară. Încercați din nou mai târziu."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub şu anda geçici bir sorun yaşıyor. Daha sonra yeniden deneyin."
+          }
+        }
+      }
+    },
+    "updateErrorRateLimited" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The GitHub request limit was reached. Try again later."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Limita de cereri GitHub a fost atinsă. Încercați din nou mai târziu."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub istek sınırına ulaşıldı. Bir süre sonra yeniden deneyin."
+          }
+        }
+      }
+    },
+    "updateErrorOffline" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "There is no internet connection. Check your connection and try again."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nu există conexiune la internet. Verificați conexiunea și încercați din nou."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "İnternet bağlantısı yok. Bağlantınızı kontrol edip yeniden deneyin."
+          }
+        }
+      }
+    },
+    "updateErrorNoPublicRelease" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No public AptReceipt release was found on GitHub yet."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Încă nu există o versiune publică AptReceipt pe GitHub."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub’da henüz herkese açık bir AptReceipt sürümü bulunamadı."
+          }
+        }
+      }
+    },
+    "updateErrorInvalidData" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The release information from GitHub could not be read."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Informațiile despre versiune de la GitHub nu au putut fi citite."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub'dan gelen sürüm bilgisi okunamadı."
+          }
+        }
+      }
+    },
+    "updateErrorBadResponse" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub returned an unexpected response."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub a returnat un răspuns neașteptat."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub beklenmeyen bir yanıt döndürdü."
+          }
+        }
+      }
+    },
     "uploadLogoButton" : {
       "extractionState" : "manual",
       "localizations" : {
