@@ -198,6 +198,8 @@ public final class GitHubUpdateChecker: ObservableObject {
     @Published public var latestRelease: GitHubRelease? = nil
     @Published public var showUpdateModal: Bool = false
     @Published public var lastCheckedDate: Date? = nil
+    /// Kind of the last failure, so Settings can tell "no public release" apart from real errors.
+    @Published public var lastFailure: UpdateCheckFailure? = nil
     @Published public var isDownloading: Bool = false
     @Published public var downloadProgress: Double = 0
     @Published public var downloadingVersion: String = ""
@@ -214,8 +216,10 @@ public final class GitHubUpdateChecker: ObservableObject {
     private init() {}
 
     /// Checks for updates via GitHub Releases API.
-    /// - Parameter userInitiated: If true, will present native alerts / sheets for up-to-date and error states.
-    public func checkForUpdates(userInitiated: Bool = true) {
+    /// - Parameters:
+    ///   - userInitiated: If true, will present native alerts / sheets for up-to-date and error states.
+    ///   - alertWhenAvailable: Also alert when a newer release exists even if not user-initiated (launch check).
+    public func checkForUpdates(userInitiated: Bool = true, alertWhenAvailable: Bool = false) {
         guard !isChecking else { return }
         if isDownloading {
             UpdateDownloadWindowManager.shared.show()
@@ -224,6 +228,7 @@ public final class GitHubUpdateChecker: ObservableObject {
 
         isChecking = true
         status = .checking
+        lastFailure = nil
 
         guard let url = URL(string: releasesURLString) else {
             isChecking = false
@@ -251,7 +256,7 @@ public final class GitHubUpdateChecker: ObservableObject {
                     if SemverCompare.isRemoteNewer(remote: release.tagName, local: self.currentAppVersion) {
                         self.status = .updateAvailable(release: release)
                         self.showUpdateModal = true
-                        if userInitiated {
+                        if userInitiated || alertWhenAvailable {
                             self.presentUpdateAvailableAlert(release: release)
                         }
                     } else {
@@ -489,6 +494,7 @@ public final class GitHubUpdateChecker: ObservableObject {
     /// Not every failure is a connection problem, so each kind gets its own explanation.
     private func reportFailure(_ failure: UpdateCheckFailure, userInitiated: Bool) {
         let message = failure.message(ReceiptSettingsStore.shared.l10n)
+        lastFailure = failure
         status = .failed(message: message)
         if userInitiated {
             presentErrorAlert(message: message, style: failure == .noPublicRelease ? .informational : .warning)

@@ -57,6 +57,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         MenuBarManager.shared.install(settings: settings)
 
+        // Opt-in launch check (off by default); a newer release is announced with the usual alert.
+        if settings.checkUpdatesAtLaunch {
+            GitHubUpdateChecker.shared.checkForUpdates(userInitiated: false, alertWhenAvailable: true)
+        }
+
         NSApp.setActivationPolicy(.regular)
         NSApp.activate(ignoringOtherApps: true)
     }

@@ -822,7 +822,100 @@ final class aptreceiptTests: XCTestCase {
     }
 
     func testConvertedSettingsTabsUseGroupedForms() {
-        XCTAssertEqual(SettingsTab.allCases.filter(\.usesGroupedForm), [.appearance, .signature, .backup])
+        XCTAssertEqual(SettingsTab.allCases.filter(\.usesGroupedForm), [.appearance, .signature, .backup, .about])
+    }
+
+    // MARK: - 9. About Tab: Updates and Reset (Arhivar alignment phase 3)
+
+    @MainActor
+    func testLaunchUpdateCheckIsOptInAndPersists() {
+        let defaults = InMemoryDefaults()
+        let store = ReceiptSettingsStore(defaults: defaults)
+        XCTAssertFalse(store.checkUpdatesAtLaunch)
+
+        store.checkUpdatesAtLaunch = true
+        XCTAssertTrue(ReceiptSettingsStore(defaults: defaults).checkUpdatesAtLaunch)
+    }
+
+    @MainActor
+    func testPreferenceResetRestoresPreferencesAndKeepsAllData() {
+        let defaults = InMemoryDefaults()
+        let store = ReceiptSettingsStore(defaults: defaults)
+        store.apartmentName = "Kept Building"
+        store.issuer = "Kept Manager"
+        store.defaultPayment = "1234"
+        store.flatCount = 5
+        store.seqNumber = 42
+        store.saveOwner("Kept Resident", apartmentNumber: 2)
+        store.saveOwnerPhone("0000", apartmentNumber: 2)
+        store.vendors = [VendorRecord(name: "Kept Vendor")]
+        store.expenseServices = [ExpenseServicePreset(name: "Kept Service", defaultDescription: "Kept")]
+        store.logoData = Data([1, 2, 3])
+        store.signatureData = Data([4, 5, 6])
+
+        store.language = .turkish
+        store.theme = .dark
+        store.currency = .euro
+        store.isLateFeeEnabled = true
+        store.lateFeeCountryProfile = .romania
+        store.lateFeeMonthlyRate = 9
+        store.lateFeeDueDay = 3
+        store.lateFeeGracePeriodDays = 10
+        store.lateFeeCustomFootnote = "Custom"
+        store.checkUpdatesAtLaunch = true
+        store.setLateFeeCountryProfile(.turkey)
+
+        store.resetPreferencesToDefaults()
+
+        let defaultProfile = LateFeeCountryProfile.default(for: ReceiptSettingsStore.Defaults.language)
+        XCTAssertEqual(store.language, ReceiptSettingsStore.Defaults.language)
+        XCTAssertEqual(store.theme, ReceiptSettingsStore.Defaults.theme)
+        XCTAssertEqual(store.currency, AppCurrency.default(for: ReceiptSettingsStore.Defaults.language))
+        XCTAssertFalse(store.isLateFeeEnabled)
+        XCTAssertEqual(store.lateFeeCountryProfile, defaultProfile)
+        XCTAssertEqual(store.lateFeeMonthlyRate, ReceiptSettingsStore.Defaults.lateFeeMonthlyRate)
+        XCTAssertEqual(store.lateFeeDueDay, ReceiptSettingsStore.Defaults.lateFeeDueDay)
+        XCTAssertEqual(store.lateFeeGracePeriodDays, defaultProfile.defaultGraceDays)
+        XCTAssertEqual(store.lateFeeCustomFootnote, "")
+        XCTAssertFalse(store.checkUpdatesAtLaunch)
+        XCTAssertTrue(LateFeeCountryProfile.allCases.allSatisfy { defaults.object(forKey: "late_fee_rate_\($0.rawValue)") == nil })
+
+        // Data survives, also after reloading from the backing store.
+        for reloaded in [store, ReceiptSettingsStore(defaults: defaults)] {
+            XCTAssertEqual(reloaded.apartmentName, "Kept Building")
+            XCTAssertEqual(reloaded.issuer, "Kept Manager")
+            XCTAssertEqual(reloaded.defaultPayment, "1234")
+            XCTAssertEqual(reloaded.flatCount, 5)
+            XCTAssertEqual(reloaded.seqNumber, 42)
+            XCTAssertEqual(reloaded.owner(for: 2), "Kept Resident")
+            XCTAssertEqual(reloaded.ownerPhone(for: 2), "0000")
+            XCTAssertEqual(reloaded.vendors.map(\.name), ["Kept Vendor"])
+            XCTAssertEqual(reloaded.expenseServices.map(\.name), ["Kept Service"])
+            XCTAssertEqual(reloaded.logoData, Data([1, 2, 3]))
+            XCTAssertEqual(reloaded.signatureData, Data([4, 5, 6]))
+        }
+    }
+
+    @MainActor
+    func testPreferenceResetMirrorsIntoDraftAndKeepsOtherDraftEdits() {
+        let store = makeIsolatedStore()
+        store.theme = .dark
+        store.isLateFeeEnabled = true
+        let draft = SettingsViewModel()
+        draft.load(from: store)
+        draft.apartmentName = "Unsaved Draft Name"
+        draft.lateFeeCustomFootnote = "Unsaved footnote"
+
+        draft.resetPreferences(settings: store)
+
+        XCTAssertEqual(draft.theme, store.theme)
+        XCTAssertEqual(draft.language, store.language)
+        XCTAssertEqual(draft.currency, store.currency)
+        XCTAssertFalse(draft.isLateFeeEnabled)
+        XCTAssertEqual(draft.lateFeeMonthlyRate, String(format: "%.1f", store.lateFeeMonthlyRate))
+        XCTAssertEqual(draft.lateFeeCustomFootnote, "")
+        XCTAssertEqual(draft.apartmentName, "Unsaved Draft Name")
+        XCTAssertNotEqual(store.apartmentName, "Unsaved Draft Name")
     }
 }
 

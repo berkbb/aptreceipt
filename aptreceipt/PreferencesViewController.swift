@@ -30,7 +30,7 @@ enum SettingsTab: String, CaseIterable, Identifiable {
     /// Tabs already moved to Arhivar's grouped `Form` layout (phase by phase).
     var usesGroupedForm: Bool {
         switch self {
-        case .appearance, .signature, .backup:
+        case .appearance, .signature, .backup, .about:
             return true
         default:
             return false
@@ -82,6 +82,8 @@ struct SettingsView: View {
     @ObservedObject var settings: ReceiptSettingsStore
     @StateObject private var viewModel: SettingsViewModel
     @Environment(\.presentationMode) private var presentationMode
+    @ObservedObject private var updateChecker = GitHubUpdateChecker.shared
+    @State private var confirmsPreferenceReset = false
     /// The tab this page shows. In the settings window each toolbar tab hosts its own page and all
     /// pages share one draft, so Save & Close commits the edits made on every tab.
     private let tab: SettingsTab
@@ -1549,75 +1551,101 @@ struct SettingsView: View {
     // MARK: - Tab 5: About (Gözden geçirilmiş)
 
     private var aboutTab: some View {
-        VStack(spacing: 16) {
-            AboutContentView(settings: settings, showsUpdateButton: false)
+        Form {
+            Section {
+                AboutContentView(settings: settings, showsUpdateButton: false)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 8)
+            } header: {
+                Text(l10n.tabAbout)
+            }
 
-            VStack(spacing: 12) {
-                // Software Updates Card
-                VStack(spacing: 10) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "arrow.triangle.2.circlepath.circle.fill")
-                            .font(.system(size: 15))
-                            .foregroundColor(.accentColor)
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(l10n.softwareUpdateSection)
-                                .font(.system(size: 12, weight: .bold))
-                            Text(l10n.softwareUpdateDesc)
-                                .font(.system(size: 10))
-                                .foregroundColor(.secondary)
-                        }
-                        Spacer()
-                    }
-
-                    HStack {
-                        if GitHubUpdateChecker.shared.isChecking {
-                            ProgressView()
-                                .controlSize(.small)
-                            Text(l10n.checkingForUpdates)
-                                .font(.system(size: 10.5))
-                                .foregroundColor(.secondary)
-                        } else {
-                            if let last = GitHubUpdateChecker.shared.lastCheckedDate {
-                                Text("\(l10n.lastChecked) \(last.formatted(date: .numeric, time: .shortened))")
-                                    .font(.system(size: 10))
-                                    .foregroundColor(.secondary)
-                            } else {
-                                Text("\(l10n.lastChecked) \(l10n.neverChecked)")
-                                    .font(.system(size: 10))
-                                    .foregroundColor(.secondary)
-                            }
-                        }
-
-                        Spacer()
-
-                        Button {
-                            GitHubUpdateChecker.shared.checkForUpdates(userInitiated: true)
-                        } label: {
-                            HStack(spacing: 4) {
-                                Image(systemName: "arrow.clockwise")
-                                Text(l10n.checkForUpdatesButton)
-                            }
-                            .font(.system(size: 11, weight: .medium))
-                        }
-                        .buttonStyle(.bordered)
-                        .disabled(GitHubUpdateChecker.shared.isChecking)
+            Section {
+                LabeledContent(l10n.installedVersionLabel, value: "\(AppInfo.version) (\(AppInfo.build))")
+                LabeledContent(l10n.updateStatusLabel) {
+                    updateStatusView
+                }
+                LabeledContent(l10n.lastChecked) {
+                    if let last = updateChecker.lastCheckedDate {
+                        Text(last.formatted(date: .numeric, time: .shortened))
+                    } else {
+                        Text(l10n.neverChecked)
                     }
                 }
-                .padding(12)
-                .frame(maxWidth: 380)
-                .background(Color(NSColor.controlBackgroundColor))
-                .clipShape(RoundedRectangle(cornerRadius: 10))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
-                )
+                .foregroundColor(.secondary)
 
+                HStack {
+                    Button(l10n.checkNowButton) {
+                        updateChecker.checkForUpdates(userInitiated: false)
+                    }
+                    .disabled(updateChecker.isChecking || updateChecker.isDownloading)
+
+                    if case .updateAvailable(let release) = updateChecker.status {
+                        Button(String(format: l10n.downloadVersionFormat, release.tagName)) {
+                            updateChecker.downloadUpdate(release: release)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .disabled(updateChecker.isDownloading)
+                    }
+                }
+
+                Toggle(l10n.checkUpdatesAtLaunchToggle, isOn: $settings.checkUpdatesAtLaunch)
+            } header: {
+                Text(l10n.softwareUpdateSection)
+            } footer: {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(l10n.softwareUpdateDesc)
+                    Text(l10n.checkUpdatesAtLaunchFooter)
+                }
+                .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Section {
+                Button(l10n.resetSettingsButton, role: .destructive) {
+                    confirmsPreferenceReset = true
+                }
+            } header: {
+                Text(l10n.resetSectionHeader)
+            } footer: {
+                Text(l10n.resetSettingsFooter)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 16)
+        .formStyle(.grouped)
+        .confirmationDialog(l10n.resetSettingsConfirmTitle, isPresented: $confirmsPreferenceReset) {
+            Button(l10n.resetSettingsConfirmAction, role: .destructive) {
+                viewModel.resetPreferences(settings: settings)
+            }
+        }
         .sheet(isPresented: $settings.showLicenseViewer) {
             LicenseViewerSheet(l10n: l10n)
+        }
+    }
+
+    @ViewBuilder
+    private var updateStatusView: some View {
+        switch updateChecker.status {
+        case .idle:
+            Text(l10n.updateStatusIdle)
+                .foregroundColor(.secondary)
+        case .checking:
+            HStack(spacing: 6) {
+                ProgressView().controlSize(.small)
+                Text(l10n.checkingForUpdates)
+            }
+            .foregroundColor(.secondary)
+        case .upToDate:
+            Label(l10n.upToDateTitle, systemImage: "checkmark.circle.fill")
+                .foregroundColor(.green)
+        case .updateAvailable(let release):
+            Label("\(l10n.updateAvailableTitle) \(release.tagName)", systemImage: "arrow.down.circle.fill")
+                .foregroundColor(.accentColor)
+        case .failed(let message):
+            let isInfo = updateChecker.lastFailure == .noPublicRelease
+            Label(message, systemImage: isInfo ? "info.circle" : "exclamationmark.triangle.fill")
+                .foregroundColor(isInfo ? .secondary : .orange)
+                .multilineTextAlignment(.trailing)
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
 
@@ -1864,6 +1892,21 @@ final class SettingsViewModel: ObservableObject {
             _ = save(to: settings)
         }
         showRestartAlert = true
+    }
+
+    /// Resets the stored preferences and mirrors them into the draft. Other draft edits (building,
+    /// residents, vendors) are kept, so Save & Close still commits them.
+    func resetPreferences(settings: ReceiptSettingsStore) {
+        settings.resetPreferencesToDefaults()
+        language = settings.language
+        theme = settings.theme
+        currency = settings.currency
+        isLateFeeEnabled = settings.isLateFeeEnabled
+        lateFeeMonthlyRate = String(format: "%.1f", settings.lateFeeMonthlyRate)
+        lateFeeDueDay = settings.lateFeeDueDay
+        lateFeeCountryProfile = settings.lateFeeCountryProfile
+        lateFeeGracePeriodDays = settings.lateFeeGracePeriodDays
+        lateFeeCustomFootnote = settings.lateFeeCustomFootnote
     }
 
     func selectCountryProfile(_ profile: LateFeeCountryProfile) {

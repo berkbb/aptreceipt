@@ -1036,6 +1036,75 @@
         }
       }
     },
+    "checkUpdatesAtLaunchToggle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check for updates at launch"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verifică actualizările la pornire"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Açılışta güncellemeleri denetle"
+          }
+        }
+      }
+    },
+    "checkUpdatesAtLaunchFooter" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When this is on, AptReceipt asks GitHub for a newer release at launch. Nothing is sent to GitHub while it is off."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Când opțiunea este activă, AptReceipt caută o versiune nouă pe GitHub la pornire. Cât timp este dezactivată, nu se trimite nimic către GitHub."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bu seçenek açıkken AptReceipt açılışta GitHub'da yeni sürüm arar. Kapalıyken GitHub'a hiçbir istek gönderilmez."
+          }
+        }
+      }
+    },
+    "checkNowButton" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check Now"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verifică acum"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Şimdi Denetle"
+          }
+        }
+      }
+    },
     "checkingForUpdates" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1768,6 +1837,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Güncellemeyi İndir"
+          }
+        }
+      }
+    },
+    "downloadVersionFormat" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download %@"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descarcă %@"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ Sürümünü İndir"
           }
         }
       }
@@ -2941,6 +3033,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gelir (Tahsilat)"
+          }
+        }
+      }
+    },
+    "installedVersionLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Installed version"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versiune instalată"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yüklü sürüm"
           }
         }
       }
@@ -6280,6 +6395,121 @@
         }
       }
     },
+    "resetSettingsFooter" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resets language, theme, currency, the late fee configuration and the launch update check. Building details, residents, vendors, services, receipts, logo, signature and the receipt number are kept."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se resetează limba, tema, moneda, configurarea penalităților și verificarea actualizărilor la pornire. Datele clădirii, locatarii, furnizorii, serviciile, chitanțele, sigla, semnătura și numărul chitanței se păstrează."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dil, tema, para birimi, gecikme tazminatı yapılandırması ve açılış güncelleme denetimi sıfırlanır. Apartman bilgileri, sakinler, firmalar, hizmetler, makbuzlar, logo, imza ve makbuz numarası korunur."
+          }
+        }
+      }
+    },
+    "resetSettingsConfirmTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset preferences to their defaults?"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resetați preferințele la valorile implicite?"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tercihler varsayılan değerlerine dönsün mü?"
+          }
+        }
+      }
+    },
+    "resetSettingsConfirmAction" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset Settings"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resetează setările"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ayarları Sıfırla"
+          }
+        }
+      }
+    },
+    "resetSettingsButton" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset Settings…"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resetează setările…"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ayarları Sıfırla…"
+          }
+        }
+      }
+    },
+    "resetSectionHeader" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resetare"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sıfırlama"
+          }
+        }
+      }
+    },
     "residentNamePlaceholder" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -8438,6 +8668,52 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "GitHub beklenmeyen bir yanıt döndürdü."
+          }
+        }
+      }
+    },
+    "updateStatusLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Status"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stare"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Durum"
+          }
+        }
+      }
+    },
+    "updateStatusIdle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not checked yet"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neverificat încă"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Henüz denetlenmedi"
           }
         }
       }

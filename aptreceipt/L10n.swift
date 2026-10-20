@@ -435,6 +435,18 @@ struct L10n {
     var updateErrorOffline: String { tr("updateErrorOffline") }
     var updateErrorTimedOut: String { tr("updateErrorTimedOut") }
     var updateErrorNoPublicRelease: String { tr("updateErrorNoPublicRelease") }
+    var installedVersionLabel: String { tr("installedVersionLabel") }
+    var updateStatusLabel: String { tr("updateStatusLabel") }
+    var updateStatusIdle: String { tr("updateStatusIdle") }
+    var checkNowButton: String { tr("checkNowButton") }
+    var downloadVersionFormat: String { tr("downloadVersionFormat") }
+    var checkUpdatesAtLaunchToggle: String { tr("checkUpdatesAtLaunchToggle") }
+    var checkUpdatesAtLaunchFooter: String { tr("checkUpdatesAtLaunchFooter") }
+    var resetSectionHeader: String { tr("resetSectionHeader") }
+    var resetSettingsButton: String { tr("resetSettingsButton") }
+    var resetSettingsConfirmTitle: String { tr("resetSettingsConfirmTitle") }
+    var resetSettingsConfirmAction: String { tr("resetSettingsConfirmAction") }
+    var resetSettingsFooter: String { tr("resetSettingsFooter") }
     var updateErrorRateLimited: String { tr("updateErrorRateLimited") }
     var updateErrorServer: String { tr("updateErrorServer") }
     var updateErrorBadResponse: String { tr("updateErrorBadResponse") }

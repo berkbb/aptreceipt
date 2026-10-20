@@ -62,6 +62,10 @@ final class ReceiptSettingsStore: ObservableObject {
     @Published var lateFeeCustomFootnote: String {
         didSet { defaults.set(lateFeeCustomFootnote, forKey: Keys.lateFeeCustomFootnote) }
     }
+    /// Opt-in: nothing is sent to GitHub at launch unless the user turns this on (see user_rejected_spec.md).
+    @Published var checkUpdatesAtLaunch: Bool {
+        didSet { defaults.set(checkUpdatesAtLaunch, forKey: Keys.checkUpdatesAtLaunch) }
+    }
     @Published var signatureData: Data? {
         didSet {
             if let signatureData {
@@ -109,7 +113,7 @@ final class ReceiptSettingsStore: ObservableObject {
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
-        let savedLang = defaults.string(forKey: Keys.language) ?? AppLanguage.english.rawValue
+        let savedLang = defaults.string(forKey: Keys.language) ?? Defaults.language.rawValue
         let resolvedLang = AppLanguage(rawValue: savedLang) ?? .english
         language = resolvedLang
 
@@ -156,27 +160,60 @@ final class ReceiptSettingsStore: ObservableObject {
             expenseServices = SampleData.defaults(for: resolvedLang).defaultServices
         }
 
-        let savedTheme = defaults.string(forKey: Keys.theme) ?? AppTheme.system.rawValue
+        let savedTheme = defaults.string(forKey: Keys.theme) ?? Defaults.theme.rawValue
         let resolvedTheme = AppTheme(rawValue: savedTheme) ?? .system
         theme = resolvedTheme
 
         isLateFeeEnabled = defaults.bool(forKey: Keys.isLateFeeEnabled)
         let savedFeeRate = defaults.double(forKey: Keys.lateFeeMonthlyRate)
-        lateFeeMonthlyRate = savedFeeRate > 0 ? savedFeeRate : 5.0
+        lateFeeMonthlyRate = savedFeeRate > 0 ? savedFeeRate : Defaults.lateFeeMonthlyRate
         let savedDueDay = defaults.integer(forKey: Keys.lateFeeDueDay)
-        lateFeeDueDay = savedDueDay > 0 ? savedDueDay : 15
+        lateFeeDueDay = savedDueDay > 0 ? savedDueDay : Defaults.lateFeeDueDay
 
         let savedProfile = defaults.string(forKey: Keys.lateFeeCountryProfile)
         let resolvedProfile = savedProfile.flatMap(LateFeeCountryProfile.init(rawValue:)) ?? LateFeeCountryProfile.default(for: resolvedLang)
         lateFeeCountryProfile = resolvedProfile
         let savedGrace = defaults.integer(forKey: Keys.lateFeeGracePeriodDays)
         lateFeeGracePeriodDays = defaults.object(forKey: Keys.lateFeeGracePeriodDays) != nil ? savedGrace : resolvedProfile.defaultGraceDays
-        lateFeeCustomFootnote = defaults.string(forKey: Keys.lateFeeCustomFootnote) ?? ""
+        lateFeeCustomFootnote = defaults.string(forKey: Keys.lateFeeCustomFootnote) ?? Defaults.lateFeeCustomFootnote
+        checkUpdatesAtLaunch = defaults.bool(forKey: Keys.checkUpdatesAtLaunch)
 
         signatureData = defaults.data(forKey: Keys.signature)
         logoData = defaults.data(forKey: Keys.logo)
 
         applyTheme(resolvedTheme)
+    }
+
+    /// Fresh-install values of the preferences that "Reset Settings…" restores.
+    enum Defaults {
+        static let language = AppLanguage.english
+        static let theme = AppTheme.system
+        static let isLateFeeEnabled = false
+        static let lateFeeMonthlyRate = 5.0
+        static let lateFeeDueDay = 15
+        static let lateFeeCustomFootnote = ""
+        static let checkUpdatesAtLaunch = false
+    }
+
+    /// Restores preferences only: language, theme, currency, late-fee configuration and the launch
+    /// update check. Building data, residents, phones, vendors, services, receipts, logo, signature and
+    /// the receipt sequence are never touched.
+    func resetPreferencesToDefaults() {
+        language = Defaults.language
+        theme = Defaults.theme
+        currency = AppCurrency.default(for: Defaults.language)
+
+        let profile = LateFeeCountryProfile.default(for: Defaults.language)
+        for savedProfile in LateFeeCountryProfile.allCases {
+            defaults.removeObject(forKey: Keys.lateFeeRate(for: savedProfile))
+        }
+        isLateFeeEnabled = Defaults.isLateFeeEnabled
+        lateFeeCountryProfile = profile
+        lateFeeMonthlyRate = Defaults.lateFeeMonthlyRate
+        lateFeeDueDay = Defaults.lateFeeDueDay
+        lateFeeGracePeriodDays = profile.defaultGraceDays
+        lateFeeCustomFootnote = Defaults.lateFeeCustomFootnote
+        checkUpdatesAtLaunch = Defaults.checkUpdatesAtLaunch
     }
 
     func effectiveLateFeeFootnote() -> String {
@@ -434,6 +471,7 @@ final class ReceiptSettingsStore: ObservableObject {
         static let lateFeeCountryProfile = "late_fee_country_profile"
         static let lateFeeGracePeriodDays = "late_fee_grace_period_days"
         static let lateFeeCustomFootnote = "late_fee_custom_footnote"
+        static let checkUpdatesAtLaunch = "check_updates_at_launch"
 
         static func lateFeeRate(for profile: LateFeeCountryProfile) -> String {
             "late_fee_rate_\(profile.rawValue)"
