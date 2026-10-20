@@ -79,3 +79,11 @@ Doğrulama: K7QM-2XPA-9TRB-4HWD
 - Any web page, server or domain, hosted or cached.
 - HTML or `data:` links inside the QR code.
 - Public-key signatures for residents (no way to check them offline on a phone without an app).
+
+## Revision 2026-10-20: sealed block instead of readable text
+
+- **Why:** phone cameras offered a web search for the plain-text QR code of 3.6.0, which would send names and amounts to a search engine (`reflexion_memory_log.md`, R-009).
+- **QR content:** only the sealed code `AR1.…` (`ReceiptDocumentView.qrContent`). The camera shows it and offers Copy (confirmed by the user on iOS); the resident sends the copied code to the management. A `mailto:` link was tried first and rejected by the user (`user_rejected_spec.md`). Upper-case letters, digits and `.` let the QR use its compact alphanumeric mode (about 73 pt).
+- **Block:** `AR1.` + Crockford Base32 of nonce (12) ‖ ChaCha20-Poly1305 ciphertext ‖ tag (16) (`ReceiptQRBlock`). Key: HKDF-SHA256 of the installation key (info `AptReceipt receipt block v1`); nonce: HMAC of the plaintext with a second derived key (SIV-style, deterministic, never shared by two receipts). Plaintext format v1: version, flags (kind, language, flat shown, late fee), varints (number, flat, amount cents, late-fee base, fee, rate × 100, months), ISO currency, five length-prefixed strings (building, payer, manager, date, period; names capped at 40 characters).
+- **Verification:** the block opens with one of this installation's keys → genuine; a receipt number written next to the code must match the sealed one. The receipt is rebuilt with `ReceiptPrintedText` in its own language and shown as the POS slip. 3.6.0 text codes and pre-3.6 QR texts are still recognized.
+- **Tests:** privacy (the QR content is only the code), opening and tampering, foreign keys, restored keys, a pasted message with text around the code, a pinned block value that a separate Python implementation (`cryptography`) also opens.

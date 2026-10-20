@@ -267,13 +267,13 @@
 "publisher" = "Publisher: Babadogan Tech and Edu";
 "publisherLabel" = "Publisher";
 "qrCodeActive" = "Verifiable QR Code Active";
-"qrVerificationNotice" = "Scan to read the receipt details. The management checks the verification code with AptReceipt.";
+"qrVerificationNotice" = "Scan, copy the code and send it to the management; they verify the receipt with AptReceipt.";
 "qrVerificationCodeLabel" = "Verification code";
 
 /* Verify Receipt */
 "verifyReceiptTitle" = "Verify Receipt";
 "verifyReceiptMenu" = "Verify Receipt…";
-"verifyReceiptSubtitle" = "Drop a photo or PDF of a receipt, or paste its QR text. Verification works offline.";
+"verifyReceiptSubtitle" = "Drop a photo or PDF of a receipt, or paste the code a resident sent. Verification works offline.";
 "verifyDropHint" = "Drop a receipt here";
 "verifyChooseFile" = "Choose File…";
 "verifyPaste" = "Paste from Clipboard";

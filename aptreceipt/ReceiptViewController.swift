@@ -607,8 +607,28 @@ struct ReceiptDocumentView: View {
 
     /// Half a millimetre per QR module on paper, so phone cameras read the code.
     private static let qrPointsPerModule: CGFloat = 72 / 25.4 * 0.5
-    /// Longest building, payer or manager name in the QR text, so the code stays scannable.
-    static let qrNameLimit = 40
+    /// Longest building, payer or manager name carried by the QR code, so it stays scannable.
+    static let qrNameLimit = ReceiptPrintedText.nameLimit
+
+    /// Title, number and amounts as printed; the Verify Receipt window rebuilds the same values.
+    private var printed: ReceiptPrintedText { ReceiptPrintedText(draft: draft, apartmentName: apartmentName, l10n: l10n) }
+    private var formattedAmount: String { printed.totalAmount }
+    private var baseAmountFormatted: String { printed.baseAmount }
+    private var lateFeeAmountFormatted: String { printed.lateFeeAmount }
+    private var mainTitle: String { printed.mainTitle }
+    private var documentSerialFormatted: String { printed.serial }
+    private var documentType: String { printed.documentType }
+
+    /// The receipt as labeled lines in its language, as the Verify Receipt window shows it.
+    var qrLines: [String] { printed.lines }
+
+    /// What the QR code holds: only the receipt sealed with this installation's key (`ReceiptQRBlock`).
+    /// A phone camera shows the code and offers to copy it; nothing personal is readable, so even a web
+    /// search reveals nothing. The resident sends the copied code to the management to verify.
+    var qrContent: String {
+        ReceiptQRBlock(draft: draft, building: apartmentName, language: l10n.resolvedLanguage)
+            .sealed(with: (verificationKeys ?? .shared).currentKey) ?? ""
+    }
 
     // Strict Print Colors (Dark Mode Proof)
     private let textDark = Color(red: 0.08, green: 0.11, blue: 0.15)
@@ -619,37 +639,9 @@ struct ReceiptDocumentView: View {
     private let cardBackground = Color(red: 0.97, green: 0.98, blue: 0.99)
     private let tableHeaderBg = Color(red: 0.12, green: 0.18, blue: 0.26)
 
-    private var formattedAmount: String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.locale = l10n.locale
-        formatter.currencySymbol = draft.currency.symbol
-        formatter.currencyCode = draft.currency.code
-        return formatter.string(from: NSNumber(value: draft.amount)) ?? "\(draft.currency.symbol) \(draft.amount)"
-    }
 
-    private var baseAmountFormatted: String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.locale = l10n.locale
-        formatter.currencySymbol = draft.currency.symbol
-        formatter.currencyCode = draft.currency.code
-        let amt = draft.baseAmount > 0 ? draft.baseAmount : (draft.isLateFeeApplied ? max(0, draft.amount - draft.lateFeeAmount) : draft.amount)
-        return formatter.string(from: NSNumber(value: amt)) ?? "\(draft.currency.symbol) \(amt)"
-    }
 
-    private var lateFeeAmountFormatted: String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.locale = l10n.locale
-        formatter.currencySymbol = draft.currency.symbol
-        formatter.currencyCode = draft.currency.code
-        return formatter.string(from: NSNumber(value: draft.lateFeeAmount)) ?? "\(draft.currency.symbol) \(draft.lateFeeAmount)"
-    }
 
-    private var mainTitle: String {
-        apartmentName.isEmpty ? l10n.defaultBuildingName : l10n.uppercased(apartmentName)
-    }
 
     private var receiptBadgeText: String {
         switch draft.kind {
@@ -659,9 +651,6 @@ struct ReceiptDocumentView: View {
         }
     }
 
-    private var documentSerialFormatted: String {
-        ReceiptSerial.formatted(kind: draft.kind, language: l10n.resolvedLanguage, sequenceNumber: draft.sequenceNumber)
-    }
 
     private var amountInWords: String {
         NumberToWords.convert(draft.amount, language: l10n.resolvedLanguage, currency: draft.currency)
@@ -694,50 +683,6 @@ struct ReceiptDocumentView: View {
         }
     }
 
-    /// What the QR code holds: the receipt as labeled lines with the same labels and amounts as the paper,
-    /// in the receipt's language, then a verification code over those lines (`ReceiptVerificationCode`).
-    var qrText: String {
-        let receiverLabel = draft.kind == .income ? l10n.invoicePayerResidentLabel : l10n.invoiceVendorLabel
-        var lines = [
-            "AptReceipt",
-            Self.capped(mainTitle),
-            "\(documentType) · \(documentSerialFormatted)",
-            Self.labeled(l10n.issueDate, draft.createdDate),
-            Self.labeled(l10n.period, draft.monthYear),
-            Self.labeled(receiverLabel, Self.capped(draft.receiver)),
-        ]
-        if draft.kind != .managementExpense, draft.showApartmentNumber, draft.apartmentNumber > 0 {
-            lines.append("\(l10n.flatPrefix) \(draft.apartmentNumber)")
-        }
-        if draft.lateFeeAmount > 0 {
-            lines.append(Self.labeled(l10n.baseDuesAmount, baseAmountFormatted))
-            lines.append(Self.labeled(l10n.lateFeeCalculated, "+" + lateFeeAmountFormatted))
-        }
-        lines.append(Self.labeled(l10n.grandTotal, formattedAmount))
-        lines.append(Self.labeled(l10n.invoiceManagerLabel, Self.capped(draft.issuer)))
-
-        let body = lines.joined(separator: "\n")
-        let code = ReceiptVerificationCode.code(for: body, key: (verificationKeys ?? .shared).currentKey)
-        return body + "\n" + Self.labeled(l10n.qrVerificationCodeLabel, code)
-    }
-
-    private static func labeled(_ label: String, _ value: String) -> String {
-        let label = label.trimmingCharacters(in: .whitespaces)
-        return (label.hasSuffix(":") ? label : label + ":") + " " + value
-    }
-
-    private static func capped(_ text: String) -> String {
-        let text = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        return text.count > qrNameLimit ? String(text.prefix(qrNameLimit - 1)) + "…" : text
-    }
-
-    private var documentType: String {
-        switch draft.kind {
-        case .income: return l10n.incomeDocumentType
-        case .outcome: return l10n.expenseDocumentType
-        case .managementExpense: return l10n.managementExpenseDocumentType
-        }
-    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -1156,7 +1101,7 @@ struct ReceiptDocumentView: View {
             // MARK: 5. Footer & Authorized Signature
             HStack(alignment: .bottom, spacing: 14) {
                 // QR Verification Code
-                if let qrImage = QRCodeGenerator.generate(from: qrText, pointsPerModule: Self.qrPointsPerModule) {
+                if let qrImage = QRCodeGenerator.generate(from: qrContent, pointsPerModule: Self.qrPointsPerModule) {
                     Image(nsImage: qrImage)
                         .interpolation(.none)
                         .resizable()

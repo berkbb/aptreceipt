@@ -308,7 +308,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         render(view: bulletinBoardView, size: CGSize(width: 595, height: 842), to: outDir.appendingPathComponent("14_bulletin_board_notice.png"), isDark: false)
 
         // 15. Verify Receipt window with the sample receipt's QR text (Dark English)
-        let sampleQRText = ReceiptDocumentView(draft: sampleDraft, apartmentName: "Sunshine Residence", signatureImage: nil, l10n: settings.l10n).qrText
+        let sampleQRText = ReceiptDocumentView(draft: sampleDraft, apartmentName: "Sunshine Residence", signatureImage: nil, l10n: settings.l10n).qrContent
         let verifyView = ReceiptVerificationView(settings: settings, initialText: sampleQRText)
         render(view: verifyView, size: ReceiptVerificationView.size, to: outDir.appendingPathComponent("15_verify_receipt.png"), isDark: true)
 

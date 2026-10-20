@@ -46,3 +46,8 @@ Each entry: what happened, why, and the lesson to apply next time.
 
 - **What:** The verification QR on receipts did not scan on screen, in the PDF or on paper. It was a `CIImage` scaled by a non-integer factor into 52 pt (uneven, blurred modules after rasterizing) with no quiet zone, next to a border stroke.
 - **Lesson:** Verify machine-readable output by machine: decode generated codes in a test (Vision `VNDetectBarcodesRequest`) through the real export paths, not by eye. Draw codes as bitmaps with whole pixels per module and a quiet zone.
+
+## R-009 — A readable QR code sent receipt details to web search (2026-10-20)
+
+- **What:** 3.6.0 put the receipt as plain text in the QR code so phones could show it offline. Phone cameras offer "search the web" for plain text, so one tap sent the payer's name, amounts and building to a search engine.
+- **Lesson:** Check what the phone's camera does with a QR payload type before choosing it, and keep personal data out of anything a phone may hand to an online service. Receipts now carry only a code sealed with the installation key; the camera offers to copy it.

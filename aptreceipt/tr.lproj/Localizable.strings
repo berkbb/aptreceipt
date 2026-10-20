@@ -267,13 +267,13 @@
 "publisher" = "Yayıncı: Babadogan Tech and Edu";
 "publisherLabel" = "Yayıncı";
 "qrCodeActive" = "Doğrulanabilir QR Kod Aktif";
-"qrVerificationNotice" = "Makbuz bilgilerini görmek için okutun. Doğrulama kodunu yönetim AptReceipt ile kontrol eder.";
+"qrVerificationNotice" = "Okutun, çıkan kodu kopyalayıp yönetime gönderin; yönetim makbuzu AptReceipt ile doğrular.";
 "qrVerificationCodeLabel" = "Doğrulama kodu";
 
 /* Verify Receipt */
 "verifyReceiptTitle" = "Makbuz Doğrula";
 "verifyReceiptMenu" = "Makbuz Doğrula…";
-"verifyReceiptSubtitle" = "Makbuzun fotoğrafını veya PDF'ini bırakın ya da QR metnini yapıştırın. Doğrulama internetsiz yapılır.";
+"verifyReceiptSubtitle" = "Makbuzun fotoğrafını veya PDF'ini bırakın ya da sakinin gönderdiği kodu yapıştırın. Doğrulama internetsiz yapılır.";
 "verifyDropHint" = "Makbuzu buraya bırakın";
 "verifyChooseFile" = "Dosya Seç…";
 "verifyPaste" = "Panodan Yapıştır";

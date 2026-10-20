@@ -267,13 +267,13 @@
 "publisher" = "Editor: Babadogan Tech and Edu";
 "publisherLabel" = "Editor";
 "qrCodeActive" = "Cod QR de Verificare Activ";
-"qrVerificationNotice" = "Scanați pentru a citi detaliile chitanței. Administrația verifică codul de verificare cu AptReceipt.";
+"qrVerificationNotice" = "Scanați, copiați codul și trimiteți-l administrației; aceasta verifică chitanța cu AptReceipt.";
 "qrVerificationCodeLabel" = "Cod de verificare";
 
 /* Verify Receipt */
 "verifyReceiptTitle" = "Verificare Chitanță";
 "verifyReceiptMenu" = "Verificare Chitanță…";
-"verifyReceiptSubtitle" = "Trageți o fotografie sau un PDF al chitanței ori lipiți textul codului QR. Verificarea funcționează offline.";
+"verifyReceiptSubtitle" = "Trageți o fotografie sau un PDF al chitanței ori lipiți codul trimis de locatar. Verificarea funcționează offline.";
 "verifyDropHint" = "Trageți chitanța aici";
 "verifyChooseFile" = "Alegeți Fișierul…";
 "verifyPaste" = "Lipiți din Clipboard";

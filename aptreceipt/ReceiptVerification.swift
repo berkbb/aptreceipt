@@ -55,7 +55,25 @@ enum ReceiptVerificationCode {
         return keys.firstIndex { constantTimeEqual(Self.code(for: text, key: $0), typed) }
     }
 
-    private static func base32(_ bytes: [UInt8]) -> [Character] {
+    /// Crockford Base32 decoding; accepts lower case, and O for 0 or I/L for 1. Trailing padding bits are dropped.
+    static func base32Decode(_ text: String) -> [UInt8]? {
+        var bytes: [UInt8] = []
+        var buffer = 0
+        var bitCount = 0
+        for character in text.uppercased() {
+            let normalized: Character = character == "O" ? "0" : (character == "I" || character == "L" ? "1" : character)
+            guard let value = alphabet.firstIndex(of: normalized) else { return nil }
+            buffer = ((buffer << 5) | value) & 0xFFFF
+            bitCount += 5
+            if bitCount >= 8 {
+                bitCount -= 8
+                bytes.append(UInt8((buffer >> bitCount) & 0xFF))
+            }
+        }
+        return bytes
+    }
+
+    static func base32(_ bytes: [UInt8]) -> [Character] {
         var result: [Character] = []
         var buffer = 0
         var bitCount = 0
@@ -237,9 +255,34 @@ struct ScannedReceiptVerification {
 
     private static let brand = "AptReceipt"
 
-    /// `nil` when the text is not an AptReceipt receipt QR code.
-    init?(scannedText: String, keys: [SymmetricKey]) {
-        var lines = ReceiptVerificationCode.normalizedText(scannedText).components(separatedBy: "\n")
+    /// `nil` when the text is not an AptReceipt receipt QR code. Accepts the sealed code (scanned, or copied
+    /// into a message with other text around it) and the text QR codes of earlier versions.
+    init?(scannedText text: String, keys: [SymmetricKey]) {
+        if let sealed = ReceiptQRBlock.find(in: text) {
+            let visibleText = text.replacingOccurrences(of: sealed, with: "")
+            let visible = ReceiptSerial.parse(visibleText)
+            if let opened = ReceiptQRBlock.open(sealed, keys: keys),
+               visible.map({ $0.kind == opened.block.kind && $0.sequenceNumber == opened.block.sequenceNumber }) ?? true {
+                self.status = .genuine(keyIndex: opened.keyIndex)
+                self.lines = opened.block.printedLines
+                self.kind = opened.block.kind
+                self.language = opened.block.language
+                self.sequenceNumber = opened.block.sequenceNumber
+            } else {
+                // Sealed with another key, changed, or next to an edited receipt number: nothing can be shown.
+                self.status = .notVerified
+                let header = ReceiptVerificationCode.normalizedText(visibleText).components(separatedBy: "\n")
+                    .first { $0.hasPrefix(Self.brand) }
+                self.lines = [header ?? Self.brand]
+                self.kind = visible?.kind
+                self.language = visible?.language
+                self.sequenceNumber = visible?.sequenceNumber
+            }
+            self.code = nil
+            return
+        }
+
+        var lines = ReceiptVerificationCode.normalizedText(text).components(separatedBy: "\n")
         if lines.count == 1, lines[0].hasPrefix(Self.brand + " | ") {
             // Receipts printed before 3.6: one line, fields separated by " | ".
             self.lines = lines[0].components(separatedBy: " | ").dropFirst().map { $0 }
@@ -286,23 +329,307 @@ enum ReceiptArchiveComparison: Equatable {
 
     /// Rebuilds each candidate's QR lines in the scanned receipt's language and compares the values, so
     /// reworded labels in a later version do not count as differences.
-    @MainActor
     static func compare(_ scan: ScannedReceiptVerification, with records: [ReceiptRecord], apartmentName: String) -> ReceiptArchiveComparison {
         guard let kind = scan.kind, let language = scan.language, let number = scan.sequenceNumber else { return .missing }
         let candidates = records.filter { $0.sequenceNumber == number && $0.kind == kind }
         guard !candidates.isEmpty else { return .missing }
         guard scan.status != .olderWithoutCode else { return .matches }
 
-        let keys = ReceiptVerificationKeyStore(fileURL: nil)
         let differences = candidates.map { record -> [String] in
-            let rebuilt = ReceiptDocumentView(
-                draft: record.toDraft(), apartmentName: apartmentName, signatureImage: nil,
-                l10n: L10n(language), verificationKeys: keys
-            ).qrText.components(separatedBy: "\n").dropLast()
+            let rebuilt = ReceiptPrintedText(draft: record.toDraft(), apartmentName: apartmentName, l10n: L10n(language)).lines
             let values = Set(rebuilt.map(ScannedReceiptVerification.value(of:)))
             return scan.lines.filter { !values.contains(ScannedReceiptVerification.value(of: $0)) }
         }
         let closest = differences.min { $0.count < $1.count } ?? []
         return closest.isEmpty ? .matches : .differs(lines: closest)
+    }
+}
+
+// MARK: - Printed Receipt Text
+
+/// A receipt's printed title, number, amounts and labeled lines, shared by the paper (`ReceiptDocumentView`)
+/// and the Verify Receipt window, so both always show the same values.
+struct ReceiptPrintedText {
+    /// Longest building, payer or manager name carried by the QR code, so it stays scannable.
+    static let nameLimit = 40
+
+    let draft: ReceiptDraft
+    let apartmentName: String
+    let l10n: L10n
+
+    var mainTitle: String {
+        apartmentName.isEmpty ? l10n.defaultBuildingName : l10n.uppercased(apartmentName)
+    }
+
+    var documentType: String {
+        switch draft.kind {
+        case .income: return l10n.incomeDocumentType
+        case .outcome: return l10n.expenseDocumentType
+        case .managementExpense: return l10n.managementExpenseDocumentType
+        }
+    }
+
+    var serial: String {
+        ReceiptSerial.formatted(kind: draft.kind, language: l10n.resolvedLanguage, sequenceNumber: draft.sequenceNumber)
+    }
+
+    var totalAmount: String { currency(draft.amount) }
+
+    var baseAmount: String {
+        currency(draft.baseAmount > 0 ? draft.baseAmount : (draft.isLateFeeApplied ? max(0, draft.amount - draft.lateFeeAmount) : draft.amount))
+    }
+
+    var lateFeeAmount: String { currency(draft.lateFeeAmount) }
+
+    /// The receipt as labeled lines in its language, with the printed labels and amounts.
+    var lines: [String] {
+        let receiverLabel = draft.kind == .income ? l10n.invoicePayerResidentLabel : l10n.invoiceVendorLabel
+        var lines = [
+            "AptReceipt",
+            Self.capped(mainTitle),
+            "\(documentType) · \(serial)",
+            Self.labeled(l10n.issueDate, draft.createdDate),
+            Self.labeled(l10n.period, draft.monthYear),
+            Self.labeled(receiverLabel, Self.capped(draft.receiver)),
+        ]
+        if draft.kind != .managementExpense, draft.showApartmentNumber, draft.apartmentNumber > 0 {
+            lines.append("\(l10n.flatPrefix) \(draft.apartmentNumber)")
+        }
+        if draft.lateFeeAmount > 0 {
+            lines.append(Self.labeled(l10n.baseDuesAmount, baseAmount))
+            lines.append(Self.labeled(l10n.lateFeeCalculated, "+" + lateFeeAmount))
+        }
+        lines.append(Self.labeled(l10n.grandTotal, totalAmount))
+        lines.append(Self.labeled(l10n.invoiceManagerLabel, Self.capped(draft.issuer)))
+        return lines
+    }
+
+    static func capped(_ text: String) -> String {
+        let text = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        return text.count > nameLimit ? String(text.prefix(nameLimit - 1)) + "…" : text
+    }
+
+    private static func labeled(_ label: String, _ value: String) -> String {
+        let label = label.trimmingCharacters(in: .whitespaces)
+        return (label.hasSuffix(":") ? label : label + ":") + " " + value
+    }
+
+    private func currency(_ value: Double) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.locale = l10n.locale
+        formatter.currencySymbol = draft.currency.symbol
+        formatter.currencyCode = draft.currency.code
+        return formatter.string(from: NSNumber(value: value)) ?? "\(draft.currency.symbol) \(value)"
+    }
+}
+
+// MARK: - Sealed Receipt Block
+
+/// The receipt's details sealed with this installation's key (ChaCha20-Poly1305): only AptReceipt with that
+/// key can open the block, and any change to it makes opening fail. A phone that scans the QR code sees only
+/// this block, so copying, sending or searching it reveals nothing personal.
+struct ReceiptQRBlock: Equatable {
+    static let prefix = "AR1."
+    private static let formatVersion: UInt8 = 1
+    private static let context = Data("AptReceipt receipt block v1".utf8)
+    private static let nonceContext = Data("AptReceipt receipt block nonce v1".utf8)
+    /// Fixed orders for the flags byte; never reorder (printed receipts must keep opening).
+    private static let kinds: [ReceiptKind] = [.income, .outcome, .managementExpense]
+    private static let languages: [AppLanguage] = [.english, .turkish, .romanian]
+
+    struct LateFee: Equatable {
+        var baseCents: Int
+        var feeCents: Int
+        var rateHundredths: Int
+        var months: Int
+    }
+
+    var kind: ReceiptKind
+    var language: AppLanguage
+    var sequenceNumber: Int
+    var showApartmentNumber: Bool
+    var apartmentNumber: Int
+    var amountCents: Int
+    var currency: AppCurrency
+    var lateFee: LateFee?
+    var building: String
+    var receiver: String
+    var issuer: String
+    var createdDate: String
+    var period: String
+
+    init(draft: ReceiptDraft, building: String, language: AppLanguage) {
+        kind = draft.kind
+        self.language = Self.languages.contains(language) ? language : .english
+        sequenceNumber = max(0, draft.sequenceNumber)
+        showApartmentNumber = draft.showApartmentNumber
+        apartmentNumber = max(0, draft.apartmentNumber)
+        amountCents = Self.cents(draft.amount)
+        currency = draft.currency
+        lateFee = draft.lateFeeAmount > 0
+            ? LateFee(baseCents: Self.cents(draft.baseAmount), feeCents: Self.cents(draft.lateFeeAmount), rateHundredths: Self.cents(draft.lateFeeRate), months: max(0, draft.lateMonths))
+            : nil
+        self.building = ReceiptPrintedText.capped(building)
+        receiver = ReceiptPrintedText.capped(draft.receiver)
+        issuer = ReceiptPrintedText.capped(draft.issuer)
+        createdDate = ReceiptPrintedText.capped(draft.createdDate)
+        period = ReceiptPrintedText.capped(draft.monthYear)
+    }
+
+    /// The receipt rebuilt from the block (notes are not carried).
+    var draft: ReceiptDraft {
+        ReceiptDraft(
+            receiver: receiver, issuer: issuer, notes: "", monthYear: period,
+            apartmentNumber: apartmentNumber, amount: Double(amountCents) / 100, sequenceNumber: sequenceNumber,
+            createdDate: createdDate, showApartmentNumber: showApartmentNumber, kind: kind, currency: currency,
+            isLateFeeApplied: lateFee != nil,
+            lateFeeRate: Double(lateFee?.rateHundredths ?? 0) / 100,
+            lateMonths: lateFee?.months ?? 0,
+            lateFeeAmount: Double(lateFee?.feeCents ?? 0) / 100,
+            baseAmount: Double(lateFee?.baseCents ?? 0) / 100
+        )
+    }
+
+    /// The receipt's labeled lines in its own language, as printed.
+    var printedLines: [String] {
+        ReceiptPrintedText(draft: draft, apartmentName: building, l10n: L10n(language)).lines
+    }
+
+    /// `AR1.` followed by the sealed block in Crockford Base32. The nonce is derived from the content (as in
+    /// SIV), so the same receipt always gives the same QR code and two different receipts never share a nonce.
+    func sealed(with key: SymmetricKey) -> String? {
+        let plain = encoded()
+        let nonceKey = HKDF<SHA256>.deriveKey(inputKeyMaterial: key, info: Self.nonceContext, outputByteCount: 32)
+        let nonceBytes = Data(HMAC<SHA256>.authenticationCode(for: plain, using: nonceKey).prefix(12))
+        guard let nonce = try? ChaChaPoly.Nonce(data: nonceBytes),
+              let box = try? ChaChaPoly.seal(plain, using: Self.sealingKey(key), nonce: nonce, authenticating: Self.context) else { return nil }
+        return Self.prefix + String(ReceiptVerificationCode.base32(Array(box.combined)))
+    }
+
+    /// Opens a block with the first key that sealed it; `nil` when none did or the block was changed.
+    static func open(_ sealed: String, keys: [SymmetricKey]) -> (block: ReceiptQRBlock, keyIndex: Int)? {
+        guard sealed.hasPrefix(prefix),
+              let bytes = ReceiptVerificationCode.base32Decode(String(sealed.dropFirst(prefix.count))),
+              let box = try? ChaChaPoly.SealedBox(combined: Data(bytes)) else { return nil }
+        for (index, key) in keys.enumerated() {
+            if let plain = try? ChaChaPoly.open(box, using: sealingKey(key), authenticating: context),
+               let block = ReceiptQRBlock(decoding: plain) {
+                return (block, index)
+            }
+        }
+        return nil
+    }
+
+    /// The first sealed block in a scanned QR code or a pasted email.
+    static func find(in text: String) -> String? {
+        text.range(of: #"AR1\.[0-9A-Za-z]{40,}"#, options: .regularExpression).map { String(text[$0]) }
+    }
+
+    private static func sealingKey(_ key: SymmetricKey) -> SymmetricKey {
+        HKDF<SHA256>.deriveKey(inputKeyMaterial: key, info: context, outputByteCount: 32)
+    }
+
+    private static func cents(_ value: Double) -> Int {
+        max(0, Int((value * 100).rounded()))
+    }
+
+    // MARK: Binary format v1
+
+    private func encoded() -> Data {
+        var data = Data([Self.formatVersion])
+        var flags = UInt8(Self.kinds.firstIndex(of: kind) ?? 0) | UInt8(Self.languages.firstIndex(of: language) ?? 0) << 2
+        if showApartmentNumber { flags |= 1 << 4 }
+        if lateFee != nil { flags |= 1 << 5 }
+        data.append(flags)
+        for number in [sequenceNumber, apartmentNumber, amountCents] {
+            Self.appendVarint(number, to: &data)
+        }
+        data.append(contentsOf: Array(currency.rawValue.utf8.prefix(3)))
+        if let lateFee {
+            for number in [lateFee.baseCents, lateFee.feeCents, lateFee.rateHundredths, lateFee.months] {
+                Self.appendVarint(number, to: &data)
+            }
+        }
+        for text in [building, receiver, issuer, createdDate, period] {
+            let bytes = Array(text.utf8.prefix(255))
+            data.append(UInt8(bytes.count))
+            data.append(contentsOf: bytes)
+        }
+        return data
+    }
+
+    private init?(decoding data: Data) {
+        var reader = ByteReader(bytes: Array(data))
+        guard reader.byte() == Self.formatVersion, let flags = reader.byte() else { return nil }
+        let kindIndex = Int(flags & 0b11), languageIndex = Int((flags >> 2) & 0b11)
+        guard kindIndex < Self.kinds.count, languageIndex < Self.languages.count,
+              let sequenceNumber = reader.varint(), let apartmentNumber = reader.varint(), let amountCents = reader.varint(),
+              let code = reader.take(3), let currency = AppCurrency(rawValue: String(decoding: code, as: UTF8.self)) else { return nil }
+        var lateFee: LateFee?
+        if flags & (1 << 5) != 0 {
+            guard let base = reader.varint(), let fee = reader.varint(), let rate = reader.varint(), let months = reader.varint() else { return nil }
+            lateFee = LateFee(baseCents: base, feeCents: fee, rateHundredths: rate, months: months)
+        }
+        guard let building = reader.string(), let receiver = reader.string(), let issuer = reader.string(),
+              let createdDate = reader.string(), let period = reader.string(), reader.isAtEnd else { return nil }
+        self.kind = Self.kinds[kindIndex]
+        self.language = Self.languages[languageIndex]
+        self.sequenceNumber = sequenceNumber
+        self.showApartmentNumber = flags & (1 << 4) != 0
+        self.apartmentNumber = apartmentNumber
+        self.amountCents = amountCents
+        self.currency = currency
+        self.lateFee = lateFee
+        self.building = building
+        self.receiver = receiver
+        self.issuer = issuer
+        self.createdDate = createdDate
+        self.period = period
+    }
+
+    /// Unsigned LEB128.
+    private static func appendVarint(_ number: Int, to data: inout Data) {
+        var value = UInt64(max(0, number))
+        repeat {
+            var byte = UInt8(value & 0x7F)
+            value >>= 7
+            if value != 0 { byte |= 0x80 }
+            data.append(byte)
+        } while value != 0
+    }
+
+    private struct ByteReader {
+        let bytes: [UInt8]
+        var index = 0
+
+        var isAtEnd: Bool { index == bytes.count }
+
+        mutating func byte() -> UInt8? {
+            guard index < bytes.count else { return nil }
+            defer { index += 1 }
+            return bytes[index]
+        }
+
+        mutating func take(_ count: Int) -> [UInt8]? {
+            guard index + count <= bytes.count else { return nil }
+            defer { index += count }
+            return Array(bytes[index..<index + count])
+        }
+
+        mutating func varint() -> Int? {
+            var value: UInt64 = 0
+            for shift in stride(from: 0, to: 63, by: 7) {
+                guard let byte = byte() else { return nil }
+                value |= UInt64(byte & 0x7F) << UInt64(shift)
+                if byte & 0x80 == 0 { return Int(exactly: value) }
+            }
+            return nil
+        }
+
+        mutating func string() -> String? {
+            guard let length = byte(), let text = take(Int(length)) else { return nil }
+            return String(bytes: text, encoding: .utf8)
+        }
     }
 }
