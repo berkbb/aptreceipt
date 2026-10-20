@@ -136,7 +136,7 @@ struct ReceiptArchiveSheet: View {
 
                     Spacer()
 
-                    Text(String(format: "%.2f %@", totalFilteredAmount, settings.currency.symbol))
+                    Text(AppFormat.currency(totalFilteredAmount, settings.currency, l10n: l10n))
                         .font(.system(size: 13, weight: .bold, design: .rounded))
                         .foregroundColor(.primary)
                 }
@@ -251,7 +251,7 @@ struct ReceiptArchiveSheet: View {
             Spacer()
 
             // Amount
-            Text(String(format: "%.2f %@", record.amount, record.currency.symbol))
+            Text(AppFormat.currency(record.amount, record.currency, l10n: l10n))
                 .font(.system(size: 15, weight: .bold, design: .rounded))
                 .foregroundColor(badgeColor)
                 .frame(width: 130, alignment: .trailing)

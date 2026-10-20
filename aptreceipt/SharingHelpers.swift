@@ -82,22 +82,11 @@ enum WhatsAppShareHelper {
 
     /// Same currency format as the printed receipt (locale grouping and decimals, symbol placement).
     static func formatAmount(_ value: Double, currency: AppCurrency, l10n: L10n) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.locale = l10n.locale
-        formatter.currencySymbol = currency.symbol
-        formatter.currencyCode = currency.code
-        return formatter.string(from: NSNumber(value: value)) ?? "\(currency.symbol) \(String(format: "%.2f", value))"
+        AppFormat.currency(value, currency, l10n: l10n)
     }
 
     static func formatRate(_ rate: Double, l10n: L10n) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.locale = l10n.locale
-        formatter.minimumFractionDigits = 1
-        formatter.maximumFractionDigits = 2
-        let number = formatter.string(from: NSNumber(value: rate)) ?? String(format: "%.1f", rate)
-        return l10n.resolvedLanguage == .turkish ? "%\(number)" : "\(number)%"
+        AppFormat.percent(rate, l10n: l10n, maximumFractionDigits: 2)
     }
 
     static func receiptSummary(draft: ReceiptDraft, buildingName: String, l10n: L10n) -> String {

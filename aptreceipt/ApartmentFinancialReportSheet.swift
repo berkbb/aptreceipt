@@ -232,7 +232,7 @@ struct ApartmentFinancialReportSheet: View {
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(.green)
                     Spacer()
-                    Text(String(format: "%%%0.1f \(l10n.paidStatus) (%d / %d)", rate, paidCount, totalFlats))
+                    Text("\(AppFormat.percent(rate, l10n: l10n)) \(l10n.paidStatus) (\(paidCount) / \(totalFlats))")
                         .font(.system(size: 12, weight: .bold, design: .rounded))
                         .foregroundColor(.green)
                 }
@@ -267,9 +267,9 @@ struct ApartmentFinancialReportSheet: View {
                                     .font(.system(size: 12, weight: .medium))
                                     .lineLimit(1)
                                 Spacer()
-                                Text(String(format: "%.2f %@", item.amount, settings.currency.symbol))
+                                Text(AppFormat.currency(item.amount, settings.currency, l10n: l10n))
                                     .font(.system(size: 12, weight: .bold, design: .rounded))
-                                Text(String(format: "(%%%0.1f)", item.percent))
+                                Text("(\(AppFormat.percent(item.percent, l10n: l10n)))")
                                     .font(.system(size: 11))
                                     .foregroundColor(.secondary)
                                     .frame(width: 50, alignment: .trailing)
@@ -350,7 +350,7 @@ struct ApartmentFinancialReportSheet: View {
                             if settings.isLateFeeEnabled {
                                 let defaultAmt = Double(settings.defaultPayment.replacingOccurrences(of: ",", with: ".")) ?? 1750.0
                                 let fee = LateFeeCalculator.fee(base: defaultAmt, monthlyRate: settings.lateFeeMonthlyRate, months: 1)
-                                Text("+\(String(format: "%.2f", fee)) \(settings.currency.symbol) \(l10n.lateFeeShortBadge)")
+                                Text("+\(AppFormat.currency(fee, settings.currency, l10n: l10n)) \(l10n.lateFeeShortBadge)")
                                     .font(.system(size: 10, weight: .bold, design: .monospaced))
                                     .foregroundColor(.orange)
                                     .padding(.horizontal, 7)
@@ -403,7 +403,7 @@ struct ApartmentFinancialReportSheet: View {
                     Spacer()
 
                     let color: Color = r.kind == .income ? .green : (r.kind == .outcome ? .orange : Color(red: 0.22, green: 0.42, blue: 0.88))
-                    Text(String(format: "%.2f %@", r.amount, r.currency.symbol))
+                    Text(AppFormat.currency(r.amount, r.currency, l10n: l10n))
                         .font(.system(size: 13, weight: .bold, design: .rounded))
                         .foregroundColor(color)
                 }
@@ -425,7 +425,7 @@ struct ApartmentFinancialReportSheet: View {
                     .font(.system(size: 11, weight: .bold))
                     .foregroundColor(.secondary)
             }
-            Text(String(format: "%.2f %@", amount, settings.currency.symbol))
+            Text(AppFormat.currency(amount, settings.currency, l10n: l10n))
                 .font(.system(size: 17, weight: .heavy, design: .rounded))
                 .foregroundColor(color)
             Text(subtitle)
@@ -470,8 +470,8 @@ struct ApartmentFinancialReportSheet: View {
         panel.showsTagField = false
         panel.allowedContentTypes = [.pdf]
         let periodStr = (selectedPeriod == "all" ? l10n.allMonths : periodTitle(selectedPeriod)).replacingOccurrences(of: " ", with: "_")
-        let aptStr = sanitizeForFileName(settings.apartmentName.isEmpty ? "Apartman" : settings.apartmentName)
-        panel.nameFieldStringValue = "\(aptStr)_Mali_Pano_Raporu_\(periodStr).pdf"
+        let aptStr = sanitizeForFileName(settings.apartmentName.isEmpty ? l10n.defaultBuildingName : settings.apartmentName)
+        panel.nameFieldStringValue = "\(l10n.bulletinPdfFileName(building: aptStr, period: periodStr)).pdf"
 
         guard panel.runModal() == .OK, let url = panel.url else { return }
 

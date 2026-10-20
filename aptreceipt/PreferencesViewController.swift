@@ -424,7 +424,7 @@ struct SettingsView: View {
                         Button {
                             viewModel.lateFeeMonthlyRate = String(format: "%.1f", rate)
                         } label: {
-                            Text(rate == viewModel.lateFeeCountryProfile.defaultRate ? "%\(String(format: "%.1f", rate)) (\(l10n.statutoryRateLabel))" : "%\(String(format: "%.1f", rate))")
+                            Text(rate == viewModel.lateFeeCountryProfile.defaultRate ? "\(AppFormat.percent(rate, l10n: l10n)) (\(l10n.statutoryRateLabel))" : AppFormat.percent(rate, l10n: l10n))
                                 .font(.system(size: 10.5, weight: isSelected ? .bold : .medium))
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 4)

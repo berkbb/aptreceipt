@@ -210,7 +210,7 @@ public final class GitHubUpdateChecker: ObservableObject {
     private let releasesURLString = "https://api.github.com/repos/berkbb/aptreceipt/releases/latest"
 
     public var currentAppVersion: String {
-        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "3.3.0"
+        AppInfo.version
     }
 
     private init() {}

@@ -1,5 +1,31 @@
 import Foundation
 
+// MARK: - Display Formatting
+
+/// Amounts and percentages as the app language writes them, so every screen matches the printed receipt.
+enum AppFormat {
+    /// e.g. "₺1.750,00" (tr), "$1,750.00" (en), "1.750,00 Lei" (ro).
+    static func currency(_ value: Double, _ currency: AppCurrency, l10n: L10n) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.locale = l10n.locale
+        formatter.currencySymbol = currency.symbol
+        formatter.currencyCode = currency.code
+        return formatter.string(from: NSNumber(value: value)) ?? "\(currency.symbol) \(String(format: "%.2f", value))"
+    }
+
+    /// e.g. "%16,7" (tr), "16.7%" (en), "16,7%" (ro). Turkish puts the sign first.
+    static func percent(_ value: Double, l10n: L10n, minimumFractionDigits: Int = 1, maximumFractionDigits: Int = 1) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.locale = l10n.locale
+        formatter.minimumFractionDigits = minimumFractionDigits
+        formatter.maximumFractionDigits = maximumFractionDigits
+        let number = formatter.string(from: NSNumber(value: value)) ?? String(format: "%.1f", value)
+        return l10n.resolvedLanguage == .turkish ? "%\(number)" : "\(number)%"
+    }
+}
+
 // MARK: - Receipt Period
 
 /// A receipt period such as "Ekim 2026", "October 2026" or "Octombrie 2026" reduced to year and month.

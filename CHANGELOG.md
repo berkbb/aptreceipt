@@ -10,6 +10,11 @@ All notable changes to this project will be documented in this file.
 - **WhatsApp receipt message**: Amounts use the same format as the printed receipt (e.g. `₺2.300,00` instead of `₺ 2300.00`), a late fee is shown as dues plus late fee under the total, and empty description, flat number or manager lines are left out.
 - **WhatsApp payment reminder**: Greets the owner by name when known, formats the dues, late fee and total like the receipt, and writes the rate per language (`%5,0`, `5.0%`).
 - **Cash summary month picker**: Periods were listed exactly as stored on each receipt, so a month created in another app language stayed untranslated ("October 2026" in Turkish), the same month could appear twice with its totals split, and the list was sorted alphabetically. Periods are now recognized in Turkish, English and Romanian, shown in the current language, merged per month and sorted newest first; paid/unpaid status, reminders, the bulletin title and the PDF file name use the same period. Unrecognized period texts are still listed as written.
+- **Amounts on every screen** (cash summary, archive, main screen, live preview, bulletin PDF) were written as `1750.00 ₺` in all languages; they now use the same per-language format as the printed receipt (`₺1.750,00`, `₺1,750.00`, `1.750,00 Lei`).
+- **Percentages and late-fee rates** were written Turkish-style everywhere (`%16.7 Paid`, `Late Fee (%5.0 × 3 Months)`); they now follow the language: `%16,7 Ödendi`, `16.7% Paid`, `16,7%` and `Gecikme Tazminatı (%2,5 × 3 Ay)`, `Late Fee (5.0% × 3 Months)`.
+- **Batch dues receipts** always stored a Turkish description and, for flats without an owner, a Turkish recipient (`… Sakini (Daire 5)`); both now use the app language.
+- **Bulletin board PDF**: the footer tagline was always Turkish, and the suggested file name was always `…_Mali_Pano_Raporu_…` with `Apartman` as the fallback building name; both now use the app language.
+- **Receipt footer version**: Receipts printed `AptReceipt v3.3.0` regardless of the installed version; they now show the real version.
 - **Receipt preview footer**: The buttons now sit in two rows (share actions, then Close / JPEG / PDF), so every label fits in all three languages, including when an invoice is attached.
 
 ## [3.5.0] - 2026-10-20

@@ -117,7 +117,7 @@ final class MainScreenViewModel: ObservableObject {
 
                 let l10n = settings.l10n
                 let vendorStr = result.vendorName ?? l10n.importInvoice
-                let amountStr = result.amount != nil ? String(format: "%.2f %@", result.amount!, settings.currency.symbol) : ""
+                let amountStr = result.amount.map { AppFormat.currency($0, settings.currency, l10n: l10n) } ?? ""
                 self.invoiceScanBanner = "\(l10n.invoiceScanSuccess): \(vendorStr) \(amountStr)".trimmingCharacters(in: .whitespaces)
             }
         }

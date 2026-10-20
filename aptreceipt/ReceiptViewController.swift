@@ -1167,7 +1167,7 @@ struct ReceiptDocumentView: View {
                             .foregroundColor(textMuted)
                     }
 
-                    Text("\(l10n.appTitle) v3.3.0 • \(l10n.publisher)")
+                    Text("\(l10n.appTitle) v\(AppInfo.version) • \(l10n.publisher)")
                         .font(.system(size: 8))
                         .foregroundColor(textMuted.opacity(0.8))
                 }

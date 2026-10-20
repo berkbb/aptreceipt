@@ -142,7 +142,7 @@ struct LiveReceiptPreview: View {
                         Text(l10n.baseDuesAmount)
                             .font(.system(size: 9.5, weight: .semibold))
                             .foregroundColor(.secondary)
-                        Text(String(format: "%.2f %@", baseAmount, currency.symbol))
+                        Text(AppFormat.currency(baseAmount, currency, l10n: l10n))
                             .font(.system(size: 11, weight: .medium, design: .monospaced))
                     }
 
@@ -155,10 +155,10 @@ struct LiveReceiptPreview: View {
                     Spacer()
 
                     VStack(alignment: .trailing, spacing: 2) {
-                        Text("\(l10n.lateFeeCalculated) (%\(String(format: "%.1f", lateFeeRate)) × \(lateMonths))")
+                        Text("\(l10n.lateFeeCalculated) (\(AppFormat.percent(lateFeeRate, l10n: l10n, maximumFractionDigits: 2)) × \(lateMonths))")
                             .font(.system(size: 9.5, weight: .semibold))
                             .foregroundColor(.orange)
-                        Text(String(format: "+%.2f %@", lateFeeAmount, currency.symbol))
+                        Text("+\(AppFormat.currency(lateFeeAmount, currency, l10n: l10n))")
                             .font(.system(size: 11, weight: .bold, design: .monospaced))
                             .foregroundColor(.orange)
                     }

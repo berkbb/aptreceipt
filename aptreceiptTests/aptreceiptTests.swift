@@ -215,10 +215,11 @@ final class aptreceiptTests: XCTestCase {
     }
 
     func testLateFeeItemNameFormatting() {
-        XCTAssertEqual(L10n(.english).lateFeeItemName(rate: 5, months: 3), "Late Fee (%5.0 × 3 Months)")
-        XCTAssertEqual(L10n(.english).lateFeeItemName(rate: 5, months: 1), "Late Fee (%5.0 × 1 Month)")
-        XCTAssertEqual(L10n(.turkish).lateFeeItemName(rate: 2.5, months: 2), "Gecikme Tazminatı (%2.5 × 2 Ay)")
-        XCTAssertEqual(L10n(.romanian).lateFeeItemName(rate: 5, months: 1), "Penalități Întârziere (%5.0 × 1 Lună)")
+        XCTAssertEqual(L10n(.english).lateFeeItemName(rate: 5, months: 3), "Late Fee (5.0% × 3 Months)")
+        XCTAssertEqual(L10n(.english).lateFeeItemName(rate: 5, months: 1), "Late Fee (5.0% × 1 Month)")
+        XCTAssertEqual(L10n(.turkish).lateFeeItemName(rate: 2.5, months: 2), "Gecikme Tazminatı (%2,5 × 2 Ay)")
+        XCTAssertEqual(L10n(.romanian).lateFeeItemName(rate: 5, months: 1), "Penalități Întârziere (5,0% × 1 Lună)")
+        XCTAssertEqual(L10n(.romanian).lateFeeItemName(rate: 0.25, months: 2), "Penalități Întârziere (0,25% × 2 Luni)")
     }
 
     // MARK: - 3. Backup Package & Settings Store Tests
@@ -1088,6 +1089,37 @@ final class aptreceiptTests: XCTestCase {
         let september = try XCTUnwrap(ReceiptPeriod(monthYear: "Eylül 2026"))
         let january = try XCTUnwrap(ReceiptPeriod(monthYear: "Ocak 2027"))
         XCTAssertEqual([october, january, september].sorted(by: >), [january, october, september])
+    }
+
+    // MARK: - 13. Per-language display formatting and generated texts
+
+    func testAmountsUseTheAppLanguageFormat() {
+        let tr = AppFormat.currency(1750, .turkishLira, l10n: L10n(.turkish))
+        XCTAssertTrue(tr.contains("1.750,00") && tr.contains("₺"), tr)
+        let en = AppFormat.currency(1750, .usDollar, l10n: L10n(.english))
+        XCTAssertTrue(en.contains("1,750.00") && en.contains("$"), en)
+        let ro = AppFormat.currency(1750, .romanianLeu, l10n: L10n(.romanian))
+        XCTAssertTrue(ro.contains("1.750,00") && ro.contains("Lei"), ro)
+        XCTAssertFalse(tr.contains("1750.00"), tr)
+    }
+
+    func testPercentagesFollowTheAppLanguage() {
+        XCTAssertEqual(AppFormat.percent(16.666, l10n: L10n(.turkish)), "%16,7")
+        XCTAssertEqual(AppFormat.percent(16.666, l10n: L10n(.english)), "16.7%")
+        XCTAssertEqual(AppFormat.percent(16.666, l10n: L10n(.romanian)), "16,7%")
+        XCTAssertEqual(AppFormat.percent(0.2, l10n: L10n(.romanian), maximumFractionDigits: 2), "0,2%")
+    }
+
+    func testBatchReceiptsBulletinAndFileNamesAreTranslated() {
+        XCTAssertEqual(L10n(.turkish).batchReceiverFallback(buildingName: "Test Apt", flat: 5), "Test Apt Sakini (Daire 5)")
+        XCTAssertEqual(L10n(.english).batchReceiverFallback(buildingName: "Test Apt", flat: 5), "Test Apt Resident (Flat 5)")
+        XCTAssertEqual(L10n(.romanian).batchReceiverFallback(buildingName: "Test Apt", flat: 5), "Locatar Test Apt (Ap. 5)")
+        XCTAssertEqual(L10n(.turkish).batchReceiptNote(period: "Ekim 2026"), "Ekim 2026 dönemi bina ortak gider ve aidat payı")
+        XCTAssertTrue(L10n(.english).batchReceiptNote(period: "October 2026").hasSuffix("October 2026"))
+        XCTAssertFalse(L10n(.english).bulletinFooterTagline.contains("Apartman"))
+        XCTAssertTrue(L10n(.turkish).bulletinFooterTagline.contains("Doğrulanabilir"))
+        XCTAssertEqual(L10n(.turkish).bulletinPdfFileName(building: "test_apt", period: "Ekim_2026"), "test_apt_Mali_Pano_Raporu_Ekim_2026")
+        XCTAssertEqual(L10n(.english).bulletinPdfFileName(building: "test_apt", period: "October_2026"), "test_apt_Financial_Bulletin_October_2026")
     }
 }
 

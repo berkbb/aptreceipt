@@ -98,7 +98,7 @@ struct ApartmentBulletinBoardView: View {
                                     .font(.system(size: 10.5, weight: .medium))
                                     .lineLimit(1)
                                 Spacer()
-                                Text(String(format: "%.2f %@", item.amount, settings.currency.symbol))
+                                Text(AppFormat.currency(item.amount, settings.currency, l10n: l10n))
                                     .font(.system(size: 10.5, weight: .bold, design: .rounded))
                                 Text(String(format: "(%%%0.1f)", item.percent))
                                     .font(.system(size: 9.5))
@@ -125,7 +125,7 @@ struct ApartmentBulletinBoardView: View {
                     Text(l10n.bulletinBoardNoticeFooter)
                         .font(.system(size: 9.5))
                         .foregroundColor(.secondary)
-                    Text("AptReceipt • Doğrulanabilir Dijital Apartman Yönetim Sistemi")
+                    Text(l10n.bulletinFooterTagline)
                         .font(.system(size: 8))
                         .foregroundColor(.secondary.opacity(0.7))
                 }
@@ -168,7 +168,7 @@ struct ApartmentBulletinBoardView: View {
                     .font(.system(size: 10, weight: .bold))
                     .foregroundColor(.secondary)
             }
-            Text(String(format: "%.2f %@", amount, settings.currency.symbol))
+            Text(AppFormat.currency(amount, settings.currency, l10n: l10n))
                 .font(.system(size: 14, weight: .bold, design: .rounded))
                 .foregroundColor(color)
         }

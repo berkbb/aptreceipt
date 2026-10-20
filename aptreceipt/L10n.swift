@@ -287,9 +287,23 @@ struct L10n {
     var statutoryRateLabel: String { tr("statutoryRateLabel") }
     var dueDayDayPrefix: String { tr("dueDayDayPrefix") }
     var dueDayDaySuffix: String { tr("dueDayDaySuffix") }
+    func batchReceiverFallback(buildingName: String, flat: Int) -> String {
+        String(format: tr("batchReceiverFallback"), buildingName, flat)
+    }
+
+    func batchReceiptNote(period: String) -> String {
+        String(format: tr("batchReceiptNote"), period)
+    }
+
+    var bulletinFooterTagline: String { tr("bulletinFooterTagline") }
+
+    func bulletinPdfFileName(building: String, period: String) -> String {
+        String(format: tr("bulletinPdfFileName"), building, period)
+    }
+
     func lateFeeItemName(rate: Double, months: Int) -> String {
         let format = tr(months > 1 ? "lateFeeItemName.other" : "lateFeeItemName.one")
-        return String(format: format, String(format: "%.1f", rate), months)
+        return String(format: format, AppFormat.percent(rate, l10n: self, maximumFractionDigits: 2), months)
     }
     var lateFeeStatutoryFootnote: String {
         tr("lateFeeStatutoryFootnote")

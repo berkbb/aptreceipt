@@ -737,6 +737,52 @@
         }
       }
     },
+    "batchReceiverFallback" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ Resident (Flat %2$d)"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Locatar %1$@ (Ap. %2$d)"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ Sakini (Daire %2$d)"
+          }
+        }
+      }
+    },
+    "batchReceiptNote" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share of building common expenses and dues for %@"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cota de întreținere și cheltuieli comune pentru %@"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ dönemi bina ortak gider ve aidat payı"
+          }
+        }
+      }
+    },
     "batchSuccessMessage" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -940,6 +986,52 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "APARTMAN YÖNETİMİ MALİ BİLANÇO VE KASA RAPORU"
+          }
+        }
+      }
+    },
+    "bulletinPdfFileName" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@_Financial_Bulletin_%2$@"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@_Raport_Financiar_Avizier_%2$@"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@_Mali_Pano_Raporu_%2$@"
+          }
+        }
+      }
+    },
+    "bulletinFooterTagline" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AptReceipt • Verifiable Digital Apartment Management System"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AptReceipt • Sistem digital verificabil de administrare a blocului"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AptReceipt • Doğrulanabilir Dijital Apartman Yönetim Sistemi"
           }
         }
       }
@@ -3917,19 +4009,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Late Fee (%%%1$@ × %2$d Month)"
+            "value" : "Late Fee (%1$@ × %2$d Month)"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Penalități Întârziere (%%%1$@ × %2$d Lună)"
+            "value" : "Penalități Întârziere (%1$@ × %2$d Lună)"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gecikme Tazminatı (%%%1$@ × %2$d Ay)"
+            "value" : "Gecikme Tazminatı (%1$@ × %2$d Ay)"
           }
         }
       }
@@ -3940,19 +4032,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Late Fee (%%%1$@ × %2$d Months)"
+            "value" : "Late Fee (%1$@ × %2$d Months)"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Penalități Întârziere (%%%1$@ × %2$d Luni)"
+            "value" : "Penalități Întârziere (%1$@ × %2$d Luni)"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gecikme Tazminatı (%%%1$@ × %2$d Ay)"
+            "value" : "Gecikme Tazminatı (%1$@ × %2$d Ay)"
           }
         }
       }

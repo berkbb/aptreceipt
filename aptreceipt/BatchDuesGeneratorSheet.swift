@@ -211,12 +211,12 @@ struct BatchDuesGeneratorSheet: View {
 
         for flat in sortedFlats {
             let owner = settings.owner(for: flat)
-            let receiverName = owner.isEmpty ? "\(settings.apartmentName) Sakini (Daire \(flat))" : owner
+            let receiverName = owner.isEmpty ? l10n.batchReceiverFallback(buildingName: settings.apartmentName, flat: flat) : owner
 
             let draft = ReceiptDraft(
                 receiver: receiverName,
                 issuer: settings.issuer,
-                notes: "\(periodStr) dönemi bina ortak gider ve aidat payı",
+                notes: l10n.batchReceiptNote(period: periodStr),
                 monthYear: periodStr,
                 apartmentNumber: flat,
                 amount: amount,
