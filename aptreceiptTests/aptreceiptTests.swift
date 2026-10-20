@@ -1138,6 +1138,20 @@ final class aptreceiptTests: XCTestCase {
         return try XCTUnwrap(NSDictionary(contentsOf: url) as? [String: String])
     }
 
+    func testEveryLanguageHasItsOwnStringFile() throws {
+        var keySets: [String: Set<String>] = [:]
+        for language in ["en", "tr", "ro"] {
+            let url = sourceDirectory.appendingPathComponent("\(language).lproj/Localizable.strings")
+            let table = try XCTUnwrap(NSDictionary(contentsOf: url) as? [String: String], "\(language) has no own Localizable.strings")
+            keySets[language] = Set(table.keys)
+        }
+        XCTAssertEqual(keySets["tr"], keySets["en"])
+        XCTAssertEqual(keySets["ro"], keySets["en"])
+        // All languages in one shared file is not allowed; each language keeps its own file.
+        let sharedCatalogs = try FileManager.default.contentsOfDirectory(at: sourceDirectory, includingPropertiesForKeys: nil).filter { $0.pathExtension == "xcstrings" }
+        XCTAssertTrue(sharedCatalogs.isEmpty, "Shared catalog found: \(sharedCatalogs.map(\.lastPathComponent))")
+    }
+
     func testEveryCatalogStringIsReallyTranslated() throws {
         let english = try catalogTable("en")
         for localization in ["tr", "ro"] {

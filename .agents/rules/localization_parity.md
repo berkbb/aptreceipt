@@ -18,13 +18,13 @@ Every user-facing text must exist in **every** supported language with the same 
 
 ## How to comply
 
-1. **Text comes from the catalog.** Put it in `aptreceipt/Localizable.xcstrings` with a value for every language, expose it through `L10n`, and never write a literal word into a view (`Text("…")`, `Label("…")`, `Button("…")` and the like). The only literals allowed are brand names and language self-names (`Babadogan Tech and Edu`, `GNU GPL v3.0`, `babadogan.net`, `Türkçe`, `English`, `Română`).
+1. **Every language has its own file, and text comes from those files.** Add the key with its translation to each of `aptreceipt/en.lproj/Localizable.strings`, `tr.lproj/Localizable.strings` and `ro.lproj/Localizable.strings` (a new language gets its own `<code>.lproj/Localizable.strings`), expose it through `L10n`, and never write a literal word into a view (`Text("…")`, `Label("…")`, `Button("…")` and the like). The only literals allowed are brand names and language self-names (`Babadogan Tech and Edu`, `GNU GPL v3.0`, `babadogan.net`, `Türkçe`, `English`, `Română`).
 2. **Really translate.** A `tr` or `ro` value must not be a copy of the English one. The only exceptions are listed in `sameAsEnglishAllowed` in the tests (`aboutCopyrightFormat`, `currencyEUR`, `menuZoom`, `okButton`, `subtotal`). Adding to that list needs a reason in the commit message.
 3. **Same placeholders.** Every language uses the same format specifiers (`%@`, `%d`, positional `%1$@`). Word order may differ; use positional specifiers when it does.
 4. **Per-language code covers every language.** When code builds text per language (`switch l10n.resolvedLanguage`), every supported language has its own branch. `default:` may only stand for English, and never stands in for a missing translation.
 5. **Numbers follow the language.** Use `AppFormat.currency` and `AppFormat.percent` (or a locale-aware `NumberFormatter` / `DateFormatter` with `l10n.locale`). Fixed patterns such as `String(format: "%.2f %@", …)` or a hardcoded `%` position are not allowed on screen. Machine formats (CSV columns, JSON) are exempt.
 6. **Stored text may be in another language.** Receipts keep the text of the language they were created in. Code that reads such text back (for example the period through `ReceiptPeriod`) must understand every supported language and show the result in the current one.
-7. **Adding a language** means translating every catalog key, every per-language branch, sample data, amounts in words, file names and legal texts *before* it ships, and adding it to `parityLanguages` in the tests. Shipping with an English fallback is not allowed.
+7. **Adding a language** means creating its own `<code>.lproj/Localizable.strings` with every key translated, plus every per-language branch, sample data, amounts in words, file names and legal texts *before* it ships, and adding it to `parityLanguages` in the tests. Shipping with an English fallback is not allowed.
 
 ## Enforcement
 
@@ -33,6 +33,7 @@ These tests must pass before any commit (`./run_all_tests_mac.command`):
 | Test | Guards |
 | --- | --- |
 | `testStringCatalogHasEveryKeyInEveryLanguage` | Same keys and format specifiers in every language |
+| `testEveryLanguageHasItsOwnStringFile` | One `Localizable.strings` per language in the sources, no single shared catalog |
 | `testEveryCatalogStringIsReallyTranslated` | No untranslated copies of English |
 | `testEveryKeyUsedInCodeExistsInAllThreeLanguages` | Every key `L10n` uses exists everywhere |
 | `testNoHardcodedTextInViews` | No literal words in views |

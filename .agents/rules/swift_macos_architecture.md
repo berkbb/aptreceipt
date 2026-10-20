@@ -6,9 +6,10 @@
 3. **Typography & Colors**:
    - Always use semantic colors (`Color.primary`, `Color.secondary`, `Color(NSColor.windowBackgroundColor)`, `Color.accentColor`) to ensure perfect appearance in both Dark and Light appearance modes.
 4. **Localization**:
-   - UI strings live in `aptreceipt/Localizable.xcstrings` (String Catalog). Each `L10n` property maps to a key of the same name via `tr("key")`; values are looked up in the `.lproj` bundle of the in-app language (`AppLanguage`), not the system language, and fall back to English.
+   - UI strings live in one file per language: `aptreceipt/en.lproj/Localizable.strings`, `tr.lproj/…` and `ro.lproj/…`, with identical keys. Each `L10n` property maps to a key of the same name via `tr("key")`; values are looked up in the `.lproj` bundle of the in-app language (`AppLanguage`), not the system language. The English fallback is only a safety net; the parity tests keep every key present in every file.
    - All string keys must exist in `en`, `tr`, and `ro` with matching format specifiers (`%@`, `%d`, positional `%1$@`); `testStringCatalogHasEveryKeyInEveryLanguage` enforces this.
-   - Formatted strings use `String(format:)` on the looked-up value; keep the catalog entry `extractionState` as `manual` so Xcode does not drop it as stale.
+   - Formatted strings use `String(format:)` on the looked-up value.
+   - When adding a key, add it to every language file in the same change, in the same alphabetical position.
    - One-to-one translation in every language is mandatory; see `localization_parity.md`.
 
 ## Source Layout

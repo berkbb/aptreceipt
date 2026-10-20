@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+- **Every language has its own string file**: the single String Catalog (`Localizable.xcstrings`) was split into `en.lproj`, `tr.lproj` and `ro.lproj` `Localizable.strings` files with identical keys (404 each, values unchanged). A test keeps one file per language and rejects a shared catalog.
+
 ### Fixed
 - **WhatsApp phone numbers**: Numbers saved in local form (`0532 …`, `0722 …`) opened a wrong or missing chat because wa.me needs the international form. Turkish and Romanian buildings now complete them with `90` / `40`; numbers that already start with `+` or `00` are kept.
 - **WhatsApp and email text**: A `&`, `+`, `=` or `?` in a building name or note cut the message short or turned into a space; the whole text now arrives. The email body no longer shows WhatsApp's `*bold*` asterisks.

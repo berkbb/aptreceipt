@@ -35,7 +35,7 @@
 		F519961A217C0540E3B6FB56 /* ApartmentFinancialReportSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 335FDA259574D491BC369FC2 /* ApartmentFinancialReportSheet.swift */; };
 		EBD3F5D514DFF5EF577DE795 /* BatchDuesGeneratorSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CF7B09A5D22F5DDFEEE6BE2 /* BatchDuesGeneratorSheet.swift */; };
 		3D40934AC58F13968AA5D9B7 /* ApartmentBulletinBoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE3D706FEAFD8AE1933CEE20 /* ApartmentBulletinBoardView.swift */; };
-		68ED18A18FEE563F50A19534 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = D1560FD55F164F23F586FC62 /* Localizable.xcstrings */; };
+		68ED18A18FEE563F50A19534 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = D1560FD55F164F23F586FC62 /* Localizable.strings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -95,7 +95,9 @@
 		335FDA259574D491BC369FC2 /* ApartmentFinancialReportSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApartmentFinancialReportSheet.swift; sourceTree = "<group>"; };
 		9CF7B09A5D22F5DDFEEE6BE2 /* BatchDuesGeneratorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatchDuesGeneratorSheet.swift; sourceTree = "<group>"; };
 		BE3D706FEAFD8AE1933CEE20 /* ApartmentBulletinBoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApartmentBulletinBoardView.swift; sourceTree = "<group>"; };
-		D1560FD55F164F23F586FC62 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		D1560FD55F164F23F586FC63 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		D1560FD55F164F23F586FC64 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Localizable.strings; sourceTree = "<group>"; };
+		D1560FD55F164F23F586FC65 /* ro */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ro; path = ro.lproj/Localizable.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -172,7 +174,7 @@
 				9A90651027E728020085AA4B /* PreferencesViewController.swift */,
 				9A90652027E728020085AA4B /* GitHubUpdateChecker.swift */,
 				9ADECA1627E5DC3500EB0A7F /* File.strings */,
-				D1560FD55F164F23F586FC62 /* Localizable.xcstrings */,
+				D1560FD55F164F23F586FC62 /* Localizable.strings */,
 			);
 			path = aptreceipt;
 			sourceTree = "<group>";
@@ -304,7 +306,7 @@
 				9A9CF8B427E22E670042D276 /* InfoPlist.strings in Resources */,
 				9A9CF88027E204920042D276 /* Main.storyboard in Resources */,
 				9ADECA1427E5DC3500EB0A7F /* File.strings in Resources */,
-				68ED18A18FEE563F50A19534 /* Localizable.xcstrings in Resources */,
+				68ED18A18FEE563F50A19534 /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -415,6 +417,16 @@
 				9ADECA1A27E5DD2D00EB0A7F /* ro */,
 			);
 			name = File.strings;
+			sourceTree = "<group>";
+		};
+		D1560FD55F164F23F586FC62 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D1560FD55F164F23F586FC63 /* en */,
+				D1560FD55F164F23F586FC64 /* tr */,
+				D1560FD55F164F23F586FC65 /* ro */,
+			);
+			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

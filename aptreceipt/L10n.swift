@@ -36,7 +36,7 @@ struct L10n {
         }
     }
 
-    /// Looks up `key` in Localizable.xcstrings for the in-app language (which may differ
+    /// Looks up `key` in `<language>.lproj/Localizable.strings` for the in-app language (which may differ
     /// from the system language), falling back to English and then to the key itself.
     private func tr(_ key: String) -> String {
         let english = Self.bundle(for: .english).localizedString(forKey: key, value: key, table: nil)

@@ -49,7 +49,7 @@
     - Menubar (`Check for Updates...`), Settings -> About tab, and About window integration with 1-click downloads.
     - In-app DMG download to `~/Downloads` with progress/cancel, SHA-256 verification against `SHA256SUMS.txt`, Ed25519 signature verification against the bundled `AptReceiptUpdatePublicEDKey`, and auto-open for drag-to-Applications install (no third-party updater framework).
 11. **Comprehensive Test Suite & CLI Runner**:
-    - 22 passing unit tests in `aptreceiptTests` verifying late fee calculations through `LateFeeCalculator` and `MainScreenViewModel`, String Catalog completeness, semver comparisons, JSON backwards compatibility, and localized citations.
+    - 22 passing unit tests in `aptreceiptTests` verifying late fee calculations through `LateFeeCalculator` and `MainScreenViewModel`, per-language string file completeness, semver comparisons, JSON backwards compatibility, and localized citations.
     - Executable `./run_all_tests_mac.command` for continuous verification.
 
 ---
