@@ -293,7 +293,6 @@
 "verifyStatusOlderDetail" = "Doğrulama kodundan önceki bir sürümle basılmış; bilgileri gösteriliyor ama doğrulanamaz.";
 "verifyNoReceiptFound" = "Burada AptReceipt QR kodu bulunamadı.";
 "verifyArchiveMatches" = "Arşivde kayıtlı ve bilgiler arşivle aynı.";
-"verifyArchiveFound" = "Arşivde bu numarayla bir makbuz var.";
 "verifyArchiveDiffers" = "Arşivdeki kayıttan farklı satırlar:";
 "verifyArchiveMissing" = "Arşivde yok: silinmiş ya da başka bir Mac'te kesilmiş olabilir.";
 "verifyEmptyState" = "Doğrulanan makbuz burada görünecek.";

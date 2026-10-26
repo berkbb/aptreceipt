@@ -86,7 +86,7 @@
 - Keys: `ReceiptVerificationKeyStore`, file `Application Support/aptreceipt/receipt-verification-keys`, current key first; carried by the system backup (2.2). Nothing is ever sent to a server or web page (`user_rejected_spec.md`).
 - Recovery code: Settings → Backup → Verification Key shows the current key as 56 characters (14 groups of 4, checksum included) and restores a key from one; restoring keeps the existing keys. A mistyped code is rejected at once; a valid one is restored only after a confirmation dialog saying that new receipts will be sealed with it and that receipts sealed with it will verify as genuine.
 - Verify Receipt window: QR from a photo, PDF or pasted text (Vision, on device) → `ScannedReceiptVerification` (genuine / not verified / older receipt without code) → `ReceiptArchiveComparison` (matches / differs / missing) → POS-style `ReceiptSlipView`.
-- Receipts printed before 3.6 carry `AptReceipt | … | …` without a code; they are shown but cannot be verified.
+- Receipts printed before 3.6 carry `AptReceipt | … | …` without a code; they are shown but cannot be verified. `ReceiptArchiveComparison` still compares their fields with the archive (`ReceiptPrintedText.olderQRFields`: building title, also in the old upper-casing without Turkish "İ", receipt number, date, payer, total and manager) and lists every field that differs.
 
 ## Buildings
 

@@ -293,7 +293,6 @@
 "verifyStatusOlderDetail" = "Printed by a version before verification codes; its details are shown but cannot be verified.";
 "verifyNoReceiptFound" = "No AptReceipt QR code was found here.";
 "verifyArchiveMatches" = "In the archive, and the details match it.";
-"verifyArchiveFound" = "The archive has a receipt with this number.";
 "verifyArchiveDiffers" = "Lines that differ from the archived receipt:";
 "verifyArchiveMissing" = "Not in the archive: it may have been deleted or issued on another Mac.";
 "verifyEmptyState" = "The verified receipt appears here.";

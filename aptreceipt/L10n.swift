@@ -244,7 +244,6 @@ struct L10n {
     var verifyStatusOlderDetail: String { tr("verifyStatusOlderDetail") }
     var verifyNoReceiptFound: String { tr("verifyNoReceiptFound") }
     var verifyArchiveMatches: String { tr("verifyArchiveMatches") }
-    var verifyArchiveFound: String { tr("verifyArchiveFound") }
     var verifyArchiveDiffers: String { tr("verifyArchiveDiffers") }
     var verifyArchiveMissing: String { tr("verifyArchiveMissing") }
     var verifyEmptyState: String { tr("verifyEmptyState") }

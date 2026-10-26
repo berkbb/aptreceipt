@@ -388,16 +388,20 @@ enum ReceiptArchiveComparison: Equatable {
     }
 
     /// Rebuilds each candidate's QR lines in the scanned receipt's language and compares the values, so
-    /// reworded labels in a later version do not count as differences.
+    /// reworded labels in a later version do not count as differences. Receipts printed before 3.6 cannot be
+    /// verified, so their fields are compared too: a changed amount or name shows up as a difference.
     static func compare(_ scan: ScannedReceiptVerification, with records: [ReceiptRecord], apartmentName: String) -> ReceiptArchiveComparison {
         guard let kind = scan.kind, let language = scan.language, let number = scan.sequenceNumber else { return .missing }
         let candidates = records.filter { $0.sequenceNumber == number && $0.kind == kind }
         guard !candidates.isEmpty else { return .missing }
-        guard scan.status != .olderWithoutCode else { return .matches }
 
         let differences = candidates.map { record -> [String] in
-            let rebuilt = ReceiptPrintedText(draft: record.toDraft(), apartmentName: apartmentName, l10n: L10n(language)).lines
-            let values = Set(rebuilt.map(ScannedReceiptVerification.value(of:)))
+            let printed = ReceiptPrintedText(draft: record.toDraft(), apartmentName: apartmentName, l10n: L10n(language))
+            if scan.status == .olderWithoutCode {
+                let fields = Set(printed.olderQRFields.map(ReceiptVerificationCode.normalizedText))
+                return scan.lines.filter { !fields.contains(ReceiptVerificationCode.normalizedText($0)) }
+            }
+            let values = Set(printed.lines.map(ScannedReceiptVerification.value(of:)))
             return scan.lines.filter { !values.contains(ScannedReceiptVerification.value(of: $0)) }
         }
         let closest = differences.min { $0.count < $1.count } ?? []
@@ -462,6 +466,12 @@ struct ReceiptPrintedText {
         lines.append(Self.labeled(l10n.grandTotal, totalAmount))
         lines.append(Self.labeled(l10n.invoiceManagerLabel, Self.capped(draft.issuer)))
         return lines
+    }
+
+    /// The fields a receipt printed before 3.6 carried in its QR code (`AptReceipt | title | number | date |
+    /// payer | total | manager`). The title is also accepted as those versions upper-cased it, without Turkish "İ".
+    var olderQRFields: [String] {
+        [mainTitle, apartmentName.uppercased(), serial, draft.createdDate, draft.receiver, totalAmount, draft.issuer]
     }
 
     static func capped(_ text: String) -> String {

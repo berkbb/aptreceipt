@@ -293,7 +293,6 @@
 "verifyStatusOlderDetail" = "Tipărită de o versiune anterioară codurilor de verificare; detaliile sunt afișate, dar nu pot fi verificate.";
 "verifyNoReceiptFound" = "Nu s-a găsit niciun cod QR AptReceipt aici.";
 "verifyArchiveMatches" = "În arhivă, iar detaliile corespund.";
-"verifyArchiveFound" = "Arhiva conține o chitanță cu acest număr.";
 "verifyArchiveDiffers" = "Rânduri diferite față de chitanța din arhivă:";
 "verifyArchiveMissing" = "Nu este în arhivă: poate a fost ștearsă sau emisă pe alt Mac.";
 "verifyEmptyState" = "Chitanța verificată apare aici.";

@@ -298,6 +298,27 @@ final class VerificationTests: XCTestCase {
     }
 
     @MainActor
+    func testOlderReceiptIsComparedWithTheArchive() throws {
+        let draft = ReceiptDraft(receiver: "Jane Smith", issuer: "John Doe", notes: "N", monthYear: "October 2026", apartmentNumber: 4, amount: 1750, sequenceNumber: 104, createdDate: "19 October 2026", showApartmentNumber: true, kind: .income, currency: .usDollar)
+        let record = ReceiptRecord(draft: draft)
+        let printed = "AptReceipt | SUNSHINE RESIDENCE | REC-0104 | 19 October 2026 | Jane Smith | $1,750.00 | John Doe"
+        let scan = try XCTUnwrap(ScannedReceiptVerification(scannedText: printed, keys: []))
+        XCTAssertEqual(ReceiptArchiveComparison.compare(scan, with: [record], apartmentName: "Sunshine Residence"), .matches)
+
+        // An older receipt has no code, so a changed amount or name only shows up against the archive.
+        let forged = try XCTUnwrap(ScannedReceiptVerification(scannedText: printed.replacingOccurrences(of: "$1,750.00", with: "$17,500.00"), keys: []))
+        XCTAssertEqual(forged.status, .olderWithoutCode)
+        XCTAssertEqual(ReceiptArchiveComparison.compare(forged, with: [record], apartmentName: "Sunshine Residence"), .differs(lines: ["$17,500.00"]))
+        let otherPayer = try XCTUnwrap(ScannedReceiptVerification(scannedText: printed.replacingOccurrences(of: "Jane Smith", with: "Jane Smyth"), keys: []))
+        XCTAssertEqual(ReceiptArchiveComparison.compare(otherPayer, with: [record], apartmentName: "Sunshine Residence"), .differs(lines: ["Jane Smyth"]))
+
+        // Versions before 3.6 upper-cased the building name without Turkish "İ".
+        let turkishDraft = ReceiptDraft(receiver: "Ayşe Yılmaz", issuer: "Mehmet Şahin", notes: "N", monthYear: "Ekim 2026", apartmentNumber: 12, amount: 12750.5, sequenceNumber: 1042, createdDate: "20.10.2026", showApartmentNumber: true, kind: .income, currency: .turkishLira)
+        let turkish = try XCTUnwrap(ScannedReceiptVerification(scannedText: "AptReceipt | YILDIZ SITESI YÖNETIMI | TAH-1042 | 20.10.2026 | Ayşe Yılmaz | ₺12.750,50 | Mehmet Şahin", keys: []))
+        XCTAssertEqual(ReceiptArchiveComparison.compare(turkish, with: [ReceiptRecord(draft: turkishDraft)], apartmentName: "Yıldız Sitesi Yönetimi"), .matches)
+    }
+
+    @MainActor
     func testQRReaderFindsTheReceiptInAnExportedPDFAndImage() throws {
         let keys = ReceiptVerificationKeyStore(fileURL: nil)
         let view = verifyReceiptView(keys: keys)

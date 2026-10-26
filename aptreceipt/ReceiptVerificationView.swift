@@ -257,7 +257,7 @@ struct ReceiptVerificationView: View {
             if let comparison {
                 Label {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(archiveText(comparison, scan: scan))
+                        Text(archiveText(comparison))
                         if let comparedBuilding {
                             Text(l10n.verifyArchiveBuilding(comparedBuilding.isEmpty ? l10n.defaultBuildingName : comparedBuilding))
                                 .font(.caption.weight(.semibold))
@@ -288,9 +288,9 @@ struct ReceiptVerificationView: View {
         }
     }
 
-    private func archiveText(_ comparison: ReceiptArchiveComparison, scan: ScannedReceiptVerification) -> String {
+    private func archiveText(_ comparison: ReceiptArchiveComparison) -> String {
         switch comparison {
-        case .matches: return scan.status == .olderWithoutCode ? l10n.verifyArchiveFound : l10n.verifyArchiveMatches
+        case .matches: return l10n.verifyArchiveMatches
         case .differs: return l10n.verifyArchiveDiffers
         case .missing: return l10n.verifyArchiveMissing
         }

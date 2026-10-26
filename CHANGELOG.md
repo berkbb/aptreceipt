@@ -11,6 +11,9 @@ All notable changes to this project will be documented in this file.
 - **Backups warn that they hold the verification key**: Settings → Backup now says that a backup file contains this Mac's verification key, so anyone who has one can make receipt codes that verify as genuine, and that backups should be kept private.
 - **Restoring a recovery code asks first**: Settings → Backup → Verification Key explains that new receipts will be sealed with the restored key and that receipts sealed with it will verify as genuine on this Mac, and restores only after confirmation. A mistyped code is still rejected at once.
 
+### Fixed
+- **Older receipts are compared with the archive**: Verify Receipt said only that the archive held a receipt with the same number for receipts printed before 3.6, which carry no verification code. It now compares their building, number, date, payer, total and manager with the archived receipt and lists every value that differs, so a changed amount or name stands out. Matching receipts say that they are in the archive and the details match.
+
 ## [3.7.0] - 2026-10-20
 
 ### Added
