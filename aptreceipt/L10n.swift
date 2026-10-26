@@ -259,6 +259,7 @@ struct L10n {
     var backupImportSuccess: String { tr("backupImportSuccess") }
     var backupImportError: String { tr("backupImportError") }
     var backupNotice: String { tr("backupNotice") }
+    var backupKeyWarning: String { tr("backupKeyWarning") }
 
     // Financial Report & Bulletin Board Strings
     var financialReportTitle: String { tr("financialReportTitle") }
@@ -365,6 +366,8 @@ struct L10n {
     var recoveryCodeWarning: String { tr("recoveryCodeWarning") }
     var recoveryCodeRestoreTitle: String { tr("recoveryCodeRestoreTitle") }
     var recoveryCodeRestoreButton: String { tr("recoveryCodeRestoreButton") }
+    var recoveryCodeRestoreConfirmTitle: String { tr("recoveryCodeRestoreConfirmTitle") }
+    var recoveryCodeRestoreConfirmMessage: String { tr("recoveryCodeRestoreConfirmMessage") }
     var recoveryCodeRestored: String { tr("recoveryCodeRestored") }
     var recoveryCodeInvalid: String { tr("recoveryCodeInvalid") }
 

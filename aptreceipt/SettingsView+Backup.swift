@@ -41,6 +41,8 @@ extension SettingsView {
                 VStack(alignment: .leading, spacing: 6) {
                     Text(l10n.backupSubtitle)
                     Label(l10n.backupNotice, systemImage: "info.circle.fill")
+                    Label(l10n.backupKeyWarning, systemImage: "exclamationmark.shield.fill")
+                        .foregroundColor(.orange)
                 }
                 .fixedSize(horizontal: false, vertical: true)
             }
@@ -86,6 +88,17 @@ extension SettingsView {
             HStack {
                 TextField(l10n.recoveryCodeRestoreTitle, text: $recoveryCodeInput)
                     .font(.system(size: 12, design: .monospaced))
+                // A valid code is restored only after confirming: its key will verify receipts as genuine here.
+                Button(l10n.recoveryCodeRestoreButton) {
+                    if ReceiptRecoveryCode.decode(recoveryCodeInput) != nil {
+                        confirmsRecoveryCodeRestore = true
+                    } else {
+                        recoveryCodeMessage = (l10n.recoveryCodeInvalid, true)
+                    }
+                }
+                .disabled(recoveryCodeInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            }
+            .confirmationDialog(l10n.recoveryCodeRestoreConfirmTitle, isPresented: $confirmsRecoveryCodeRestore) {
                 Button(l10n.recoveryCodeRestoreButton) {
                     if ReceiptVerificationKeyStore.shared.restore(recoveryCode: recoveryCodeInput) {
                         recoveryCodeInput = ""
@@ -94,7 +107,8 @@ extension SettingsView {
                         recoveryCodeMessage = (l10n.recoveryCodeInvalid, true)
                     }
                 }
-                .disabled(recoveryCodeInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            } message: {
+                Text(l10n.recoveryCodeRestoreConfirmMessage)
             }
 
             if let message = recoveryCodeMessage {

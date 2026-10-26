@@ -12,6 +12,7 @@ struct SettingsView: View {
     @State var confirmsPreferenceReset = false
     @State var showsRecoveryCode = false
     @State var recoveryCodeInput = ""
+    @State var confirmsRecoveryCodeRestore = false
     @State var recoveryCodeMessage: (text: String, isError: Bool)?
     /// The tab this page shows. In the settings window each toolbar tab hosts its own page and all
     /// pages share one draft, so Save & Close commits the edits made on every tab.

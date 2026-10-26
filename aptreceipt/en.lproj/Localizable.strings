@@ -24,6 +24,7 @@
 "backupExportSuccess" = "Backup exported successfully.";
 "backupImportError" = "Failed to read backup file or invalid format.";
 "backupImportSuccess" = "All data and archive restored successfully.";
+"backupKeyWarning" = "Backup files also contain this Mac's verification key: anyone who has one can create receipt codes that verify as issued by this installation. Keep them private.";
 "backupNotice" = "Backups contain all resident records, custom vendors, expense services, and receipt history in a portable format.";
 "backupSubtitle" = "Export your entire apartment configuration, residents, vendors, and receipt archive to a single JSON file, or restore from a previous backup";
 "backupTitle" = "Data Backup & Restore";
@@ -481,6 +482,8 @@
 "recoveryCodeWarning" = "Do not share this code: anyone who has it can create receipt codes that verify as issued by this installation.";
 "recoveryCodeRestoreTitle" = "Recovery code";
 "recoveryCodeRestoreButton" = "Restore";
+"recoveryCodeRestoreConfirmTitle" = "Restore this verification key?";
+"recoveryCodeRestoreConfirmMessage" = "New receipts will be sealed with this key, and receipts sealed with it will verify as genuine on this Mac. Only restore a recovery code you wrote down from your own AptReceipt.";
 "recoveryCodeRestored" = "Key restored; receipts sealed with it can now be verified.";
 "recoveryCodeInvalid" = "Invalid code: a character may be missing or mistyped.";
 

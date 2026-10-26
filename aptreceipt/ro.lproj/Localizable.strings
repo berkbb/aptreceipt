@@ -24,6 +24,7 @@
 "backupExportSuccess" = "Copie salvată cu succes.";
 "backupImportError" = "Eroare la citirea copiei de siguranță.";
 "backupImportSuccess" = "Datele și arhiva au fost restaurate cu succes.";
+"backupKeyWarning" = "Fișierele de siguranță conțin și cheia de verificare a acestui Mac: oricine are unul poate crea coduri de chitanță valabile în numele acestei instalări. Păstrați-le private.";
 "backupNotice" = "Fișierul de siguranță conține toți locatarii, furnizorii și istoricul chitanțelor.";
 "backupSubtitle" = "Exportați sau restaurați configurările, locatarii, furnizorii și arhiva într-un singur fișier JSON";
 "backupTitle" = "Salvare & Restaurare Date";
@@ -481,6 +482,8 @@
 "recoveryCodeWarning" = "Nu împărtășiți acest cod: oricine îl are poate crea coduri de chitanță valabile în numele acestei instalări.";
 "recoveryCodeRestoreTitle" = "Cod de recuperare";
 "recoveryCodeRestoreButton" = "Restaurați";
+"recoveryCodeRestoreConfirmTitle" = "Restaurați această cheie de verificare?";
+"recoveryCodeRestoreConfirmMessage" = "Chitanțele noi vor fi sigilate cu această cheie, iar chitanțele sigilate cu ea vor fi verificate ca autentice pe acest Mac. Restaurați doar un cod de recuperare notat din propriul AptReceipt.";
 "recoveryCodeRestored" = "Cheia a fost restaurată; chitanțele sigilate cu ea pot fi acum verificate.";
 "recoveryCodeInvalid" = "Cod nevalid: poate lipsi un caracter sau a fost scris greșit.";
 

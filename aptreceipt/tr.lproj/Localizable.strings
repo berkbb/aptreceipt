@@ -24,6 +24,7 @@
 "backupExportSuccess" = "Yedekleme başarıyla dışa aktarıldı.";
 "backupImportError" = "Yedek dosyası okunamadı veya dosya biçimi geçersiz.";
 "backupImportSuccess" = "Tüm veriler ve arşiv başarıyla geri yüklendi.";
+"backupKeyWarning" = "Yedek dosyaları bu Mac'in doğrulama anahtarını da içerir: yedeğe sahip olan herkes bu kurulum adına geçerli makbuz kodu üretebilir. Yedekleri kimseyle paylaşmayın.";
 "backupNotice" = "Yedek dosyası tüm sakin kayıtlarını, firma listesini, işletme hizmetlerini ve makbuz geçmişini taşınabilir formatta içerir.";
 "backupSubtitle" = "Tüm apartman ayarları, sakinler, firmalar ve makbuz arşivinizi tek bir JSON dosyasına yedekleyin veya geri yükleyin";
 "backupTitle" = "Veri Yedekleme ve Geri Yükleme";
@@ -481,6 +482,8 @@
 "recoveryCodeWarning" = "Bu kodu kimseyle paylaşmayın: kodu bilen herkes bu kurulum adına geçerli makbuz kodu üretebilir.";
 "recoveryCodeRestoreTitle" = "Kurtarma kodu";
 "recoveryCodeRestoreButton" = "Geri Yükle";
+"recoveryCodeRestoreConfirmTitle" = "Bu doğrulama anahtarı geri yüklensin mi?";
+"recoveryCodeRestoreConfirmMessage" = "Yeni makbuzlar bu anahtarla şifrelenir ve bu anahtarla şifrelenmiş makbuzlar bu Mac'te gerçek olarak doğrulanır. Yalnızca kendi AptReceipt'inizden yazdığınız bir kurtarma kodunu geri yükleyin.";
 "recoveryCodeRestored" = "Anahtar geri yüklendi; bu anahtarla kesilen makbuzlar artık doğrulanabilir.";
 "recoveryCodeInvalid" = "Kod geçersiz: bir karakter eksik ya da yanlış yazılmış olabilir.";
 
