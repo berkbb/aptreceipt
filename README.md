@@ -24,7 +24,7 @@ A modern, native macOS application to effortlessly generate, manage, and export 
 - **Dues Tracking Checklist & WhatsApp Reminders:** Interactive resident payment ledger showing who paid and who is pending for any period, with 1-click WhatsApp payment reminders.
 - **A4 Printable Apartment Bulletin Board Notice (Pano İlanı):** Generates and exports official A4 PDF notice sheets ready to hang on building bulletin boards or share on resident groups.
 - **Batch Dues Generator (Toplu Aidat Makbuzu):** 1-click generation of sequential receipts for all or selected apartment flats in a single operation.
-- **Offline QR Receipt Verification:** Each receipt's QR code holds only a code sealed with this installation's key (ChaCha20-Poly1305): a phone camera shows it and offers to copy it, and no personal detail is readable, even if it is searched. Residents send the copied code to the management. **File → Verify Receipt…** (or the Receipt Archive) opens a photo, PDF or the pasted code on this Mac and shows the receipt as a POS-style slip stamped Genuine, Not Verified or Older Receipt, together with how it compares with the archive. No server or web page is involved; the key stays on this Mac and travels with *Export Full System Backup*, and Settings → Backup shows it as a recovery code to write down and restore on another Mac.
+- **Offline QR Receipt Verification:** Each receipt's QR code holds only a code sealed with this installation's key (ChaCha20-Poly1305): a phone camera shows it and offers to copy it, and no personal detail is readable, even if it is searched. Residents send the copied code to the management. **File → Verify Receipt…** (or the Receipt Archive) opens a photo, PDF or the pasted code on this Mac and shows the receipt as a POS-style slip stamped Genuine, Not Verified or Older Receipt, together with how it compares with the archive. No server or web page is involved; the key stays on this Mac and travels with *Export Full System Backup*, so keep backup files private, and Settings → Backup shows it as a recovery code to write down and restore on another Mac (restoring asks for confirmation first). Older receipts without a code cannot be verified, but their details are still compared with the archive.
 - **Apple Vision & PDFKit Invoice OCR Import:** Smart OCR text and amount recognition from scanned vendor invoices or PDFs, with automated page-2 attachment merging into exported receipt PDFs.
 
 ---
@@ -154,6 +154,12 @@ Release DMGs are signed with an Ed25519 key so the in-app updater only installs 
 - **Publishing a release:** bump the version in Xcode, add the version's section to `CHANGELOG.md`, commit and push, then run `./release.sh`. It builds the app, creates the DMG and `SHA256SUMS.txt`, signs the DMG (`.dmg.sig`), and publishes all three to GitHub Releases.
 
 Keep a copy of the private key somewhere safe outside the repository. If it is lost, existing installs cannot verify new updates and users must update manually from the release page.
+
+---
+
+## Security
+
+To report a vulnerability, use GitHub's private reporting; see [SECURITY.md](SECURITY.md).
 
 ---
 

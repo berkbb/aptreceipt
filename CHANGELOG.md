@@ -2,12 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [3.7.1] - 2026-10-26
 
 ### Added
 - **Security policy** (`SECURITY.md`): how to report a vulnerability privately and which versions get fixes.
 
 ### Changed
+- Bumped marketing version to `3.7.1` (build `16`).
 - **Backups warn that they hold the verification key**: Settings → Backup now says that a backup file contains this Mac's verification key, so anyone who has one can make receipt codes that verify as genuine, and that backups should be kept private.
 - **Restoring a recovery code asks first**: Settings → Backup → Verification Key explains that new receipts will be sealed with the restored key and that receipts sealed with it will verify as genuine on this Mac, and restores only after confirmation. A mistyped code is still rejected at once.
 
