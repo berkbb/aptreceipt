@@ -29,7 +29,7 @@ Every phase keeps existing data and behavior unless stated, ends with the full t
 
 ## Phase 4 — Recovery code for the verification keys
 
-- Settings shows, on request, the current key as a recovery code: 32 bytes plus a 2-byte checksum in Crockford Base32, 56 characters in 14 groups of 4, with Copy and a warning to keep it private.
+- Settings shows, on request, the current key as a recovery code: 32 bytes plus a 3-byte checksum in Crockford Base32, 56 characters in 14 groups of 4, with Copy and a warning to keep it private.
 - "Restore from Recovery Code" accepts it (spaces, dashes, lower case, O/I/L tolerated), rejects a wrong checksum, and adds the key in front of the existing ones (`ReceiptVerificationKeyStore.restore`), so older receipts keep verifying.
 - All texts in three language files.
 - Tests: round trip, typos caught by the checksum, restore keeps existing keys, nothing written in tests.
