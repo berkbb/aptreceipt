@@ -12,7 +12,7 @@ Enterprise agentic security framework: observability sensors, pre-deployment red
 
 ## Application in AptReceipt
 
-- AptReceipt ships no agent. For agents working on the repository, the security rules in `owasp_agentic_security.md` and `openai_tool_calling_safety.md` apply.
+- AptReceipt ships no agent. For agents working on the repository, the security rules in `owasp_agentic_security.md` and `openai_agents_sdk_safety.md` apply.
 
 ## Rollback
 

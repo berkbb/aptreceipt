@@ -11,7 +11,7 @@ This file is binding for every human and AI agent. Read it **first**, before tou
 ## Read order (agent workflow)
 1. **Constitution** — this file.
 2. **Context** — `.agents/context/`: `domain_wiki.md`, `code_graph_wiki.md` (symbols, call paths, impact map), `symbolic_memory_graph.md` (runtime states), `roadmap.md` (pending work only), `user_rejected_spec.md` (never re-propose), `reflexion_memory_log.md` (lessons), `prd.md`, plus plan files such as `settings_arhivar_alignment_plan.md`.
-3. **Rules** — `.agents/rules/about_rules.md` is the index: domain rules (`localization_parity.md`, `ui_rules.md`, `math_rules.md`, `swift_macos_architecture.md`) and the 42 core AI standards with how each applies here.
+3. **Rules** — `.agents/rules/about_rules.md` is the index: domain rules (`localization_parity.md`, `ui_rules.md`, `math_rules.md`, `swift_macos_architecture.md`) and the 41 core AI standards with how each applies here.
 4. **Skills** — `.agents/skills/`: test only through `sentinel_test_skill.md`; audit persisted data with `snapshot_audit_skill.md`. Only the repository's own scripts (`run_all_tests_mac.command`, `build_app.sh`, `release.sh`) may be executed.
 
 ## Core Directives & Standards

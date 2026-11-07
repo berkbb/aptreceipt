@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Changed
+- **Agent rule files follow the current upstream standard names**: six files in `.agents/rules/` were renamed to their current upstream names (`letta_memory_management.md`, `microsoft_agent_framework.md`, `openai_agents_sdk_safety.md`, `aws_bedrock_agentcore.md`, `mistral_function_calling.md`, `meta_purple_llama_safety.md`); the unsourced Grok reasoning-trace file was retired and its directives moved into `chain_of_thought_prompting.md` and `openinference_specification.md`; the A2UI v1.0 and Mistral Agents SDK sources are recorded.
+
 ## [3.7.1] - 2026-10-26
 
 ### Added

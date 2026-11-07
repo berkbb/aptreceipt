@@ -1,9 +1,9 @@
-# OpenAI Swarm Tool Safety Protocol
+# OpenAI Agents SDK Guardrails & Tool Safety Standard
 
-- **Source:** OpenAI Swarm — https://github.com/openai/swarm
-- **Version / publication date:** as listed in the global `CLAUDE.md` core standards (reviewed 2026-10-20)
-- **Last review date:** 2026-10-20
-- **Change summary:** Adopted for AptReceipt on 2026-10-20.
+- **Source:** OpenAI Agents SDK — https://github.com/openai/openai-agents-python
+- **Version / publication date:** as listed in the global `CLAUDE.md` core standards (reviewed 2026-11-07)
+- **Last review date:** 2026-11-07
+- **Change summary:** Adopted for AptReceipt on 2026-10-20. Renamed from `openai_tool_calling_safety.md` on 2026-11-07; Swarm is retired; the Agents SDK is its successor.
 - **Applicability:** Applies to agent work on this repository
 
 ## Purpose

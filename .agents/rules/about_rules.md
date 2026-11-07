@@ -1,6 +1,6 @@
 # About Rules — Index & Governance
 
-- **Last updated:** 2026-10-20
+- **Last updated:** 2026-11-07
 - **Scope:** AptReceipt
 
 `.agents/rules/` holds the declarative rules every agent follows. Read `../AGENTS.md` first; then the domain rules for the area you change; the core standards describe how agents work.
@@ -14,7 +14,7 @@
 | `math_rules.md` | Financial invariants (cents, late fee, rates, formats, versions) |
 | `swift_macos_architecture.md` | AppKit/SwiftUI architecture, persistence, localization lookup, source layout |
 
-## Core AI standards (42)
+## Core AI standards (41)
 
 | File | Standard | Status |
 | --- | --- | --- |
@@ -25,13 +25,13 @@
 | `agent2agent_protocol.md` | Google Agent2Agent Protocol (A2A) | Not applicable |
 | `agent_payments_protocol.md` | Google Agent Payments Protocol (AP2) | Not applicable |
 | `agent_skills_specification.md` | Anthropic Agent Skills Specification | Applies |
-| `agent_to_ui_protocol.md` | Google Agent-to-UI Protocol (A2UI) | Not applicable |
+| `agent_to_ui_protocol.md` | Agent-to-User Interface Protocol (A2UI) | Not applicable |
 | `agent_user_interaction_protocol.md` | CopilotKit Agent-User Interaction Protocol (AG-UI) | Not applicable |
 | `agentic_commerce_protocol.md` | OpenAI and Stripe Agentic Commerce Protocol (ACP) | Not applicable |
 | `agentic_detection_response.md` | Uber Agentic AI Detection and Response (ADR) | Not applicable |
 | `apple_app_intents_agent.md` | Apple App Intents & System Agent Protocol (AIAP) | Not applicable |
 | `autogpt_autonomous_loop.md` | AutoGPT Continuous Autonomous Goal Loop Standard | Applies |
-| `aws_agent_governance.md` | AWS Bedrock Agentic Governance Standard | Applies |
+| `aws_bedrock_agentcore.md` | Amazon Bedrock AgentCore Governance Standard | Applies |
 | `camel_ai_inception.md` | CAMEL-AI Inception Prompting Standard | Applies |
 | `chain_of_thought_prompting.md` | Google Research Chain-of-Thought Prompting | Applies |
 | `cognition_devin_workflow.md` | Cognition AI Devin Autonomous Software Engineering Standard | Applies |
@@ -39,20 +39,19 @@
 | `crewai_task_delegation.md` | CrewAI Multi-Agent Task Delegation Protocol | Applies |
 | `dspy_declarative_signatures.md` | Stanford DSPy Declarative Signature Standard | Not applicable |
 | `generative_agents_reflection.md` | Stanford Generative Agents Memory Reflection Standard | Applies |
-| `grok_reasoning_trace.md` | xAI Grok Reasoning Trace Protocol | Applies |
 | `huggingface_codeagent_actions.md` | Hugging Face Actions-as-Code Standard (CodeAgent) | Applies |
 | `ibm_granite_enterprise.md` | IBM Granite Enterprise Agent Standard | Applies |
 | `langgraph_state_machine.md` | LangChain/LangGraph Cyclic State Machine Standard | Applies |
+| `letta_memory_management.md` | Letta Memory Management Standard | Applies |
 | `mcp_apps_extension.md` | MCP Apps Extension | Not applicable |
 | `mcp_enterprise_managed_authorization.md` | MCP Enterprise-Managed Authorization | Not applicable |
-| `memgpt_os_memory.md` | MemGPT / Letta OS Memory Management Standard | Applies |
-| `meta_fair_safety.md` | Meta FAIR Agentic Safety Protocol | Applies |
-| `mistral_tool_binding.md` | Mistral AI Tool Binding Standard | Applies |
+| `meta_purple_llama_safety.md` | Meta Purple Llama Agentic Safety Standard | Applies |
+| `microsoft_agent_framework.md` | Microsoft Agent Framework Multi-Agent Orchestration Standard | Applies |
+| `mistral_function_calling.md` | Mistral AI Function Calling, Agents SDK & Managed Agents Standard | Applies |
 | `model_context_protocol.md` | Anthropic Model Context Protocol (MCP) | Applies |
-| `multi_agent_orchestration.md` | Microsoft AutoGen Multi-Agent Orchestration Protocol | Applies |
+| `openai_agents_sdk_safety.md` | OpenAI Agents SDK Guardrails & Tool Safety Standard | Applies |
 | `openai_harmony_response_format.md` | OpenAI Harmony Response Format | Not applicable |
 | `openai_model_spec.md` | OpenAI Model Spec | Applies |
-| `openai_tool_calling_safety.md` | OpenAI Swarm Tool Safety Protocol | Applies |
 | `openinference_specification.md` | Arize AI OpenInference Specification | Not applicable |
 | `owasp_agentic_security.md` | OWASP Top 10 for Agentic Applications & LLMs (ASI) | Applies |
 | `qwen_agent_interpreter.md` | Alibaba Qwen-Agent Code Interpreter Standard | Applies |
