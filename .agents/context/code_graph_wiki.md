@@ -1,6 +1,6 @@
 # AptReceipt Code Graph Wiki
 
-- **Last updated:** 2026-10-20
+- **Last updated:** 2026-11-08
 - **Scope:** AptReceipt (aptreceipt)
 - **Layout:** sources in `aptreceipt/`, unit tests in `aptreceiptTests/` (one XCTestCase class per area), runner `./run_all_tests_mac.command`.
 
@@ -73,7 +73,7 @@
 
 **Update checker**
 - `checkForUpdates` -> `URLSession` GET `releases/latest` -> `SemverCompare.isRemoteNewer(remote:local: AppInfo.version)` -> `status` (`.updateAvailable` / `.upToDate` / `.failed` via `UpdateCheckFailure`) and alerts when user-initiated.
-- `downloadUpdate` -> `fetchExpectedDigest` (`UpdateChecksums.parse`) -> `fetchSignature` -> `UpdateFileDownloader.download` -> `UpdateChecksums.sha256` -> `UpdateSignature.isValid` -> `moveToDownloads` -> open the DMG -> completed or failed alert.
+- `downloadUpdate` -> `downloadVerifiedUpdate` (`fetchExpectedDigest` (`UpdateChecksums.parse`) -> `fetchSignature` -> `UpdateFileDownloader.download` -> `UpdateChecksums.sha256` -> `UpdateSignature.isValid`) -> `moveToDownloads` -> open the DMG -> completed or failed alert. Every asset fetch goes through `withAssetFallback`: `browser_download_url` first, then once more through the asset's API URL (`acceptedAPIURL(for:)`, only `https://api.github.com/repos/berkbb/aptreceipt/releases/assets/…`, `Accept: application/octet-stream`) after a `URLError` or an HTTP 5xx (`shouldRetryThroughAPI(after:)`). The checker's `URLSession` is injectable (`GitHubUpdateChecker(session:)`); tests use `StubURLProtocol`.
 
 ## Impact map
 

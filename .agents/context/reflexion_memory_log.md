@@ -1,6 +1,6 @@
 # Reflexion Memory Log
 
-- **Last updated:** 2026-10-20
+- **Last updated:** 2026-11-08
 - **Scope:** AptReceipt (aptreceipt)
 
 Each entry: what happened, why, and the lesson to apply next time.
@@ -51,3 +51,8 @@ Each entry: what happened, why, and the lesson to apply next time.
 
 - **What:** 3.6.0 put the receipt as plain text in the QR code so phones could show it offline. Phone cameras offer "search the web" for plain text, so one tap sent the payer's name, amounts and building to a search engine.
 - **Lesson:** Check what the phone's camera does with a QR payload type before choosing it, and keep personal data out of anything a phone may hand to an online service. Receipts now carry only a code sealed with the installation key; the camera offers to copy it.
+
+## R-010 — One download host made every update fail (2026-11-08)
+
+- **What:** GitHub's Frankfurt edge answered HTTP 504 for every `releases/download` URL for hours while `api.github.com` kept working. The updater fetched the DMG, `SHA256SUMS.txt` and the `.sig` file only from `browser_download_url`, so Download Update failed for everyone in the region although the release was there.
+- **Lesson:** A release asset has two addresses; after a transport error or a 5xx on github.com, fetch it once more from the asset's API URL (`Accept: application/octet-stream`), accept that URL only for this repository, and keep the checksum and signature checks on whichever download succeeded. Keep the download seam injectable (`GitHubUpdateChecker(session:)`) so a stub `URLProtocol` can replay the outage in tests without the network.

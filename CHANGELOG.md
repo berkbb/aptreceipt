@@ -7,6 +7,9 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - **Agent rule files follow the current upstream standard names**: six files in `.agents/rules/` were renamed to their current upstream names (`letta_memory_management.md`, `microsoft_agent_framework.md`, `openai_agents_sdk_safety.md`, `aws_bedrock_agentcore.md`, `mistral_function_calling.md`, `meta_purple_llama_safety.md`); the unsourced Grok reasoning-trace file was retired and its directives moved into `chain_of_thought_prompting.md` and `openinference_specification.md`; the A2UI v1.0 and Mistral Agents SDK sources are recorded.
 
+### Fixed
+- **Update downloads survive a github.com outage**: on 2026-11-08 GitHub's Frankfurt edge answered HTTP 504 for every `releases/download` URL for hours while `api.github.com` kept working, so Download Update failed although the release was there. When the DMG, `SHA256SUMS.txt` or the `.sig` file cannot be fetched from github.com (a connection error or an HTTP 5xx; a 404 is still a plain failure), the same file is now fetched once more from the release asset's API URL (`https://api.github.com/repos/berkbb/aptreceipt/releases/assets/<id>`, `Accept: application/octet-stream`). An API URL that points at another repository or host is ignored, and the SHA-256 and Ed25519 signature checks run unchanged on whichever download succeeded.
+
 ## [3.7.1] - 2026-10-26
 
 ### Added
