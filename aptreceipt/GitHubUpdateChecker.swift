@@ -17,17 +17,31 @@ public struct GitHubReleaseAsset: Codable, Equatable {
     public let name: String
     public let browserDownloadUrl: String
     public let size: Int?
+    /// The asset's API URL (`https://api.github.com/repos/<owner>/<repo>/releases/assets/<id>`), used as a
+    /// second download source when github.com's release download edge fails.
+    public let apiUrl: String?
 
     enum CodingKeys: String, CodingKey {
         case name
         case browserDownloadUrl = "browser_download_url"
         case size
+        case apiUrl = "url"
     }
 
-    public init(name: String, browserDownloadUrl: String, size: Int? = nil) {
+    public init(name: String, browserDownloadUrl: String, size: Int? = nil, apiUrl: String? = nil) {
         self.name = name
         self.browserDownloadUrl = browserDownloadUrl
         self.size = size
+        self.apiUrl = apiUrl
+    }
+
+    /// The API URL of this asset, accepted only when it belongs to the expected repository, so a crafted
+    /// release JSON cannot point the fallback download at another host or repository.
+    public func apiDownloadURL(repoOwner: String, repoName: String) -> URL? {
+        guard let apiUrl, apiUrl.hasPrefix("https://api.github.com/repos/\(repoOwner)/\(repoName)/releases/assets/") else {
+            return nil
+        }
+        return URL(string: apiUrl)
     }
 }
 
@@ -205,15 +219,23 @@ public final class GitHubUpdateChecker: ObservableObject {
     @Published public var downloadingVersion: String = ""
 
     private var downloadTask: Task<Void, Never>? = nil
-    private let repoOwner = "berkbb"
-    private let repoName = "aptreceipt"
-    private let releasesURLString = "https://api.github.com/repos/berkbb/aptreceipt/releases/latest"
+    nonisolated static let repoOwner = "berkbb"
+    nonisolated static let repoName = "aptreceipt"
+    private let releasesURLString = "https://api.github.com/repos/\(GitHubUpdateChecker.repoOwner)/\(GitHubUpdateChecker.repoName)/releases/latest"
+    /// Session for the release check and the asset downloads; tests inject one with a stub `URLProtocol`.
+    private let session: URLSession
 
     public var currentAppVersion: String {
         AppInfo.version
     }
 
-    private init() {}
+    private var userAgent: String {
+        "AptReceipt-macOS/\(currentAppVersion)"
+    }
+
+    init(session: URLSession = .shared) {
+        self.session = session
+    }
 
     /// Checks for updates via GitHub Releases API.
     /// - Parameters:
@@ -240,11 +262,11 @@ public final class GitHubUpdateChecker: ObservableObject {
         request.httpMethod = "GET"
         request.timeoutInterval = 15.0
         request.setValue("application/vnd.github.v3+json", forHTTPHeaderField: "Accept")
-        request.setValue("AptReceipt-macOS/\(currentAppVersion)", forHTTPHeaderField: "User-Agent")
+        request.setValue(userAgent, forHTTPHeaderField: "User-Agent")
 
         Task {
             do {
-                let (data, response) = try await URLSession.shared.data(for: request)
+                let (data, response) = try await session.data(for: request)
                 self.lastCheckedDate = Date()
                 self.isChecking = false
 
@@ -341,25 +363,8 @@ public final class GitHubUpdateChecker: ObservableObject {
 
         downloadTask = Task {
             do {
-                let expectedDigest = try await self.fetchExpectedDigest(release: release, fileName: dmgAsset.name)
-                let signature = try await self.fetchSignature(release: release, asset: dmgAsset)
-                let tempURL = try await UpdateFileDownloader.download(from: dmgURL) { fraction in
-                    Task { @MainActor in self.downloadProgress = fraction }
-                }
+                let tempURL = try await self.downloadVerifiedUpdate(release: release, dmgAsset: dmgAsset, dmgURL: dmgURL)
                 defer { try? FileManager.default.removeItem(at: tempURL) }
-
-                if let expectedDigest {
-                    let actualDigest = try UpdateChecksums.sha256(of: tempURL)
-                    guard actualDigest == expectedDigest else {
-                        throw UpdateDownloadError.checksumMismatch
-                    }
-                }
-
-                if let signature {
-                    guard try UpdateSignature.isValid(fileURL: tempURL, signatureBase64: signature.value, publicKeyBase64: signature.publicKey) else {
-                        throw UpdateDownloadError.signatureInvalid
-                    }
-                }
 
                 let destinationURL = try Self.moveToDownloads(tempURL, fileName: dmgAsset.name)
                 self.finishDownload()
@@ -384,35 +389,141 @@ public final class GitHubUpdateChecker: ObservableObject {
         UpdateDownloadWindowManager.shared.close()
     }
 
+    /// Downloads the release DMG to a temporary file and verifies it against `SHA256SUMS.txt` and the
+    /// release's Ed25519 signature. Returns the verified file; the caller owns it. A file that fails
+    /// verification is deleted before the error is thrown. `publicKey` is the bundled key; tests inject their own.
+    func downloadVerifiedUpdate(
+        release: GitHubRelease,
+        dmgAsset: GitHubReleaseAsset,
+        dmgURL: URL,
+        publicKey: String? = UpdateSignature.bundledPublicKey
+    ) async throws -> URL {
+        let expectedDigest = try await fetchExpectedDigest(release: release, fileName: dmgAsset.name)
+        let signature = try await fetchSignature(release: release, asset: dmgAsset, publicKey: publicKey)
+        let configuration = session.configuration
+        let tempURL = try await withAssetFallback(dmgAsset, browserURL: dmgURL) { request in
+            try await UpdateFileDownloader.download(request, configuration: configuration) { fraction in
+                Task { @MainActor in self.downloadProgress = fraction }
+            }
+        }
+
+        do {
+            if let expectedDigest {
+                let actualDigest = try UpdateChecksums.sha256(of: tempURL)
+                guard actualDigest == expectedDigest else {
+                    throw UpdateDownloadError.checksumMismatch
+                }
+            }
+
+            if let signature {
+                guard try UpdateSignature.isValid(fileURL: tempURL, signatureBase64: signature.value, publicKeyBase64: signature.publicKey) else {
+                    throw UpdateDownloadError.signatureInvalid
+                }
+            }
+        } catch {
+            try? FileManager.default.removeItem(at: tempURL)
+            throw error
+        }
+        return tempURL
+    }
+
     /// Returns the expected digest for `fileName`, or nil when the release has no checksum file.
     private func fetchExpectedDigest(release: GitHubRelease, fileName: String) async throws -> String? {
         guard let checksumAsset = release.checksumAsset, let url = URL(string: checksumAsset.browserDownloadUrl) else {
             return nil
         }
-        let (data, response) = try await URLSession.shared.data(from: url)
-        guard (response as? HTTPURLResponse)?.statusCode == 200, let text = String(data: data, encoding: .utf8) else {
+        let data: Data
+        do {
+            data = try await fetchAssetData(checksumAsset, browserURL: url)
+        } catch UpdateDownloadError.badResponse {
             throw UpdateDownloadError.checksumUnavailable
         }
-        guard let digest = UpdateChecksums.parse(text)[fileName] else {
+        guard let text = String(data: data, encoding: .utf8), let digest = UpdateChecksums.parse(text)[fileName] else {
             throw UpdateDownloadError.checksumUnavailable
         }
         return digest
     }
 
-    /// Returns the release's signature for `asset` with the bundled public key, or nil when this build
-    /// has no public key. A release without a signature is rejected so it cannot bypass verification.
-    private func fetchSignature(release: GitHubRelease, asset: GitHubReleaseAsset) async throws -> (value: String, publicKey: String)? {
-        guard let publicKey = UpdateSignature.bundledPublicKey else {
+    /// Returns the release's signature for `asset` with `publicKey`, or nil when this build has no
+    /// public key. A release without a signature is rejected so it cannot bypass verification.
+    private func fetchSignature(release: GitHubRelease, asset: GitHubReleaseAsset, publicKey: String?) async throws -> (value: String, publicKey: String)? {
+        guard let publicKey else {
             return nil
         }
         guard let signatureAsset = release.signatureAsset(for: asset), let url = URL(string: signatureAsset.browserDownloadUrl) else {
             throw UpdateDownloadError.signatureMissing
         }
-        let (data, response) = try await URLSession.shared.data(from: url)
-        guard (response as? HTTPURLResponse)?.statusCode == 200, let text = String(data: data, encoding: .utf8) else {
+        let data: Data
+        do {
+            data = try await fetchAssetData(signatureAsset, browserURL: url)
+        } catch UpdateDownloadError.badResponse {
+            throw UpdateDownloadError.signatureMissing
+        }
+        guard let text = String(data: data, encoding: .utf8) else {
             throw UpdateDownloadError.signatureMissing
         }
         return (text, publicKey)
+    }
+
+    // MARK: - GitHub API Download Fallback
+
+    /// The asset's API URL when it belongs to this app's repository, otherwise nil.
+    nonisolated static func acceptedAPIURL(for asset: GitHubReleaseAsset) -> URL? {
+        asset.apiDownloadURL(repoOwner: repoOwner, repoName: repoName)
+    }
+
+    /// A download is retried through the API after a transport error or an HTTP 5xx from github.com,
+    /// as on the 2026-11-08 regional outage. A 404 or any other 4xx is a plain failure, and a cancelled
+    /// download stays cancelled.
+    nonisolated static func shouldRetryThroughAPI(after error: Error) -> Bool {
+        if let urlError = error as? URLError {
+            return urlError.code != .cancelled
+        }
+        if case .badResponse(let statusCode)? = error as? UpdateDownloadError {
+            return statusCode >= 500
+        }
+        return false
+    }
+
+    /// Builds the request for a release asset. API requests ask for the file itself (`Accept:
+    /// application/octet-stream`); GitHub then redirects to the storage host and URLSession follows.
+    private func assetRequest(url: URL, viaAPI: Bool) -> URLRequest {
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue(userAgent, forHTTPHeaderField: "User-Agent")
+        if viaAPI {
+            request.setValue("application/octet-stream", forHTTPHeaderField: "Accept")
+        }
+        return request
+    }
+
+    /// Runs `attempt` with the asset's `browser_download_url`; when that fails in a retryable way and the
+    /// asset has an API URL in this repository, runs it once more with the API URL.
+    private func withAssetFallback<T>(
+        _ asset: GitHubReleaseAsset,
+        browserURL: URL,
+        _ attempt: (URLRequest) async throws -> T
+    ) async throws -> T {
+        do {
+            return try await attempt(assetRequest(url: browserURL, viaAPI: false))
+        } catch {
+            guard Self.shouldRetryThroughAPI(after: error), !Task.isCancelled, let apiURL = Self.acceptedAPIURL(for: asset) else {
+                throw error
+            }
+            return try await attempt(assetRequest(url: apiURL, viaAPI: true))
+        }
+    }
+
+    /// Downloads a small release asset (checksums, signature) into memory; non-200 answers throw `badResponse`.
+    private func fetchAssetData(_ asset: GitHubReleaseAsset, browserURL: URL) async throws -> Data {
+        try await withAssetFallback(asset, browserURL: browserURL) { request in
+            let (data, response) = try await session.data(for: request)
+            let statusCode = (response as? HTTPURLResponse)?.statusCode ?? -1
+            guard statusCode == 200 else {
+                throw UpdateDownloadError.badResponse(statusCode: statusCode)
+            }
+            return data
+        }
     }
 
     /// Moves the downloaded file into ~/Downloads without overwriting existing files.
@@ -511,7 +622,7 @@ public final class GitHubUpdateChecker: ObservableObject {
         alert.addButton(withTitle: l10n.openReleasesPage)
 
         if alert.runModal() == .alertSecondButtonReturn {
-            if let releasesURL = URL(string: "https://github.com/\(repoOwner)/\(repoName)/releases") {
+            if let releasesURL = URL(string: "https://github.com/\(Self.repoOwner)/\(Self.repoName)/releases") {
                 NSWorkspace.shared.open(releasesURL)
             }
         }
@@ -627,16 +738,17 @@ final class UpdateFileDownloader: NSObject, URLSessionDownloadDelegate, @uncheck
         self.progressHandler = progressHandler
     }
 
-    /// Downloads `url` to a temporary file and returns its location. The caller owns the file.
-    static func download(from url: URL, progress: @escaping @Sendable (Double) -> Void) async throws -> URL {
-        try await UpdateFileDownloader(progressHandler: progress).start(url)
+    /// Downloads `request` to a temporary file and returns its location. The caller owns the file.
+    /// `configuration` comes from the checker's session so tests can route the download through a stub protocol.
+    static func download(_ request: URLRequest, configuration: URLSessionConfiguration = .default, progress: @escaping @Sendable (Double) -> Void) async throws -> URL {
+        try await UpdateFileDownloader(progressHandler: progress).start(request, configuration: configuration)
     }
 
-    private func start(_ url: URL) async throws -> URL {
+    private func start(_ request: URLRequest, configuration: URLSessionConfiguration) async throws -> URL {
         try await withTaskCancellationHandler {
             try await withCheckedThrowingContinuation { continuation in
-                let session = URLSession(configuration: .default, delegate: self, delegateQueue: nil)
-                let task = session.downloadTask(with: url)
+                let session = URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
+                let task = session.downloadTask(with: request)
                 lock.lock()
                 self.continuation = continuation
                 self.task = task

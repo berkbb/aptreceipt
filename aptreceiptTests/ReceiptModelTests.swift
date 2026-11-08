@@ -429,6 +429,174 @@ final class ReceiptModelTests: XCTestCase {
         XCTAssertNoThrow(try Curve25519.Signing.PublicKey(rawRepresentation: data))
     }
 
+    // MARK: - 4b. GitHub API Download Fallback (2026-11-08 regional outage)
+
+    private static let fallbackDMGName = "aptreceipt-9.9.9.dmg"
+    private static let browserBase = "https://github.com/berkbb/aptreceipt/releases/download/v9.9.9/"
+    private static let apiBase = "https://api.github.com/repos/berkbb/aptreceipt/releases/assets/"
+
+    func testGitHubReleaseAssetKeepsAPIURL() throws {
+        let json = """
+        {
+            "tag_name": "v9.9.9",
+            "html_url": "https://github.com/berkbb/aptreceipt/releases/tag/v9.9.9",
+            "assets": [
+                {
+                    "name": "aptreceipt-9.9.9.dmg",
+                    "url": "https://api.github.com/repos/berkbb/aptreceipt/releases/assets/101",
+                    "browser_download_url": "https://github.com/berkbb/aptreceipt/releases/download/v9.9.9/aptreceipt-9.9.9.dmg"
+                },
+                { "name": "SHA256SUMS.txt", "browser_download_url": "https://github.com/berkbb/aptreceipt/releases/download/v9.9.9/SHA256SUMS.txt" }
+            ]
+        }
+        """.data(using: .utf8)!
+
+        let release = try JSONDecoder().decode(GitHubRelease.self, from: json)
+        let dmg = try XCTUnwrap(release.dmgAsset)
+
+        XCTAssertEqual(dmg.browserDownloadUrl, "https://github.com/berkbb/aptreceipt/releases/download/v9.9.9/aptreceipt-9.9.9.dmg")
+        XCTAssertEqual(dmg.apiUrl, "https://api.github.com/repos/berkbb/aptreceipt/releases/assets/101")
+        XCTAssertEqual(GitHubUpdateChecker.acceptedAPIURL(for: dmg)?.absoluteString, "https://api.github.com/repos/berkbb/aptreceipt/releases/assets/101")
+        XCTAssertNil(release.checksumAsset?.apiUrl)
+        XCTAssertNil(GitHubUpdateChecker.acceptedAPIURL(for: try XCTUnwrap(release.checksumAsset)))
+    }
+
+    func testForeignAssetAPIURLIsDropped() {
+        let foreign = [
+            "https://api.github.com/repos/berkbb/other-app/releases/assets/101",
+            "https://api.github.com/repos/someone/aptreceipt/releases/assets/101",
+            "http://api.github.com/repos/berkbb/aptreceipt/releases/assets/101",
+            "https://api.github.com.example.net/repos/berkbb/aptreceipt/releases/assets/101",
+            "https://example.com/repos/berkbb/aptreceipt/releases/assets/101",
+            "https://api.github.com/repos/berkbb/aptreceipt/releases/101",
+        ]
+        for url in foreign {
+            let asset = GitHubReleaseAsset(name: "aptreceipt-9.9.9.dmg", browserDownloadUrl: "https://example.com/x.dmg", apiUrl: url)
+            XCTAssertNil(GitHubUpdateChecker.acceptedAPIURL(for: asset), url)
+        }
+        let accepted = GitHubReleaseAsset(name: "aptreceipt-9.9.9.dmg", browserDownloadUrl: "https://example.com/x.dmg", apiUrl: Self.apiBase + "7")
+        XCTAssertEqual(GitHubUpdateChecker.acceptedAPIURL(for: accepted)?.absoluteString, Self.apiBase + "7")
+    }
+
+    func testRetryThroughAPIOnlyAfterTransportErrorsAndServerErrors() {
+        XCTAssertTrue(GitHubUpdateChecker.shouldRetryThroughAPI(after: URLError(.cannotConnectToHost)))
+        XCTAssertTrue(GitHubUpdateChecker.shouldRetryThroughAPI(after: UpdateDownloadError.badResponse(statusCode: 500)))
+        XCTAssertTrue(GitHubUpdateChecker.shouldRetryThroughAPI(after: UpdateDownloadError.badResponse(statusCode: 504)))
+        XCTAssertFalse(GitHubUpdateChecker.shouldRetryThroughAPI(after: UpdateDownloadError.badResponse(statusCode: 404)))
+        XCTAssertFalse(GitHubUpdateChecker.shouldRetryThroughAPI(after: UpdateDownloadError.badResponse(statusCode: 403)))
+        XCTAssertFalse(GitHubUpdateChecker.shouldRetryThroughAPI(after: URLError(.cancelled)))
+        XCTAssertFalse(GitHubUpdateChecker.shouldRetryThroughAPI(after: UpdateDownloadError.checksumMismatch))
+        XCTAssertFalse(GitHubUpdateChecker.shouldRetryThroughAPI(after: CancellationError()))
+    }
+
+    /// A release whose three assets carry both URLs, with the stub answering as given.
+    private func makeFallbackRelease() -> (release: GitHubRelease, dmg: GitHubReleaseAsset) {
+        let dmg = GitHubReleaseAsset(name: Self.fallbackDMGName, browserDownloadUrl: Self.browserBase + Self.fallbackDMGName, apiUrl: Self.apiBase + "1")
+        let sums = GitHubReleaseAsset(name: GitHubRelease.checksumAssetName, browserDownloadUrl: Self.browserBase + GitHubRelease.checksumAssetName, apiUrl: Self.apiBase + "2")
+        let sig = GitHubReleaseAsset(name: Self.fallbackDMGName + ".sig", browserDownloadUrl: Self.browserBase + Self.fallbackDMGName + ".sig", apiUrl: Self.apiBase + "3")
+        let release = GitHubRelease(tagName: "v9.9.9", name: nil, body: nil, htmlUrl: "https://github.com/berkbb/aptreceipt/releases/tag/v9.9.9", assets: [dmg, sums, sig])
+        return (release, dmg)
+    }
+
+    @MainActor
+    private func makeStubbedChecker() -> GitHubUpdateChecker {
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [StubURLProtocol.self]
+        return GitHubUpdateChecker(session: URLSession(configuration: configuration))
+    }
+
+    @MainActor
+    func testUpdateDownloadFallsBackToAPIAfterServerError() async throws {
+        StubURLProtocol.reset()
+        defer { StubURLProtocol.reset() }
+
+        let payload = Data("aptreceipt disk image bytes".utf8)
+        let key = Curve25519.Signing.PrivateKey()
+        let publicKey = key.publicKey.rawRepresentation.base64EncodedString()
+        let signature = try key.signature(for: payload).base64EncodedString()
+        let digest = SHA256.hash(data: payload).map { String(format: "%02x", $0) }.joined()
+        let (release, dmg) = makeFallbackRelease()
+
+        // github.com's download edge answers 504 for everything; the API still serves the files.
+        for asset in release.assets {
+            StubURLProtocol.responses[asset.browserDownloadUrl] = .init(statusCode: 504, body: Data("<html>504</html>".utf8))
+        }
+        StubURLProtocol.responses[Self.apiBase + "1"] = .init(statusCode: 200, body: payload)
+        StubURLProtocol.responses[Self.apiBase + "2"] = .init(statusCode: 200, body: Data("\(digest)  \(Self.fallbackDMGName)\n".utf8))
+        StubURLProtocol.responses[Self.apiBase + "3"] = .init(statusCode: 200, body: Data((signature + "\n").utf8))
+
+        let checker = makeStubbedChecker()
+        let fileURL = try await checker.downloadVerifiedUpdate(release: release, dmgAsset: dmg, dmgURL: try XCTUnwrap(URL(string: dmg.browserDownloadUrl)), publicKey: publicKey)
+        defer { try? FileManager.default.removeItem(at: fileURL) }
+
+        XCTAssertEqual(try Data(contentsOf: fileURL), payload)
+
+        let requests = StubURLProtocol.requests
+        XCTAssertEqual(requests.count, 6, "each asset is tried once on github.com and once through the API")
+        for request in requests {
+            let url = try XCTUnwrap(request.url?.absoluteString)
+            XCTAssertTrue(request.value(forHTTPHeaderField: "User-Agent")?.hasPrefix("AptReceipt-macOS/") == true, url)
+            if url.hasPrefix(Self.apiBase) {
+                XCTAssertEqual(request.value(forHTTPHeaderField: "Accept"), "application/octet-stream", url)
+            } else {
+                XCTAssertNotEqual(request.value(forHTTPHeaderField: "Accept"), "application/octet-stream", url)
+            }
+        }
+        // Each API request follows its own failed github.com request.
+        let order = requests.compactMap { $0.url?.absoluteString }
+        XCTAssertEqual(order, [
+            Self.browserBase + GitHubRelease.checksumAssetName, Self.apiBase + "2",
+            Self.browserBase + Self.fallbackDMGName + ".sig", Self.apiBase + "3",
+            Self.browserBase + Self.fallbackDMGName, Self.apiBase + "1",
+        ])
+    }
+
+    @MainActor
+    func testUpdateDownloadFallbackStillRejectsWrongChecksum() async throws {
+        StubURLProtocol.reset()
+        defer { StubURLProtocol.reset() }
+
+        let payload = Data("aptreceipt disk image bytes".utf8)
+        let (release, dmg) = makeFallbackRelease()
+        for asset in release.assets {
+            StubURLProtocol.responses[asset.browserDownloadUrl] = .init(statusCode: 503, body: Data())
+        }
+        StubURLProtocol.responses[Self.apiBase + "1"] = .init(statusCode: 200, body: payload)
+        StubURLProtocol.responses[Self.apiBase + "2"] = .init(statusCode: 200, body: Data("\(String(repeating: "0", count: 64))  \(Self.fallbackDMGName)\n".utf8))
+
+        let checker = makeStubbedChecker()
+        do {
+            let fileURL = try await checker.downloadVerifiedUpdate(release: release, dmgAsset: dmg, dmgURL: try XCTUnwrap(URL(string: dmg.browserDownloadUrl)), publicKey: nil)
+            try? FileManager.default.removeItem(at: fileURL)
+            XCTFail("a file whose SHA-256 does not match SHA256SUMS.txt must be rejected")
+        } catch let error as UpdateDownloadError {
+            guard case .checksumMismatch = error else {
+                return XCTFail("unexpected error \(error)")
+            }
+        }
+        XCTAssertEqual(StubURLProtocol.requests.count, 4, "checksums and the DMG are each fetched twice; no signature without a public key")
+    }
+
+    @MainActor
+    func testUpdateDownloadDoesNotRetryThroughAPIAfterNotFound() async throws {
+        StubURLProtocol.reset()
+        defer { StubURLProtocol.reset() }
+
+        let (release, dmg) = makeFallbackRelease()
+        StubURLProtocol.responses[Self.browserBase + GitHubRelease.checksumAssetName] = .init(statusCode: 404, body: Data())
+
+        let checker = makeStubbedChecker()
+        do {
+            _ = try await checker.downloadVerifiedUpdate(release: release, dmgAsset: dmg, dmgURL: try XCTUnwrap(URL(string: dmg.browserDownloadUrl)), publicKey: nil)
+            XCTFail("a missing checksum file must fail the download")
+        } catch let error as UpdateDownloadError {
+            guard case .checksumUnavailable = error else {
+                return XCTFail("unexpected error \(error)")
+            }
+        }
+        XCTAssertEqual(StubURLProtocol.requests.compactMap { $0.url?.absoluteString }, [Self.browserBase + GitHubRelease.checksumAssetName])
+    }
+
     // MARK: - 5. Multi-Country Late Fee Profiles Tests
 
     func testLateFeeCountryProfiles() {
@@ -494,4 +662,55 @@ final class ReceiptModelTests: XCTestCase {
         XCTAssertEqual(decoded.lateFeeGracePeriodDays, 30)
         XCTAssertEqual(decoded.lateFeeCustomFootnote, "Penalități cf. Legea 196/2018")
     }
+}
+
+// MARK: - Stub URL Protocol
+
+/// Answers requests from an in-memory table so the update download runs without the network.
+/// Unknown URLs fail with `URLError(.cannotFindHost)`.
+final class StubURLProtocol: URLProtocol {
+    struct Response {
+        let statusCode: Int
+        let body: Data
+    }
+
+    private static let lock = NSLock()
+    private static var storedResponses: [String: Response] = [:]
+    private static var storedRequests: [URLRequest] = []
+
+    static var responses: [String: Response] {
+        get { lock.withLock { storedResponses } }
+        set { lock.withLock { storedResponses = newValue } }
+    }
+
+    static var requests: [URLRequest] {
+        lock.withLock { storedRequests }
+    }
+
+    static func reset() {
+        lock.withLock {
+            storedResponses = [:]
+            storedRequests = []
+        }
+    }
+
+    override class func canInit(with request: URLRequest) -> Bool { true }
+    override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
+
+    override func startLoading() {
+        let response = Self.lock.withLock { () -> Response? in
+            Self.storedRequests.append(request)
+            return request.url.flatMap { Self.storedResponses[$0.absoluteString] }
+        }
+        guard let url = request.url, let response else {
+            client?.urlProtocol(self, didFailWithError: URLError(.cannotFindHost))
+            return
+        }
+        let httpResponse = HTTPURLResponse(url: url, statusCode: response.statusCode, httpVersion: "HTTP/1.1", headerFields: ["Content-Length": String(response.body.count)])!
+        client?.urlProtocol(self, didReceive: httpResponse, cacheStoragePolicy: .notAllowed)
+        client?.urlProtocol(self, didLoad: response.body)
+        client?.urlProtocolDidFinishLoading(self)
+    }
+
+    override func stopLoading() {}
 }
